@@ -1,0 +1,62 @@
+{
+  "name": "@sentzunhat/zacatl",
+  "main": "src/index.ts",
+  "module": "src/index.ts",
+  "version": "0.0.1",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sentzunhat/zacatl.git"
+  },
+  "description": "",
+  "author": "Diego Beltran <beltrd@gmail.com> (https://sentzunhat.com)",
+  "contributors": [
+    {
+      "name": "Diego Beltran",
+      "url": "https://sentzunhat.com",
+      "email": "beltrd@gmail.com"
+    }
+  ],
+  "bugs": {
+    "url": "https://github.com/sentzunhat/zacatl/issues"
+  },
+  "scripts": {
+    "start": "npx tsx src/index.ts --project ./tsconfig.json",
+    "build": "tsc --project tsconfig.json",
+    "test": "NODE_ENV=test ENV=test vitest run",
+    "test:coverage": "npm run test -- --coverage",
+    "type:check": "tsc -p ./tsconfig.json && tsc -p test/tsconfig.json",
+    "lint": "DEBUG=eslint:cli-engine bun eslint ."
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3.3.1",
+    "@eslint/js": "^9.24.0",
+    "@types/config": "^3.3.5",
+    "@types/i18n": "^0.13.12",
+    "@types/node": "^22.7.4",
+    "@types/uuid": "^10.0.0",
+    "@typescript-eslint/parser": "^8.29.0",
+    "@vitest/coverage-istanbul": "^3.1.1",
+    "eslint": "^9.20.1",
+    "knip": "^5.47.0",
+    "tsx": "^4.19.1",
+    "typescript": "^5.6.2",
+    "typescript-eslint": "^8.29.0",
+    "vitest": "^3.1.1"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@fastify/http-proxy": "^9.5.0",
+    "config": "^3.3.12",
+    "fastify": "^5.0.0",
+    "fastify-type-provider-zod": "^4.0.2",
+    "i18n": "^0.15.1",
+    "mongodb-memory-server": "^10.1.4",
+    "mongoose": "^8.7.0",
+    "pino": "^9.4.0",
+    "pino-pretty": "^11.2.2",
+    "reflect-metadata": "^0.2.2",
+    "tsyringe": "^4.8.0",
+    "uuid": "^10.0.0",
+    "zod": "^3.24.2"
+  }
+}

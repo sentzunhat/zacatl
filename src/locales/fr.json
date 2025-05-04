@@ -1,0 +1,9 @@
+{
+  "ERROR_MESSAGES": {
+    "DEFAULT": "An error occurred.",
+    "VALIDATION": "Validation error: required fields are missing or invalid. Please review your input and ensure all fields meet the expected format."
+  },
+  "SUCCESS_MESSAGES": {
+    "DEFAULT": "Your request was processed successfully."
+  }
+}

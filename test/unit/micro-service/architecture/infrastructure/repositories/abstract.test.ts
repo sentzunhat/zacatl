@@ -1,0 +1,83 @@
+import { Schema } from "mongoose";
+import { singleton } from "tsyringe";
+
+import { BaseRepository } from "../../../../../../src/micro-service/architecture/infrastructure";
+import { connectToMongoServerAndRegisterDependency } from "../../../../helpers/database/mongo";
+
+interface UserTest {
+  name: string;
+}
+
+const schemaUserTest = new Schema<UserTest>({
+  name: { type: String, required: true },
+});
+
+@singleton()
+class UserRepository extends BaseRepository<UserTest> {
+  constructor() {
+    super({ name: "User", schema: schemaUserTest });
+  }
+}
+
+describe("BaseRepository", () => {
+  let repository: UserRepository;
+
+  beforeAll(async () => {
+    await connectToMongoServerAndRegisterDependency();
+
+    repository = new UserRepository();
+  });
+
+  it("should create a model using the provided name and schema", async () => {
+    expect(repository.model.modelName).toBe("User");
+    expect(repository.model.schema).toBe(schemaUserTest);
+  });
+
+  it("should call create() and return the created user document", async () => {
+    const user = { name: "Alice" };
+
+    const spyFunction = vi.spyOn(repository.model, "create");
+
+    const result = await repository.create(user);
+
+    expect(spyFunction).toHaveBeenNthCalledWith(1, user);
+    expect(result).toEqual(expect.objectContaining(user));
+  });
+
+  it("should call findById() and return the user document", async () => {
+    const user = await repository.create({ name: "Alice" });
+
+    const spyFunction = vi.spyOn(repository.model, "findById");
+
+    const result = await repository.findById(user.id);
+
+    expect(spyFunction).toHaveBeenNthCalledWith(1, user.id);
+    expect(result).toEqual(user);
+  });
+
+  it("should call update() and return the updated user document", async () => {
+    const user = await repository.create({ name: "Alice" });
+
+    const update = { name: "Alice Updated" };
+
+    const spyFunction = vi.spyOn(repository.model, "findByIdAndUpdate");
+
+    const result = await repository.update(user.id, update);
+
+    expect(spyFunction).toHaveBeenNthCalledWith(1, user.id, update, {
+      new: true,
+    });
+    expect(result).toEqual(expect.objectContaining(update));
+  });
+
+  it("should call delete() and return the deleted user document", async () => {
+    const user = await repository.create({ name: "Alice" });
+
+    const spyFunction = vi.spyOn(repository.model, "findByIdAndDelete");
+
+    const result = await repository.delete(user.id);
+
+    expect(spyFunction).toHaveBeenNthCalledWith(1, user.id);
+    expect(result).toEqual(user);
+  });
+});
