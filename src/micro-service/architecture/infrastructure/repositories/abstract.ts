@@ -1,41 +1,38 @@
 import importedMongoose, {
   connection,
   Model,
-  Document,
   Mongoose,
   Schema,
-  Types,
 } from "mongoose";
 import { v4 as uuidv4 } from "uuid";
 import { container } from "tsyringe";
 
-export type BaseRepositoryConfig<T> = {
+export type BaseRepositoryConfig<D> = {
   name?: string;
-  schema: Schema<T>;
+  schema: Schema<D>;
 };
 
-export type TDocument<T> = Document<Types.ObjectId, {}, T> &
-  T & {
-    id: string;
-  };
-
-export type TRequiredId<T> = T & {
-  _id: Types.ObjectId;
+export type LeanDocument<T> = T & {
+  id: string;
+  createdAt: Date;
+  updatedAt: Date;
 };
 
-export type Repository<T> = {
-  model: Model<T>;
+// D - Document, meant for Database representation
+// T - Type, meant for TypeScript representation
+export type Repository<D, T> = {
+  model: Model<D>;
 
-  findById(id: string): Promise<TDocument<T> | null>;
-  create(entity: T): Promise<TDocument<T>>;
-  update(id: string, entity: Partial<T>): Promise<TDocument<T> | null>;
-  delete(id: string): Promise<TDocument<T> | null>;
+  findById(id: string): Promise<LeanDocument<T> | null>;
+  create(entity: D): Promise<LeanDocument<T>>;
+  update(id: string, update: Partial<D>): Promise<LeanDocument<T> | null>;
+  delete(id: string): Promise<LeanDocument<T> | null>;
 };
 
-export abstract class BaseRepository<T> implements Repository<T> {
-  public model: Model<T>;
+export abstract class BaseRepository<D, T> implements Repository<D, T> {
+  public readonly model: Model<D>;
 
-  constructor(config: BaseRepositoryConfig<T>) {
+  constructor(config: BaseRepositoryConfig<D>) {
     const mongoose = connection.db?.databaseName
       ? importedMongoose
       : container.resolve<Mongoose>(Mongoose);
@@ -43,9 +40,9 @@ export abstract class BaseRepository<T> implements Repository<T> {
     const { name, schema } = config;
 
     if (name) {
-      this.model = mongoose.model<T>(name, schema);
+      this.model = mongoose.model<D>(name, schema);
     } else {
-      this.model = mongoose.model<T>(uuidv4(), schema);
+      this.model = mongoose.model<D>(uuidv4(), schema);
     }
 
     this.model.createCollection();
@@ -53,59 +50,51 @@ export abstract class BaseRepository<T> implements Repository<T> {
     this.model.init();
   }
 
-  /**
-   * Transforms a Mongoose document into a plain entity object.
-   */
-  protected toEntity(doc: TDocument<T>): TRequiredId<T> {
-    // We call the built-in toObject method and cast to T.
-    return doc.toObject<TDocument<T>>({ virtuals: true }) as TRequiredId<T>;
-  }
-
-  async findById(id: string): Promise<TDocument<T> | null> {
-    const foundEntity = await this.model.findById<TDocument<T>>(id).exec();
-
-    if (!foundEntity) {
-      return null;
-    }
-
-    return foundEntity.toObject<TDocument<T>>({
-      virtuals: true,
-    });
-  }
-
-  async create(entity: T): Promise<TDocument<T>> {
-    const createdEntity = await this.model.create<TDocument<T>>(entity);
-
-    return createdEntity.toObject<TDocument<T>>({
-      virtuals: true,
-    });
-  }
-
-  async update(id: string, entity: Partial<T>): Promise<TDocument<T> | null> {
-    const updatedEntity = await this.model
-      .findByIdAndUpdate<TDocument<T>>(id, entity, { new: true })
+  async findById(id: string): Promise<LeanDocument<T> | null> {
+    const entity = await this.model
+      .findById(id)
+      .lean<LeanDocument<T>>({ virtuals: true })
       .exec();
 
-    if (!updatedEntity) {
+    if (!entity) {
       return null;
     }
 
-    return updatedEntity.toObject<TDocument<T>>({
-      virtuals: true,
-    });
+    return entity;
   }
 
-  async delete(id: string): Promise<TDocument<T> | null> {
-    const deletedEntity = await this.model
-      .findByIdAndDelete<TDocument<T>>(id)
+  async create(entity: D): Promise<LeanDocument<T>> {
+    const doc = await this.model.create(entity);
+
+    return doc.toObject<LeanDocument<T>>({ virtuals: true });
+  }
+
+  async update(
+    id: string,
+    update: Partial<D>
+  ): Promise<LeanDocument<T> | null> {
+    const entity = await this.model
+      .findByIdAndUpdate(id, update, { new: true })
+      .lean<LeanDocument<T>>({ virtuals: true })
       .exec();
 
-    if (!deletedEntity) {
+    if (!entity) {
       return null;
     }
 
-    return deletedEntity.toObject<TDocument<T>>({
-      virtuals: true,
-    });
+    return entity;
+  }
+
+  async delete(id: string): Promise<LeanDocument<T> | null> {
+    const entity = await this.model
+      .findByIdAndDelete(id)
+      .lean<LeanDocument<T>>({ virtuals: true })
+      .exec();
+
+    if (!entity) {
+      return null;
+    }
+
+    return entity;
   }
 }
