@@ -2,7 +2,7 @@
   "name": "@sentzunhat/zacatl",
   "main": "src/index.ts",
   "module": "src/index.ts",
-  "version": "0.0.3",
+  "version": "0.0.5",
   "repository": {
     "type": "git",
     "url": "https://github.com/sentzunhat/zacatl.git"
@@ -45,18 +45,18 @@
   },
   "license": "MIT",
   "dependencies": {
-    "@fastify/http-proxy": "^9.5.0",
-    "config": "^3.3.12",
-    "fastify": "^5.0.0",
+    "@fastify/http-proxy": "^11.1.2",
+    "config": "^4.0.0",
+    "fastify": "^5.3.3",
     "fastify-type-provider-zod": "^4.0.2",
     "i18n": "^0.15.1",
     "mongodb-memory-server": "^10.1.4",
-    "mongoose": "^8.7.0",
-    "pino": "^9.4.0",
-    "pino-pretty": "^11.2.2",
+    "mongoose": "^8.15.0",
+    "pino": "^9.7.0",
+    "pino-pretty": "^13.0.0",
     "reflect-metadata": "^0.2.2",
-    "tsyringe": "^4.8.0",
-    "uuid": "^10.0.0",
-    "zod": "^3.24.2"
+    "tsyringe": "^4.10.0",
+    "uuid": "^11.1.0",
+    "zod": "^3.25.28"
   }
 }
