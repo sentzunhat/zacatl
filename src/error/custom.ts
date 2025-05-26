@@ -42,7 +42,6 @@ export class CustomError extends Error {
 
   constructor({ message, code, reason, metadata, error }: CustomErrorArgs) {
     super(message);
-
     this.id = uuidv4();
     this.custom = true;
     this.name = this.constructor.name;

@@ -1,0 +1,29 @@
+# Zacatl Project: MongoDB Schema Design Guidelines
+
+origin: mongodb_schema_design_guidelines.md
+source: MongoDB_schema_design_guidelines.pdf
+
+principles:
+  - favor_embedding:
+      rule: Embed related data within a single document when possible to improve performance by reducing the need for joins/queries.
+      rationale: Embedded documents ensure related data is retrieved together, enhancing read performance for one-to-few/one-to-many relationships.
+  - minimalism_and_simplicity:
+      rule: Design schemas with simplicity and minimalism. Use nested objects to reflect natural data hierarchies.
+      rationale: Minimal schemas are easier to understand, maintain, and scale.
+  - property_naming:
+      rule: Use single-word property names when possible; otherwise, limit to two words.
+      rationale: Short, concise property names reduce errors and improve readability.
+  - document_size_and_cardinality:
+      rule: Keep document size within MongoDB’s 16MB limit. Avoid embedding data that could grow unbounded (high-cardinality relationships).
+      rationale: Large documents degrade performance and complicate replication/backup. Use references for large/independent data.
+  - lifecycle_consistency:
+      rule: Embed data only if it shares a lifecycle with the parent document. Use references if embedded data is accessed/updated independently.
+      rationale: Aligning lifecycles ensures consistent, predictable schema behavior.
+
+flexibility:
+  - These guidelines are best practices and should be adapted to specific application requirements and data access patterns.
+  - The recommendation for concise property names is flexible, but clarity and consistency are critical.
+
+conclusion:
+  - Following these guidelines will help ensure MongoDB schemas are optimized for performance, maintainability, and scalability.
+  - Adapt as needed for your application’s needs.

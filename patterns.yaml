@@ -1,0 +1,55 @@
+# Zacatl Project: Coding Patterns and Architectural Practices
+
+origin:
+  - coding_standards.md
+  - coding_standards.pdf
+  - README.md (patterns section)
+
+patterns:
+  - hexagonal_architecture:
+      description: |
+        Structure the application to separate core business logic from external dependencies using Ports and Adapters. Core logic is in the Domain layer, with Application, Infrastructure, and Platform layers handling entry points, persistence, and orchestration.
+      source: coding_standards.pdf
+  - object_oriented_programming:
+      description: |
+        Use classes to encapsulate state and behavior, especially for providers, repositories, and server classes. Follows OOP principles for modularity and encapsulation.
+      source: coding_standards.pdf
+  - functional_programming:
+      description: |
+        Use pure functions and higher-order functions for stateless operations and utility logic. Prefer immutability and function composition where possible.
+      source: coding_standards.pdf
+  - dependency_injection:
+      description: |
+        Use tsyringe for DI. Register all services, repositories, and handlers in the DI container. Never instantiate dependencies directly; always resolve via DI. Promotes modularity, flexibility, and testability.
+      source: coding_standards.pdf
+  - modular_server_design:
+      description: |
+        Server classes (e.g., ModularServer, FastifyServer) accept dependencies (Fastify, providers, databases, etc.) via constructor injection. Route registration and DI setup are centralized.
+      source: coding_standards.pdf
+  - centralized_configuration:
+      description: |
+        Use a DI container to register and configure dependencies (providers, repositories, Fastify instances, etc.). Server initialization is performed by resolving the server from the DI container and starting it on a specified port.
+      source: coding_standards.pdf
+  - error_handling:
+      description: |
+        All custom errors extend CustomError. Use CustomError.handle(error) in middleware or route handlers to log/format errors. Always include relevant metadata and a clear message. Let errors bubble up to Fastify’s error handler unless custom handling is needed.
+      source: README.md
+  - validation:
+      description: |
+        Use zod schemas for all request/response validation. Place validation logic in the Application layer.
+      source: README.md
+  - testing:
+      description: |
+        Use vitest for all tests. Place tests in test/, mirroring src/ structure. Write unit tests for all logic. Mock all external dependencies (DB, services) in tests. Use descriptive test names and group related tests in files named after the module under test.
+      source: README.md
+
+best_practices:
+  - clean_code:
+      description: Write clean, modular, and straightforward code with meaningful names and strong typing. Use the latest language features and avoid redundancy (DRY principle).
+      source: coding_standards.pdf
+  - security_and_ethics:
+      description: Validate all inputs, handle errors gracefully, and never expose sensitive data. Code should be secure, efficient, and ethical.
+      source: coding_standards.pdf
+  - minimal_comments:
+      description: Prefer clarity in code and tests over excessive comments. Use comments only when necessary for context.
+      source: coding_standards.pdf

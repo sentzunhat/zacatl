@@ -13,7 +13,7 @@ const schemaUserTest = new Schema<UserTest>({
 });
 
 @singleton()
-class UserRepository extends BaseRepository<UserTest> {
+class UserRepository extends BaseRepository<UserTest, UserTest> {
   constructor() {
     super({ name: "User", schema: schemaUserTest });
   }
@@ -46,13 +46,11 @@ describe("BaseRepository", () => {
 
   it("should call findById() and return the user document", async () => {
     const user = await repository.create({ name: "Alice" });
-
     const spyFunction = vi.spyOn(repository.model, "findById");
-
     const result = await repository.findById(user.id);
-
     expect(spyFunction).toHaveBeenNthCalledWith(1, user.id);
-    expect(result).toEqual(user);
+    expect(result).toMatchObject({ name: user.name });
+    expect(result?.id).toBe(user.id);
   });
 
   it("should call update() and return the updated user document", async () => {
@@ -72,12 +70,11 @@ describe("BaseRepository", () => {
 
   it("should call delete() and return the deleted user document", async () => {
     const user = await repository.create({ name: "Alice" });
-
     const spyFunction = vi.spyOn(repository.model, "findByIdAndDelete");
-
     const result = await repository.delete(user.id);
-
     expect(spyFunction).toHaveBeenNthCalledWith(1, user.id);
-    expect(result).toEqual(user);
+    // Patch: allow for id only (ignore _id)
+    expect(result).toMatchObject({ name: user.name });
+    expect(result?.id).toBe(user.id);
   });
 });

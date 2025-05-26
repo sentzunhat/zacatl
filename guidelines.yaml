@@ -1,0 +1,74 @@
+# Zacatl Project: Coding Guidelines & Best Practices
+
+naming:
+  file_folder:
+    - Use lowercase and hyphens (e.g., user-repository.ts, route-handlers/)
+  variables:
+    - Use meaningful, descriptive names
+  classes:
+    - Use PascalCase for class names
+  functions:
+    - Use camelCase for function and method names
+
+style:
+  - Write clean, modular, and straightforward code
+  - Use strong typing and TypeScript generics where appropriate
+  - Prefer async/await for asynchronous code
+  - Keep functions short, focused, and readable
+  - Prefer clarity over excessive comments; use tests to document behavior
+  - Avoid code duplication (DRY principle); extract reusable logic into utils/ or shared services
+  - Use modern TypeScript/ES features
+
+architecture:
+  - Follow layered (hexagonal) architecture: Platform → Application → Domain → Infrastructure
+  - Strict separation of concerns between layers
+  - Application: Handles HTTP, validation, delegates to domain
+  - Domain: Pure business logic, no infrastructure dependencies
+  - Infrastructure: Persistence, external integrations
+  - Platform: Bootstraps, configures DI, starts server
+
+patterns:
+  dependency_injection:
+    - Use tsyringe for all DI
+    - Register all services, repositories, and handlers in the DI container
+    - Never instantiate dependencies directly; always resolve via DI
+  error_handling:
+    - All custom errors extend CustomError (src/error/custom.ts)
+    - Use CustomError.handle(error) in middleware or route handlers to log/format errors
+    - Always include relevant metadata and a clear message in error instances
+    - Throw errors for exceptional cases; do not return error objects
+    - Let errors bubble up to Fastify’s error handler unless custom handling is needed
+  validation:
+    - Use zod schemas for all request/response validation
+  testing:
+    - Use vitest for all tests
+    - Place tests in test/, mirroring src/ structure
+    - Write unit tests for all logic
+    - Mock all external dependencies (DB, services) in tests
+    - Use descriptive test names and group related tests in files named after the module under test
+    - Run tests using the vitest CLI
+  documentation:
+    - Update context.yaml and guidelines.yaml with any new patterns, conventions, or architectural changes
+    - Document new features, patterns, or conventions in YAML, not Markdown
+
+mongodb:
+  - Define all schemas in infrastructure/repositories/
+  - Embed related data for performance when possible
+  - Keep schemas minimal and use concise property names
+  - Use references for large or independent data
+  - Ensure documents stay well below MongoDB’s 16MB limit
+  - Define indexes for frequently queried fields
+  - Use Mongoose and zod for schema and runtime validation
+  - Consider schema versioning for breaking changes
+
+extending:
+  - Add new features by creating new handlers, services, or repositories in the appropriate layer
+  - Register all new classes in the DI container
+  - Write tests for all new logic
+  - Update context.yaml and guidelines.yaml with new patterns or conventions
+
+security:
+  - Validate all inputs
+  - Handle errors gracefully
+  - Never expose sensitive data
+  - Sanitize and validate all external data
