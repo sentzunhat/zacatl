@@ -4,24 +4,24 @@ Welcome to Zacatl! This project uses structured YAML documentation for all conte
 
 ## Getting Started
 
-- **Project context, architecture, and component summaries:**  
+- **Project context, architecture, and component summaries:**
   See [`context.yaml`](./context.yaml)
-- **Coding standards, naming conventions, and best practices:**  
+- **Coding standards, naming conventions, and best practices:**
   See [`guidelines.yaml`](./guidelines.yaml)
-- **Design and usage patterns:**  
+- **Design and usage patterns:**
   See [`patterns.yaml`](./patterns.yaml)
-- **MongoDB schema design guidelines:**  
+- **MongoDB schema design guidelines:**
   See [`mongodb.yaml`](./mongodb.yaml)
 
 ## Setup
 
 1. Install dependencies:
    ```zsh
-   bun i
+   npm install
    ```
 2. Run tests:
    ```zsh
-   bun test
+   npm test
    ```
 3. Explore the codebase, starting from `src/`.
 
@@ -32,7 +32,3 @@ Welcome to Zacatl! This project uses structured YAML documentation for all conte
 - Place all tests in the `test/` directory, mirroring the `src/` structure.
 
 For any questions, refer to the YAML documentation or contact the maintainers.
-
----
-
-_This file replaces the previous Markdown documentation. For all details, see the YAML files above._
