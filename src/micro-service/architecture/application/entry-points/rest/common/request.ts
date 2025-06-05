@@ -1,17 +1,16 @@
-import { z } from "zod";
 import { IncomingMessage } from "http";
 import { FastifySchema, FastifyRequest, RawServerBase } from "fastify";
 
 export type Request<
   TBody,
-  TQuerystring = z.ZodSchema<Record<string, string>>,
+  TQuerystring = Record<string, string>,
   TParams = void
 > = FastifyRequest<
   {
     Body: TBody;
     Querystring: TQuerystring;
     Params: TParams;
-    Headers: z.ZodSchema<Record<string, string>>;
+    Headers: Record<string, string>;
   },
   RawServerBase,
   IncomingMessage,
