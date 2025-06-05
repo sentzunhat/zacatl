@@ -3,7 +3,7 @@ import { FastifySchema, FastifyRequest, RawServerBase } from "fastify";
 
 export type Request<
   TBody,
-  TQuerystring = Record<string, string>,
+  TQuerystring = void,
   TParams = void
 > = FastifyRequest<
   {
