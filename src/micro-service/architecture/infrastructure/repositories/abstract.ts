@@ -7,6 +7,7 @@ import importedMongoose, {
   Schema,
   Default__v,
   Require_id,
+  ObjectId,
 } from "mongoose";
 import { v4 as uuidv4 } from "uuid";
 import { container } from "tsyringe";
@@ -17,6 +18,14 @@ export type BaseRepositoryConfig<D> = {
 };
 
 export type WithMongooseMeta<T> = Default__v<Require_id<T>>;
+
+export type MongooseDocument<Db> = Document<
+  ObjectId,
+  {},
+  Db,
+  Record<string, string>
+> &
+  WithMongooseMeta<Db>;
 
 export type LeanWithMeta<T> = WithMongooseMeta<T> & {
   id: string;
@@ -31,9 +40,9 @@ export type LeanDocument<T> = T & {
 };
 
 export type MongooseDoc<Db> = IfAny<
-  Db,
-  unknown,
-  Document<unknown, {}, Db, {}> & WithMongooseMeta<Db>
+  MongooseDocument<Db>,
+  MongooseDocument<Db>,
+  MongooseDocument<Db>
 >;
 
 export type ToLeanInput<D, T> =
@@ -47,6 +56,7 @@ export type ToLeanInput<D, T> =
 export type Repository<D, T> = {
   model: Model<D>;
 
+  toLean(input: ToLeanInput<D, T>): LeanDocument<T> | null;
   findById(id: string): Promise<LeanDocument<T> | null>;
   create(entity: D): Promise<LeanDocument<T>>;
   update(id: string, update: Partial<D>): Promise<LeanDocument<T> | null>;
@@ -62,12 +72,15 @@ export abstract class BaseRepository<D, T> implements Repository<D, T> {
     const mongoose = connection.db?.databaseName
       ? importedMongoose
       : container.resolve<Mongoose>(Mongoose);
+
     const { name, schema } = this.config;
+
     if (name) {
       this.model = mongoose.model<D>(name, schema);
     } else {
       this.model = mongoose.model<D>(uuidv4(), schema);
     }
+
     this.model.createCollection();
     this.model.createIndexes();
     this.model.init();
@@ -77,20 +90,17 @@ export abstract class BaseRepository<D, T> implements Repository<D, T> {
    * Ensures the returned document has the correct id, createdAt, and updatedAt fields.
    * Accepts a Mongoose document, a plain object, or a result from .lean().
    */
-  private toLean(input: ToLeanInput<D, T>): LeanDocument<T> | null {
+  public toLean(input: ToLeanInput<D, T>): LeanDocument<T> | null {
     if (!input) {
       return null;
     }
 
     let base: LeanWithMeta<T>;
 
-    if (
-      Object.prototype.hasOwnProperty.call(input, "toObject") &&
-      typeof (input as unknown as { toObject: unknown }).toObject === "function"
-    ) {
-      base = (
-        input as Document<unknown, {}, D, {}> & WithMongooseMeta<D>
-      ).toObject<LeanDocument<T>>({ virtuals: true });
+    if (typeof (input as MongooseDoc<D>).toObject === "function") {
+      base = (input as MongooseDoc<D>).toObject<LeanDocument<T>>({
+        virtuals: true,
+      });
     } else {
       base = input as LeanWithMeta<T>;
     }
@@ -132,11 +142,15 @@ export abstract class BaseRepository<D, T> implements Repository<D, T> {
   }
 
   async create(entity: D): Promise<LeanDocument<T>> {
-    const doc = await this.model.create(entity);
+    const document = await this.model.create<D>(entity);
 
-    doc.toObject();
+    const leanDocument = this.toLean(document as MongooseDoc<D>);
 
-    return this.toLean(doc)!;
+    if (!leanDocument) {
+      throw new Error("failed to create document");
+    }
+
+    return leanDocument;
   }
 
   async update(

@@ -10,9 +10,17 @@ import {
   createFakeFastifyRequest,
 } from "../../../../../../helpers/common/common";
 
-class TestPostRouteHandler extends PostRouteHandler<unknown, string, unknown> {
-  async handler(_: unknown, __: unknown): Promise<string> {
-    return "Test POST response";
+class TestPostRouteHandler extends PostRouteHandler<{}, {}, {}, {}> {
+  constructor() {
+    super({
+      url: "/post-test",
+      schema: {}, // Use an empty schema for test purposes.
+    });
+  }
+
+  handler(_: Request<{}, {}, {}>): {} | Promise<{}> {
+    // Dummy implementation
+    return {};
   }
 }
 
@@ -20,12 +28,9 @@ describe("PostRouteHandler", () => {
   it("executes POST handler and sends proper response", async () => {
     vi.spyOn(i18n, "__").mockReturnValue("Default success POST");
 
-    const testHandler = new TestPostRouteHandler({
-      url: "/post-test",
-      schema: {}, // Use an empty schema for test purposes.
-    });
+    const testHandler = new TestPostRouteHandler();
 
-    const fakeRequest = createFakeFastifyRequest() as Request<unknown, string>;
+    const fakeRequest = createFakeFastifyRequest() as Request<{}, {}, {}>;
     const fakeReply = createFakeFastifyReply();
 
     await testHandler.execute(fakeRequest, fakeReply);
@@ -34,7 +39,7 @@ describe("PostRouteHandler", () => {
     expect(fakeReply.send).toHaveBeenCalledWith({
       ok: true,
       message: "Default success POST",
-      data: "Test POST response",
+      data: {},
     });
   });
 });

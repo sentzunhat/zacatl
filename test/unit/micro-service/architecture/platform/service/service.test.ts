@@ -146,6 +146,8 @@ describe("Service", () => {
       const port = 3000;
       const service = new Service(config);
 
+      await service.configureDatabases();
+
       await service.start({ port });
 
       expect(
@@ -184,15 +186,13 @@ describe("Service", () => {
     });
 
     it("should throw an error if database configuration fails", async () => {
-      const port = 3000;
-
       strategiesForDatabaseVendor[DatabaseVendor.MONGOOSE] = originalDbStrategy;
 
       fakeMongoose.connect.mockRejectedValue(new Error("db connect failed"));
 
       const service = new Service(config);
 
-      await expect(service.start({ port })).rejects.toThrow(
+      await expect(service.configureDatabases()).rejects.toThrow(
         "failed to configure database for service"
       );
     });

@@ -5,6 +5,20 @@ import { HTTPMethods, FastifySchema, FastifyReply } from "fastify";
 import { RouteHandler } from "./route-handler";
 import { Request } from "../common/request";
 
+export type RouteSchema<
+  TBody = void,
+  TQuerystring = Record<string, string>,
+  TParams = Record<string, string>,
+  THeaders = Record<string, string>,
+  TResponse = void
+> = {
+  body?: z.ZodSchema<TBody>;
+  querystring?: z.ZodSchema<TQuerystring>;
+  params?: z.ZodSchema<TParams>;
+  headers?: z.ZodSchema<THeaders>;
+  response?: z.ZodSchema<TResponse>;
+};
+
 export type AbstractRouteHandlerConstructor = {
   url: string;
   method: HTTPMethods;
@@ -15,9 +29,9 @@ export type HandlerOutput<TResponse> = TResponse;
 
 export abstract class AbstractRouteHandler<
   TBody = void,
-  TQuerystring = z.ZodSchema<Record<string, string>>,
+  TQuerystring = Record<string, string>,
   TResponse = void,
-  TParams = void
+  TParams = Record<string, string>
 > implements RouteHandler<TBody, TQuerystring, TParams>
 {
   public url: string;

@@ -1,6 +1,4 @@
-import { z } from "zod";
 import { FastifySchema } from "fastify";
-
 import { AbstractRouteHandler } from "./abstract";
 
 export type PostRouteHandlerConstructor = {
@@ -9,10 +7,10 @@ export type PostRouteHandlerConstructor = {
 };
 
 export abstract class PostRouteHandler<
-  TBody = never,
-  TResponse = never,
-  TQuerystring = z.ZodSchema<Record<string, string>>,
-  TParams = void
+  TBody = unknown,
+  TResponse = unknown,
+  TQuerystring = Record<string, string>,
+  TParams = Record<string, string>
 > extends AbstractRouteHandler<TBody, TQuerystring, TResponse, TParams> {
   constructor(args: PostRouteHandlerConstructor) {
     super({

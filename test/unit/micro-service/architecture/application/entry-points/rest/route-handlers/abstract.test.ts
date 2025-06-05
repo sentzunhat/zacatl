@@ -10,9 +10,29 @@ import {
   Request,
 } from "../../../../../../../../src/micro-service/architecture/application";
 
-class TestRouteHandler extends AbstractRouteHandler<unknown, string, unknown> {
-  async handler(_: unknown, __: unknown): Promise<string> {
-    return "Test Data";
+class TestRouteHandler extends AbstractRouteHandler<
+  void, // Body
+  Record<string, string>, // Querystring
+  void, // Params
+  void // Response
+> {
+  constructor() {
+    super({
+      url: "/",
+      schema: {},
+      method: "GET",
+    });
+  }
+
+  handler(
+    _: Request<
+      void, // Body
+      Record<string, string>, // Querystring
+      void // Params
+    >
+  ): void | Promise<void> {
+    // Dummy implementation
+    return;
   }
 }
 
@@ -20,15 +40,15 @@ describe("AbstractRouteHandler", () => {
   it("executes the handler and sends the proper response", async () => {
     vi.spyOn(i18n, "__").mockReturnValue("Default success");
 
-    const fakeRequest = createFakeFastifyRequest() as Request<unknown, string>;
+    const fakeRequest = createFakeFastifyRequest() as Request<
+      void, // Body
+      Record<string, string>, // Querystring
+      void // Params
+    >;
 
     const fakeReply: any = createFakeFastifyReply();
 
-    const testHandler = new TestRouteHandler({
-      url: "/test",
-      method: "GET",
-      schema: {},
-    });
+    const testHandler = new TestRouteHandler();
 
     await testHandler.execute(fakeRequest, fakeReply);
 
@@ -36,7 +56,7 @@ describe("AbstractRouteHandler", () => {
     expect(fakeReply.send).toHaveBeenCalledWith({
       ok: true,
       message: "Default success",
-      data: "Test Data",
+      data: undefined,
     });
   });
 });

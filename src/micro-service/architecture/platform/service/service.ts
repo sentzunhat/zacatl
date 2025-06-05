@@ -206,6 +206,10 @@ export class Service implements ServicePort {
   }
 
   public async configureDatabases(): Promise<void> {
+    if (!this.databases || this.databases.length === 0) {
+      return; // No databases to configure
+    }
+
     for (const database of this.databases) {
       const strategy = strategiesForDatabaseVendor[database.vendor];
 

@@ -16,7 +16,14 @@ class DummyHookHandler implements HookHandler {
   async execute(_: FastifyRequest): Promise<void> {}
 }
 
-class DummyRouteHandler extends AbstractRouteHandler {
+import { FastifyReply } from "fastify";
+
+class DummyRouteHandler extends AbstractRouteHandler<
+  void, // Body
+  Record<string, string>, // Querystring
+  void, // Params
+  void // Response
+> {
   constructor() {
     super({
       url: "/",
@@ -25,7 +32,17 @@ class DummyRouteHandler extends AbstractRouteHandler {
     });
   }
 
-  handler(_: Request<void, {}>): void | Promise<void> {}
+  handler(
+    _: Request<
+      void, // Body
+      Record<string, string>, // Querystring
+      void // Params
+    >,
+    __: FastifyReply
+  ): void | Promise<void> {
+    // Dummy implementation
+    return;
+  }
 }
 
 const fakeConfig: ConfigApplication = {

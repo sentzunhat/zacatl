@@ -1,42 +1,128 @@
 # Zacatl Microservice Framework
 
-A blazing fast, modular TypeScript microservice framework for Node.js, designed for rapid development of high-performance APIs and distributed systems. Zacatl enforces a clean, layered architecture, robust typing, and seamless collaboration between human and AI contributors.
+[![npm version](https://img.shields.io/npm/v/@sentzunhat/zacatl.svg)](https://www.npmjs.com/package/@sentzunhat/zacatl)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![TypeScript](https://img.shields.io/badge/%3C%2F%3E-TypeScript-%230074c1.svg)](https://www.typescriptlang.org/)
 
----
+A modular, high-performance TypeScript microservice framework for Node.js, featuring layered architecture, dependency injection, and robust validation for building scalable APIs and distributed systems.
 
-## 1. How Humans and AI Agents Can Contribute
+## Table of Contents
 
-- **Read the docs:** Always review `guidelines.yaml`, `context.yaml`, and `patterns.yaml` before making changes.
-- **Follow conventions:** Use dependency injection (`tsyringe`), maintain modularity, and respect the layered architecture.
-- **Testing:** All logic must be unit tested (`vitest`). Place tests in `test/unit/`, mirroring the `src/` structure.
-- **Documentation:** Update YAML docs with new patterns, features, or conventions. AI agents should parse YAML for context.
-- **Register everything:** All services, repositories, and handlers must be registered in the DI container.
+- [Overview](#overview)
+- [Key Features](#key-features)
+- [Installation](#installation)
+- [Quick Start](#quick-start)
+- [Project Structure](#project-structure)
+- [Core Concepts](#core-concepts)
+- [Configuration](#configuration)
+- [Testing](#testing)
+- [Contributing](#contributing)
+- [Documentation](#documentation)
+- [License](#license)
 
----
+## Overview
 
-## 2. Project Structure & Layer Overview
+Zacatl is a TypeScript-first microservice framework that enforces clean, layered (hexagonal) architecture with strict separation of concerns. It's designed for rapid development of robust APIs and distributed systems, with built-in support for dependency injection, validation, and seamless collaboration between human and AI contributors.
+
+## Key Features
+
+- **🏗️ Layered Architecture**: Clean separation with Application, Domain, Infrastructure, and Platform layers
+- **💉 Dependency Injection**: Built-in DI container using `tsyringe` for better modularity
+- **⚡ High Performance**: Built on Fastify for maximum speed and efficiency
+- **🔍 Type Safety**: Full TypeScript support with strict typing and generics
+- **✅ Validation**: Request/response validation using Zod schemas
+- **🧪 Testing**: Comprehensive testing with Vitest and clear test structure
+- **📊 MongoDB Support**: Built-in repository pattern with Mongoose integration
+- **🌐 Internationalization**: Multi-language support with i18n
+- **🚀 Production Ready**: Error handling, logging, and monitoring built-in
+
+## Installation
+
+Install Zacatl using npm:
+
+```bash
+npm install @sentzunhat/zacatl
+```
+
+Or with yarn:
+
+```bash
+yarn add @sentzunhat/zacatl
+```
+
+## Quick Start
+
+Here's a minimal example to get you started:
+
+```typescript
+import Fastify from "fastify";
+import { MicroService } from "@sentzunhat/zacatl";
+
+const fastifyApp = Fastify();
+
+const microservice = new MicroService({
+  architecture: {
+    application: {
+      entryPoints: {
+        rest: {
+          hookHandlers: [], // Add hook handler classes
+          routeHandlers: [], // Add route handler classes
+        },
+      },
+    },
+    domain: { providers: [] }, // Add domain provider classes
+    infrastructure: { repositories: [] }, // Add repository classes
+    service: {
+      name: "my-service",
+      server: {
+        type: "SERVER",
+        vendor: "FASTIFY",
+        instance: fastifyApp,
+      },
+      databases: [
+        // Example for MongoDB:
+        // {
+        //   vendor: "MONGOOSE",
+        //   instance: new Mongoose(),
+        //   connectionString: "mongodb://localhost/mydb",
+        // }
+      ],
+    },
+  },
+});
+
+await microservice.start({ port: 9000 });
+```
+
+For a complete example with route handlers, see our [examples](./examples) directory.
+
+## Project Structure
 
 ```
 src/
-  configuration.ts         # App configuration (env, settings)
-  logs.ts                  # Logging utilities
-  optionals.ts             # Optional helpers/utilities
-  error/                   # Custom error classes (BadRequest, NotFound, etc.)
-  locales/                 # Localization files (en.json, fr.json, ...)
-  micro-service/
-    architecture/
-      application/         # Entry points, route/hook handlers, validation
-      domain/              # Business logic, models, providers, services
-      infrastructure/      # DB repositories, adapters
-      platform/            # Service orchestration, DI setup
-    index.ts               # Microservice layer entry
-  utils/                   # Utility functions (base64, hmac, etc.)
+├── configuration.ts         # App configuration and environment settings
+├── logs.ts                  # Structured logging with Pino
+├── optionals.ts             # Optional utility types and helpers
+├── error/                   # Custom error classes (BadRequest, NotFound, etc.)
+├── locales/                 # Internationalization files (en.json, fr.json)
+├── micro-service/
+│   └── architecture/
+│       ├── application/     # HTTP entry points, validation, route handlers
+│       ├── domain/          # Business logic, models, services (pure)
+│       ├── infrastructure/  # Database repositories, external adapters
+│       └── platform/        # Service orchestration, DI setup, startup
+└── utils/                   # Utility functions (base64, hmac, etc.)
+
+test/
+└── unit/                    # Unit tests mirroring src/ structure
 ```
 
-- **Application:** Handles HTTP entry points, validation, and delegates to domain logic.
-- **Domain:** Pure business logic, models, and providers. No infrastructure dependencies.
-- **Infrastructure:** Persistence (MongoDB repositories), adapters, and external integrations.
-- **Platform:** Bootstraps the app, configures DI, and starts the server.
+### Layer Responsibilities
+
+- **Application Layer**: Handles HTTP requests, validation, and delegates to domain logic
+- **Domain Layer**: Contains pure business logic, models, and services (no infrastructure dependencies)
+- **Infrastructure Layer**: Manages persistence (MongoDB repositories) and external integrations
+- **Platform Layer**: Bootstraps the application, configures DI container, and starts the server
 
 ---
 

@@ -14,7 +14,9 @@ export type HttpStatusCode =
   | 502 // Bad Gateway
   | 503; // Service Unavailable;
 
-export type ErrorCode = Optional<HttpStatusCode | string>;
+export type StatusCodeString = "invalid";
+
+export type ErrorCode = Optional<HttpStatusCode | StatusCodeString>;
 
 export interface CustomErrorsArgs {
   message: string;
