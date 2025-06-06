@@ -3,10 +3,11 @@ import { FastifyReply } from "fastify";
 import { Request } from "./request";
 
 export type Handler<
-  TBody,
-  TQuerystring = Record<string, string>,
-  TParams = void
+  TBody = void,
+  TQuerystring = void,
+  TParams = void,
+  THeaders = void
 > = (
-  request: Request<TBody, TQuerystring, TParams>,
+  request: Request<TBody, TQuerystring, TParams, THeaders>,
   reply: FastifyReply
 ) => Promise<void>;

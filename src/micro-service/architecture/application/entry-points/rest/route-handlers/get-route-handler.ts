@@ -8,7 +8,7 @@ export type GetRouteHandlerConstructor = {
 
 export abstract class GetRouteHandler<
   TBody = void,
-  TQuerystring = Record<string, string>,
+  TQuerystring = void,
   TResponse = void,
   TParams = void
 > extends AbstractRouteHandler<TBody, TQuerystring, TResponse, TParams> {

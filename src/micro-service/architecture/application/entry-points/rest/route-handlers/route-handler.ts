@@ -4,11 +4,12 @@ import { Handler } from "../common/handler";
 
 export type RouteHandler<
   TBody = void,
-  TQuerystring = Record<string, string>,
-  TParams = void
+  TQuerystring = void,
+  TParams = void,
+  THeaders = void
 > = {
   url: string;
   method: HTTPMethods;
   schema: FastifySchema;
-  execute: Handler<TBody, TQuerystring, TParams>;
+  execute: Handler<TBody, TQuerystring, TParams, THeaders>;
 };

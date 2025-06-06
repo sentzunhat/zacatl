@@ -7,10 +7,10 @@ export type PostRouteHandlerConstructor = {
 };
 
 export abstract class PostRouteHandler<
-  TBody = unknown,
-  TResponse = unknown,
-  TQuerystring = Record<string, string>,
-  TParams = Record<string, string>
+  TBody = void,
+  TResponse = void,
+  TQuerystring = void,
+  TParams = void
 > extends AbstractRouteHandler<TBody, TQuerystring, TResponse, TParams> {
   constructor(args: PostRouteHandlerConstructor) {
     super({

@@ -2,7 +2,7 @@ import { IncomingMessage } from "http";
 import { FastifySchema, FastifyRequest, RawServerBase } from "fastify";
 
 export type Request<
-  TBody,
+  TBody = void,
   TQuerystring = void,
   TParams = void,
   THeaders = void

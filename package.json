@@ -2,7 +2,7 @@
   "name": "@sentzunhat/zacatl",
   "main": "src/index.ts",
   "module": "src/index.ts",
-  "version": "0.0.11",
+  "version": "0.0.12",
   "repository": {
     "type": "git",
     "url": "https://github.com/sentzunhat/zacatl.git"
@@ -56,7 +56,8 @@
     "test": "NODE_ENV=test ENV=test vitest run",
     "test:coverage": "npm run test -- --coverage",
     "type:check": "tsc -p ./tsconfig.json && tsc -p test/tsconfig.json",
-    "lint": "DEBUG=eslint:cli-engine bun eslint ."
+    "lint": "DEBUG=eslint:cli-engine bun eslint .",
+    "publish:latest": "npm i && npm run test && npm run test:coverage && npm run type:check && npm run lint && npm run build && npm publish --access public --tag latest"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.1",

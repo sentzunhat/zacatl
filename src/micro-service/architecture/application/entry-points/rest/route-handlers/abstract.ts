@@ -7,9 +7,9 @@ import { Request } from "../common/request";
 
 export type RouteSchema<
   TBody = void,
-  TQuerystring = Record<string, string>,
-  TParams = Record<string, string>,
-  THeaders = Record<string, string>,
+  TQuerystring = void,
+  TParams = void,
+  THeaders = void,
   TResponse = void
 > = {
   body?: z.ZodSchema<TBody>;
@@ -29,10 +29,11 @@ export type HandlerOutput<TResponse> = TResponse;
 
 export abstract class AbstractRouteHandler<
   TBody = void,
-  TQuerystring = Record<string, string>,
+  TQuerystring = void,
   TResponse = void,
-  TParams = Record<string, string>
-> implements RouteHandler<TBody, TQuerystring, TParams>
+  TParams = void,
+  THeaders = void
+> implements RouteHandler<TBody, TQuerystring, TParams, THeaders>
 {
   public url: string;
   public method: HTTPMethods;
@@ -45,12 +46,12 @@ export abstract class AbstractRouteHandler<
   }
 
   abstract handler(
-    request: Request<TBody, TQuerystring, TParams>,
+    request: Request<TBody, TQuerystring, TParams, THeaders>,
     reply: FastifyReply
   ): Promise<HandlerOutput<TResponse>> | HandlerOutput<TResponse>;
 
   public async execute(
-    request: Request<TBody, TQuerystring, TParams>,
+    request: Request<TBody, TQuerystring, TParams, THeaders>,
     reply: FastifyReply
   ): Promise<void> {
     const response = await this.handler(request, reply);

@@ -18,12 +18,7 @@ class DummyHookHandler implements HookHandler {
 
 import { FastifyReply } from "fastify";
 
-class DummyRouteHandler extends AbstractRouteHandler<
-  void, // Body
-  Record<string, string>, // Querystring
-  void, // Params
-  void // Response
-> {
+class DummyRouteHandler extends AbstractRouteHandler {
   constructor() {
     super({
       url: "/",
@@ -32,14 +27,7 @@ class DummyRouteHandler extends AbstractRouteHandler<
     });
   }
 
-  handler(
-    _: Request<
-      void, // Body
-      Record<string, string>, // Querystring
-      void // Params
-    >,
-    __: FastifyReply
-  ): void | Promise<void> {
+  handler(_: Request, __: FastifyReply): void | Promise<void> {
     // Dummy implementation
     return;
   }
