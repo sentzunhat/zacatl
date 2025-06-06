@@ -4,13 +4,14 @@ import { FastifySchema, FastifyRequest, RawServerBase } from "fastify";
 export type Request<
   TBody,
   TQuerystring = void,
-  TParams = void
+  TParams = void,
+  THeaders = void
 > = FastifyRequest<
   {
     Body: TBody;
     Querystring: TQuerystring;
     Params: TParams;
-    Headers: Record<string, string>;
+    Headers: THeaders;
   },
   RawServerBase,
   IncomingMessage,
