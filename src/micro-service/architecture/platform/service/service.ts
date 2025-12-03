@@ -3,6 +3,7 @@ import { FastifyInstance } from "fastify";
 import { ZodTypeProvider } from "fastify-type-provider-zod";
 import { container } from "tsyringe";
 import { Mongoose } from "mongoose";
+import { Sequelize } from "sequelize";
 
 import { HookHandler, RouteHandler } from "../../application";
 import { CustomError } from "../../../../error";
@@ -37,9 +38,10 @@ type ServiceServer = {
 
 export enum DatabaseVendor {
   MONGOOSE = "MONGOOSE",
+  SEQUELIZE = "SEQUELIZE",
 }
 
-type DatabaseInstance = Mongoose;
+type DatabaseInstance = Mongoose | Sequelize;
 
 type OnDatabaseConnectedFunction = Optional<
   (dbInstance: DatabaseInstance) => Promise<void> | void
@@ -126,7 +128,9 @@ export const strategiesForDatabaseVendor = {
     const { serviceName, database, connectionString, onDatabaseConnected } =
       input;
 
-    if (!database || !database.connect) {
+    const mongoose = database as Mongoose;
+
+    if (!mongoose || !mongoose.connect) {
       throw new CustomError({
         message: "database instance is not provided",
         code: 500,
@@ -134,18 +138,45 @@ export const strategiesForDatabaseVendor = {
       });
     }
 
-    await database.connect(connectionString, {
+    await mongoose.connect(connectionString, {
       dbName: serviceName,
       autoIndex: true,
       autoCreate: true,
     });
 
     if (onDatabaseConnected) {
+      await onDatabaseConnected(mongoose);
+    }
+
+    container.register<Mongoose>(mongoose.constructor.name, {
+      useValue: mongoose,
+    });
+  },
+  [DatabaseVendor.SEQUELIZE]: async (input: {
+    serviceName: string;
+    database: DatabaseInstance;
+    connectionString: string;
+    onDatabaseConnected?: OnDatabaseConnectedFunction;
+  }) => {
+    const { database, onDatabaseConnected } = input;
+    const sequelize = database as Sequelize;
+
+    if (!sequelize || !sequelize.authenticate) {
+      throw new CustomError({
+        message: "database instance is not provided or invalid",
+        code: 500,
+        reason: "database instance not provided",
+      });
+    }
+
+    await sequelize.authenticate();
+
+    if (onDatabaseConnected) {
       await onDatabaseConnected(database);
     }
 
-    container.register<typeof database>(database.constructor.name, {
-      useValue: database,
+    container.register<Sequelize>("Sequelize", {
+      useValue: sequelize,
     });
   },
 };

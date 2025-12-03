@@ -4,8 +4,12 @@ import path from "path";
 import { AbstractArchitecture } from "../architecture";
 import { HookHandler, RouteHandler } from "./entry-points/rest";
 
-export type ApplicationHookHandlers = Array<new () => HookHandler>;
-export type ApplicationRouteHandlers = Array<new () => RouteHandler>;
+export type ApplicationHookHandlers = Array<
+  new (...args: unknown[]) => HookHandler
+>;
+export type ApplicationRouteHandlers = Array<
+  new (...args: unknown[]) => RouteHandler
+>;
 
 export type ApplicationEntryPoints = {
   rest: {

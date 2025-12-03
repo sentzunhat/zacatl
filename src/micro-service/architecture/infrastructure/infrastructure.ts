@@ -1,7 +1,7 @@
 import { AbstractArchitecture } from "../architecture";
 
 export type ConfigInfrastructure = {
-  repositories: Array<new () => unknown>;
+  repositories: Array<new (...args: unknown[]) => unknown>;
 };
 
 export class Infrastructure extends AbstractArchitecture {

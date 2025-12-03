@@ -1,7 +1,7 @@
 import { AbstractArchitecture } from "../architecture";
 
 export type ConfigDomain = {
-  providers: Array<new () => unknown>;
+  providers: Array<new (...args: unknown[]) => unknown>;
 };
 
 export class Domain extends AbstractArchitecture {

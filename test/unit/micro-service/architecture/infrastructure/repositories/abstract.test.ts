@@ -15,7 +15,7 @@ const schemaUserTest = new Schema<UserTest>({
 @singleton()
 class UserRepository extends BaseRepository<UserTest, UserTest> {
   constructor() {
-    super({ name: "User", schema: schemaUserTest });
+    super({ type: "mongoose", name: "User", schema: schemaUserTest });
   }
 }
 
@@ -29,14 +29,14 @@ describe("BaseRepository", () => {
   });
 
   it("should create a model using the provided name and schema", async () => {
-    expect(repository.model.modelName).toBe("User");
-    expect(repository.model.schema).toBe(schemaUserTest);
+    expect((repository.model as any).modelName).toBe("User");
+    expect((repository.model as any).schema).toBe(schemaUserTest);
   });
 
   it("should call create() and return the created user document", async () => {
     const user = { name: "Alice" };
 
-    const spyFunction = vi.spyOn(repository.model, "create");
+    const spyFunction = vi.spyOn(repository.model as any, "create");
 
     const result = await repository.create(user);
 
@@ -46,7 +46,7 @@ describe("BaseRepository", () => {
 
   it("should call findById() and return the user document", async () => {
     const user = await repository.create({ name: "Alice" });
-    const spyFunction = vi.spyOn(repository.model, "findById");
+    const spyFunction = vi.spyOn(repository.model as any, "findById");
     const result = await repository.findById(user.id);
     expect(spyFunction).toHaveBeenNthCalledWith(1, user.id);
     expect(result).toMatchObject({ name: user.name });
@@ -58,7 +58,7 @@ describe("BaseRepository", () => {
 
     const update = { name: "Alice Updated" };
 
-    const spyFunction = vi.spyOn(repository.model, "findByIdAndUpdate");
+    const spyFunction = vi.spyOn(repository.model as any, "findByIdAndUpdate");
 
     const result = await repository.update(user.id, update);
 
@@ -70,7 +70,7 @@ describe("BaseRepository", () => {
 
   it("should call delete() and return the deleted user document", async () => {
     const user = await repository.create({ name: "Alice" });
-    const spyFunction = vi.spyOn(repository.model, "findByIdAndDelete");
+    const spyFunction = vi.spyOn(repository.model as any, "findByIdAndDelete");
     const result = await repository.delete(user.id);
     expect(spyFunction).toHaveBeenNthCalledWith(1, user.id);
     // Patch: allow for id only (ignore _id)

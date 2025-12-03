@@ -31,50 +31,44 @@ const defaultLogger: pino.BaseLogger = pino({
 
 export type LoggerInput =
   | {
-      logData?: unknown;
-      metadata?: unknown;
+      data?: unknown;
+      details?: unknown;
     }
   | undefined;
 
 const logger = {
   log: (message: string, input?: LoggerInput): void => {
     console.log(message, {
-      logData: input?.logData,
-      metadata: input?.metadata,
+      data: input?.data,
+      details: input?.details,
     });
   },
 
   info: (message: string, input?: LoggerInput): void => {
-    defaultLogger.info(
-      { logData: input?.logData, metadata: input?.metadata },
-      message
-    );
+    defaultLogger.info({ data: input?.data, details: input?.details }, message);
   },
 
   trace: (message: string, input?: LoggerInput): void => {
     defaultLogger.trace(
-      { logData: input?.logData, metadata: input?.metadata },
+      { data: input?.data, details: input?.details },
       message
     );
   },
 
   warn: (message: string, input?: LoggerInput): void => {
-    defaultLogger.warn(
-      { logData: input?.logData, metadata: input?.metadata },
-      message
-    );
+    defaultLogger.warn({ data: input?.data, details: input?.details }, message);
   },
 
   error: (message: string, input?: LoggerInput): void => {
     defaultLogger.error(
-      { logData: input?.logData, metadata: input?.metadata },
+      { data: input?.data, details: input?.details },
       message
     );
   },
 
   fatal: (message: string, input?: LoggerInput): void => {
     defaultLogger.fatal(
-      { logData: input?.logData, metadata: input?.metadata },
+      { data: input?.data, details: input?.details },
       message
     );
   },

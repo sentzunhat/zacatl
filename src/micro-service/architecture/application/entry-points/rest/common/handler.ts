@@ -6,8 +6,9 @@ export type Handler<
   TBody = void,
   TQuerystring = void,
   TParams = void,
-  THeaders = void
+  THeaders = void,
+  TReply = unknown
 > = (
   request: Request<TBody, TQuerystring, TParams, THeaders>,
   reply: FastifyReply
-) => Promise<void>;
+) => Promise<TReply>;
