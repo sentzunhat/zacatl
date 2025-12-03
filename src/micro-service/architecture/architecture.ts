@@ -1,5 +1,7 @@
 import { container } from "tsyringe";
 
+export type Constructor<T = unknown> = new (...args: unknown[]) => T;
+
 type Architecture = {
   start: () => void;
 };
@@ -9,7 +11,7 @@ export abstract class AbstractArchitecture implements Architecture {
    * A generic helper method to register an array of handler classes.
    * @param handlers - An array of class constructors that implement the handler functionality.
    */
-  protected registerDependencies<T>(dependencies: Array<new () => T>): void {
+  protected registerDependencies<T>(dependencies: Array<Constructor<T>>): void {
     for (const dependency of dependencies) {
       const instance = new dependency();
 

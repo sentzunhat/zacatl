@@ -1,15 +1,11 @@
 import i18n from "i18n";
 import path from "path";
 
-import { AbstractArchitecture } from "../architecture";
+import { AbstractArchitecture, Constructor } from "../architecture";
 import { HookHandler, RouteHandler } from "./entry-points/rest";
 
-export type ApplicationHookHandlers = Array<
-  new (...args: unknown[]) => HookHandler
->;
-export type ApplicationRouteHandlers = Array<
-  new (...args: unknown[]) => RouteHandler
->;
+export type ApplicationHookHandlers = Array<Constructor<HookHandler>>;
+export type ApplicationRouteHandlers = Array<Constructor<RouteHandler>>;
 
 export type ApplicationEntryPoints = {
   rest: {

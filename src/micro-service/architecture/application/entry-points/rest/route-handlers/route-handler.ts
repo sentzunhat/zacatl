@@ -6,10 +6,11 @@ export type RouteHandler<
   TBody = void,
   TQuerystring = void,
   TParams = void,
-  THeaders = void
+  THeaders = void,
+  TReply = unknown
 > = {
   url: string;
   method: HTTPMethods;
   schema: FastifySchema;
-  execute: Handler<TBody, TQuerystring, TParams, THeaders>;
+  execute: Handler<TBody, TQuerystring, TParams, THeaders, TReply>;
 };

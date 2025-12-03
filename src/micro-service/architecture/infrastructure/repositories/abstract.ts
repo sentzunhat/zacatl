@@ -43,6 +43,28 @@ export abstract class BaseRepository<D, T> implements Repository<D, T> {
     return this.implementation.model;
   }
 
+  public isMongoose(): boolean {
+    return this.implementation instanceof MongooseRepository;
+  }
+
+  public isSequelize(): boolean {
+    return this.implementation instanceof SequelizeRepository;
+  }
+
+  public getMongooseModel(): MongooseModel<D> {
+    if (!this.isMongoose()) {
+      throw new Error("Repository is not using Mongoose");
+    }
+    return this.implementation.model as MongooseModel<D>;
+  }
+
+  public getSequelizeModel(): ModelCtor<any> {
+    if (!this.isSequelize()) {
+      throw new Error("Repository is not using Sequelize");
+    }
+    return this.implementation.model as ModelCtor<any>;
+  }
+
   public toLean(input: ToLeanInput<D, T>): LeanDocument<T> | null {
     return this.implementation.toLean(input);
   }
