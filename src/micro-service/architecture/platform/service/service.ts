@@ -58,10 +58,13 @@ type DatabaseServer = {
   onDatabaseConnected?: OnDatabaseConnectedFunction;
 };
 
+import { PageModuleConfig, PageModule } from "../page";
+
 export type ConfigService = {
   name: string;
   server: ServiceServer;
   databases: Array<DatabaseServer>;
+  page?: PageModuleConfig;
 };
 
 export enum HandlersType {
@@ -197,11 +200,13 @@ export class Service implements ServicePort {
   private name: string;
   private server: ServiceServer;
   private databases: Array<DatabaseServer>;
+  private page?: PageModuleConfig | undefined;
 
-  constructor({ name, server, databases }: ConfigService) {
+  constructor({ name, server, databases, page }: ConfigService) {
     this.name = name;
     this.server = server;
     this.databases = databases;
+    this.page = page;
   }
 
   public async registerHandlers(input: RegisterHandlersInput): Promise<void> {
@@ -330,11 +335,31 @@ export class Service implements ServicePort {
     }
   }
 
+  private async configurePageModule(): Promise<void> {
+    if (!this.page) {
+      return;
+    }
+
+    const pageModule = new PageModule(this.page);
+
+    if (this.server.vendor === ServerVendor.FASTIFY) {
+      await pageModule.register(this.server.instance as FastifyInstance);
+    } else {
+      // Future support for Express or other vendors
+      throw new CustomError({
+        message: `Page module is not supported for server vendor ${this.server.vendor}`,
+        code: 500,
+        reason: "page module not supported",
+      });
+    }
+  }
+
   private async configure(input: StartInput): Promise<void> {
     const { port } = input;
 
     // await this.configureDatabases();
     await this.configureServer();
+    await this.configurePageModule();
     await this.startServer({ port });
   }
 
