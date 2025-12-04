@@ -20,6 +20,11 @@ export type PageModuleConfig = {
    * Defaults to "/api".
    */
   apiPrefix?: string;
+  /**
+   * A custom registration function for advanced setups (e.g. Vite Middleware Mode).
+   * If provided, this takes precedence over devServerUrl and staticDir.
+   */
+  customRegister?: (server: FastifyInstance) => Promise<void> | void;
 };
 
 export class PageModule {
@@ -30,7 +35,17 @@ export class PageModule {
   }
 
   public async register(server: FastifyInstance): Promise<void> {
-    const { devServerUrl, staticDir, apiPrefix = "/api" } = this.config;
+    const {
+      devServerUrl,
+      staticDir,
+      apiPrefix = "/api",
+      customRegister,
+    } = this.config;
+
+    if (customRegister) {
+      await customRegister(server);
+      return;
+    }
 
     if (devServerUrl) {
       // Development mode: Proxy to dev server
