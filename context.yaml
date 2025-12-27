@@ -112,7 +112,7 @@ layers:
     description: Bootstraps the app, configures DI, starts the server.
     files:
       - src/micro-service/architecture/platform/micro-service.ts
-      - src/micro-service/architecture/platform/service/service.ts
+      - src/micro-service/architecture/platform/server/server.ts
   - name: Application
     description: Handles HTTP requests, validation, delegates to domain logic.
     files:

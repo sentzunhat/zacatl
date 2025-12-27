@@ -1,43 +1,45 @@
-import { Model, ModelCtor } from "sequelize";
+import { Model, ModelStatic } from "sequelize";
 import { Repository, SequelizeRepositoryConfig, LeanDocument } from "./types";
 
-export class SequelizeRepository<D extends Model, T>
-  implements Repository<D, T>
+export class SequelizeRepository<D extends Model, I, O>
+  implements Repository<D, I, O>
 {
-  public readonly model: ModelCtor<D>;
+  public readonly model: ModelStatic<D>;
 
   constructor(config: SequelizeRepositoryConfig<D>) {
     this.model = config.model;
   }
 
-  public toLean(input: any): LeanDocument<T> | null {
+  public toLean(input: unknown): O | null {
     if (!input) return null;
-    const plain = input instanceof Model ? input.get({ plain: true }) : input;
+    const plain =
+      input instanceof Model ? input.get({ plain: true }) : (input as O);
 
     // Ensure id, createdAt, updatedAt exist and are correct types
     // This assumes the model has these fields.
     return {
-      ...(plain as T),
-      id: String(plain.id || plain._id || ""),
-      createdAt: plain.createdAt ? new Date(plain.createdAt) : new Date(),
-      updatedAt: plain.updatedAt ? new Date(plain.updatedAt) : new Date(),
-    } as LeanDocument<T>;
+      ...(plain as O),
+      id: String((plain as any).id || (plain as any)._id || ""),
+      createdAt: (plain as any).createdAt
+        ? new Date((plain as any).createdAt)
+        : new Date(),
+      updatedAt: (plain as any).updatedAt
+        ? new Date((plain as any).updatedAt)
+        : new Date(),
+    } as O;
   }
 
-  async findById(id: string): Promise<LeanDocument<T> | null> {
+  async findById(id: string): Promise<O | null> {
     const entity = await this.model.findByPk(id);
     return this.toLean(entity);
   }
 
-  async create(entity: D): Promise<LeanDocument<T>> {
+  async create(entity: I): Promise<O> {
     const document = await this.model.create(entity as any);
-    return this.toLean(document) as LeanDocument<T>;
+    return this.toLean(document) as O;
   }
 
-  async update(
-    id: string,
-    update: Partial<D>
-  ): Promise<LeanDocument<T> | null> {
+  async update(id: string, update: Partial<I>): Promise<O | null> {
     const [affectedCount] = await this.model.update(update as any, {
       where: { id } as any,
     });
@@ -49,7 +51,7 @@ export class SequelizeRepository<D extends Model, T>
     return this.findById(id);
   }
 
-  async delete(id: string): Promise<LeanDocument<T> | null> {
+  async delete(id: string): Promise<O | null> {
     const entity = await this.findById(id);
     if (!entity) return null;
 
@@ -60,11 +62,3 @@ export class SequelizeRepository<D extends Model, T>
     return entity;
   }
 }
-[
-  {
-    type: "image",
-    payload: {
-      attachment_id: "{{ $json.propertyName }}",
-    },
-  },
-];

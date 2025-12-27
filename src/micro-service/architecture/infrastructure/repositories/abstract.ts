@@ -1,5 +1,5 @@
 import { Model as MongooseModel } from "mongoose";
-import { ModelCtor } from "sequelize";
+import { ModelStatic } from "sequelize";
 import {
   BaseRepositoryConfig,
   Repository,
@@ -12,8 +12,8 @@ import { SequelizeRepository } from "./sequelize";
 
 export * from "./types";
 
-export abstract class BaseRepository<D, T> implements Repository<D, T> {
-  private implementation: Repository<D, T>;
+export abstract class BaseRepository<D, I, O> implements Repository<D, I, O> {
+  private implementation: Repository<D, I, O>;
 
   constructor(config: BaseRepositoryConfig<D>) {
     if (config.type === "mongoose") {
@@ -21,10 +21,10 @@ export abstract class BaseRepository<D, T> implements Repository<D, T> {
     } else if (config.type === "sequelize") {
       this.implementation = new SequelizeRepository(
         config as any
-      ) as unknown as Repository<D, T>;
+      ) as unknown as Repository<D, I, O>;
     } else {
       // Backward compatibility: if type is missing but schema is present, assume Mongoose
-      if ((config as any).schema) {
+      if ("schema" in config) {
         const mongooseConfig: MongooseRepositoryConfig<D> = {
           type: "mongoose",
           name: (config as any).name,
@@ -39,7 +39,7 @@ export abstract class BaseRepository<D, T> implements Repository<D, T> {
     }
   }
 
-  get model(): MongooseModel<D> | ModelCtor<any> {
+  get model(): MongooseModel<D> | ModelStatic<any> {
     return this.implementation.model;
   }
 
@@ -58,33 +58,30 @@ export abstract class BaseRepository<D, T> implements Repository<D, T> {
     return this.implementation.model as MongooseModel<D>;
   }
 
-  public getSequelizeModel(): ModelCtor<any> {
+  public getSequelizeModel(): ModelStatic<any> {
     if (!this.isSequelize()) {
       throw new Error("Repository is not using Sequelize");
     }
-    return this.implementation.model as ModelCtor<any>;
+    return this.implementation.model as ModelStatic<any>;
   }
 
-  public toLean(input: ToLeanInput<D, T>): LeanDocument<T> | null {
+  public toLean(input: unknown): O | null {
     return this.implementation.toLean(input);
   }
 
-  async findById(id: string): Promise<LeanDocument<T> | null> {
+  async findById(id: string): Promise<O | null> {
     return this.implementation.findById(id);
   }
 
-  async create(entity: D): Promise<LeanDocument<T>> {
+  async create(entity: I): Promise<O> {
     return this.implementation.create(entity);
   }
 
-  async update(
-    id: string,
-    update: Partial<D>
-  ): Promise<LeanDocument<T> | null> {
+  async update(id: string, update: Partial<I>): Promise<O | null> {
     return this.implementation.update(id, update);
   }
 
-  async delete(id: string): Promise<LeanDocument<T> | null> {
+  async delete(id: string): Promise<O | null> {
     return this.implementation.delete(id);
   }
 }

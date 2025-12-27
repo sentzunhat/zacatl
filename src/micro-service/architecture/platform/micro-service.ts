@@ -1,14 +1,14 @@
 import { Application, ConfigApplication } from "../application";
 import { ConfigDomain, Domain } from "../domain";
 import { ConfigInfrastructure, Infrastructure } from "../infrastructure";
-import { ConfigService, HandlersType, Service } from "./service/service";
+import { ConfigServer, HandlersType, Server } from "./server/server";
 
 export type ConfigMicroService = {
   architecture: {
     application: ConfigApplication;
     domain: ConfigDomain;
     infrastructure: ConfigInfrastructure;
-    service: ConfigService;
+    server: ConfigServer;
   };
 };
 
@@ -16,22 +16,22 @@ export class MicroService {
   private application: Application;
   private domain: Domain;
   private infrastructure: Infrastructure;
-  private service: Service;
+  private server: Server;
 
   constructor(config: ConfigMicroService) {
     const { architecture } = config;
-    const { application, domain, infrastructure, service } = architecture;
+    const { application, domain, infrastructure, server } = architecture;
 
     this.application = new Application(application);
     this.domain = new Domain(domain);
     this.infrastructure = new Infrastructure(infrastructure);
-    this.service = new Service(service);
+    this.server = new Server(server);
   }
 
   public async start(input: { port: number }): Promise<void> {
     const { port } = input;
 
-    await this.service.configureDatabases();
+    await this.server.configureDatabases();
 
     this.infrastructure.start();
 
@@ -39,15 +39,15 @@ export class MicroService {
 
     this.application.start();
 
-    this.service.registerHandlers({
+    this.server.registerHandlers({
       handlers: this.application.routeHandlers,
       handlersType: HandlersType.ROUTE,
     });
-    this.service.registerHandlers({
+    this.server.registerHandlers({
       handlers: this.application.hookHandlers,
       handlersType: HandlersType.HOOK,
     });
 
-    await this.service.start({ port });
+    await this.server.start({ port });
   }
 }

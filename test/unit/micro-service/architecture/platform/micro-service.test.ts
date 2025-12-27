@@ -7,9 +7,9 @@ import {
 import { Application } from "../../../../../src/micro-service/architecture/application";
 import { Infrastructure } from "../../../../../src/micro-service/architecture/infrastructure";
 import {
-  Service,
+  Server,
   HandlersType,
-} from "../../../../../src/micro-service/architecture/platform/service/service";
+} from "../../../../../src/micro-service/architecture/platform/server/server";
 import { Domain } from "../../../../../src/micro-service/architecture/domain";
 
 describe("MicroService", () => {
@@ -26,7 +26,21 @@ describe("MicroService", () => {
         application: {} as any,
         domain: {} as any,
         infrastructure: {} as any,
-        service: {} as any,
+        server: {
+          name: "TestService",
+          server: {
+            type: "SERVER",
+            vendor: "FASTIFY",
+            instance: {
+              listen: vi.fn(),
+              withTypeProvider: vi.fn(() => ({ route: vi.fn() })),
+              addHook: vi.fn(),
+              register: vi.fn(),
+              setNotFoundHandler: vi.fn(),
+            },
+          },
+          databases: [],
+        } as any,
       },
     };
 
@@ -41,7 +55,7 @@ describe("MicroService", () => {
     (microService as any).application.hookHandlers = ["dummyHookHandler"];
   });
 
-  it("should start the micro service by starting application, domain, infrastructure and service", async () => {
+  it("should start the micro service by starting application, domain, infrastructure and server", async () => {
     // Arrange: create spies on the start and register methods of the dependencies.
     // Spying on the prototype methods works because the MicroService instance calls these methods.
     const appStartSpy = vi
@@ -53,11 +67,11 @@ describe("MicroService", () => {
     const infrastructureStartSpy = vi
       .spyOn(Infrastructure.prototype, "start")
       .mockImplementation(() => {});
-    const serviceRegisterHandlersSpy = vi
-      .spyOn(Service.prototype, "registerHandlers")
+    const serverRegisterHandlersSpy = vi
+      .spyOn(Server.prototype, "registerHandlers")
       .mockImplementation(() => Promise.resolve());
-    const serviceStartSpy = vi
-      .spyOn(Service.prototype, "start")
+    const serverStartSpy = vi
+      .spyOn(Server.prototype, "start")
       .mockImplementation(() => Promise.resolve());
 
     // Act: Call MicroService.start().
@@ -70,17 +84,17 @@ describe("MicroService", () => {
 
     // Assert registerHandlers was called twice:
     // First for route handlers...
-    expect(serviceRegisterHandlersSpy).toHaveBeenNthCalledWith(1, {
+    expect(serverRegisterHandlersSpy).toHaveBeenNthCalledWith(1, {
       handlers: (microService as any).application.routeHandlers,
       handlersType: HandlersType.ROUTE,
     });
     // ...and second for hook handlers.
-    expect(serviceRegisterHandlersSpy).toHaveBeenNthCalledWith(2, {
+    expect(serverRegisterHandlersSpy).toHaveBeenNthCalledWith(2, {
       handlers: (microService as any).application.hookHandlers,
       handlersType: HandlersType.HOOK,
     });
 
-    // Assert that service.start was called with the expected port.
-    expect(serviceStartSpy).toHaveBeenCalledWith({ port });
+    // Assert that server.start was called with the expected port.
+    expect(serverStartSpy).toHaveBeenCalledWith({ port });
   });
 });

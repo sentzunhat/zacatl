@@ -7,7 +7,7 @@ import {
   ObjectId,
   IfAny,
 } from "mongoose";
-import { Model as SequelizeModel, ModelCtor, Model } from "sequelize";
+import { Model as SequelizeModel, ModelStatic, Model } from "sequelize";
 
 export type WithMongooseMeta<T> = Default__v<Require_id<T>>;
 
@@ -51,19 +51,19 @@ export type MongooseRepositoryConfig<D> = {
 
 export type SequelizeRepositoryConfig<D extends Model> = {
   type: "sequelize";
-  model: ModelCtor<D>;
+  model: ModelStatic<D>;
 };
 
 export type BaseRepositoryConfig<D> =
   | MongooseRepositoryConfig<D>
   | SequelizeRepositoryConfig<D extends Model ? D : never>;
 
-export type Repository<D, T> = {
-  model: MongooseModel<D> | ModelCtor<SequelizeModel<any, any>>;
+export type Repository<D, I, O> = {
+  model: MongooseModel<D> | ModelStatic<SequelizeModel<any, any>>;
 
-  toLean(input: any): LeanDocument<T> | null;
-  findById(id: string): Promise<LeanDocument<T> | null>;
-  create(entity: D): Promise<LeanDocument<T>>;
-  update(id: string, update: Partial<D>): Promise<LeanDocument<T> | null>;
-  delete(id: string): Promise<LeanDocument<T> | null>;
+  toLean(input: unknown): O | null;
+  findById(id: string): Promise<O | null>;
+  create(entity: I): Promise<O>;
+  update(id: string, update: Partial<I>): Promise<O | null>;
+  delete(id: string): Promise<O | null>;
 };

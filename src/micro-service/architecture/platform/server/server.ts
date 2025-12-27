@@ -1,24 +1,26 @@
-import proxy from "@fastify/http-proxy";
 import { FastifyInstance } from "fastify";
-import { ZodTypeProvider } from "fastify-type-provider-zod";
 import { container } from "tsyringe";
 import { Mongoose } from "mongoose";
 import { Sequelize } from "sequelize";
+import { Express } from "express";
 
 import { HookHandler, RouteHandler } from "../../application";
 import { CustomError } from "../../../../error";
 import { Optional } from "../../../../optionals";
+import { ServerAdapter } from "./server-adapter";
+import { FastifyAdapter } from "./adapters/fastify-adapter";
+import { ExpressAdapter } from "./adapters/express-adapter";
+import { PageModule } from "../page";
 
-export enum ServiceType {
+export enum ServerType {
   SERVER = "SERVER",
   GATEWAY = "GATEWAY",
 }
 
 export enum ServerVendor {
   FASTIFY = "FASTIFY",
+  EXPRESS = "EXPRESS",
 }
-
-type ServerInstance = FastifyInstance;
 
 type ProxyGateway = {
   upstream: string;
@@ -29,10 +31,10 @@ type ProxiesGateway = Array<ProxyGateway>;
 
 type GatewayService = { proxies: ProxiesGateway };
 
-type ServiceServer = {
-  type: ServiceType;
+type HttpServerConfig = {
+  type: ServerType;
   vendor: ServerVendor;
-  instance: ServerInstance;
+  instance: unknown;
   gateway?: GatewayService;
 };
 
@@ -58,13 +60,18 @@ type DatabaseServer = {
   onDatabaseConnected?: OnDatabaseConnectedFunction;
 };
 
-import { PageModuleConfig, PageModule } from "../page";
+type ServerPageConfig = {
+  devServerUrl?: string;
+  staticDir?: string;
+  customRegister?: (server: unknown) => Promise<void> | void;
+  apiPrefix?: string;
+};
 
-export type ConfigService = {
+export type ConfigServer = {
   name: string;
-  server: ServiceServer;
+  server: HttpServerConfig;
   databases: Array<DatabaseServer>;
-  page?: PageModuleConfig;
+  page?: ServerPageConfig;
 };
 
 export enum HandlersType {
@@ -73,53 +80,6 @@ export enum HandlersType {
 }
 
 type Handlers = RouteHandler | HookHandler;
-
-export const strategiesForServerVendor = {
-  [ServerVendor.FASTIFY]: {
-    handlers: {
-      [HandlersType.ROUTE]: (
-        server: FastifyInstance,
-        handler: Handlers
-      ): void => {
-        const route = handler as RouteHandler;
-
-        server.withTypeProvider<ZodTypeProvider>().route({
-          url: route.url,
-          method: route.method,
-          schema: route.schema,
-          handler: route.execute.bind(route),
-        });
-
-        // console.info(`registered route: ${route.method} ${route.url}`);
-      },
-      [HandlersType.HOOK]: (
-        server: FastifyInstance,
-        handler: Handlers
-      ): void => {
-        const hook = handler as HookHandler;
-
-        server.addHook(hook.name, hook.execute.bind(hook));
-
-        // console.info(`registered hook: ${hook.name}`);
-      },
-    },
-    server: {
-      [ServiceType.SERVER]: (_: ServerInstance) => {},
-      [ServiceType.GATEWAY]: (
-        instance: ServerInstance,
-        proxies?: ProxiesGateway
-      ) => {
-        proxies?.forEach((proxyConf) => {
-          instance.register(proxy, {
-            upstream: proxyConf.upstream,
-            ...(proxyConf.prefix ? { prefix: proxyConf.prefix } : {}),
-            http2: false, // Optional: configuration specific to your needs.
-          });
-        });
-      },
-    },
-  },
-};
 
 export const strategiesForDatabaseVendor = {
   [DatabaseVendor.MONGOOSE]: async (input: {
@@ -191,43 +151,48 @@ type RegisterHandlersInput = {
   handlersType: HandlersType;
 };
 
-type ServicePort = {
+type ServerPort = {
   start: (input: StartInput) => Promise<void>;
   registerHandlers: (input: RegisterHandlersInput) => Promise<void>;
 };
 
-export class Service implements ServicePort {
+export class Server implements ServerPort {
   private name: string;
-  private server: ServiceServer;
+  private server: HttpServerConfig;
   private databases: Array<DatabaseServer>;
-  private page?: PageModuleConfig | undefined;
+  private page?: ServerPageConfig | undefined;
+  private adapter: ServerAdapter;
 
-  constructor({ name, server, databases, page }: ConfigService) {
+  constructor({ name, server, databases, page }: ConfigServer) {
     this.name = name;
     this.server = server;
     this.databases = databases;
     this.page = page;
+
+    if (this.server.vendor === ServerVendor.FASTIFY) {
+      this.adapter = new FastifyAdapter(
+        this.server.instance as FastifyInstance
+      );
+    } else if (this.server.vendor === ServerVendor.EXPRESS) {
+      this.adapter = new ExpressAdapter(this.server.instance as Express);
+    } else {
+      throw new Error(`Unsupported server vendor: ${this.server.vendor}`);
+    }
   }
 
   public async registerHandlers(input: RegisterHandlersInput): Promise<void> {
     const { handlers, handlersType } = input;
 
-    const registerHandlersFunction =
-      strategiesForServerVendor[this.server.vendor].handlers[handlersType];
-
-    if (!registerHandlersFunction) {
-      throw new CustomError({
-        message: `service vendor ${this.server.vendor} is not supported for ${handlersType} registration`,
-        code: 500,
-        reason: "service vendor not supported",
-        metadata: { vendor: this.server.vendor },
-      });
-    }
-
     await Promise.all(
       handlers.map(async (handler) => {
         try {
-          registerHandlersFunction(this.server.instance, handler);
+          if (handlersType === HandlersType.ROUTE) {
+            this.adapter.registerRoute(handler as RouteHandler);
+          } else if (handlersType === HandlersType.HOOK) {
+            this.adapter.registerHook(handler as HookHandler);
+          } else {
+            throw new Error(`Handler type ${handlersType} is not supported`);
+          }
         } catch (error: unknown) {
           throw new CustomError({
             message: `failed to register ${handlersType}: ${handler.constructor.name}`,
@@ -295,29 +260,25 @@ export class Service implements ServicePort {
   }
 
   private async configureServer(): Promise<void> {
-    const configureServerFunction =
-      strategiesForServerVendor[this.server.vendor].server[this.server.type];
-
-    if (!configureServerFunction) {
-      throw new CustomError({
-        message: `service vendor ${this.server.vendor} is not supported for server configuration`,
-        code: 500,
-        reason: "service vendor not supported",
-        metadata: { service: { name: this.name, vendor: this.server.vendor } },
+    if (
+      this.server.type === ServerType.GATEWAY &&
+      this.server.gateway?.proxies
+    ) {
+      this.server.gateway.proxies.forEach((proxyConf) => {
+        this.adapter.registerProxy({
+          upstream: proxyConf.upstream,
+          prefix: proxyConf.prefix || "/",
+          http2: false,
+        });
       });
     }
-
-    configureServerFunction(this.server.instance, this.server.gateway?.proxies);
   }
 
   private async startServer(input: StartInput): Promise<void> {
     const { port } = input;
 
     try {
-      await this.server.instance.listen({
-        host: "0.0.0.0",
-        port: port,
-      });
+      await this.adapter.listen(port);
     } catch (error: unknown) {
       throw new CustomError({
         message: `failed to start service "${this.name}"`,
@@ -340,18 +301,15 @@ export class Service implements ServicePort {
       return;
     }
 
-    const pageModule = new PageModule(this.page);
+    const { apiPrefix, ...pageProps } = this.page;
 
-    if (this.server.vendor === ServerVendor.FASTIFY) {
-      await pageModule.register(this.server.instance as FastifyInstance);
-    } else {
-      // Future support for Express or other vendors
-      throw new CustomError({
-        message: `Page module is not supported for server vendor ${this.server.vendor}`,
-        code: 500,
-        reason: "page module not supported",
-      });
-    }
+    const pageModule = new PageModule({
+      root: process.cwd(),
+      page: pageProps,
+      ...(apiPrefix ? { apiPrefix } : {}),
+    });
+
+    await pageModule.register(this.adapter);
   }
 
   private async configure(input: StartInput): Promise<void> {
