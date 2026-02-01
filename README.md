@@ -362,3 +362,7 @@ Zacatl is built for developers who value clean architecture, type safety, and te
 **Created by**: [Diego Beltran](https://www.linkedin.com/in/diego-beltran)  
 **Repository**: https://github.com/sentzunhat/zacatl  
 **npm**: https://www.npmjs.com/package/@sentzunhat/zacatl
+
+## 🤖 Acknowledgments
+
+This framework was built with assistance from **GitHub Copilot** and friendly ML/LLM models, demonstrating effective human-AI collaboration in software development.
