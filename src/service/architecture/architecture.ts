@@ -13,9 +13,8 @@ export abstract class AbstractArchitecture implements Architecture {
    */
   protected registerDependencies<T>(dependencies: Array<Constructor<T>>): void {
     for (const dependency of dependencies) {
-      const instance = new dependency();
-
-      container.register<typeof instance>(dependency.name, {
+      // Register class directly - tsyringe handles instantiation with DI
+      container.register(dependency.name, {
         useClass: dependency,
       });
     }
@@ -28,7 +27,7 @@ export abstract class AbstractArchitecture implements Architecture {
    */
   protected registerAndStoreDependencies<T>(
     dependencies: Array<new () => T>,
-    storage: Array<T>
+    storage: Array<T>,
   ): void {
     for (const dependency of dependencies) {
       container.register(dependency.name, { useClass: dependency });

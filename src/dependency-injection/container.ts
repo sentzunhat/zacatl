@@ -84,6 +84,63 @@ export const resolveDependency = <T>(token: InjectionToken<T>): T => {
 };
 
 /**
+ * Register a dependency with explicit dependencies (no decorator metadata required)
+ * Useful for tsx/ts-node/ESM environments where decorator metadata is not available
+ *
+ * @param serviceClass - Class to register
+ * @param dependencies - Array of dependency classes to inject (in constructor order)
+ *
+ * @example
+ * ```typescript
+ * import { registerWithDependencies } from '@sentzunhat/zacatl';
+ *
+ * // Register with no deps
+ * registerWithDependencies(MachineRepository, []);
+ *
+ * // Register with explicit deps
+ * registerWithDependencies(MachineService, [MachineRepository]);
+ * ```
+ */
+export const registerWithDependencies = <T>(
+  serviceClass: new (...args: unknown[]) => T,
+  dependencies: Array<new (...args: unknown[]) => unknown> = [],
+): void => {
+  tsyringeContainer.register(serviceClass, {
+    useFactory: (c: DependencyContainer) => {
+      const resolvedDeps = dependencies.map((dep) => c.resolve(dep));
+      return new serviceClass(...resolvedDeps);
+    },
+  } as never);
+};
+
+/**
+ * Register a singleton with explicit dependencies (no decorator metadata required)
+ * Useful for tsx/ts-node/ESM environments where decorator metadata is not available
+ *
+ * @param serviceClass - Class to register as singleton
+ * @param dependencies - Array of dependency classes to inject (in constructor order)
+ *
+ * @example
+ * ```typescript
+ * import { registerSingletonWithDependencies } from '@sentzunhat/zacatl';
+ *
+ * // Register singleton with deps
+ * registerSingletonWithDependencies(MachineService, [MachineRepository]);
+ * ```
+ */
+export const registerSingletonWithDependencies = <T>(
+  serviceClass: new (...args: unknown[]) => T,
+  dependencies: Array<new (...args: unknown[]) => unknown> = [],
+): void => {
+  tsyringeContainer.registerSingleton(serviceClass, {
+    useFactory: (c: DependencyContainer) => {
+      const resolvedDeps = dependencies.map((dep) => c.resolve(dep));
+      return new serviceClass(...resolvedDeps);
+    },
+  } as never);
+};
+
+/**
  * Clear all registrations (useful for testing)
  */
 export const clearContainer = (): void => {
