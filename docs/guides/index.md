@@ -2,14 +2,19 @@
 
 Comprehensive guides for using @sentzunhat/zacatl features.
 
+> **📦 New in v0.0.26:** Dependency injection helpers for tsx/ts-node  
 > **📦 New in v0.0.21:** Import shortcuts for better DX  
-> See [v0.0.21 Migration Guide](../migration/v0.0.21.md)
+> See [Migration Guides](../migration/)
+
+## Core Concepts
+
+- [Dependency Injection](./dependency-injection.md) - Complete DI guide with decorators, helpers, and Service architecture
+- [Single Import System](./single-import.md) - Import all dependencies from one place
 
 ## Infrastructure
 
 - [Infrastructure Usage](./infrastructure-usage.md) - Working with BaseRepository
 - [Multi-ORM Setup](./multi-orm-setup.md) - Using multiple databases simultaneously
-- [Single Import System](./single-import.md) - Import all dependencies from one place
 
 ## See Also
 

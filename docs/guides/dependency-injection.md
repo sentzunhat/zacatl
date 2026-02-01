@@ -1,0 +1,660 @@
+# Dependency Injection Guide
+
+Complete guide to dependency injection patterns in Zacatl.
+
+> **📦 v0.0.26:** Added `registerWithDependencies` and `registerSingletonWithDependencies` helpers for tsx/ts-node compatibility
+
+---
+
+## Overview
+
+Zacatl uses [tsyringe](https://github.com/microsoft/tsyringe) for dependency injection. There are **three recommended approaches** depending on your build setup and preferences.
+
+| Approach                    | Best For                                 | Pros                                                                                        | Cons                                                                          |
+| --------------------------- | ---------------------------------------- | ------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| **1. Decorators**           | Production apps with TypeScript compiler | ✅ Clean syntax<br>✅ Auto-registration<br>✅ Standard tsyringe pattern                     | ⚠️ Requires `emitDecoratorMetadata: true`<br>⚠️ May not work with tsx/ts-node |
+| **2. Helper Functions**     | tsx/ts-node environments                 | ✅ Works without decorator metadata<br>✅ Explicit dependencies<br>✅ Great for CLI/scripts | ⚠️ Manual registration order                                                  |
+| **3. Service Architecture** | Full-stack applications                  | ✅ Automatic DI<br>✅ Layer-based structure<br>✅ Best practices enforced                   | ⚠️ More boilerplate                                                           |
+
+---
+
+## Approach 1: Decorators (Recommended for Production)
+
+**Best for:** Standard TypeScript apps compiled with `tsc`
+
+### Setup
+
+Ensure your `tsconfig.json` has:
+
+```json
+{
+  "compilerOptions": {
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true
+  }
+}
+```
+
+### Basic Usage
+
+```typescript
+import {
+  inject,
+  singleton,
+  BadRequestError,
+  ValidationError,
+  InternalServerError,
+} from "@sentzunhat/zacatl";
+
+// Define a repository
+@singleton()
+class UserRepository {
+  async findById(id: string) {
+    // Implementation
+    return { id, name: "John Doe" };
+  }
+}
+
+// Inject dependencies
+@singleton()
+class UserService {
+  constructor(
+    @inject(UserRepository)
+    private userRepo: UserRepository,
+  ) {}
+
+  async getUser(id: string) {
+    const user = await this.userRepo.findById(id);
+    if (!user) {
+      throw new BadRequestError({
+        message: "User not found",
+        reason: "USER_NOT_FOUND",
+      });
+    }
+    return user;
+  }
+}
+
+// Multiple dependencies
+@singleton()
+class NotificationService {
+  constructor(
+    @inject(UserRepository)
+    private userRepo: UserRepository,
+    @inject(EmailService)
+    private emailService: EmailService,
+    @inject(LogService)
+    private logService: LogService,
+  ) {}
+
+  async notifyUser(userId: string, message: string) {
+    const user = await this.userRepo.findById(userId);
+
+    if (!user) {
+      this.logService.warn(`User ${userId} not found`);
+      return;
+    }
+
+    await this.emailService.send(user.email, message);
+    this.logService.info(`Notification sent to ${userId}`);
+  }
+}
+```
+
+### Real-World Example
+
+From a production authentication service:
+
+```typescript
+import {
+  inject,
+  singleton,
+  BadRequestError,
+  ValidationError,
+  InternalServerError,
+} from "@sentzunhat/zacatl";
+
+@singleton()
+export class AttestOptionsProviderAdapter {
+  constructor(
+    @inject(DeviceProviderAdapter)
+    private deviceProvider: DeviceProviderAdapter,
+    @inject(ChallengeRepositoryAdapter)
+    private challengeRepository: ChallengeRepositoryAdapter,
+    @inject(SessionProviderAdapter)
+    private sessionProvider: SessionProviderAdapter,
+  ) {}
+
+  public async generate(input: AttestGenerateOptionsInput) {
+    const { token, fingerprint, tenantId, partnerId } = input;
+
+    if (!token) {
+      throw new BadRequestError({
+        message: "invalid token",
+        reason: "CLIENT_TOKEN_MISSING",
+      });
+    }
+
+    // Use injected dependencies
+    const device = await this.deviceProvider.get({
+      fingerprint,
+      tenancy: { partnerId, tenantId },
+    });
+
+    const challenge = await this.challengeRepository.create({
+      value: this.generateChallengeValue(),
+      deviceId: device.id,
+      expiresAt: new Date(Date.now() + 10 * 60 * 1000),
+    });
+
+    return {
+      value: challenge.value,
+      token: device.token.server,
+    };
+  }
+}
+```
+
+---
+
+## Approach 2: Helper Functions (tsx/ts-node Compatible)
+
+**Best for:** CLI tools, scripts, tsx/ts-node environments, or when you prefer explicit control
+
+> **New in v0.0.26:** Helpers that don't require `emitDecoratorMetadata`
+
+### Setup
+
+```typescript
+import {
+  registerWithDependencies,
+  registerSingletonWithDependencies,
+  resolveDependency,
+} from "@sentzunhat/zacatl";
+```
+
+### Basic Usage
+
+```typescript
+import {
+  registerWithDependencies,
+  registerSingletonWithDependencies,
+  resolveDependency,
+} from "@sentzunhat/zacatl";
+
+// Define classes without decorators
+class Logger {
+  log(message: string) {
+    console.log(`[LOG] ${message}`);
+  }
+}
+
+class Database {
+  constructor(private logger: Logger) {}
+
+  async query(sql: string) {
+    this.logger.log(`Executing: ${sql}`);
+    return [{ id: 1, name: "Result" }];
+  }
+}
+
+class UserService {
+  constructor(
+    private db: Database,
+    private logger: Logger,
+  ) {}
+
+  async getUsers() {
+    this.logger.log("Fetching users");
+    return await this.db.query("SELECT * FROM users");
+  }
+}
+
+// Register dependencies BEFORE dependents
+registerSingletonWithDependencies(Logger); // No dependencies
+registerSingletonWithDependencies(Database, [Logger]); // Depends on Logger
+registerSingletonWithDependencies(UserService, [Database, Logger]); // Depends on both
+
+// Resolve and use
+const userService = resolveDependency<UserService>(UserService);
+const users = await userService.getUsers();
+```
+
+### Important: Registration Order
+
+Dependencies **must be registered before** classes that depend on them:
+
+```typescript
+// ✅ CORRECT - Logger first, then Database
+registerSingletonWithDependencies(Logger);
+registerSingletonWithDependencies(Database, [Logger]);
+
+// ❌ WRONG - Database registered before Logger
+registerSingletonWithDependencies(Database, [Logger]); // Error!
+registerSingletonWithDependencies(Logger);
+```
+
+The helpers will throw clear errors if order is wrong:
+
+```
+Error: Dependency Logger not registered. Register it before Database.
+```
+
+### Transient vs Singleton
+
+```typescript
+// Transient - new instance every time
+registerWithDependencies(TransientService, [Logger]);
+
+const instance1 = resolveDependency<TransientService>(TransientService);
+const instance2 = resolveDependency<TransientService>(TransientService);
+console.log(instance1 === instance2); // false
+
+// Singleton - same instance every time
+registerSingletonWithDependencies(SingletonService, [Logger]);
+
+const instance1 = resolveDependency<SingletonService>(SingletonService);
+const instance2 = resolveDependency<SingletonService>(SingletonService);
+console.log(instance1 === instance2); // true
+```
+
+### CLI Tool Example
+
+```typescript
+#!/usr/bin/env tsx
+import {
+  registerSingletonWithDependencies,
+  resolveDependency,
+} from "@sentzunhat/zacatl";
+
+class ConfigLoader {
+  load() {
+    return { apiKey: process.env.API_KEY };
+  }
+}
+
+class ApiClient {
+  constructor(private config: ConfigLoader) {}
+
+  async fetch(endpoint: string) {
+    const config = this.config.load();
+    // Use config.apiKey
+  }
+}
+
+class CliApp {
+  constructor(private api: ApiClient) {}
+
+  async run() {
+    const data = await this.api.fetch("/users");
+    console.log(data);
+  }
+}
+
+// Register in order
+registerSingletonWithDependencies(ConfigLoader);
+registerSingletonWithDependencies(ApiClient, [ConfigLoader]);
+registerSingletonWithDependencies(CliApp, [ApiClient]);
+
+// Run
+const app = resolveDependency<CliApp>(CliApp);
+await app.run();
+```
+
+---
+
+## Approach 3: Service Architecture (Full-Stack Apps)
+
+**Best for:** REST APIs, microservices, full applications
+
+The Service architecture automatically handles DI registration for you.
+
+### Basic Setup
+
+```typescript
+import { Service, singleton } from "@sentzunhat/zacatl";
+
+// Define your classes
+@singleton()
+class EmailProvider {
+  async send(to: string, message: string) {
+    console.log(`Email sent to ${to}`);
+  }
+}
+
+@singleton()
+class UserProvider {
+  constructor(private emailProvider: EmailProvider) {}
+
+  async createUser(email: string) {
+    // Create user...
+    await this.emailProvider.send(email, "Welcome!");
+    return { id: "123", email };
+  }
+}
+
+// Service auto-registers everything
+const service = new Service({
+  architecture: {
+    domain: {
+      providers: [EmailProvider, UserProvider],
+    },
+  },
+});
+
+await service.start();
+```
+
+See the [Service Architecture Guide](./service-architecture.md) for full details.
+
+---
+
+## Common Patterns
+
+### Pattern 1: Repository with Service
+
+```typescript
+import { inject, singleton, NotFoundError } from "@sentzunhat/zacatl";
+
+@singleton()
+class UserRepository {
+  async findById(id: string) {
+    // DB query
+    return { id, email: "user@example.com" };
+  }
+
+  async create(data: any) {
+    // DB insert
+    return { id: "new-id", ...data };
+  }
+}
+
+@singleton()
+class UserService {
+  constructor(
+    @inject(UserRepository)
+    private userRepo: UserRepository,
+  ) {}
+
+  async getUser(id: string) {
+    const user = await this.userRepo.findById(id);
+    if (!user) {
+      throw new NotFoundError({
+        message: "User not found",
+        reason: "USER_NOT_FOUND",
+      });
+    }
+    return user;
+  }
+}
+```
+
+### Pattern 2: Multiple Dependencies
+
+```typescript
+@singleton()
+class OrderService {
+  constructor(
+    @inject(OrderRepository)
+    private orderRepo: OrderRepository,
+    @inject(PaymentProvider)
+    private paymentProvider: PaymentProvider,
+    @inject(EmailProvider)
+    private emailProvider: EmailProvider,
+    @inject(Logger)
+    private logger: Logger,
+  ) {}
+
+  async createOrder(userId: string, items: Item[]) {
+    this.logger.info(`Creating order for user ${userId}`);
+
+    const order = await this.orderRepo.create({ userId, items });
+    await this.paymentProvider.charge(order.total);
+    await this.emailProvider.sendOrderConfirmation(userId, order);
+
+    return order;
+  }
+}
+```
+
+### Pattern 3: Interface-Based DI
+
+```typescript
+import { inject, singleton, container } from "@sentzunhat/zacatl";
+
+// Define interface
+interface INotificationService {
+  send(userId: string, message: string): Promise<void>;
+}
+
+// Implementations
+@singleton()
+class EmailNotificationService implements INotificationService {
+  async send(userId: string, message: string) {
+    console.log(`Email to ${userId}: ${message}`);
+  }
+}
+
+@singleton()
+class SmsNotificationService implements INotificationService {
+  async send(userId: string, message: string) {
+    console.log(`SMS to ${userId}: ${message}`);
+  }
+}
+
+// Register with token
+
+container.register<INotificationService>("INotificationService", {
+  useClass: EmailNotificationService,
+});
+
+// Inject by token
+@singleton()
+class UserService {
+  constructor(
+    @inject("INotificationService")
+    private notificationService: INotificationService,
+  ) {}
+}
+```
+
+---
+
+## Best Practices
+
+### 1. Choose the Right Approach
+
+```typescript
+// ✅ Production app with tsc - use decorators
+@singleton()
+class MyService {
+  constructor(@inject(MyRepo) private repo: MyRepo) {}
+}
+
+// ✅ CLI tool with tsx - use helpers
+registerSingletonWithDependencies(MyRepo);
+registerSingletonWithDependencies(MyService, [MyRepo]);
+
+// ✅ Full REST API - use Service architecture
+const service = new Service({
+  architecture: {
+    domain: { providers: [MyService, MyRepo] },
+  },
+});
+```
+
+### 2. Keep Dependencies Explicit
+
+```typescript
+// ✅ Good - clear what's needed
+@singleton()
+class OrderService {
+  constructor(
+    @inject(OrderRepo) private orderRepo: OrderRepo,
+    @inject(PaymentService) private paymentService: PaymentService,
+  ) {}
+}
+
+// ❌ Bad - hidden dependency
+@singleton()
+class OrderService {
+  async createOrder() {
+    const paymentService = resolveDependency<PaymentService>(PaymentService);
+  }
+}
+```
+
+### 3. Use Interfaces for Flexibility
+
+```typescript
+// Define contract
+interface ILogger {
+  log(message: string): void;
+}
+
+// Multiple implementations
+class ConsoleLogger implements ILogger {
+  log(message: string) {
+    console.log(message);
+  }
+}
+
+class FileLogger implements ILogger {
+  log(message: string) {
+    fs.appendFileSync("app.log", message + "\n");
+  }
+}
+
+// Register based on environment
+container.register<ILogger>("ILogger", {
+  useClass: process.env.NODE_ENV === "production" ? FileLogger : ConsoleLogger,
+});
+```
+
+### 4. Avoid Circular Dependencies
+
+```typescript
+// ❌ Bad - circular dependency
+@singleton()
+class UserService {
+  constructor(@inject(OrderService) private orderService: OrderService) {}
+}
+
+@singleton()
+class OrderService {
+  constructor(@inject(UserService) private userService: UserService) {}
+}
+
+// ✅ Good - introduce a third service
+@singleton()
+class UserOrderCoordinator {
+  constructor(
+    @inject(UserService) private userService: UserService,
+    @inject(OrderService) private orderService: OrderService,
+  ) {}
+}
+```
+
+---
+
+## Troubleshooting
+
+### "TypeInfo not known" Errors
+
+**Problem:** Getting errors like `TypeInfo not known for "MyClass"` when using tsx or ts-node
+
+**Solution:** Use helper functions instead of decorators:
+
+```typescript
+// Instead of decorators
+import { registerSingletonWithDependencies } from "@sentzunhat/zacatl";
+
+registerSingletonWithDependencies(MyRepository);
+registerSingletonWithDependencies(MyService, [MyRepository]);
+```
+
+### Dependency Not Registered
+
+**Problem:** `Error: Dependency X not registered`
+
+**Solution:** Register dependencies **before** dependents:
+
+```typescript
+// ✅ Correct order
+registerSingletonWithDependencies(Logger);
+registerSingletonWithDependencies(Database, [Logger]);
+registerSingletonWithDependencies(Service, [Database, Logger]);
+```
+
+### Getting Different Instances
+
+**Problem:** Expecting singleton behavior but getting new instances
+
+**Solution:** Use `registerSingletonWithDependencies` not `registerWithDependencies`:
+
+```typescript
+// ✅ Singleton - same instance
+registerSingletonWithDependencies(MyService, []);
+
+// ❌ Transient - new instances
+registerWithDependencies(MyService, []);
+```
+
+---
+
+## Migration from Older Versions
+
+### From Manual DI (pre-v0.0.26)
+
+**Before:**
+
+```typescript
+container.register(Logger, { useClass: Logger });
+container.register(Database, {
+  useFactory: (c) => new Database(c.resolve(Logger)),
+});
+```
+
+**After:**
+
+```typescript
+registerSingletonWithDependencies(Logger);
+registerSingletonWithDependencies(Database, [Logger]);
+```
+
+---
+
+---
+
+## Importing from Zacatl
+
+**Recommended:** Import everything from `@sentzunhat/zacatl`:
+
+```typescript
+import {
+  // DI decorators and container
+  inject,
+  singleton,
+  container,
+
+  // Errors
+  BadRequestError,
+  ValidationError,
+  NotFoundError,
+
+  // Other utilities
+  Service,
+  BaseRepository,
+} from "@sentzunhat/zacatl";
+```
+
+This ensures you're using the correct versions bundled with Zacatl. You can also import directly from `tsyringe` if needed, but the Zacatl exports are recommended for consistency.
+
+---
+
+## See Also
+
+- [Service Architecture Guide](./service-architecture.md)
+- [tsyringe Documentation](https://github.com/microsoft/tsyringe)
+- [Error Handling](../api/errors.md)
+- [Examples](../examples/)

@@ -1,6 +1,17 @@
 import "reflect-metadata";
 import { container as tsyringeContainer } from "tsyringe";
 import type { DependencyContainer, InjectionToken } from "tsyringe";
+import type { Constructor } from "../service/architecture/architecture";
+
+/**
+ * Track registered classes to avoid requiring decorator metadata
+ */
+const registeredClasses = new Set<Constructor>();
+
+/**
+ * Cache for singleton instances
+ */
+const singletonInstances = new Map<Constructor, object>();
 
 /**
  * Standalone DI container decoupled from microservice architecture.
@@ -101,13 +112,25 @@ export const resolveDependency = <T>(token: InjectionToken<T>): T => {
  * registerWithDependencies(MachineService, [MachineRepository]);
  * ```
  */
-export const registerWithDependencies = <T>(
-  serviceClass: new (...args: unknown[]) => T,
-  dependencies: Array<new (...args: unknown[]) => unknown> = [],
+export const registerWithDependencies = <T extends object>(
+  serviceClass: Constructor<T>,
+  dependencies: Constructor[] = [],
 ): void => {
+  // Track this class as registered
+  registeredClasses.add(serviceClass);
+
   tsyringeContainer.register(serviceClass, {
-    useFactory: (c: DependencyContainer) => {
-      const resolvedDeps = dependencies.map((dep) => c.resolve(dep));
+    useFactory: () => {
+      const resolvedDeps = dependencies.map((dep) => {
+        // Check if dependency was registered
+        if (!registeredClasses.has(dep)) {
+          throw new Error(
+            `Dependency ${dep.name} not registered. Register it before ${serviceClass.name}.`,
+          );
+        }
+        // Resolve from container (works because we registered it)
+        return tsyringeContainer.resolve(dep);
+      });
       return new serviceClass(...resolvedDeps);
     },
   } as never);
@@ -128,14 +151,37 @@ export const registerWithDependencies = <T>(
  * registerSingletonWithDependencies(MachineService, [MachineRepository]);
  * ```
  */
-export const registerSingletonWithDependencies = <T>(
-  serviceClass: new (...args: unknown[]) => T,
-  dependencies: Array<new (...args: unknown[]) => unknown> = [],
+export const registerSingletonWithDependencies = <T extends object>(
+  serviceClass: Constructor<T>,
+  dependencies: Constructor[] = [],
 ): void => {
-  tsyringeContainer.registerSingleton(serviceClass, {
-    useFactory: (c: DependencyContainer) => {
-      const resolvedDeps = dependencies.map((dep) => c.resolve(dep));
-      return new serviceClass(...resolvedDeps);
+  // Track this class as registered
+  registeredClasses.add(serviceClass);
+
+  // Use register() with manual singleton pattern (lifecycle can't be used with factories)
+  tsyringeContainer.register(serviceClass, {
+    useFactory: () => {
+      // Check if we already have a singleton instance
+      if (singletonInstances.has(serviceClass)) {
+        return singletonInstances.get(serviceClass) as T;
+      }
+
+      // Create new instance
+      const resolvedDeps = dependencies.map((dep) => {
+        // Check if dependency was registered
+        if (!registeredClasses.has(dep)) {
+          throw new Error(
+            `Dependency ${dep.name} not registered. Register it before ${serviceClass.name}.`,
+          );
+        }
+        // Resolve from container (works because we registered it)
+        return tsyringeContainer.resolve(dep);
+      });
+      const instance = new serviceClass(...resolvedDeps);
+
+      // Cache the singleton instance
+      singletonInstances.set(serviceClass, instance);
+      return instance;
     },
   } as never);
 };
@@ -146,4 +192,6 @@ export const registerSingletonWithDependencies = <T>(
 export const clearContainer = (): void => {
   tsyringeContainer.clearInstances();
   tsyringeContainer.reset();
+  singletonInstances.clear();
+  registeredClasses.clear();
 };
