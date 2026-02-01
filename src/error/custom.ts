@@ -41,10 +41,19 @@ export class CustomError extends Error {
   public readonly error?: Optional<Error>;
   public readonly time: Date;
   public readonly id: string;
+  public readonly correlationId: string;
 
-  constructor({ message, code, reason, metadata, error }: CustomErrorArgs) {
+  constructor({
+    message,
+    code,
+    reason,
+    metadata,
+    error,
+    correlationId,
+  }: CustomErrorArgs & { correlationId?: string }) {
     super(message);
     this.id = uuidv4();
+    this.correlationId = correlationId || this.id;
     this.custom = true;
     this.name = this.constructor.name;
     this.code = code;
@@ -56,5 +65,47 @@ export class CustomError extends Error {
     if (Error.captureStackTrace) {
       Error.captureStackTrace(this, this.constructor);
     }
+  }
+
+  toJSON() {
+    return {
+      name: this.name,
+      message: this.message,
+      code: this.code,
+      reason: this.reason,
+      metadata: this.metadata,
+      error: this.error
+        ? {
+            name: this.error.name,
+            message: this.error.message,
+            stack: this.error.stack,
+          }
+        : undefined,
+      time: this.time.toISOString(),
+      id: this.id,
+      correlationId: this.correlationId,
+      stack: this.stack,
+      custom: this.custom,
+    };
+  }
+
+  public override toString(): string {
+    return (
+      `[` +
+      this.time.toISOString() +
+      `] ` +
+      this.name +
+      `: ` +
+      this.message +
+      `\nCorrelationId: ` +
+      this.correlationId +
+      (this.code ? `\nCode: ` + this.code : "") +
+      (this.reason ? `\nReason: ` + this.reason : "") +
+      (this.metadata
+        ? `\nMetadata: ` + JSON.stringify(this.metadata, null, 2)
+        : "") +
+      (this.error ? `\nCaused by: ` + this.error.toString() : "") +
+      (this.stack ? `\nStack: ` + this.stack : "")
+    );
   }
 }

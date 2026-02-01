@@ -1,295 +1,364 @@
-# Zacatl Microservice Framework
+# Zacatl Framework
 
 [![npm version](https://img.shields.io/npm/v/@sentzunhat/zacatl.svg)](https://www.npmjs.com/package/@sentzunhat/zacatl)
+[![npm downloads](https://img.shields.io/npm/dm/@sentzunhat/zacatl.svg)](https://www.npmjs.com/package/@sentzunhat/zacatl)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![TypeScript](https://img.shields.io/badge/%3C%2F%3E-TypeScript-%230074c1.svg)](https://www.typescriptlang.org/)
+[![TypeScript](https://img.shields.io/badge/%3C%2F%3E-TypeScript-3178c6.svg)](https://www.typescriptlang.org/)
+[![Node.js 24+](https://img.shields.io/badge/Node.js-24%2B-brightgreen.svg)](https://nodejs.org/)
+[![Tests: 161](https://img.shields.io/badge/Tests-161-blue.svg)](#testing)
+[![Coverage: 79%](https://img.shields.io/badge/Coverage-79%25-brightgreen.svg)](#testing)
 
-A modular, high-performance TypeScript microservice framework for Node.js, featuring layered architecture, dependency injection, and robust validation for building scalable APIs and distributed systems.
+**Production-ready TypeScript framework for building scalable microservices, APIs, and distributed systems.**
 
-## Table of Contents
+Zacatl enforces clean, layered architecture with dependency injection, validation, and comprehensive error handling—designed for both human developers and AI agents to collaborate effectively.
 
-- [Overview](#overview)
-- [Key Features](#key-features)
-- [Installation](#installation)
-- [Quick Start](#quick-start)
-- [Project Structure](#project-structure)
-- [Core Concepts](#core-concepts)
-- [Configuration](#configuration)
-- [Testing](#testing)
-- [Contributing](#contributing)
-- [Documentation](#documentation)
-- [License](#license)
+## ✨ Key Features
 
-## Overview
+- **🏗️ Layered/Hexagonal Architecture** - Clean separation with Application, Domain, Infrastructure, and Platform layers
+- **💉 Dependency Injection** - Built-in DI container using `tsyringe`
+- **✅ Type-Safe Validation** - Full Zod schema support for requests/responses
+- **🛡️ Structured Error Handling** - 7 custom error types with correlation IDs
+- **🗄️ Pluggable ORM Adapters** - Sequelize, Mongoose, or build your own
+- **🌐 Multi-Language Support** - Pluggable i18n with filesystem/memory adapters
+- **🔌 Adapter Pattern** - Easy integration with any database or service
+- **🧪 Comprehensive Testing** - 161 tests, 79% coverage, Vitest
+- **⚡ Runtime Detection** - Works with Node.js 22+ and Bun
+- **📝 Production Ready** - Structured logging, monitoring, and error tracking
 
-Zacatl is a TypeScript-first microservice framework that enforces clean, layered (hexagonal) architecture with strict separation of concerns. It's designed for rapid development of robust APIs and distributed systems, with built-in support for dependency injection, validation, and seamless collaboration between human and AI contributors.
+## 📖 Documentation
 
-## Key Features
+- **[Full Documentation Index](./docs/INDEX.md)** - Complete guide and reference
+- **[5-Minute Quick Start](./docs/getting-started/quickstart-5min.md)** - Get up and running fast
+- **[Framework Overview](./docs/architecture/framework-overview.md)** - Architecture and concepts
+- **[Installation Guide](./docs/getting-started/INSTALLATION.md)** - Setup instructions
+- **[Testing Guide](./docs/testing/README.md)** - How to test your services
+- **[Examples](./docs/examples/README.md)** - Practical patterns
+- **[API Reference](./docs/api/README.md)** - Core APIs
 
-- **🏗️ Layered Architecture**: Clean separation with Application, Domain, Infrastructure, and Platform layers
-- **💉 Dependency Injection**: Built-in DI container using `tsyringe` for better modularity
-- **⚡ High Performance**: Built on Fastify for maximum speed and efficiency
-- **🔍 Type Safety**: Full TypeScript support with strict typing and generics
-- **✅ Validation**: Request/response validation using Zod schemas
-- **🧪 Testing**: Comprehensive testing with Vitest and clear test structure
-- **📊 MongoDB Support**: Built-in repository pattern with Mongoose integration
-- **🌐 Internationalization**: Multi-language support with i18n
-- **🚀 Production Ready**: Error handling, logging, and monitoring built-in
+## Ethical Use (Non-binding)
 
-## Installation
+Zacatl is MIT-licensed (permissive). Please don’t use it to harm people.
 
-Install Zacatl using npm:
+## 🚀 Quick Start
+
+### Install
 
 ```bash
 npm install @sentzunhat/zacatl
 ```
 
-Or with yarn:
-
-```bash
-yarn add @sentzunhat/zacatl
-```
-
-## Quick Start
-
-Here's a minimal example to get you started:
+### Hello World HTTP Service
 
 ```typescript
 import Fastify from "fastify";
-import { MicroService } from "@sentzunhat/zacatl";
+import { Service } from "@sentzunhat/zacatl";
 
-const fastifyApp = Fastify();
+const fastify = Fastify();
 
-const microservice = new MicroService({
+const service = new Service({
   architecture: {
     application: {
-      entryPoints: {
-        rest: {
-          hookHandlers: [], // Add hook handler classes
-          routeHandlers: [], // Add route handler classes
-        },
-      },
+      entryPoints: { rest: { hookHandlers: [], routeHandlers: [] } },
     },
-    domain: { providers: [] }, // Add domain provider classes
-    infrastructure: { repositories: [] }, // Add repository classes
-    service: {
-      name: "my-service",
-      server: {
-        type: "SERVER",
-        vendor: "FASTIFY",
-        instance: fastifyApp,
-      },
-      databases: [
-        // Example for MongoDB:
-        // {
-        //   vendor: "MONGOOSE",
-        //   instance: new Mongoose(),
-        //   connectionString: "mongodb://localhost/mydb",
-        // }
-      ],
+    domain: { providers: [] },
+    infrastructure: { repositories: [] },
+    server: {
+      name: "hello-service",
+      server: { type: "SERVER", vendor: "FASTIFY", instance: fastify },
     },
   },
 });
 
-await microservice.start({ port: 9000 });
+await service.start({ port: 3000 });
 ```
 
-For a complete example with route handlers, see our [examples](./examples) directory.
+### CLI / Desktop Application
 
-## Project Structure
+```typescript
+import { Service, resolveDependency } from "@sentzunhat/zacatl";
+
+class MyService {
+  doSomething = async () => console.log("Hello from CLI!");
+}
+
+const service = new Service({
+  architecture: {
+    domain: { providers: [MyService] },
+  },
+});
+
+await service.start();
+const myService = resolveDependency<MyService>("MyService");
+await myService.doSomething();
+```
+
+## 🏗️ Architecture Layers
+
+Zacatl implements **layered (hexagonal) architecture**:
+
+```
+┌─────────────────────────────────────────┐
+│        Application Layer                │  HTTP handlers, validation, routes
+├─────────────────────────────────────────┤
+│        Domain Layer                     │  Business logic, services, models
+├─────────────────────────────────────────┤
+│        Infrastructure Layer             │  Repositories, database adapters
+├─────────────────────────────────────────┤
+│        Platform Layer                   │  DI container, service startup
+└─────────────────────────────────────────┘
+```
+
+Each layer has a single responsibility and strict dependencies flow inward.
+
+## 💾 Database Adapters
+
+### Sequelize
+
+```typescript
+import { Sequelize } from "sequelize";
+import { SequelizeAdapter } from "@sentzunhat/zacatl/adapters";
+
+const sequelize = new Sequelize("postgresql://user:pass@localhost/db");
+
+const service = new Service({
+  architecture: {
+    server: {
+      databases: [
+        {
+          vendor: "SEQUELIZE",
+          instance: sequelize,
+        },
+      ],
+    },
+  },
+});
+```
+
+### MongoDB (Mongoose)
+
+```typescript
+import mongoose from "mongoose";
+
+const service = new Service({
+  architecture: {
+    server: {
+      databases: [
+        {
+          vendor: "MONGOOSE",
+          instance: mongoose,
+          connectionString: "mongodb://localhost/mydb",
+        },
+      ],
+    },
+  },
+});
+```
+
+### Custom Repository Pattern
+
+Implement `IRepository<T>` for any database:
+
+```typescript
+import { IRepository } from "@sentzunhat/zacatl";
+
+class MyRepository<T> implements IRepository<T> {
+  findById = async (id: string): Promise<T | null> => {
+    /* ... */
+  };
+  findMany = async (filter: Record<string, unknown>): Promise<T[]> => {
+    /* ... */
+  };
+  create = async (data: T): Promise<T> => {
+    /* ... */
+  };
+  update = async (id: string, data: Partial<T>): Promise<void> => {
+    /* ... */
+  };
+  delete = async (id: string): Promise<void> => {
+    /* ... */
+  };
+  exists = async (id: string): Promise<boolean> => {
+    /* ... */
+  };
+}
+```
+
+## 🌐 Internationalization
+
+```typescript
+import { createI18n, FilesystemAdapter } from "@sentzunhat/zacatl";
+
+const i18n = createI18n();
+const greeting = i18n.t("greeting"); // Loads from src/localization/locales/
+
+await i18n.setLanguage("es");
+const saludo = i18n.t("greeting"); // Translations loaded automatically
+```
+
+Place translation files in `src/localization/locales/`:
+
+```json
+// en.json
+{ "greeting": "Hello {{name}}", "errors": { "notFound": "Not found" } }
+```
+
+```json
+// es.json
+{ "greeting": "Hola {{name}}", "errors": { "notFound": "No encontrado" } }
+```
+
+## ✅ Validation with Zod
+
+```typescript
+import { z } from "zod";
+import { loadConfig } from "@sentzunhat/zacatl";
+
+const AppConfigSchema = z.object({
+  server: z.object({
+    port: z.number().min(1).max(65535),
+    host: z.string(),
+  }),
+  logLevel: z.enum(["debug", "info", "warn", "error"]).default("info"),
+});
+
+const config = loadConfig("./config/app.yaml", "yaml", AppConfigSchema);
+```
+
+## 🛡️ Error Handling
+
+Zacatl includes 7 custom error types with built-in correlation IDs:
+
+```typescript
+import {
+  BadRequestError,
+  NotFoundError,
+  UnauthorizedError,
+  ForbiddenError,
+  ValidationError,
+  InternalServerError,
+  BadResourceError,
+} from "@sentzunhat/zacatl";
+
+throw new ValidationError("Email is required");
+throw new NotFoundError("User not found", { userId: 123 });
+```
+
+## 🧪 Testing
+
+Zacatl comes with **161 passing tests** and **79% coverage**:
+
+```bash
+npm test                 # Run all tests
+npm run test:watch      # Watch mode
+npm run test:coverage   # Coverage report
+```
+
+Example test with mocking:
+
+```typescript
+import { describe, it, expect, vi } from "vitest";
+
+describe("UserService", () => {
+  it("should create a user", async () => {
+    const mockRepo = { create: vi.fn().mockResolvedValue({ id: "1" }) };
+    const service = new UserService(mockRepo as any);
+
+    const result = await service.createUser({ name: "John" });
+
+    expect(result.id).toBe("1");
+    expect(mockRepo.create).toHaveBeenCalledOnce();
+  });
+});
+```
+
+## 🔍 Runtime Detection
+
+Check which runtime you're using:
+
+```typescript
+import {
+  detectRuntime,
+  isBun,
+  isNode,
+  getRuntimeType,
+  getRuntimeVersion,
+} from "@sentzunhat/zacatl";
+
+const runtime = detectRuntime();
+console.log(runtime.type); // "node" | "bun" | "unknown"
+console.log(runtime.version); // "22.11.0"
+
+if (isNode()) {
+  // Node.js specific code
+}
+```
+
+## 📦 What's Included
 
 ```
 src/
-├── configuration.ts         # App configuration and environment settings
-├── logs.ts                  # Structured logging with Pino
-├── optionals.ts             # Optional utility types and helpers
-├── error/                   # Custom error classes (BadRequest, NotFound, etc.)
-├── locales/                 # Internationalization files (en.json, fr.json)
-├── micro-service/
-│   └── architecture/
-│       ├── application/     # HTTP entry points, validation, route handlers
-│       ├── domain/          # Business logic, models, services (pure)
-│       ├── infrastructure/  # Database repositories, external adapters
-│       └── platform/        # Service orchestration, DI setup, startup
-└── utils/                   # Utility functions (base64, hmac, etc.)
-
-test/
-└── unit/                    # Unit tests mirroring src/ structure
+├── service/architecture/       # Core framework
+│   ├── application/            # HTTP handlers, validation
+│   ├── domain/                 # Business logic
+│   ├── infrastructure/         # Repositories, adapters
+│   └── platform/               # DI setup, server startup
+├── configuration/              # Config loading & validation
+├── error/                      # 7 custom error types
+├── localization/               # i18n with adapters
+├── logs/                       # Pino logging
+└── utils/                      # Runtime detection, base64, HMAC
 ```
 
-### Layer Responsibilities
+## 🛠️ Development
 
-- **Application Layer**: Handles HTTP requests, validation, and delegates to domain logic
-- **Domain Layer**: Contains pure business logic, models, and services (no infrastructure dependencies)
-- **Infrastructure Layer**: Manages persistence (MongoDB repositories) and external integrations
-- **Platform Layer**: Bootstraps the application, configures DI container, and starts the server
+### Building
 
----
-
-## 3. Core Architectural Concepts
-
-- **Layered (Hexagonal) Architecture:**
-  - Platform → Application → Domain → Infrastructure
-  - Strict separation of concerns; each layer has a single responsibility.
-- **Error Handling:** All errors extend `CustomError` (see `src/error/`).
-- **Validation:** Use `zod` schemas for all request/response validation.
-- **Service Registration:** Register handlers/services in the DI container.
-
----
-
-## 4. Coding Standards for Humans and AI
-
-- **Naming:**
-  - Files/folders: lowercase, hyphens (e.g., `user-repository.ts`)
-  - Classes: PascalCase
-  - Functions/variables: camelCase, descriptive
-- **Code Style:**
-  - Clean, modular, and straightforward
-  - Use strong typing and TypeScript generics
-  - DRY principle: extract reusable logic
-  - Minimal comments; use tests to document behavior
-  - Validate all inputs and sanitize external data
-- **AI Patterns:**
-  - Replicate DI, modularity, and test structure
-  - Update YAML docs when generating new code
-
----
-
-## 5. Dependency Injection (DI) Details
-
-- **DI Container:** All services, repositories, and handlers are registered using `tsyringe`.
-- **No direct instantiation:** Always resolve dependencies via DI.
-- **AI Registration:** When generating new components, ensure they are registered in the DI container.
-
----
-
-## 6. Database Schema & Persistence
-
-- **MongoDB schemas:** Define all schemas in `src/micro-service/architecture/infrastructure/repositories/`.
-- **Repository pattern:** Extend `BaseRepository` for new collections.
-- **Schema best practices:**
-  - Favor embedding for related data
-  - Keep schemas minimal and property names concise
-  - Use references for large or independent data
-  - See `mongodb.yaml` for full guidelines
-
----
-
-## 7. Error Management and Validation
-
-- **Error Classes:** All errors extend `CustomError` (see `src/error/`).
-- **Throw, don’t return:** Always throw errors for exceptional cases.
-- **Validation:** Use `zod` for all request/response validation. Place schemas in the Application layer.
-
----
-
-## 8. Testing Philosophy and Setup
-
-- **Framework:** Use `vitest` for all tests.
-- **Structure:** Place tests in `test/unit/`, mirroring the `src/` structure.
-- **Mocking:** Mock all external dependencies (DB, services) in tests.
-- **AI Testing:** When generating new logic, always add or update tests.
-
----
-
-## 9. Minimal Usage Example
-
-```typescript
-import Fastify from "fastify";
-import { MicroService } from "@sentzunhat/zacatl";
-
-const fastifyApp = Fastify();
-
-const microservice = new MicroService({
-  architecture: {
-    application: {
-      entryPoints: {
-        rest: {
-          hookHandlers: [], // Add hook handler classes
-          routeHandlers: [], // Add route handler classes
-        },
-      },
-    },
-    domain: { providers: [] }, // Add domain provider classes
-    infrastructure: { repositories: [] }, // Add repository classes
-    service: {
-      name: "my-service",
-      server: {
-        type: "SERVER",
-        vendor: "FASTIFY",
-        instance: fastifyApp,
-      },
-      databases: [
-        // Example for MongoDB:
-        // {
-        //   vendor: "MONGOOSE",
-        //   instance: new Mongoose(),
-        //   connectionString: "mongodb://localhost/mydb",
-        // }
-      ],
-    },
-  },
-});
-
-await microservice.start({ port: 9000 });
+```bash
+npm run build      # Compile TypeScript to build/
+npm run build:watch # Watch mode
 ```
 
----
+### Code Quality
 
-## 10. Configuration and Environment Variables
+```bash
+npm run lint       # Run ESLint
+npm run type:check # TypeScript checking
+```
 
-- **Localization:** Place locale JSON files in `src/locales/` (e.g., `en.json`)
-- **Environment Variables:**
-  - `SERVICE_NAME` - Service name
-  - `NODE_ENV` - Environment (development, production, test)
-  - `CONNECTION_STRING` - Database connection string
+## 📋 Requirements
 
----
+- **Node.js**: 24.0.0 or higher (LTS)
+- **npm**: 10.0.0 or higher (bundled with Node 24)
+- **TypeScript**: 5.9+ (we use 5.9.3)
 
-## 11. Extending the Codebase (for Humans & AI)
+Optional:
 
-- Add new features by creating new handlers, services, or repositories in the appropriate layer.
-- Register all new classes in the DI container.
-- Write tests for all new logic.
-- Update YAML docs (`context.yaml`, `guidelines.yaml`, `patterns.yaml`, `mongodb.yaml`) with new patterns or conventions.
+- **Bun**: Latest for fast package management (development only)
 
----
+## 📄 License
 
-## 12. Documentation References
+[MIT License](./LICENSE) © 2025 Sentzunhat
 
-- [`context.yaml`](./context.yaml): Architecture, components, and project context
-- [`guidelines.yaml`](./guidelines.yaml): Coding standards and best practices
-- [`patterns.yaml`](./patterns.yaml): Design and usage patterns
-- [`mongodb.yaml`](./mongodb.yaml): MongoDB schema guidelines
-
----
-
-## 13. Contributing Workflow
-
-### For Humans
+## 🤝 Contributing
 
 1. Fork the repository
-2. Create your feature branch: `git checkout -b feature/amazing-feature`
-3. Commit your changes: `git commit -m 'Add some amazing feature'`
-4. Push to the branch: `git push origin feature/amazing-feature`
-5. Open a Pull Request
-6. Ensure all tests pass and docs are updated
+2. Create a feature branch: `git checkout -b feature/amazing-feature`
+3. Add tests for your changes
+4. Update documentation
+5. Commit: `git commit -m 'Add amazing feature'`
+6. Push: `git push origin feature/amazing-feature`
+7. Open a Pull Request
 
-### For AI Agents
+## 📞 Support
 
-- Parse YAML docs for context and conventions
-- Register new code in the DI container
-- Add or update tests in `test/unit/`
-- Update YAML docs with new features or patterns
+- 📖 [Documentation](./docs/INDEX.md)
+- 🐛 [Issue Tracker](https://github.com/sentzunhat/zacatl/issues)
+- 💬 [Discussions](https://github.com/sentzunhat/zacatl/discussions)
 
----
+## 🙋 About
 
-## 14. License and Maintainers
+Zacatl is built for developers who value clean architecture, type safety, and test-driven development. It's equally useful for humans and AI agents building production services.
 
-- **License:** MIT License © 2025 Sentzunhat
-- **Maintainer:** Diego Beltran ([LinkedIn](https://www.linkedin.com/in/diego-beltran))
-- **Project URL:** [GitHub](https://github.com/sentzunhat/zacatl)
-
----
-
-_For all details, see the YAML documentation files above. Zacatl is designed for seamless collaboration between humans and AI agents._
+**Created by**: [Diego Beltran](https://www.linkedin.com/in/diego-beltran)  
+**Repository**: https://github.com/sentzunhat/zacatl  
+**npm**: https://www.npmjs.com/package/@sentzunhat/zacatl

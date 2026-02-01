@@ -1,14 +1,13 @@
 {
   "compilerOptions": {
     "incremental": true,
-    "target": "ESNext",
-    "lib": ["ESNext", "DOM"],
+    "target": "ES2024",
+    "lib": ["ES2024"],
     "module": "ESNext",
     "moduleResolution": "bundler",
-    "baseUrl": "./src",
     "rootDir": "./src",
 
-    "types": ["vitest/globals"],
+    "types": ["vitest/globals", "node", "bun"],
     "resolveJsonModule": true,
     "allowImportingTsExtensions": false,
 
@@ -56,7 +55,23 @@
     "allowUnusedLabels": false,
     "allowUnreachableCode": false,
 
-    "skipLibCheck": true
+    "skipLibCheck": true,
+
+    "paths": {
+      "@zacatl/error": ["./src/error/index.ts"],
+      "@zacatl/utils": ["./src/utils/index.ts"],
+      "@zacatl/logs": ["./src/logs/index.ts"],
+      "@zacatl/optionals": ["./src/optionals.ts"],
+      "@zacatl/configuration": ["./src/configuration/index.ts"],
+      "@zacatl/infrastructure": [
+        "./src/service/architecture/infrastructure/index.ts"
+      ],
+      "@zacatl/domain": ["./src/service/architecture/domain/index.ts"],
+      "@zacatl/application": [
+        "./src/service/architecture/application/index.ts"
+      ],
+      "@zacatl/platform": ["./src/service/architecture/platform/index.ts"]
+    }
   },
   "include": ["src/**/*.ts", "src/**/*.js"],
   "exclude": ["node_modules", "build", "coverage", "test"]

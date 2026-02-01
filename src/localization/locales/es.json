@@ -1,0 +1,9 @@
+{
+  "ERROR_MESSAGES": {
+    "DEFAULT": "Ocurrió un error.",
+    "VALIDATION": "Error de validación: faltan campos requeridos o son inválidos. Por favor, revise su entrada y asegúrese de que todos los campos cumplan con el formato esperado."
+  },
+  "SUCCESS_MESSAGES": {
+    "DEFAULT": "Su solicitud se procesó correctamente."
+  }
+}

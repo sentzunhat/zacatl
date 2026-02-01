@@ -1,0 +1,7 @@
+{
+  "SERVICE_NAME": "zacatl-test",
+  "NODE_ENV": "test",
+  "APP_VERSION": "0.0.16",
+  "APP_ENV": "test",
+  "CONNECTION_STRING": "mongodb://localhost:27017/zacatl-test"
+}

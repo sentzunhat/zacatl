@@ -1,0 +1,151 @@
+# Zacatl Project: Structured Context
+
+components:
+  - name: MicroService
+    type: class
+    file: src/micro-service/architecture/platform/micro-service.ts
+    description: |
+      The main orchestrator for the microservice. Bootstraps Application, Domain, Infrastructure, and Service layers. Handles startup, dependency registration, and handler registration.
+    methods:
+      - name: constructor
+        description: Initializes all architecture layers from config.
+      - name: start
+        description: Starts the service, configures databases, registers handlers, and launches the HTTP server.
+    dependencies:
+      - Application
+      - Domain
+      - Infrastructure
+      - Service
+
+  - name: Application
+    type: class
+    file: src/micro-service/architecture/application/application.ts
+    description: |
+      Handles HTTP entry points (REST), validation, and delegates to domain logic. Registers route and hook handlers using DI.
+    methods:
+      - name: constructor
+        description: Configures i18n and stores entry point config.
+      - name: start
+        description: Registers and stores REST hook and route handlers.
+    dependencies:
+      - AbstractArchitecture
+      - HookHandler
+      - RouteHandler
+
+  - name: Infrastructure
+    type: class
+    file: src/micro-service/architecture/infrastructure/infrastructure.ts
+    description: |
+      Registers and manages repositories (e.g., MongoDB) for persistence. Uses DI for repository registration.
+    methods:
+      - name: constructor
+        description: Stores repository config.
+      - name: start
+        description: Registers repositories in DI container.
+    dependencies:
+      - AbstractArchitecture
+
+  - name: BaseRepository
+    type: abstract class
+    file: src/micro-service/architecture/infrastructure/repositories/abstract.ts
+    description: |
+      Abstract base for MongoDB repositories. Handles model creation, lazy initialization, and CRUD methods. Ensures returned documents have an id field.
+    methods:
+      - name: constructor
+        description: Sets up Mongoose model and schema.
+      - name: findById
+        description: Finds a document by id and returns a lean object with id.
+      - name: create
+        description: Creates a new document and returns a lean object with id.
+      - name: update
+        description: Updates a document by id and returns a lean object with id.
+      - name: delete
+        description: Deletes a document by id and returns a lean object with id.
+    dependencies:
+      - mongoose
+      - tsyringe
+
+  - name: AbstractArchitecture
+    type: abstract class
+    file: src/micro-service/architecture/architecture.ts
+    description: |
+      Provides generic dependency registration helpers for all architecture layers. Enforces a start() contract.
+    methods:
+      - name: registerDependencies
+        description: Registers an array of classes in the DI container.
+      - name: registerAndStoreDependencies
+        description: Registers classes and stores resolved instances in a provided array.
+      - name: start
+        description: Abstract method to be implemented by subclasses.
+    dependencies:
+      - tsyringe
+
+  - name: CustomError
+    type: class
+    file: src/error/custom.ts
+    description: |
+      Base class for all custom errors. Supports metadata, error codes, and unique IDs. Used for structured error handling.
+    methods:
+      - name: constructor
+        description: Initializes error with message, code, reason, metadata, and stack trace.
+
+  - name: getConfigOrThrow
+    type: function
+    file: src/configuration.ts
+    description: |
+      Retrieves configuration values from the config system. Throws if missing.
+
+  - name: defaultLogger
+    type: object
+    file: src/logs.ts
+    description: |
+      Pino-based logger configured with environment and service metadata. Used for structured logging.
+
+  - name: Utility Exports
+    type: module
+    file: src/utils/index.ts
+    description: |
+      Exports utility functions (e.g., base64, hmac) for use throughout the codebase.
+
+layers:
+  - name: Platform
+    description: Bootstraps the app, configures DI, starts the server.
+    files:
+      - src/micro-service/architecture/platform/micro-service.ts
+      - src/micro-service/architecture/platform/server/server.ts
+  - name: Application
+    description: Handles HTTP requests, validation, delegates to domain logic.
+    files:
+      - src/micro-service/architecture/application/application.ts
+      - src/micro-service/architecture/application/entry-points/rest/route-handlers/
+      - src/micro-service/architecture/application/entry-points/rest/hook-handlers/
+  - name: Domain
+    description: Pure business rules, models, and logic (no infrastructure deps).
+    files:
+      - src/micro-service/architecture/domain/
+  - name: Infrastructure
+    description: Persistence (MongoDB repositories), external service integration.
+    files:
+      - src/micro-service/architecture/infrastructure/repositories/
+      - src/micro-service/architecture/infrastructure/infrastructure.ts
+
+patterns:
+  - Dependency Injection: All services, repositories, and handlers are registered in the DI container (tsyringe). Never instantiate dependencies directly.
+  - Error Handling: Custom error classes extend CustomError. Errors are thrown and bubble up to Fastify's error handler unless custom handling is needed.
+  - Validation: All request/response validation uses zod schemas.
+  - Testing: All business logic, handlers, and utilities are unit tested using vitest. Tests mirror the src/ structure.
+
+config:
+  - Localization: Locale JSON files in src/locales/ (e.g., en.json)
+  - Environment Variables:
+      - SERVICE_NAME: Service name
+      - NODE_ENV: Environment (development, production, test)
+      - CONNECTION_STRING: Database connection string
+      - APP_VERSION: Application version
+      - APP_ENV: Application environment
+
+testing:
+  - All tests are in test/unit/, mirroring src/ structure.
+  - Uses vitest for all tests.
+  - Mocks external dependencies (DB, services) in tests.
+  - Test helpers in test/unit/helpers/.
