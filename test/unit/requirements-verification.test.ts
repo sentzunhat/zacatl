@@ -1,9 +1,9 @@
 /**
- * Verification Test: All Requirements from Original Issue
+ * Verification Test: v0.0.24 - Strict Subpath-Only Strategy
  *
- * This test ensures all specific requirements are met:
- * 1. ✅ Dedicated ORM entry points exist
- * 2. ✅ ORMs available from main package (dual-option)
+ * This test ensures the critical bug fix is applied:
+ * 1. ✅ Main package exports NO ORMs (prevents eager loading)
+ * 2. ✅ Dedicated ORM entry points exist
  * 3. ✅ DI utilities available from application subpath
  * 4. ✅ Package.json exports configured correctly
  */
@@ -11,14 +11,17 @@
 import { describe, it, expect } from "vitest";
 
 describe("Original Issue Requirements Verification", () => {
-  it("✅ Requirement 1: ORMs available from main package (convenience)", async () => {
+  it("✅ Requirement 1: Main package does NOT export ORMs (bug fix)", async () => {
     const mainExports = await import("../../src/index.js");
 
+    // Core exports should work
     expect(mainExports.Service).toBeDefined();
-    expect(mainExports.mongoose).toBeDefined();
-    expect(mainExports.Schema).toBeDefined();
-    expect(mainExports.Sequelize).toBeDefined();
-    expect(mainExports.DataTypes).toBeDefined();
+
+    // ORMs should NOT be exported (prevents eager loading)
+    expect("mongoose" in mainExports).toBe(false);
+    expect("Schema" in mainExports).toBe(false);
+    expect("Sequelize" in mainExports).toBe(false);
+    expect("DataTypes" in mainExports).toBe(false);
   });
 
   it("✅ Requirement 2: Dedicated Mongoose subpath exists", async () => {
@@ -48,13 +51,12 @@ describe("Original Issue Requirements Verification", () => {
     expect(appExports.registerDependency).toBeDefined();
   });
 
-  it("✅ Benefit 1: Both import styles work (flexibility)", async () => {
-    const fromMain = await import("../../src/index.js");
+  it("✅ Benefit 1: Subpath imports are isolated and tree-shakeable", async () => {
     const fromSubpath = await import("../../src/orm/mongoose.js");
 
-    // Both point to same mongoose
-    expect(fromMain.mongoose).toBe(fromSubpath.mongoose);
-    expect(fromMain.Schema).toBe(fromSubpath.Schema);
+    // Mongoose available ONLY via subpath
+    expect(fromSubpath.mongoose).toBeDefined();
+    expect(fromSubpath.Schema).toBeDefined();
   });
 
   it("✅ Benefit 2: Clean imports without workarounds", async () => {

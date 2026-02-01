@@ -5,8 +5,8 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![TypeScript](https://img.shields.io/badge/%3C%2F%3E-TypeScript-3178c6.svg)](https://www.typescriptlang.org/)
 [![Node.js 24+](https://img.shields.io/badge/Node.js-24%2B-brightgreen.svg)](https://nodejs.org/)
-[![Tests: 180](https://img.shields.io/badge/Tests-180-blue.svg)](#testing)
-[![Coverage: 79%](https://img.shields.io/badge/Coverage-79%25-brightgreen.svg)](#testing)
+[![Tests: 188](https://img.shields.io/badge/Tests-188-blue.svg)](#testing)
+[![Coverage: 78%](https://img.shields.io/badge/Coverage-78%25-brightgreen.svg)](#testing)
 
 **Production-ready TypeScript framework for building scalable microservices, APIs, and distributed systems.**
 
@@ -47,29 +47,24 @@ Zacatl is MIT-licensed (permissive). Please don’t use it to harm people.
 npm install @sentzunhat/zacatl
 ```
 
-## 📦 Import Options (v0.0.23+)
+## 📦 Import Strategy (v0.0.24+)
 
-> **New in v0.0.23:** Dual-option import strategy. Choose convenience (main package) or minimal bundles (subpaths). [Import Guide](./docs/guides/orm-import-strategies.md)
+> **⚠️ Breaking Change in v0.0.24:** Main package no longer exports ORMs. Use dedicated subpaths to prevent eager loading. [Migration Guide](./docs/migration/v0.0.24.md)
 
 ```typescript
-// Option 1: Main package (convenience - everything in one place)
-import {
-  Service,
-  mongoose,
-  Schema,
-  Sequelize,
-  singleton,
-} from "@sentzunhat/zacatl";
-
-// Option 2: Subpath imports (minimal - tree-shakeable)
+// ✅ Recommended: Subpath imports (tree-shakeable, no eager loading)
 import { Service } from "@sentzunhat/zacatl";
 import { mongoose, Schema } from "@sentzunhat/zacatl/orm/mongoose";
+import { Sequelize, DataTypes } from "@sentzunhat/zacatl/orm/sequelize";
 import { resolveDependency } from "@sentzunhat/zacatl/application";
 
-// Subpath shortcuts
+// Other subpath shortcuts
 import { BaseRepository, ORMType } from "@sentzunhat/zacatl/infrastructure";
 import { CustomError } from "@sentzunhat/zacatl/errors";
 import { loadConfig } from "@sentzunhat/zacatl/config";
+
+// ❌ No longer available (removed in v0.0.24)
+// import { mongoose } from "@sentzunhat/zacatl";  // Would cause eager loading
 ```
 
 ### Hello World HTTP Service

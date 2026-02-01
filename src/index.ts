@@ -26,6 +26,7 @@ export type { DependencyContainer } from "tsyringe";
 export { z } from "zod";
 export type { ZodSchema, ZodType, ZodError } from "zod";
 
-// Optional ORM exports for convenience (also available via subpath imports)
-export * from "./orm/mongoose.js";
-export * from "./orm/sequelize.js";
+// ⚠️ ORM exports REMOVED from main package to prevent eager loading
+// Use dedicated subpath imports instead:
+//   import { mongoose, Schema } from "@sentzunhat/zacatl/orm/mongoose"
+//   import { Sequelize, DataTypes } from "@sentzunhat/zacatl/orm/sequelize"
