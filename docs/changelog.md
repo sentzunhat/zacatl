@@ -1,6 +1,100 @@
-# Release Notes - vX.Y.Z
+# Release Notes
 
-## Summary
+## [0.0.21] - 2026-01-31
+
+### 🐛 Critical Bug Fixes
+
+#### **Issue #1: Optional ORM Dependencies (BREAKING FIX)**
+
+**Problem:** Both Mongoose and Sequelize adapters were imported unconditionally at the top level, forcing all projects to install both ORMs even if only using one.
+
+**Solution:** Implemented lazy loading with `require()` - adapters are now only loaded when actually used.
+
+```typescript
+// Now you can use ONLY Sequelize without installing mongoose
+npm install @sentzunhat/zacatl sequelize
+
+// Or ONLY Mongoose without installing sequelize
+npm install @sentzunhat/zacatl mongoose
+```
+
+**Impact:** Projects can now install and use a single ORM without dependency conflicts.
+
+---
+
+#### **Issue #2: Mongoose v9 ESM Import**
+
+**Problem:** `connection` named export doesn't exist in mongoose v9, causing `SyntaxError` in ESM environments.
+
+**Before:**
+
+```typescript
+import { connection } from "mongoose"; // ❌ Breaks in v9
+```
+
+**After:**
+
+```typescript
+import mongoose from "mongoose";
+mongoose.connection; // ✅ Works in v9
+```
+
+**Impact:** Mongoose adapter now works correctly with mongoose v9+ in ESM/tsx/Node.js runtimes.
+
+---
+
+### Developer Experience Improvements
+
+#### 📦 Package Exports Map
+
+- Added comprehensive `exports` field for better module resolution
+- Shorter, cleaner import paths for better DX
+- Backward compatible - all old paths still work
+
+**New Import Shortcuts:**
+
+```typescript
+import { BaseRepository, ORMType } from "@sentzunhat/zacatl/infrastructure";
+import { CustomError } from "@sentzunhat/zacatl/errors";
+import { loadConfig } from "@sentzunhat/zacatl/config";
+```
+
+#### 🔧 Peer Dependencies
+
+- Moved `mongoose` and `sequelize` to `peerDependencies` with `optional: true`
+- Clearer indication of which ORMs are supported
+- No forced installation of unused dependencies
+
+#### 🧪 Bun Support
+
+- Added `test:bun` and `test:node` scripts
+- Better runtime-specific testing
+
+#### 📚 Documentation
+
+- Added [v0.0.21 Migration Guide](./migration/v0.0.21.md)
+- Updated README with import shortcuts section
+- All examples remain backward compatible
+
+### Technical Details
+
+**Lazy Loading Implementation:**
+
+- Adapters use CommonJS `require()` for conditional loading
+- Type safety maintained with TypeScript type assertions
+- Works in both compiled JavaScript and TypeScript environments
+- ORM type stored for runtime checks without instanceof
+
+###Migration Path
+No code changes required. Projects already using both ORMs will continue to work. Projects wanting to use a single ORM can now uninstall the unused one.
+
+See [v0.0.21 Migration Guide](./migration/v0.0.21.md) for details.
+
+---
+
+## [0.0.20] - 2026-01-30
+
+### Summary
 
 Zacatl is production-ready with organized documentation, full test coverage, and verified build/publish pipelines.
 

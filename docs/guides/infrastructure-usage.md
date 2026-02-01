@@ -1,5 +1,13 @@
 # Infrastructure Usage Guide
 
+> **📦 v0.0.21+ Import Shortcut:**
+>
+> ```typescript
+> import { BaseRepository, ORMType } from "@sentzunhat/zacatl/infrastructure";
+> ```
+>
+> See [v0.0.21 Migration Guide](../migration/v0.0.21.md) for more shortcuts.
+
 ## Modular ORM System
 
 Your service supports **multiple ORMs simultaneously**. You can mix Mongoose (MongoDB), Sequelize (PostgreSQL/MySQL/SQLite), or any future ORM in the same application.

@@ -6,6 +6,7 @@ Documentation for migrating between versions of @sentzunhat/zacatl.
 
 ### Version Migrations
 
+- [v0.0.21 Migration Guide](./v0.0.21.md) - Import shortcuts and DX improvements
 - [v0.0.20 Migration Guide](./v0.0.20.md) - Post-release migration instructions
 - [Prepare for v0.0.20](./prepare-v0.0.20.md) - Pre-release preparation guide
 

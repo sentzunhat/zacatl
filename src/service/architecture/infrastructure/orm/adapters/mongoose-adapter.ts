@@ -1,8 +1,5 @@
-import importedMongoose, {
-  connection,
-  Model as MongooseModel,
-  Mongoose,
-} from "mongoose";
+import type { Model as MongooseModel } from "mongoose";
+import { Mongoose } from "mongoose";
 import { v4 as uuidv4 } from "uuid";
 import { container } from "tsyringe";
 import type {
@@ -14,9 +11,11 @@ import type {
 /**
  * MongooseAdapter - Handles Mongoose-specific ORM operations
  *
- * This adapter wraps Mongoose model operations and provides a consistent
- * interface for the repository layer. It handles document transformation,
- * ID normalization, and timestamp management.
+ * Provides consistent interface for repository layer with:
+ * - Document transformation
+ * - ID normalization
+ * - Timestamp management
+ * - Connection instance from DI container
  */
 export class MongooseAdapter<D, I, O> implements ORMAdapter<D, I, O> {
   public readonly model: MongooseModel<D>;
@@ -24,9 +23,9 @@ export class MongooseAdapter<D, I, O> implements ORMAdapter<D, I, O> {
 
   constructor(config: MongooseRepositoryConfig<D>) {
     this.config = config;
-    const mongoose = connection.db?.databaseName
-      ? importedMongoose
-      : container.resolve<Mongoose>(Mongoose);
+    // Get mongoose instance from DI container - allows per-database configuration
+    // Connection strings should be set up before repository instantiation
+    const mongoose = container.resolve<Mongoose>(Mongoose);
 
     const { name, schema } = this.config;
 

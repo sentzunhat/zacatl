@@ -13,15 +13,23 @@ Complete API documentation for Zacatl framework.
 
 ## Quick Reference
 
+### Main Package (v0.0.21+)
+
 ```typescript
-import {
-  Service,
-  NotFoundError,
-  loadConfig,
-  createLogger,
-  createI18n,
-} from "@sentzunhat/zacatl";
+// Core exports
+import { Service } from "@sentzunhat/zacatl";
+
+// Import shortcuts (v0.0.21+)
+import { BaseRepository, ORMType } from "@sentzunhat/zacatl/infrastructure";
+import { NotFoundError, BadRequestError } from "@sentzunhat/zacatl/errors";
+import { loadConfig } from "@sentzunhat/zacatl/config";
+
+// Full paths (still supported)
+import { createLogger } from "@sentzunhat/zacatl";
+import { createI18n } from "@sentzunhat/zacatl";
 ```
+
+See [v0.0.21 Migration Guide](../migration/v0.0.21.md) for all available import shortcuts.
 
 ---
 

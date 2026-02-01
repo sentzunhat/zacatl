@@ -44,6 +44,7 @@ TypeScript microservice framework for building production-ready services.
 ### Migration & Upgrades
 
 - [Migration Guides](./migration/index.md)
+- [v0.0.21 Migration](./migration/v0.0.21.md) - Import shortcuts (latest)
 - [v0.0.20 Migration](./migration/v0.0.20.md)
 - [Prepare for v0.0.20](./migration/prepare-v0.0.20.md)
 

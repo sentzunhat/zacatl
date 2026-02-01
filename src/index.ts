@@ -30,5 +30,8 @@ export type { DependencyContainer } from "tsyringe";
 export { z } from "zod";
 export type { ZodSchema, ZodType, ZodError } from "zod";
 
+// Re-export ORMs (included as dependencies)
+export * from "./orm-exports";
+
 // Note: TypeScript utility types (Partial, Required, Readonly, etc.)
 // are globally available and don't need re-export

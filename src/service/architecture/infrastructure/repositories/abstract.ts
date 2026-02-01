@@ -1,5 +1,5 @@
-import { Model as MongooseModel } from "mongoose";
-import { Model, ModelStatic } from "sequelize";
+import type { Model as MongooseModel } from "mongoose";
+import type { Model, ModelStatic } from "sequelize";
 import {
   BaseRepositoryConfig,
   Repository,
@@ -8,8 +8,10 @@ import {
   ORMAdapter,
   ORMType,
 } from "./types";
-import { MongooseAdapter } from "../orm/adapters/mongoose-adapter";
-import { SequelizeAdapter } from "../orm/adapters/sequelize-adapter";
+import {
+  loadMongooseAdapter,
+  loadSequelizeAdapter,
+} from "../orm/adapter-loader";
 
 export * from "./types";
 
@@ -34,22 +36,27 @@ const isSequelizeConfig = <D extends Model>(
 /**
  * BaseRepository - Abstract base class for all repositories
  *
- * Uses the adapter pattern to support multiple ORMs (Mongoose, Sequelize, etc.)
- * without circular dependencies. Adapters are imported from separate files in
- * the orm/ folder.
+ * Supports multiple ORMs (Mongoose, Sequelize) through adapter pattern.
+ * Adapters are lazy-loaded - only the ORM you use gets imported.
+ * This allows projects to install only one ORM without unused dependencies.
  */
 export abstract class BaseRepository<D, I, O> implements Repository<D, I, O> {
   private adapter: ORMAdapter<D, I, O>;
+  private readonly ormType: ORMType;
 
   constructor(config: BaseRepositoryConfig<D>) {
+    this.ormType = config.type;
+
     if (isMongooseConfig<D>(config)) {
-      // TypeScript knows config is MongooseRepositoryConfig<D>
-      this.adapter = new MongooseAdapter<D, I, O>(config);
+      this.adapter = loadMongooseAdapter<D, I, O>(config);
     } else if (isSequelizeConfig(config)) {
-      // TypeScript knows config is SequelizeRepositoryConfig
-      this.adapter = new SequelizeAdapter<Model, I, O>(config);
+      // Type assertion needed here because D could be either Mongoose or Sequelize model
+      this.adapter = loadSequelizeAdapter<Model, I, O>(config) as ORMAdapter<
+        D,
+        I,
+        O
+      >;
     } else {
-      // Exhaustiveness check - should never reach here with proper types
       const exhaustive: never = config;
       throw new Error(
         `Invalid repository configuration. Received: ${JSON.stringify(exhaustive)}`,
@@ -62,11 +69,11 @@ export abstract class BaseRepository<D, I, O> implements Repository<D, I, O> {
   }
 
   public isMongoose(): boolean {
-    return this.adapter instanceof MongooseAdapter;
+    return this.ormType === ORMType.Mongoose;
   }
 
   public isSequelize(): boolean {
-    return this.adapter instanceof SequelizeAdapter;
+    return this.ormType === ORMType.Sequelize;
   }
 
   public getMongooseModel(): MongooseModel<D> {

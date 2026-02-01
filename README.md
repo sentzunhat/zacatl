@@ -47,6 +47,18 @@ Zacatl is MIT-licensed (permissive). Please don’t use it to harm people.
 npm install @sentzunhat/zacatl
 ```
 
+## 📦 Import Shortcuts (v0.0.21+)
+
+```typescript
+// Short imports for better DX
+import { BaseRepository, ORMType } from "@sentzunhat/zacatl/infrastructure";
+import { CustomError } from "@sentzunhat/zacatl/errors";
+import { loadConfig } from "@sentzunhat/zacatl/config";
+
+// Or full path (still works)
+import { BaseRepository } from "@sentzunhat/zacatl/build/service/architecture/infrastructure/repositories/abstract";
+```
+
 ### Hello World HTTP Service
 
 ```typescript

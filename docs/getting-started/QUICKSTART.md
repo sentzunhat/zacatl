@@ -8,6 +8,22 @@ Welcome to Zacatl! This guide will help you get started with the framework quick
 npm install @sentzunhat/zacatl
 ```
 
+## Import Shortcuts (v0.0.21+)
+
+Zacatl now supports shorter import paths for better developer experience:
+
+```typescript
+// Recommended (v0.0.21+)
+import { BaseRepository, ORMType } from "@sentzunhat/zacatl/infrastructure";
+import { CustomError, BadRequestError } from "@sentzunhat/zacatl/errors";
+import { loadConfig } from "@sentzunhat/zacatl/config";
+
+// Also works (backward compatible)
+import { Service } from "@sentzunhat/zacatl";
+```
+
+See the [v0.0.21 Migration Guide](../migration/v0.0.21.md) for all available shortcuts.
+
 ## Quick Setup
 
 ### 1. Basic Microservice
