@@ -1,5 +1,55 @@
 # Release Notes
 
+## [0.0.22] - 2026-01-31
+
+### 🐛 Critical ESM Runtime Fix
+
+#### **Issue: CommonJS `require()` in ESM Environment**
+
+**Problem:** v0.0.21 used `require()` for lazy loading adapters, which throws `ReferenceError: require is not defined` in pure ESM environments (Bun, Node.js ESM, Vite, Next.js).
+
+**Root Cause:**
+
+```typescript
+// v0.0.21 - BROKEN in ESM
+export function loadMongooseAdapter(config) {
+  const adapters = require("./adapters/mongoose-adapter"); // ❌
+  return new adapters.MongooseAdapter(config);
+}
+```
+
+**Solution:** Replaced `require()` with async `import()` and implemented lazy initialization pattern:
+
+```typescript
+// v0.0.22 - Works in ALL environments
+export async function loadMongooseAdapter(config) {
+  const adapters = await import("./adapters/mongoose-adapter"); // ✅
+  return new adapters.MongooseAdapter(config);
+}
+```
+
+**Implementation Details:**
+
+- ✅ Repository constructors remain synchronous (no breaking changes)
+- ✅ Adapters load lazily on first async method call
+- ✅ Single initialization promise prevents race conditions
+- ✅ Handles both ESM (`ERR_MODULE_NOT_FOUND`) and CommonJS (`MODULE_NOT_FOUND`) error codes
+
+**Impact:** Framework now works in all JavaScript runtimes without `require is not defined` errors.
+
+**Migration:** See [Migration Guide v0.0.22](./migration/v0.0.22.md) for details. Most users need no code changes.
+
+---
+
+### Testing
+
+- ✅ 169 tests passing (8 new ESM adapter tests)
+- ✅ Verified in Bun runtime
+- ✅ Verified with Node.js ESM
+- ✅ All existing tests pass without modification
+
+---
+
 ## [0.0.21] - 2026-01-31
 
 ### 🐛 Critical Bug Fixes

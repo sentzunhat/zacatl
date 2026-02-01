@@ -39,25 +39,48 @@ const isSequelizeConfig = <D extends Model>(
  * Supports multiple ORMs (Mongoose, Sequelize) through adapter pattern.
  * Adapters are lazy-loaded - only the ORM you use gets imported.
  * This allows projects to install only one ORM without unused dependencies.
+ *
+ * Uses lazy initialization to support ESM dynamic imports while maintaining
+ * backward compatibility with synchronous constructors.
  */
 export abstract class BaseRepository<D, I, O> implements Repository<D, I, O> {
-  private adapter: ORMAdapter<D, I, O>;
+  private adapter?: ORMAdapter<D, I, O>;
   private readonly ormType: ORMType;
+  private readonly config: BaseRepositoryConfig<D>;
+  private initPromise?: Promise<void>;
 
   constructor(config: BaseRepositoryConfig<D>) {
     this.ormType = config.type;
+    this.config = config;
+  }
 
-    if (isMongooseConfig<D>(config)) {
-      this.adapter = loadMongooseAdapter<D, I, O>(config);
-    } else if (isSequelizeConfig(config)) {
+  /**
+   * Ensures the adapter is initialized before any operation
+   * Uses a promise to prevent multiple concurrent initializations
+   */
+  private async ensureInitialized(): Promise<void> {
+    if (this.adapter) return;
+
+    if (!this.initPromise) {
+      this.initPromise = this.loadAdapter();
+    }
+
+    await this.initPromise;
+  }
+
+  /**
+   * Loads the appropriate ORM adapter based on configuration
+   */
+  private async loadAdapter(): Promise<void> {
+    if (isMongooseConfig<D>(this.config)) {
+      this.adapter = await loadMongooseAdapter<D, I, O>(this.config);
+    } else if (isSequelizeConfig(this.config)) {
       // Type assertion needed here because D could be either Mongoose or Sequelize model
-      this.adapter = loadSequelizeAdapter<Model, I, O>(config) as ORMAdapter<
-        D,
-        I,
-        O
-      >;
+      this.adapter = (await loadSequelizeAdapter<Model, I, O>(
+        this.config,
+      )) as ORMAdapter<D, I, O>;
     } else {
-      const exhaustive: never = config;
+      const exhaustive: never = this.config;
       throw new Error(
         `Invalid repository configuration. Received: ${JSON.stringify(exhaustive)}`,
       );
@@ -65,6 +88,11 @@ export abstract class BaseRepository<D, I, O> implements Repository<D, I, O> {
   }
 
   get model(): MongooseModel<D> | ModelStatic<any> {
+    if (!this.adapter) {
+      throw new Error(
+        "Repository not initialized. Call an async method first or await repository.ensureInitialized()",
+      );
+    }
     return this.adapter.model;
   }
 
@@ -77,6 +105,11 @@ export abstract class BaseRepository<D, I, O> implements Repository<D, I, O> {
   }
 
   public getMongooseModel(): MongooseModel<D> {
+    if (!this.adapter) {
+      throw new Error(
+        "Repository not initialized. Call an async method first or await repository.ensureInitialized()",
+      );
+    }
     if (!this.isMongoose()) {
       throw new Error("Repository is not using Mongoose");
     }
@@ -84,6 +117,11 @@ export abstract class BaseRepository<D, I, O> implements Repository<D, I, O> {
   }
 
   public getSequelizeModel(): ModelStatic<any> {
+    if (!this.adapter) {
+      throw new Error(
+        "Repository not initialized. Call an async method first or await repository.ensureInitialized()",
+      );
+    }
     if (!this.isSequelize()) {
       throw new Error("Repository is not using Sequelize");
     }
@@ -91,22 +129,31 @@ export abstract class BaseRepository<D, I, O> implements Repository<D, I, O> {
   }
 
   public toLean(input: unknown): O | null {
+    if (!this.adapter) {
+      throw new Error(
+        "Repository not initialized. Call an async method first or await repository.ensureInitialized()",
+      );
+    }
     return this.adapter.toLean(input);
   }
 
   async findById(id: string): Promise<O | null> {
-    return this.adapter.findById(id);
+    await this.ensureInitialized();
+    return this.adapter!.findById(id);
   }
 
   async create(entity: I): Promise<O> {
-    return this.adapter.create(entity);
+    await this.ensureInitialized();
+    return this.adapter!.create(entity);
   }
 
   async update(id: string, update: Partial<I>): Promise<O | null> {
-    return this.adapter.update(id, update);
+    await this.ensureInitialized();
+    return this.adapter!.update(id, update);
   }
 
   async delete(id: string): Promise<O | null> {
-    return this.adapter.delete(id);
+    await this.ensureInitialized();
+    return this.adapter!.delete(id);
   }
 }

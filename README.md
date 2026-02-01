@@ -5,7 +5,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![TypeScript](https://img.shields.io/badge/%3C%2F%3E-TypeScript-3178c6.svg)](https://www.typescriptlang.org/)
 [![Node.js 24+](https://img.shields.io/badge/Node.js-24%2B-brightgreen.svg)](https://nodejs.org/)
-[![Tests: 161](https://img.shields.io/badge/Tests-161-blue.svg)](#testing)
+[![Tests: 169](https://img.shields.io/badge/Tests-169-blue.svg)](#testing)
 [![Coverage: 79%](https://img.shields.io/badge/Coverage-79%25-brightgreen.svg)](#testing)
 
 **Production-ready TypeScript framework for building scalable microservices, APIs, and distributed systems.**
@@ -21,7 +21,7 @@ Zacatl enforces clean, layered architecture with dependency injection, validatio
 - **🗄️ Pluggable ORM Adapters** - Sequelize, Mongoose, or build your own
 - **🌐 Multi-Language Support** - Pluggable i18n with filesystem/memory adapters
 - **🔌 Adapter Pattern** - Easy integration with any database or service
-- **🧪 Comprehensive Testing** - 161 tests, 79% coverage, Vitest
+- **🧪 Comprehensive Testing** - 169 tests, 79% coverage, Vitest
 - **⚡ Runtime Detection** - Works with Node.js 22+ and Bun
 - **📝 Production Ready** - Structured logging, monitoring, and error tracking
 
@@ -47,7 +47,9 @@ Zacatl is MIT-licensed (permissive). Please don’t use it to harm people.
 npm install @sentzunhat/zacatl
 ```
 
-## 📦 Import Shortcuts (v0.0.21+)
+## 📦 Import Shortcuts (v0.0.22+)
+
+> **New in v0.0.22:** ESM runtime compatibility fix. Adapters now use dynamic `import()` instead of `require()`. [Migration Guide](./docs/migration/v0.0.22.md)
 
 ```typescript
 // Short imports for better DX

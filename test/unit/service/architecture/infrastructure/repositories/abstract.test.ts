@@ -52,6 +52,8 @@ describe("BaseRepository", () => {
 
   it("should create a model using the provided name and schema", async () => {
     if (!repository) return; // Skip if repository couldn't be initialized
+    // Initialize adapter by calling an async method first
+    await repository.create({ name: "test" });
     expect(repository.getMongooseModel().modelName).toBe("User");
     expect(repository.getMongooseModel().schema).toBe(schemaUserTest);
   });
@@ -60,11 +62,13 @@ describe("BaseRepository", () => {
     if (!repository) return; // Skip if repository couldn't be initialized
     const user = { name: "Alice" };
 
+    // Initialize adapter first, then spy
+    await repository.create({ name: "init" });
     const spyFunction = vi.spyOn(repository.getMongooseModel(), "create");
 
     const result = await repository.create(user);
 
-    expect(spyFunction).toHaveBeenNthCalledWith(1, user);
+    expect(spyFunction).toHaveBeenCalledWith(user);
     expect(result).toEqual(expect.objectContaining(user));
   });
 

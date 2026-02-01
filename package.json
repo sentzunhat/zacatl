@@ -4,7 +4,7 @@
   "main": "build/index.js",
   "module": "build/index.js",
   "types": "build/index.d.ts",
-  "version": "0.0.21",
+  "version": "0.0.22",
   "packageManager": "npm@10.9.0",
   "exports": {
     ".": {
@@ -100,7 +100,9 @@
     "test:coverage": "npm run test -- --coverage",
     "test:bun": "bun test",
     "test:node": "vitest run",
-    "type:check": "tsc -p ./tsconfig.json && tsc -p test/tsconfig.json",
+    "type:check": "npm run type:check:src && npm run type:check:test",
+    "type:check:src": "tsc --noEmit -p ./tsconfig.json",
+    "type:check:test": "tsc --noEmit -p ./test/tsconfig.json",
     "lint": "DEBUG=eslint:cli-engine bun eslint .",
     "prepublish": "npm run test:coverage && npm run type:check && npm run lint && npm run build",
     "publish:latest": "npm run prepublish && npm publish --access public --tag latest",
