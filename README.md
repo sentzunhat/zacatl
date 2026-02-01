@@ -5,7 +5,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![TypeScript](https://img.shields.io/badge/%3C%2F%3E-TypeScript-3178c6.svg)](https://www.typescriptlang.org/)
 [![Node.js 24+](https://img.shields.io/badge/Node.js-24%2B-brightgreen.svg)](https://nodejs.org/)
-[![Tests: 169](https://img.shields.io/badge/Tests-169-blue.svg)](#testing)
+[![Tests: 180](https://img.shields.io/badge/Tests-180-blue.svg)](#testing)
 [![Coverage: 79%](https://img.shields.io/badge/Coverage-79%25-brightgreen.svg)](#testing)
 
 **Production-ready TypeScript framework for building scalable microservices, APIs, and distributed systems.**
@@ -47,18 +47,29 @@ Zacatl is MIT-licensed (permissive). Please don’t use it to harm people.
 npm install @sentzunhat/zacatl
 ```
 
-## 📦 Import Shortcuts (v0.0.22+)
+## 📦 Import Options (v0.0.23+)
 
-> **New in v0.0.22:** ESM runtime compatibility fix. Adapters now use dynamic `import()` instead of `require()`. [Migration Guide](./docs/migration/v0.0.22.md)
+> **New in v0.0.23:** Dual-option import strategy. Choose convenience (main package) or minimal bundles (subpaths). [Import Guide](./docs/guides/orm-import-strategies.md)
 
 ```typescript
-// Short imports for better DX
+// Option 1: Main package (convenience - everything in one place)
+import {
+  Service,
+  mongoose,
+  Schema,
+  Sequelize,
+  singleton,
+} from "@sentzunhat/zacatl";
+
+// Option 2: Subpath imports (minimal - tree-shakeable)
+import { Service } from "@sentzunhat/zacatl";
+import { mongoose, Schema } from "@sentzunhat/zacatl/orm/mongoose";
+import { resolveDependency } from "@sentzunhat/zacatl/application";
+
+// Subpath shortcuts
 import { BaseRepository, ORMType } from "@sentzunhat/zacatl/infrastructure";
 import { CustomError } from "@sentzunhat/zacatl/errors";
 import { loadConfig } from "@sentzunhat/zacatl/config";
-
-// Or full path (still works)
-import { BaseRepository } from "@sentzunhat/zacatl/build/service/architecture/infrastructure/repositories/abstract";
 ```
 
 ### Hello World HTTP Service

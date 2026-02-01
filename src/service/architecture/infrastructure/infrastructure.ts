@@ -2,6 +2,7 @@ import { AbstractArchitecture, Constructor } from "../architecture";
 
 export type ConfigInfrastructure = {
   repositories: Array<Constructor>;
+  autoRegister?: boolean; // Auto-register on construction (default: false)
 };
 
 export class Infrastructure extends AbstractArchitecture {
@@ -11,9 +12,17 @@ export class Infrastructure extends AbstractArchitecture {
     super();
 
     this.config = config;
+
+    // Auto-register if enabled (useful without Service)
+    if (config.autoRegister) {
+      this.registerDependencies(this.config.repositories);
+    }
   }
 
   public start(): void {
-    this.registerDependencies(this.config.repositories);
+    // Register if not already done
+    if (!this.config.autoRegister) {
+      this.registerDependencies(this.config.repositories);
+    }
   }
 }

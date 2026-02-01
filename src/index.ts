@@ -10,10 +10,8 @@ export * from "./logs";
 export * from "./runtime";
 export * from "./localization";
 
-// Re-export infrastructure with ORM types
 export * from "./service/architecture/infrastructure";
 
-// Re-export server types for convenience
 export {
   ServerType,
   ServerVendor,
@@ -22,16 +20,12 @@ export {
 } from "./service/architecture/platform/server/server";
 export type { ConfigServer } from "./service/architecture/platform/server/server";
 
-// Re-export commonly used third-party packages
-export { container } from "tsyringe";
+// Third-party integrations
+export { container, singleton, inject } from "tsyringe";
 export type { DependencyContainer } from "tsyringe";
-
-// Re-export Zod for validation
 export { z } from "zod";
 export type { ZodSchema, ZodType, ZodError } from "zod";
 
-// Re-export ORMs (included as dependencies)
-export * from "./orm-exports";
-
-// Note: TypeScript utility types (Partial, Required, Readonly, etc.)
-// are globally available and don't need re-export
+// Optional ORM exports for convenience (also available via subpath imports)
+export * from "./orm/mongoose.js";
+export * from "./orm/sequelize.js";

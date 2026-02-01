@@ -1,5 +1,65 @@
 # Release Notes
 
+## [0.0.23] - 2026-01-31
+
+### 🎯 Dual ORM Import Strategy - Flexibility for All Use Cases
+
+**New Feature:** Choose between convenience (main package) or minimal bundles (subpath imports).
+
+#### Import Options
+
+**Option 1 - Main Package (Convenience):**
+
+```typescript
+import { Service, mongoose, Schema, Sequelize } from "@sentzunhat/zacatl";
+```
+
+**Option 2 - Subpath Imports (Minimal Bundle):**
+
+```typescript
+import { Service } from "@sentzunhat/zacatl";
+import { mongoose, Schema } from "@sentzunhat/zacatl/orm/mongoose";
+import { Sequelize, DataTypes } from "@sentzunhat/zacatl/orm/sequelize";
+```
+
+#### Why Both Options?
+
+- **Main Package**: Quick projects, prototypes, learning (includes both ORMs)
+- **Subpath Imports**: Production apps, bundle optimization (tree-shakeable)
+
+**No Breaking Changes:** Both import styles work - choose based on your needs.
+
+**See:** [docs/guides/orm-import-strategies.md](./guides/orm-import-strategies.md)
+
+---
+
+### 🧹 Code Cleanup
+
+- Simplified documentation comments throughout codebase
+- Removed redundant explanations while keeping essential docs
+- Cleaner code, same functionality
+
+---
+
+### 📦 Dependency Management Optimization
+
+**Change:** Mongoose and Sequelize included as regular dependencies for version control.
+
+**Rationale:**
+
+- **Single Source of Truth:** All users get tested, compatible ORM versions
+- **Version Control:** Zacatl manages ORM version compatibility
+- **Automatic Updates:** Upgrading zacatl updates ORMs to compatible versions
+- **Simpler Installation:** `npm install @sentzunhat/zacatl` includes everything
+
+**Dependencies Structure:**
+
+- `dependencies`: Core packages + mongoose + sequelize (guaranteed compatible)
+- `peerDependencies`: Optional flexibility for advanced users to override
+- `devDependencies`: Testing tools (mongodb-memory-server, etc.)
+
+---
+
 ## [0.0.22] - 2026-01-31
 
 ### 🐛 Critical ESM Runtime Fix

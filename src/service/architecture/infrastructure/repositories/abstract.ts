@@ -1,3 +1,4 @@
+// Type-only imports prevent eager loading in ESM
 import type { Model as MongooseModel } from "mongoose";
 import type { Model, ModelStatic } from "sequelize";
 import {
@@ -15,18 +16,12 @@ import {
 
 export * from "./types";
 
-/**
- * Type guard to check if config is for Mongoose
- */
 const isMongooseConfig = <D>(
   config: BaseRepositoryConfig<D>,
 ): config is MongooseRepositoryConfig<D> => {
   return config.type === ORMType.Mongoose;
 };
 
-/**
- * Type guard to check if config is for Sequelize
- */
 const isSequelizeConfig = <D extends Model>(
   config: BaseRepositoryConfig<D>,
 ): config is SequelizeRepositoryConfig<D> => {
@@ -34,14 +29,8 @@ const isSequelizeConfig = <D extends Model>(
 };
 
 /**
- * BaseRepository - Abstract base class for all repositories
- *
- * Supports multiple ORMs (Mongoose, Sequelize) through adapter pattern.
- * Adapters are lazy-loaded - only the ORM you use gets imported.
- * This allows projects to install only one ORM without unused dependencies.
- *
- * Uses lazy initialization to support ESM dynamic imports while maintaining
- * backward compatibility with synchronous constructors.
+ * Abstract base repository supporting multiple ORMs via adapter pattern.
+ * Adapters are lazy-loaded for optimal bundle size.
  */
 export abstract class BaseRepository<D, I, O> implements Repository<D, I, O> {
   private adapter?: ORMAdapter<D, I, O>;

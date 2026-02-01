@@ -5,15 +5,11 @@ import type {
   ORMAdapter,
 } from "../repositories/types";
 
-/**
- * Loads MongooseAdapter dynamically - only when needed
- * Throws helpful error if mongoose is not installed
- */
+/** Lazy-loads MongooseAdapter when needed */
 export async function loadMongooseAdapter<D, I, O>(
   config: MongooseRepositoryConfig<D>,
 ): Promise<ORMAdapter<D, I, O>> {
   try {
-    // Dynamic import - only loads when Mongoose is actually used
     const adapters = await import("./adapters/mongoose-adapter");
     return new adapters.MongooseAdapter<D, I, O>(config);
   } catch (error: any) {
@@ -29,15 +25,11 @@ export async function loadMongooseAdapter<D, I, O>(
   }
 }
 
-/**
- * Loads SequelizeAdapter dynamically - only when needed
- * Throws helpful error if sequelize is not installed
- */
+/** Lazy-loads SequelizeAdapter when needed */
 export async function loadSequelizeAdapter<D extends Model, I, O>(
   config: SequelizeRepositoryConfig<D>,
 ): Promise<ORMAdapter<D, I, O>> {
   try {
-    // Dynamic import - only loads when Sequelize is actually used
     const adapters = await import("./adapters/sequelize-adapter");
     return new adapters.SequelizeAdapter<D, I, O>(config);
   } catch (error: any) {

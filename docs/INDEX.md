@@ -24,6 +24,8 @@ TypeScript microservice framework for building production-ready services.
 - [Infrastructure Usage](./guides/infrastructure-usage.md) - BaseRepository pattern
 - [Multi-ORM Setup](./guides/multi-orm-setup.md) - Multiple databases
 - [Single Import System](./guides/single-import.md) - Import all from one place
+- **[AI Agent: Scaffold HTTP Service](./guides/ai-agent-scaffold-http-service.md)** - Production-ready project templates
+- [AI Agent: Non-HTTP Services](./guides/ai-agent-non-http-setup.md) - CLI, workers, migrations
 
 ### Architecture
 
@@ -99,8 +101,15 @@ TypeScript microservice framework for building production-ready services.
 
 ### "I'm building a CLI app"
 
-1. [CLI Example](./examples/02-cli-app.md)
-2. [First Service](./getting-started/first-service.md)
+1. [AI Agent: Non-HTTP Services](./guides/ai-agent-non-http-setup.md)
+2. [CLI Example](./examples/02-cli-app.md)
+3. [First Service](./getting-started/first-service.md)
+
+### "I want to scaffold a new HTTP service"
+
+1. **[AI Agent: Scaffold HTTP Service](./guides/ai-agent-scaffold-http-service.md)** - Start here!
+2. [5-Minute Quick Start](./getting-started/quickstart-5min.md)
+3. [Examples - REST API](./examples/03-rest-api.md)
 
 ### "I need to test my code"
 

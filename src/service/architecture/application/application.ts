@@ -18,6 +18,7 @@ export type ApplicationEntryPoints = {
 
 export type ConfigApplication = {
   entryPoints: ApplicationEntryPoints;
+  autoRegister?: boolean; // Auto-register on construction (default: false)
 };
 
 export class Application extends AbstractArchitecture {
@@ -36,6 +37,11 @@ export class Application extends AbstractArchitecture {
     });
 
     this.config = config;
+
+    // Auto-register if enabled (useful without Service)
+    if (config.autoRegister) {
+      this.registerRest();
+    }
   }
 
   /**
@@ -44,16 +50,19 @@ export class Application extends AbstractArchitecture {
   private registerRest(): void {
     this.registerAndStoreDependencies(
       this.config.entryPoints.rest.hookHandlers,
-      this.hookHandlers
+      this.hookHandlers,
     );
 
     this.registerAndStoreDependencies(
       this.config.entryPoints.rest.routeHandlers,
-      this.routeHandlers
+      this.routeHandlers,
     );
   }
 
   public start(): void {
-    this.registerRest();
+    // Register if not already done
+    if (!this.config.autoRegister) {
+      this.registerRest();
+    }
   }
 }
