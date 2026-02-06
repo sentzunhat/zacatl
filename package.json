@@ -4,129 +4,129 @@
   "main": "build/index.js",
   "module": "build/index.js",
   "types": "build/index.d.ts",
-  "version": "0.0.27",
+  "version": "0.0.28",
   "packageManager": "npm@10.9.0",
   "exports": {
     ".": {
+      "types": "./build/index.d.ts",
       "bun": "./src/index.ts",
       "import": "./build/index.js",
-      "require": "./build/index.js",
-      "types": "./build/index.d.ts"
+      "require": "./build/index.js"
     },
     "./service": {
+      "types": "./build/service/index.d.ts",
       "bun": "./src/service/index.ts",
-      "import": "./build/service/index.js",
-      "types": "./build/service/index.d.ts"
+      "import": "./build/service/index.js"
     },
     "./third-party": {
+      "types": "./build/third-party/index.d.ts",
       "bun": "./src/third-party/index.ts",
-      "import": "./build/third-party/index.js",
-      "types": "./build/third-party/index.d.ts"
+      "import": "./build/third-party/index.js"
     },
     "./error": {
+      "types": "./build/error/index.d.ts",
       "bun": "./src/error/index.ts",
-      "import": "./build/error/index.js",
-      "types": "./build/error/index.d.ts"
+      "import": "./build/error/index.js"
     },
     "./third-party/mongoose": {
+      "types": "./build/third-party/mongoose.d.ts",
       "bun": "./src/third-party/mongoose.ts",
-      "import": "./build/third-party/mongoose.js",
-      "types": "./build/third-party/mongoose.d.ts"
+      "import": "./build/third-party/mongoose.js"
     },
     "./third-party/sequelize": {
+      "types": "./build/third-party/sequelize.d.ts",
       "bun": "./src/third-party/sequelize.ts",
-      "import": "./build/third-party/sequelize.js",
-      "types": "./build/third-party/sequelize.d.ts"
+      "import": "./build/third-party/sequelize.js"
     },
     "./third-party/uuid": {
+      "types": "./build/third-party/uuid.d.ts",
       "bun": "./src/third-party/uuid.ts",
-      "import": "./build/third-party/uuid.js",
-      "types": "./build/third-party/uuid.d.ts"
+      "import": "./build/third-party/uuid.js"
     },
     "./third-party/i18n": {
+      "types": "./build/third-party/i18n.d.ts",
       "bun": "./src/third-party/i18n.ts",
-      "import": "./build/third-party/i18n.js",
-      "types": "./build/third-party/i18n.d.ts"
+      "import": "./build/third-party/i18n.js"
     },
     "./third-party/i18next": {
+      "types": "./build/third-party/i18next.d.ts",
       "bun": "./src/third-party/i18next.ts",
-      "import": "./build/third-party/i18next.js",
-      "types": "./build/third-party/i18next.d.ts"
+      "import": "./build/third-party/i18next.js"
     },
     "./third-party/js-yaml": {
+      "types": "./build/third-party/js-yaml.d.ts",
       "bun": "./src/third-party/js-yaml.ts",
-      "import": "./build/third-party/js-yaml.js",
-      "types": "./build/third-party/js-yaml.d.ts"
+      "import": "./build/third-party/js-yaml.js"
     },
     "./third-party/fastify": {
+      "types": "./build/third-party/fastify.d.ts",
       "bun": "./src/third-party/fastify.ts",
-      "import": "./build/third-party/fastify.js",
-      "types": "./build/third-party/fastify.d.ts"
+      "import": "./build/third-party/fastify.js"
     },
     "./third-party/eslint": {
+      "types": "./build/third-party/eslint.d.ts",
       "bun": "./src/third-party/eslint.ts",
-      "import": "./build/third-party/eslint.js",
-      "types": "./build/third-party/eslint.d.ts"
+      "import": "./build/third-party/eslint.js"
     },
     "./infrastructure": {
+      "types": "./build/service/layers/infrastructure/repositories/abstract.d.ts",
       "bun": "./src/service/layers/infrastructure/repositories/abstract.ts",
-      "import": "./build/service/layers/infrastructure/repositories/abstract.js",
-      "types": "./build/service/layers/infrastructure/repositories/abstract.d.ts"
+      "import": "./build/service/layers/infrastructure/repositories/abstract.js"
     },
     "./domain": {
+      "types": "./build/service/layers/domain/index.d.ts",
       "bun": "./src/service/layers/domain/index.ts",
-      "import": "./build/service/layers/domain/index.js",
-      "types": "./build/service/layers/domain/index.d.ts"
+      "import": "./build/service/layers/domain/index.js"
     },
     "./application": {
+      "types": "./build/service/layers/application/index.d.ts",
       "bun": "./src/service/layers/application/index.ts",
-      "import": "./build/service/layers/application/index.js",
-      "types": "./build/service/layers/application/index.d.ts"
+      "import": "./build/service/layers/application/index.js"
     },
     "./errors": {
+      "types": "./build/error/index.d.ts",
       "bun": "./src/error/index.ts",
-      "import": "./build/error/index.js",
-      "types": "./build/error/index.d.ts"
+      "import": "./build/error/index.js"
     },
     "./dependency-injection": {
+      "types": "./build/dependency-injection/index.d.ts",
       "bun": "./src/dependency-injection/index.ts",
-      "import": "./build/dependency-injection/index.js",
-      "types": "./build/dependency-injection/index.d.ts"
+      "import": "./build/dependency-injection/index.js"
     },
     "./runtime": {
+      "types": "./build/runtime/index.d.ts",
       "bun": "./src/runtime/index.ts",
-      "import": "./build/runtime/index.js",
-      "types": "./build/runtime/index.d.ts"
+      "import": "./build/runtime/index.js"
     },
     "./utils": {
+      "types": "./build/utils/index.d.ts",
       "bun": "./src/utils/index.ts",
-      "import": "./build/utils/index.js",
-      "types": "./build/utils/index.d.ts"
+      "import": "./build/utils/index.js"
     },
     "./optionals": {
+      "types": "./build/optionals.d.ts",
       "bun": "./src/optionals.ts",
-      "import": "./build/optionals.js",
-      "types": "./build/optionals.d.ts"
+      "import": "./build/optionals.js"
     },
     "./logs": {
+      "types": "./build/logs/index.d.ts",
       "bun": "./src/logs/index.ts",
-      "import": "./build/logs/index.js",
-      "types": "./build/logs/index.d.ts"
+      "import": "./build/logs/index.js"
     },
     "./localization": {
+      "types": "./build/localization/index.d.ts",
       "bun": "./src/localization/index.ts",
-      "import": "./build/localization/index.js",
-      "types": "./build/localization/index.d.ts"
+      "import": "./build/localization/index.js"
     },
     "./configuration": {
+      "types": "./build/configuration/index.d.ts",
       "bun": "./src/configuration/index.ts",
-      "import": "./build/configuration/index.js",
-      "types": "./build/configuration/index.d.ts"
+      "import": "./build/configuration/index.js"
     },
     "./config": {
+      "types": "./build/configuration/index.d.ts",
       "bun": "./src/configuration/index.ts",
-      "import": "./build/configuration/index.js",
-      "types": "./build/configuration/index.d.ts"
+      "import": "./build/configuration/index.js"
     },
     "./eslint": {
       "import": "./src/eslint/index.mjs"
@@ -195,7 +195,7 @@
   },
   "scripts": {
     "start": "npx tsx src/index.ts --project ./tsconfig.json",
-    "build": "tsc --project tsconfig.json",
+    "build": "tsc --project tsconfig.json && tsc-alias -p tsconfig.json",
     "build:watch": "tsc --project tsconfig.json --watch",
     "test": "NODE_ENV=test ENV=test vitest run",
     "test:watch": "NODE_ENV=test ENV=test vitest",
@@ -233,6 +233,7 @@
     "eslint-plugin-import": "^2.32.0",
     "knip": "^5.83.0",
     "mongodb-memory-server": "^11.0.1",
+    "tsc-alias": "^1.8.16",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.48.1",
@@ -272,7 +273,7 @@
     "i18n": "^0.15.3",
     "i18next": "^25.8.4",
     "js-yaml": "^4.1.1",
-    "mongoose": "^9.1.6",
+    "mongoose": "^9.0.0",
     "pino": "^10.3.0",
     "pino-pretty": "^13.1.3",
     "reflect-metadata": "^0.2.2",

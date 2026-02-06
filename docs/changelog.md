@@ -1,5 +1,27 @@
 # Release Notes
 
+## [0.0.28] - 2026-02-06
+
+### ✨ Enhancements
+
+- **Runtime Path Alias Resolution**: Integrated `tsc-alias` post-build step to transform internal path aliases (`@zacatl/*`) into relative imports
+  - Enables external consumers to use the library without path alias resolution issues
+  - Build script now runs `tsc && tsc-alias` for complete compilation pipeline
+  - Path aliases properly replaced in CommonJS and ESM output
+
+### ✅ Fixes
+
+- **Export Condition Ordering**: Reordered all package.json exports to place `"types"` condition first
+  - Resolves TypeScript build warnings about incorrect export condition order
+  - Ensures type information is properly resolved before runtime conditions
+  - Applies to all 24+ subpath exports
+
+### 📦 Dependencies
+
+- Added `tsc-alias@^1.8.16` to dev dependencies for runtime path alias resolution
+
+---
+
 ## [0.0.27] - 2026-02-05
 
 ### ✨ Enhancements
@@ -390,14 +412,14 @@ Layered/hexagonal architecture:
 
 ## Features
 
-✅ Fastify & Express integrations  
-✅ Sequelize & Mongoose adapters  
-✅ tsyringe DI container  
-✅ Zod validation  
-✅ 7 custom error types  
-✅ Pino logging  
-✅ i18n adapters  
-✅ YAML/JSON configuration  
+✅ Fastify & Express integrations
+✅ Sequelize & Mongoose adapters
+✅ tsyringe DI container
+✅ Zod validation
+✅ 7 custom error types
+✅ Pino logging
+✅ i18n adapters
+✅ YAML/JSON configuration
 ✅ Runtime detection (Node/Bun)
 
 ## No Breaking Changes
@@ -422,6 +444,6 @@ All changes are additive. Existing APIs remain unchanged.
 
 ---
 
-**Status**: ✅ Ready for Release  
-**Version**: X.Y.Z  
+**Status**: ✅ Ready for Release
+**Version**: X.Y.Z
 **Date**: YYYY-MM-DD
