@@ -109,7 +109,7 @@ export const resolveBuiltInLocalesDir = (): string => {
 
   const candidates = [
     path.resolve(here, "locales"),
-    path.resolve(here, "../src/localization/locales"),
+    path.resolve(here, "../../src/localization/locales"),
     path.resolve(process.cwd(), "src/localization/locales"),
   ];
 

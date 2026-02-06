@@ -4,7 +4,7 @@
   "main": "build/index.js",
   "module": "build/index.js",
   "types": "build/index.d.ts",
-  "version": "0.0.29",
+  "version": "0.0.30",
   "packageManager": "npm@10.9.0",
   "exports": {
     ".": {
@@ -247,6 +247,7 @@
   "files": [
     "build",
     "src/eslint",
+    "src/localization/locales",
     "README.md",
     "LICENSE"
   ],
