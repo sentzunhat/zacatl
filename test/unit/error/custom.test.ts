@@ -11,8 +11,8 @@ describe("CustomError", () => {
     expect(error.correlationId).toBeDefined();
     expect(typeof error.correlationId).toBe("string");
     expect(error.correlationId.length).toBeGreaterThan(0);
-    // It should be the same as id when generated
-    expect(error.correlationId).toBe(error.id);
+    // It should be different from id when generated
+    expect(error.correlationId).not.toBe(error.id);
   });
 
   it("should use the provided correlationId", () => {

@@ -1,7 +1,6 @@
 import { describe, it, expect } from "vitest";
 import {
   detectRuntime,
-  isBun,
   isNode,
   getRuntimeType,
   getRuntimeVersion,
@@ -9,26 +8,18 @@ import {
 import type { RuntimeType } from "../../../src/runtime/types";
 
 describe("Runtime Detection", () => {
-  // Determine which runtime we're currently on for runtime-specific tests
-  const currentRuntime = typeof Bun !== "undefined" ? "bun" : "node";
-
   describe("detectRuntime", () => {
     it("should detect the current runtime correctly", () => {
       const result = detectRuntime();
 
       expect(result).toBeDefined();
-      expect(result.type).toBe(currentRuntime);
+      expect(result.type).toBe("node");
       expect(result.version).toBeDefined();
       expect(result.version).toMatch(/^\d+\.\d+\.\d+/);
 
-      // Verify the correct runtime flag is set
-      if (currentRuntime === "bun") {
-        expect(result.isBun).toBe(true);
-        expect(result.isNode).toBe(false);
-      } else if (currentRuntime === "node") {
-        expect(result.isNode).toBe(true);
-        expect(result.isBun).toBe(false);
-      }
+      // Verify the correct runtime flag is set (always Node.js in main package)
+      expect(result.isNode).toBe(true);
+      expect(result.isBun).toBe(false);
     });
 
     it("should return all required properties", () => {
@@ -41,21 +32,15 @@ describe("Runtime Detection", () => {
     });
   });
 
-  describe("isBun", () => {
-    it("should correctly identify Bun runtime", () => {
-      expect(isBun()).toBe(currentRuntime === "bun");
-    });
-  });
-
   describe("isNode", () => {
     it("should correctly identify Node.js runtime", () => {
-      expect(isNode()).toBe(currentRuntime === "node");
+      expect(isNode()).toBe(true);
     });
   });
 
   describe("getRuntimeType", () => {
     it("should return the current runtime type", () => {
-      expect(getRuntimeType()).toBe(currentRuntime);
+      expect(getRuntimeType()).toBe("node");
     });
 
     it("should return a valid RuntimeType", () => {
@@ -89,7 +74,6 @@ describe("Runtime Detection", () => {
     it("should maintain consistency between helper functions and detectRuntime", () => {
       const runtime = detectRuntime();
 
-      expect(isBun()).toBe(runtime.isBun);
       expect(isNode()).toBe(runtime.isNode);
       expect(getRuntimeType()).toBe(runtime.type);
       expect(getRuntimeVersion()).toBe(runtime.version);

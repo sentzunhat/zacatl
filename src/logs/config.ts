@@ -5,12 +5,49 @@ export interface PinoConfigOptions {
   serviceName?: string;
   appVersion?: string;
   appEnv?: string;
+  /** Override or extend the generated Pino config */
+  pinoConfig?: Partial<pino.LoggerOptions>;
 }
 
 /**
  * Default Pino logger configuration with sensible fallbacks.
  * - Uses pino-pretty in non-production environments for readability
  * - Emits structured JSON in production
+ *
+ * @example Basic usage
+ * ```typescript
+ * import { PinoLoggerAdapter, createPinoConfig } from '@sentzunhat/zacatl/logs';
+ * const logger = new PinoLoggerAdapter(createPinoConfig());
+ * ```
+ *
+ * @example With service metadata
+ * ```typescript
+ * const config = createPinoConfig({
+ *   serviceName: 'user-api',
+ *   appVersion: '1.0.0'
+ * });
+ * ```
+ *
+ * @example Multi-transport (console + file) - NO SPREAD NEEDED
+ * ```typescript
+ * const config = createPinoConfig({
+ *   pinoConfig: {
+ *     transport: {
+ *       targets: [
+ *         { target: 'pino/file', options: { destination: './app.log' } },
+ *         { target: 'pino-pretty', options: { colorize: true } }
+ *       ]
+ *     }
+ *   }
+ * });
+ * ```
+ *
+ * @example File logging with destination
+ * ```typescript
+ * import pino from 'pino';
+ * const dest = pino.destination('/var/log/app.log');
+ * const logger = new PinoLoggerAdapter(createPinoConfig(), dest);
+ * ```
  */
 export const createPinoConfig = (
   options?: PinoConfigOptions,
@@ -27,7 +64,7 @@ export const createPinoConfig = (
       }
     : undefined;
 
-  return {
+  const baseConfig: pino.LoggerOptions = {
     level: process.env["LOG_LEVEL"] ?? "info",
     ...(transport ? { transport } : {}),
     formatters: {
@@ -50,4 +87,19 @@ export const createPinoConfig = (
       },
     },
   };
+
+  // Merge custom Pino config if provided
+  if (options?.pinoConfig) {
+    return {
+      ...baseConfig,
+      ...options.pinoConfig,
+      // Deep merge formatters if both exist
+      formatters: {
+        ...baseConfig.formatters,
+        ...options.pinoConfig.formatters,
+      },
+    };
+  }
+
+  return baseConfig;
 };

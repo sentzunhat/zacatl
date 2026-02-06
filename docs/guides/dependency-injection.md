@@ -4,6 +4,8 @@ Complete guide to dependency injection patterns in Zacatl.
 
 > **📦 v0.0.26:** Added `registerWithDependencies` and `registerSingletonWithDependencies` helpers for tsx/ts-node compatibility
 
+> **⚠️ Class Tokens vs String Tokens:** The canonical pattern uses **class-based tokens** (`@inject(MyClass)`) for automatic type safety and resolution. String tokens (`@inject("myToken")`) require manual registration and are only for advanced use cases. See [String Token Warning](#string-token-warning) below.
+
 ---
 
 ## Overview
@@ -417,46 +419,45 @@ class OrderService {
 }
 ```
 
-### Pattern 3: Interface-Based DI
+### Pattern 3: Abstract-Class DI (Manual Binding)
 
 ```typescript
 import { inject, singleton, container } from "@sentzunhat/zacatl";
 
-// Define interface
-interface INotificationService {
-  send(userId: string, message: string): Promise<void>;
+// Define abstract token
+abstract class NotificationService {
+  abstract send(userId: string, message: string): Promise<void>;
 }
 
 // Implementations
 @singleton()
-class EmailNotificationService implements INotificationService {
+class EmailNotificationService extends NotificationService {
   async send(userId: string, message: string) {
     console.log(`Email to ${userId}: ${message}`);
   }
 }
 
 @singleton()
-class SmsNotificationService implements INotificationService {
+class SmsNotificationService extends NotificationService {
   async send(userId: string, message: string) {
     console.log(`SMS to ${userId}: ${message}`);
   }
 }
 
-// Register with token
+// Manual binding (must run before Service creation)
+container.registerSingleton(NotificationService, EmailNotificationService);
 
-container.register<INotificationService>("INotificationService", {
-  useClass: EmailNotificationService,
-});
-
-// Inject by token
+// Inject by class token
 @singleton()
 class UserService {
   constructor(
-    @inject("INotificationService")
-    private notificationService: INotificationService,
+    @inject(NotificationService)
+    private notificationService: NotificationService,
   ) {}
 }
 ```
+
+**Note:** Prefer class-based injection with concrete providers. Use abstract tokens only when you need a swappable contract, and bind them manually before creating a `Service`.
 
 ---
 
@@ -506,6 +507,8 @@ class OrderService {
 
 ### 3. Use Interfaces for Flexibility
 
+> **⚠️ String Token Warning:** This pattern uses string tokens and requires manual registration. Only use this for advanced cases where you need runtime polymorphism. The canonical pattern uses class tokens.
+
 ```typescript
 // Define contract
 interface ILogger {
@@ -525,10 +528,40 @@ class FileLogger implements ILogger {
   }
 }
 
-// Register based on environment
+// Manual registration with string token (advanced only)
 container.register<ILogger>("ILogger", {
   useClass: process.env.NODE_ENV === "production" ? FileLogger : ConsoleLogger,
 });
+
+// Inject using string token
+class MyService {
+  constructor(@inject("ILogger") private logger: ILogger) {}
+}
+```
+
+**Preferred alternative using class tokens:**
+
+```typescript
+// Use abstract class instead of interface for DI
+abstract class LoggerPort {
+  abstract log(message: string): void;
+}
+
+@singleton()
+class ConsoleLogger extends LoggerPort {
+  log(message: string) {
+    console.log(message);
+  }
+}
+
+// Register concrete implementation
+container.registerInstance(LoggerPort, new ConsoleLogger());
+
+// Inject using class token (automatic type safety)
+@singleton()
+class MyService {
+  constructor(@inject(LoggerPort) private logger: LoggerPort) {}
+}
 ```
 
 ### 4. Avoid Circular Dependencies
@@ -599,6 +632,69 @@ registerSingletonWithDependencies(MyService, []);
 // ❌ Transient - new instances
 registerWithDependencies(MyService, []);
 ```
+
+---
+
+## String Token Warning
+
+**String tokens are for advanced/manual use only.** The canonical Zacatl pattern uses **class-based tokens** for automatic type safety.
+
+### ❌ Avoid String Tokens
+
+```typescript
+// String token - requires manual registration, no type safety
+container.registerInstance("MyRepository", new MyRepositoryAdapter());
+
+@singleton()
+class MyService {
+  constructor(@inject("MyRepository") private repo: any) {}
+  //                 ^^^^^^^^^^^^^^^^           ^^^ - loses type safety
+}
+```
+
+### ✅ Use Class Tokens
+
+```typescript
+// Class token - automatic type resolution and type safety
+container.registerInstance(MyRepositoryAdapter, new MyRepositoryAdapter());
+
+@singleton()
+class MyService {
+  constructor(@inject(MyRepositoryAdapter) private repo: MyRepositoryAdapter) {}
+  //                 ^^^^^^^^^^^^^^^^^^^^           ^^^^^^^^^^^^^^^^^^^^ - full type safety
+}
+```
+
+**When to use abstract classes instead of interfaces:**
+
+```typescript
+// Abstract class can be used as a DI token
+abstract class RepositoryPort {
+  abstract findById(id: string): Promise<Model>;
+}
+
+// Concrete implementation
+@singleton()
+class SequelizeRepository extends RepositoryPort {
+  async findById(id: string) {
+    /* ... */
+  }
+}
+
+// Register and inject using class token
+container.registerInstance(RepositoryPort, new SequelizeRepository());
+
+@singleton()
+class Service {
+  constructor(@inject(RepositoryPort) private repo: RepositoryPort) {}
+}
+```
+
+**Only use string tokens when:**
+
+- You need runtime polymorphism that can't be achieved with class tokens
+- You're integrating with third-party code that requires string tokens
+- You understand you must manually register every string token before use
 
 ---
 

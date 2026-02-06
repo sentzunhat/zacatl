@@ -51,7 +51,7 @@ describe("v0.0.24 Bug Fix: No Eager ORM Loading", () => {
 
   it("should ONLY load mongoose when explicitly imported from subpath", async () => {
     // Explicitly import mongoose from subpath
-    const { mongoose } = await import("../../src/orm/mongoose.js");
+    const { mongoose } = await import("../../src/third-party/mongoose.js");
 
     // Verify mongoose was imported
     expect(mongoose).toBeDefined();

@@ -8,58 +8,50 @@
 
 **New to Zacatl?** Start here:
 
-1. **[Quick Start](getting-started/quickstart-simple.md)** - Get running in 5 minutes
-2. **[Full Tutorial](getting-started/QUICKSTART.md)** - Complete setup guide with examples
+1. **[Quick Start](tutorials/quickstart.md)** - Get running in 5 minutes
+2. **[Tutorials](tutorials/README.md)** - Step-by-step learning guides
 
 ## 📚 Documentation by Category
 
-### Getting Started
+### Learning Tutorials
 
-- [Installation](getting-started/INSTALLATION.md) - Install and setup
-- [Quick Start (5 min)](getting-started/quickstart-5min.md) - Fast setup with code examples
-- [Simple Quick Start](getting-started/quickstart-simple.md) - Minimal example
-- [Complete Tutorial](getting-started/QUICKSTART.md) - Comprehensive guide
-- [First Service](getting-started/first-service.md) - Build your first service
-- [Database Setup](getting-started/database-setup.md) - Connect to databases
+- [Installation](tutorials/installation.md) - Install and setup
+- [Quick Start](tutorials/quickstart.md) - Get started in 5 minutes
+- [Hello World](tutorials/hello-world.md) - Your first service
+- [REST API](tutorials/rest-api.md) - Build HTTP services
+- [Working with Databases](tutorials/working-with-databases.md) - Query data
+- [Error Handling](tutorials/error-handling.md) - Handle errors gracefully
+- [i18n](tutorials/i18n.md) - Multi-language support
+- [Testing](tutorials/testing.md) - Write tests
+- [First Service](tutorials/first-service.md) - Build a complete service
+- [CLI App](tutorials/cli-app.md) - Build command-line tools
 
-### Examples
+### Guides & How-Tos
 
-- [Hello World](examples/01-hello-world.md)
-- [CLI App](examples/02-cli-app.md)
-- [REST API](examples/03-rest-api.md)
-- [Database](examples/04-database.md)
-- [Error Handling](examples/05-error-handling.md)
-- [i18n](examples/06-i18n.md)
-- [Testing](examples/07-testing.md)
+- [Infrastructure Usage](guides/infrastructure-usage.md) - BaseRepository patterns
+- [Dependency Injection](guides/dependency-injection.md) - DI with tsyringe
+- [HTTP Service Scaffold](guides/http-service-scaffold.md) - AI-powered templates
+- [Non-HTTP Setup](guides/non-http-setup.md) - CLI and workers
+- [Dependencies Reference](guides/dependencies-reference.md) - External deps guide
+- [Non-HTTP Elegant](guides/non-http-elegant.md) - Non-HTTP patterns
+- [Single Import](guides/single-import.md) - Import patterns
 
-### Guides
+### Reference Documentation
 
-- [Infrastructure Usage](guides/infrastructure-usage.md) - BaseRepository pattern
-- [Multi-ORM Setup](guides/multi-orm-setup.md) - Multiple databases simultaneously
-- [Single Import System](guides/single-import.md) - Import all from one place
+**[Complete Reference →](reference/README.md)**
 
-### Architecture & Design
-
-- [Framework Overview](architecture/framework-overview.md) - Core concepts
-- [ORM Support](architecture/orm.md) - Database integration overview
-- [ORM Architecture](architecture/orm-detailed.md) - In-depth adapter pattern design
-- [Architecture Decisions](architecture/decisions/) - ADRs
-
-### API Reference
-
-- [Configuration](api/configuration.md)
-- [Errors](api/errors.md)
-- [i18n](api/i18n.md)
-- [Logging](api/logging.md)
-- [Repository](api/repository.md)
-- [Service](api/service.md)
+- [API Reference](reference/api/README.md) - Service, Config, Errors, Logging, i18n, Repository
+- [Architecture](reference/architecture/README.md) - Framework overview, multi-context design
+- [ORM & Databases](reference/orm/README.md) - Database adapters, patterns, setup
+- [Architecture Decisions](reference/architecture/decisions/) - Design decision records
 
 ### Migration & Upgrades
 
 - [Migration Index](migration/index.md) - All migration guides
+- [v0.0.26 → v0.1.0](migration/v0.0.26-to-v0.1.0.md) - Multi-context support (latest)
+- [v0.0.21 Migration](migration/v0.0.21.md) - Import shortcuts
 - [v0.0.20 Migration](migration/v0.0.20.md) - Post-release migration
-- [Prepare for v0.0.20](migration/prepare-v0.0.20.md) - Pre-release preparation
-- [Type Safety Improvements](migration/type-safety-improvements.md)
+- [Prepare for v0.0.20](migration/prepare-v0.0.20.md) - Pre-release prep
 
 ### Development & Standards
 
@@ -70,7 +62,16 @@
 ### Testing
 
 - [Testing Guide](testing/README.md) - Complete testing documentation
-- [Setup](testing/01-setup.md) through [Best Practices](testing/10-best-practices.md)
+- [Setup](testing/01-setup.md) - Test environment setup
+- [Basic Tests](testing/02-basic-tests.md) - Write your first tests
+- [Mocking](testing/03-mocking.md) - Mock services and data
+- [HTTP Testing](testing/04-http-testing.md) - Test API routes
+- [Error Testing](testing/05-error-testing.md) - Test error scenarios
+- [Organization](testing/06-test-organization.md) - Structure tests
+- [Fixtures](testing/07-fixtures.md) - Test data fixtures
+- [Async Testing](testing/08-async-testing.md) - Async patterns
+- [Coverage](testing/09-coverage.md) - Code coverage
+- [Best Practices](testing/10-best-practices.md) - Testing patterns
 
 ### Internal Documentation
 
@@ -78,6 +79,7 @@
 - [Agent Integration](internal/agent-integration-spec.md) - AI agent specs
 - [Agent Prompts](internal/agent-prompt-template.md) - AI templates
 - [Implementation Summary](internal/implementation-summary.md) - Progress snapshot
+- [Express REST Roadmap](internal/express-rest-roadmap.md) - Express routing parity plan
 - [Roadmap](internal/roadmap.md) - Future plans
 - [CLI Module Spec](internal/cli-module-spec.md)
 - [Desktop Module Spec](internal/desktop-module-spec.md)

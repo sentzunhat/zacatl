@@ -10,14 +10,20 @@ export default defineConfig({
   resolve: {
     extensions: [".ts", ".tsx", ".js", ".mjs", ".json"],
     alias: {
-      "@zacatl/error": path.resolve(__dirname, "./src/error"),
-      "@zacatl/utils": path.resolve(__dirname, "./src/utils"),
-      "@zacatl/logs": path.resolve(__dirname, "./src/logs"),
-      "@zacatl/optionals": path.resolve(__dirname, "./src/optionals.ts"),
-      "@zacatl/configuration": path.resolve(
+      "@zacatl/configuration": path.resolve(__dirname, "./src/configuration"),
+      "@zacatl/dependency-injection": path.resolve(
         __dirname,
-        "./src/configuration.ts",
+        "./src/dependency-injection",
       ),
+      "@zacatl/error": path.resolve(__dirname, "./src/error"),
+      "@zacatl/localization": path.resolve(__dirname, "./src/localization"),
+      "@zacatl/logs": path.resolve(__dirname, "./src/logs"),
+      "@zacatl/orm": path.resolve(__dirname, "./src/orm"),
+      "@zacatl/runtime": path.resolve(__dirname, "./src/runtime"),
+      "@zacatl/service": path.resolve(__dirname, "./src/service"),
+      "@zacatl/utils": path.resolve(__dirname, "./src/utils"),
+      "@zacatl/third-party": path.resolve(__dirname, "./src/third-party"),
+      "@zacatl/optionals": path.resolve(__dirname, "./src/optionals.ts"),
       "@zacatl/infrastructure": path.resolve(
         __dirname,
         "./src/service/architecture/infrastructure",

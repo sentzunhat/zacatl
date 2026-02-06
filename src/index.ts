@@ -4,29 +4,42 @@ export * from "./utils";
 export * from "./error";
 export * from "./dependency-injection";
 export * from "./service";
-export { Service } from "./service";
-export type { ConfigService } from "./service";
+export { Service } from "./service/service";
+export type { ConfigService } from "./service/service";
 export * from "./logs";
 export * from "./runtime";
 export * from "./localization";
 
-export * from "./service/architecture/infrastructure";
+export * from "./service/layers/infrastructure";
 
+// Service architecture types
+export { ServiceType } from "./service/types";
+export type { ConfigCLI, ConfigDesktop } from "./service/types";
+
+// Layer composition utilities
+export type { Constructor, Provider } from "./service/layers/types";
+
+// Application layer types
+export type {
+  ApplicationRestHooks,
+  ApplicationRestRoutes,
+  ApplicationEntryPoints,
+  ConfigApplication,
+} from "./service/layers/application";
+
+// Server types
 export {
-  ServerType,
-  ServerVendor,
   DatabaseVendor,
-  HandlersType,
-} from "./service/architecture/platform/server/server";
-export type { ConfigServer } from "./service/architecture/platform/server/server";
+  ServerVendor,
+  ServerType,
+} from "./service/platforms/server/types";
+export { HandlersType } from "./service/platforms/server/api/api-server";
+export type { ConfigServer } from "./service/platforms/server/server";
 
-// Third-party integrations
-export { container, singleton, inject } from "tsyringe";
-export type { DependencyContainer } from "tsyringe";
-export { z } from "zod";
-export type { ZodSchema, ZodType, ZodError } from "zod";
+export * from "./service";
 
-// ⚠️ ORM exports REMOVED from main package to prevent eager loading
-// Use dedicated subpath imports instead:
-//   import { mongoose, Schema } from "@sentzunhat/zacatl/orm/mongoose"
-//   import { Sequelize, DataTypes } from "@sentzunhat/zacatl/orm/sequelize"
+export * from "./third-party";
+
+export * from "./utils";
+
+export * from "./optionals";

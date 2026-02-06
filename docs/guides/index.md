@@ -1,23 +1,24 @@
 # Guides
 
-Comprehensive guides for using @sentzunhat/zacatl features.
+Topic-specific how-to guides for using Zacatl.
 
-> **📦 New in v0.0.26:** Dependency injection helpers for tsx/ts-node  
-> **📦 New in v0.0.21:** Import shortcuts for better DX  
-> See [Migration Guides](../migration/)
+## Getting Started Guides
 
-## Core Concepts
+- [HTTP Service Scaffold](http-service-scaffold.md) - AI-powered REST API templates
+- [Non-HTTP Setup](non-http-setup.md) - CLI tools and background workers
+- [Dependencies Reference](dependencies-reference.md) - External dependencies guide
 
-- [Dependency Injection](./dependency-injection.md) - Complete DI guide with decorators, helpers, and Service architecture
-- [Single Import System](./single-import.md) - Import all dependencies from one place
+## Feature Guides
 
-## Infrastructure
+- [Dependency Injection](dependency-injection.md) - Complete DI guide with decorators
+- [Infrastructure Usage](infrastructure-usage.md) - Working with BaseRepository
+- [Single Import](single-import.md) - Import patterns
+- [Third-Party Imports](third-party-imports.md) - Tree-shakeable third-party subpaths
+- [Non-HTTP Elegant](non-http-elegant.md) - Non-HTTP patterns
+- [ESLint Configuration](eslint-configuration.md) - Shareable ESLint configs for Hexagonal Architecture
 
-- [Infrastructure Usage](./infrastructure-usage.md) - Working with BaseRepository
-- [Multi-ORM Setup](./multi-orm-setup.md) - Using multiple databases simultaneously
+## Related Resources
 
-## See Also
-
-- [Examples](../examples/README.md) - Quick-start code examples
-- [API Reference](../api/README.md) - Detailed API documentation
-- [Architecture](../architecture/framework-overview.md) - Framework design decisions
+- [Tutorials](../tutorials/README.md) - Step-by-step learning
+- [Reference](../reference/README.md) - Complete API documentation
+- [ORM Docs](../reference/orm/README.md) - Database integration guide

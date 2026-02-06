@@ -1,0 +1,27 @@
+{
+  "name": "platform-express-01-with-sqlite",
+  "version": "1.0.0",
+  "description": "Express + SQLite (Sequelize) example using Zacatl framework",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "tsx src/index.ts",
+    "dev": "tsx watch --tsconfig tsconfig.dev.json src/index.ts",
+    "build": "tsc -p tsconfig.json",
+    "clean": "rm -rf dist database.sqlite"
+  },
+  "dependencies": {
+    "@sentzunhat/zacatl": "file:../../..",
+    "express": "^4.21.2",
+    "sequelize": "^6.37.5",
+    "sqlite3": "^5.1.7",
+    "reflect-metadata": "^0.2.2",
+    "tsyringe": "^4.10.0"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.0",
+    "@types/node": "^20.11.16",
+    "tsx": "^4.7.0",
+    "typescript": "^5.3.3"
+  }
+}

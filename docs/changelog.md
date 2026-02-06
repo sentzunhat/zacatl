@@ -1,5 +1,160 @@
 # Release Notes
 
+## [0.0.27] - 2026-02-05
+
+### ✨ Enhancements
+
+- **Bun Runtime Support**: Added `"bun"` export conditions to all package.json exports
+  - Bun now automatically uses TypeScript source files (`src/**/*.ts`) instead of compiled JavaScript
+  - Enables native path alias resolution (`@zacatl/*`) without build-time transformation
+  - Significantly improves Docker build times (no framework compilation needed)
+  - Node.js/npm continue to use compiled build artifacts as before
+
+- **Dependency Updates**: Updated to latest stable versions
+  - `@fastify/static`: 8.3.0 → 9.0.0
+  - `@types/bun`: 1.3.6 → 1.3.8
+  - `@types/node`: 24.10.1 → 25.2.1
+  - `fastify`: 5.6.2 → 5.7.4
+  - `i18next`: 25.8.0 → 25.8.4
+  - `knip`: 5.71.0 → 5.83.0
+  - `mongodb-memory-server`: 10.4.1 → 11.0.1
+  - `mongoose`: 9.0.0 → 9.1.6
+
+### ✅ Fixes
+
+- **Exports**: Added CommonJS-compatible `require` entry for the main export
+- **DI Stability**: Fixed dependency injection error handling with `isRegistered` validation
+  - Now throws proper error messages when dependencies are not registered
+  - Improved error messages include class names and dependency chain information
+- **Type Safety**: Fixed strict TypeScript mode violations
+  - Index signature access properly typed in localization tests
+  - Null safety checks in layer registration tests
+  - Buffer access using globalThis for Node.js compatibility
+- **Tests**: All 183 unit tests passing with updated dependencies
+
+**Migration Guide:** [docs/migration/v0.0.26-to-v0.0.27.md](./migration/v0.0.26-to-v0.0.27.md)
+
+---
+
+## [0.1.0] - 2026-02-03
+
+### 🎯 Multi-Context Architecture Support
+
+**Major Feature:** Zacatl now supports CLI, Desktop, and Server applications from a single, unified architecture.
+
+#### New ServiceType Enum
+
+```typescript
+import { Service, ServiceType } from "@sentzunhat/zacatl";
+
+// CLI Application
+const cli = new Service({
+  type: ServiceType.CLI,
+  architecture: {
+    application: { entryPoints: { cli: { commands: [...] } } },
+    cli: { name: "my-tool", version: "1.0.0" },
+    // ... rest of config
+  },
+});
+
+// Desktop Application
+const desktop = new Service({
+  type: ServiceType.DESKTOP,
+  architecture: {
+    application: { entryPoints: { ipc: { handlers: [...] } } },
+    desktop: {
+      window: { title: "My App", width: 1024, height: 768 },
+      platform: "neutralino"
+    },
+    // ... rest of config
+  },
+});
+
+// HTTP Server (default - backward compatible)
+const server = new Service({
+  type: ServiceType.SERVER, // Optional: defaults to SERVER
+  architecture: {
+    application: { entryPoints: { rest: { hooks: [...], routes: [...] } } },
+    server: { vendor: ServerVendor.FASTIFY },
+    // ... rest of config
+  },
+});
+```
+
+#### Breaking Changes (with Backward Compatibility)
+
+**Property Renames** for clarity and consistency:
+
+| Old Name                   | New Name            | Compatibility               |
+| -------------------------- | ------------------- | --------------------------- |
+| `hookHandlers`             | `hooks`             | ✅ Legacy getters available |
+| `routeHandlers`            | `routes`            | ✅ Legacy getters available |
+| `ApplicationHookHandlers`  | `ApplicationHooks`  | ✅ Type alias available     |
+| `ApplicationRouteHandlers` | `ApplicationRoutes` | ✅ Type alias available     |
+
+**Config Structure Changes:**
+
+- `ApplicationEntryPoints` is now polymorphic (supports `cli`, `rest`, `ipc`)
+- `ConfigService` now includes optional `type: ServiceType` field
+- New types: `ConfigCLI`, `ConfigDesktop`
+
+**Backward Compatibility:**
+
+- ✅ Old property names still work via legacy getters
+- ✅ `type` defaults to `ServiceType.SERVER` if not specified
+- ✅ Existing HTTP server configs work without changes
+- ✅ All 201 tests passing
+
+**Migration Guide:** [docs/migration/v0.0.26-to-v0.1.0.md](./migration/v0.0.26-to-v0.1.0.md)
+
+---
+
+### 🏗️ Architecture Improvements
+
+- **Type Safety**: Added validation for type-specific configurations
+- **Polymorphic Entry Points**: Support for multiple application contexts
+- **Cleaner API**: Shorter property names without losing clarity
+- **Better Errors**: Helpful validation messages for config mismatches
+
+---
+
+### 📚 Documentation Updates
+
+- Added [Multi-Context Cleanup Design](./architecture/MULTI-CONTEXT-CLEANUP-DESIGN.md)
+- Added [Migration Guide v0.0.26 → v0.1.0](./migration/v0.0.26-to-v0.1.0.md)
+- Updated README with multi-context examples
+- Updated test count badges (201 tests, 79% coverage)
+
+---
+
+### 🧪 Testing
+
+- **201 tests passing** (up from 188)
+- **79% code coverage** (maintained)
+- Added tests for new validation logic
+- Updated existing tests to use new property names
+
+---
+
+### 📦 New Exports
+
+```typescript
+// New type exports
+export { ServiceType } from "@sentzunhat/zacatl";
+export type { ConfigCLI, ConfigDesktop } from "@sentzunhat/zacatl";
+export type { ApplicationHooks, ApplicationRoutes } from "@sentzunhat/zacatl";
+```
+
+---
+
+### 🔮 Future Roadmap
+
+- **v0.2.0**: CLI implementation complete (command execution, arg parsing)
+- **v0.3.0**: Desktop implementation complete (IPC, window management)
+- **v1.0.0**: Remove legacy getters, finalize API
+
+---
+
 ## [0.0.23] - 2026-01-31
 
 ### 🎯 Dual ORM Import Strategy - Flexibility for All Use Cases
@@ -18,8 +173,8 @@ import { Service, mongoose, Schema, Sequelize } from "@sentzunhat/zacatl";
 
 ```typescript
 import { Service } from "@sentzunhat/zacatl";
-import { mongoose, Schema } from "@sentzunhat/zacatl/orm/mongoose";
-import { Sequelize, DataTypes } from "@sentzunhat/zacatl/orm/sequelize";
+import { mongoose, Schema } from "@sentzunhat/zacatl/third-party/mongoose";
+import { Sequelize, DataTypes } from "@sentzunhat/zacatl/third-party/sequelize";
 ```
 
 #### Why Both Options?

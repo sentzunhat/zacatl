@@ -8,20 +8,15 @@ export const detectRuntime = (): RuntimeInfo => {
   let type: RuntimeType = "unknown";
   let version: string | undefined = undefined;
 
-  // Check for Bun
-  if (typeof Bun !== "undefined") {
-    type = "bun";
-    version = Bun.version;
-  }
   // Check for Node.js
-  else if (typeof process !== "undefined" && process.versions?.node) {
+  if (typeof process !== "undefined" && process.versions?.node) {
     type = "node";
     version = process.versions.node;
   }
 
   const result: RuntimeInfo = {
     type,
-    isBun: type === "bun",
+    isBun: false,
     isNode: type === "node",
   };
 
@@ -33,19 +28,11 @@ export const detectRuntime = (): RuntimeInfo => {
 };
 
 /**
- * Check if the current runtime is Bun
- * @returns true if running on Bun
- */
-export const isBun = (): boolean => typeof Bun !== "undefined";
-
-/**
  * Check if the current runtime is Node.js
  * @returns true if running on Node.js
  */
 export const isNode = (): boolean =>
-  typeof Bun === "undefined" &&
-  typeof process !== "undefined" &&
-  !!process.versions?.node;
+  typeof process !== "undefined" && !!process.versions?.node;
 
 /**
  * Get the current runtime type

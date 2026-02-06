@@ -1,20 +1,19 @@
 /**
- * Configuration module
- * Provides explicit YAML and JSON config loaders + legacy node-config wrapper
+ * Simple JSON and YAML configuration loader with Zod schema validation
+ *
+ * @example
+ * // Load JSON file
+ * import { loadJSON, serverSchema } from '@zacatl/configuration';
+ * const config = loadJSON('./config.json', serverSchema);
+ *
+ * @example
+ * // Load YAML file
+ * import { loadYML, databaseSchema } from '@zacatl/configuration';
+ * const config = loadYML('./config.yml', databaseSchema);
  */
 
-export type { ConfigFormat, ConfigLoader, LoadedConfig } from "./types";
-
-export { JSONLoader, createJSONLoader } from "./loaders/json-loader";
-export { YAMLLoader, createYAMLLoader } from "./loaders/yaml-loader";
-
-export { getLoader, loadConfig, loadConfigFromPaths } from "./loader";
-
-export {
-  validateConfig,
-  validateLoadedConfig,
-  safeValidateConfig,
-} from "./validation";
-
-// Application-wide configuration (via node-config)
-export { getConfigOrThrow } from "./app-config";
+// ============================================================================
+// Simple loaders - just load JSON or YAML with optional schema
+// ============================================================================
+export { loadJSON } from "./json";
+export { loadYML, loadYAML } from "./yml";

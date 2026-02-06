@@ -11,20 +11,20 @@ export type LoggerInput =
 /**
  * Logger interface that wraps Pino with structured logging
  */
-export interface Logger {
+export type Logger = {
   log: (message: string, input?: LoggerInput) => void;
   info: (message: string, input?: LoggerInput) => void;
   trace: (message: string, input?: LoggerInput) => void;
   warn: (message: string, input?: LoggerInput) => void;
   error: (message: string, input?: LoggerInput) => void;
   fatal: (message: string, input?: LoggerInput) => void;
-}
+};
 
 /**
- * Logger adapter interface - implement this to create custom log transports
+ * Logger port interface - implement this to create custom log transports
  * (Winston, Bunyan, Console, CloudWatch, etc.)
  */
-export interface LoggerAdapter {
+export interface LoggerPort {
   log: (message: string, input?: LoggerInput) => void;
   info: (message: string, input?: LoggerInput) => void;
   trace: (message: string, input?: LoggerInput) => void;

@@ -1,0 +1,60 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "build",
+      "type": "shell",
+      "command": "npm run build",
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    },
+    {
+      "label": "build:watch",
+      "type": "shell",
+      "command": "npm run build:watch",
+      "isBackground": true,
+      "group": "build"
+    },
+    {
+      "label": "test",
+      "type": "shell",
+      "command": "npm test",
+      "group": "test"
+    },
+    {
+      "label": "test:watch",
+      "type": "shell",
+      "command": "npm run test:watch",
+      "isBackground": true,
+      "group": "test"
+    },
+    {
+      "label": "test:coverage",
+      "type": "shell",
+      "command": "npm run test:coverage",
+      "group": "test"
+    },
+    {
+      "label": "type:check",
+      "type": "shell",
+      "command": "npm run type:check"
+    },
+    {
+      "label": "lint",
+      "type": "shell",
+      "command": "npm run lint"
+    },
+    {
+      "label": "clean",
+      "type": "shell",
+      "command": "npm run clean"
+    },
+    {
+      "label": "clean:build",
+      "type": "shell",
+      "command": "npm run clean:build"
+    }
+  ]
+}

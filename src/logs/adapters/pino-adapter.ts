@@ -1,13 +1,13 @@
 import pino from "pino";
 
 import { createPinoConfig } from "../config";
-import type { LoggerAdapter, LoggerInput } from "../types";
+import type { LoggerPort, LoggerInput } from "../types";
 
 /**
  * Pino-based logger adapter for production microservices
  * providing structured, high-performance logging.
  */
-export class PinoLoggerAdapter implements LoggerAdapter {
+export class PinoLoggerAdapter implements LoggerPort {
   private readonly pinoLogger: pino.BaseLogger;
 
   constructor(

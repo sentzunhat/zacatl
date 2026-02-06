@@ -1,23 +1,35 @@
-# Zacatl Dependencies Reference (v0.0.22+)
+# Zacatl Dependencies Reference (v0.0.27+)
+
+## Runtime Support
+
+Zacatl supports both **Node.js** and **Bun** runtimes:
+
+- **Node.js 24+**: Uses compiled JavaScript from `build/` directory (requires `npm run build`)
+- **Bun 1.x**: Uses TypeScript source directly from `src/` directory (no build step needed)
+  - Native TypeScript transpilation
+  - Automatic path alias resolution (`@zacatl/*`)
+  - Faster development and Docker builds
 
 ## What's Included (No Installation Needed)
 
 When you install `@sentzunhat/zacatl`, these are **already included**:
 
 ### Core Dependencies
+
 ```typescript
-import { 
-  singleton,        // ✅ From tsyringe (re-exported)
-  inject,          // ✅ From tsyringe (re-exported)
-  container,       // ✅ From tsyringe (re-exported)
-  Service,         // ✅ Zacatl core
+import {
+  singleton, // ✅ From tsyringe (re-exported)
+  inject, // ✅ From tsyringe (re-exported)
+  container, // ✅ From tsyringe (re-exported)
+  Service, // ✅ Zacatl core
   resolveDependency, // ✅ Zacatl DI
-  logger,          // ✅ Pino logger
-  z,               // ✅ Zod validation (re-exported)
+  logger, // ✅ Pino logger
+  z, // ✅ Zod validation (re-exported)
 } from "@sentzunhat/zacatl";
 ```
 
 ### Errors
+
 ```typescript
 import {
   CustomError,
@@ -32,16 +44,15 @@ import {
 ```
 
 ### Configuration
+
 ```typescript
 import { loadConfig } from "@sentzunhat/zacatl/config";
 ```
 
 ### Infrastructure
+
 ```typescript
-import { 
-  BaseRepository, 
-  ORMType 
-} from "@sentzunhat/zacatl/infrastructure";
+import { BaseRepository, ORMType } from "@sentzunhat/zacatl/infrastructure";
 ```
 
 ---
@@ -92,17 +103,21 @@ const sequelize = new Sequelize("postgresql://localhost/db");
 ### Pattern 1: No Database (CLI/Worker)
 
 **Install:**
+
 ```bash
 npm install @sentzunhat/zacatl
 ```
 
 **Use:**
+
 ```typescript
 import { Service, singleton, resolveDependency } from "@sentzunhat/zacatl";
 
 @singleton()
 class MyService {
-  doWork() { console.log("Working..."); }
+  doWork() {
+    console.log("Working...");
+  }
 }
 
 const service = new Service({
@@ -119,13 +134,20 @@ await service.start();
 ### Pattern 2: With MongoDB
 
 **Install:**
+
 ```bash
 npm install @sentzunhat/zacatl mongoose
 ```
 
 **Use:**
+
 ```typescript
-import { Service, singleton, BaseRepository, ORMType } from "@sentzunhat/zacatl";
+import {
+  Service,
+  singleton,
+  BaseRepository,
+  ORMType,
+} from "@sentzunhat/zacatl";
 import mongoose, { Schema } from "mongoose";
 
 const UserSchema = new Schema({ name: String });
@@ -142,10 +164,12 @@ const service = new Service({
     infrastructure: { repositories: [UserRepository] },
     server: {
       name: "app",
-      databases: [{
-        vendor: "MONGOOSE",
-        instance: mongoose.connect("mongodb://localhost/db"),
-      }],
+      databases: [
+        {
+          vendor: "MONGOOSE",
+          instance: mongoose.connect("mongodb://localhost/db"),
+        },
+      ],
     },
   },
 });
@@ -156,13 +180,20 @@ const service = new Service({
 ### Pattern 3: With PostgreSQL (Sequelize)
 
 **Install:**
+
 ```bash
 npm install @sentzunhat/zacatl sequelize pg pg-hstore
 ```
 
 **Use:**
+
 ```typescript
-import { Service, singleton, BaseRepository, ORMType } from "@sentzunhat/zacatl";
+import {
+  Service,
+  singleton,
+  BaseRepository,
+  ORMType,
+} from "@sentzunhat/zacatl";
 import { Sequelize, DataTypes } from "sequelize";
 
 const sequelize = new Sequelize("postgresql://localhost/db");
@@ -183,10 +214,12 @@ const service = new Service({
     infrastructure: { repositories: [UserRepository] },
     server: {
       name: "app",
-      databases: [{
-        vendor: "SEQUELIZE",
-        instance: sequelize,
-      }],
+      databases: [
+        {
+          vendor: "SEQUELIZE",
+          instance: sequelize,
+        },
+      ],
     },
   },
 });
@@ -196,17 +229,17 @@ const service = new Service({
 
 ## Quick Reference Table
 
-| Feature | Import From | Install Required? |
-|---------|-------------|-------------------|
-| `singleton` decorator | `@sentzunhat/zacatl` | ❌ No (included) |
-| `Service` | `@sentzunhat/zacatl` | ❌ No (included) |
-| `BaseRepository` | `@sentzunhat/zacatl` | ❌ No (included) |
-| `logger` | `@sentzunhat/zacatl` | ❌ No (included) |
-| `z` (Zod) | `@sentzunhat/zacatl` | ❌ No (included) |
-| `mongoose` | `mongoose` | ✅ Yes (optional) |
-| `Schema` | `mongoose` | ✅ Yes (optional) |
-| `Sequelize` | `sequelize` | ✅ Yes (optional) |
-| Database drivers | `pg`, `mysql2`, etc | ✅ Yes (if using Sequelize) |
+| Feature               | Import From          | Install Required?           |
+| --------------------- | -------------------- | --------------------------- |
+| `singleton` decorator | `@sentzunhat/zacatl` | ❌ No (included)            |
+| `Service`             | `@sentzunhat/zacatl` | ❌ No (included)            |
+| `BaseRepository`      | `@sentzunhat/zacatl` | ❌ No (included)            |
+| `logger`              | `@sentzunhat/zacatl` | ❌ No (included)            |
+| `z` (Zod)             | `@sentzunhat/zacatl` | ❌ No (included)            |
+| `mongoose`            | `mongoose`           | ✅ Yes (optional)           |
+| `Schema`              | `mongoose`           | ✅ Yes (optional)           |
+| `Sequelize`           | `sequelize`          | ✅ Yes (optional)           |
+| Database drivers      | `pg`, `mysql2`, etc  | ✅ Yes (if using Sequelize) |
 
 ---
 
@@ -247,24 +280,57 @@ Do you need database access?
 
 ```typescript
 // Everything you need for a basic service (no database)
-import { 
-  Service, 
-  singleton, 
-  resolveDependency 
-} from "@sentzunhat/zacatl";
+import { Service, singleton, resolveDependency } from "@sentzunhat/zacatl";
 
 // That's it! No other imports needed. ✅
 ```
 
 ---
 
+## Current Package Versions (v0.0.27)
+
+### Core Runtime Dependencies
+
+| Package            | Version | Purpose                  |
+| ------------------ | ------- | ------------------------ |
+| `fastify`          | ^5.7.4  | Web framework            |
+| `pino`             | ^10.3.0 | Logging                  |
+| `pino-pretty`      | ^13.1.3 | Pretty log formatting    |
+| `zod`              | ^4.3.6  | Validation               |
+| `tsyringe`         | ^4.10.0 | Dependency injection     |
+| `reflect-metadata` | ^0.2.2  | DI metadata support      |
+| `uuid`             | ^13.0.0 | UUID generation          |
+| `i18n`             | ^0.15.3 | i18n support             |
+| `i18next`          | ^25.8.4 | Advanced i18n            |
+| `js-yaml`          | ^4.1.1  | YAML parsing             |
+| `config`           | ^4.1.1  | Configuration management |
+
+### Optional Peer Dependencies
+
+| Package          | Version | When to Use                   |
+| ---------------- | ------- | ----------------------------- |
+| `mongoose`       | ^9.1.6  | MongoDB/Mongoose repositories |
+| `sequelize`      | ^6.0.0  | SQL database ORM              |
+| `better-sqlite3` | ^12.6.2 | Embedded SQLite               |
+
+### Development Tools
+
+| Tool         | Version         |
+| ------------ | --------------- |
+| `typescript` | ^5.9.3          |
+| `node`       | 24.0.0+         |
+| `npm`        | 10.9.0+         |
+| `bun`        | 1.x+ (optional) |
+
+---
+
 ## Version Info
 
-- **Zacatl:** 0.0.22+
+- **Zacatl:** 0.0.27
 - **Node.js:** 24.0.0+
 - **TypeScript:** 5.9.3+ (recommended)
 - **Bun:** Latest (optional, for faster package management)
 
 ---
 
-**Next:** [Non-HTTP Setup Guide](./non-http-elegant.md) | [Full Docs](../INDEX.md)
+**Next:** [Non-HTTP Setup Guide](./non-http-elegant.md) | [Full Docs](../index.md)

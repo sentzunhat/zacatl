@@ -1,0 +1,34 @@
+import type { Optional } from "@zacatl/optionals";
+
+import type { ConfigApplication } from "../application";
+import type { ConfigDomain, ProviderPort } from "../domain";
+import type { ConfigInfrastructure } from "../infrastructure";
+
+export type ConfigLayers = {
+  /** Application layer: Entry points for different contexts */
+  application?: Optional<ConfigApplication>;
+
+  /** Domain layer: Business logic providers (always required) */
+  domain?: Optional<ConfigDomain>;
+
+  /** Infrastructure layer: Data access repositories (always required) */
+  infrastructure?: Optional<ConfigInfrastructure>;
+};
+
+/**
+ * Constructor type that accepts classes with any parameter signature
+ * Uses contravariant unknown[] to allow flexibility in DI container
+ * Supports both manual instantiation and automatic DI resolution
+ */
+export type Constructor<T = object> = new (...args: any[]) => T;
+
+/**
+ * Domain layer provider - business logic service
+ * Consistent naming with HookHandler, RouteHandler, and Repository types
+ */
+export type Provider = Constructor<ProviderPort>;
+
+export type DependencyInjection<T> = {
+  register: (dependency: Constructor<T>) => void;
+  resolve: (dependency: Constructor<T>) => T;
+};

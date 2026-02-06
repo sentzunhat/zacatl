@@ -240,7 +240,7 @@ These files are kept for reference but are not used by the framework. They can b
 ## Related Documentation
 
 - [ORM_ARCHITECTURE.md](./ORM_ARCHITECTURE.md) - Original design document
-- [QUICKSTART.md](./QUICKSTART.md) - Usage examples
+- [quickstart.md](../../migration/quickstart.md) - Usage examples
 - [IMPLEMENTATION_SUMMARY.md](../IMPLEMENTATION_SUMMARY.md) - Overall project status
 
 ---

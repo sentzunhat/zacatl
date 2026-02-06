@@ -5,13 +5,15 @@
  * can auto-register dependencies without needing Service orchestration.
  */
 
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect, beforeEach, vi } from "vitest";
+import { container } from "tsyringe";
+
 import {
   clearContainer,
   resolveDependency,
 } from "../../src/dependency-injection";
-import { Domain } from "../../src/service/architecture/domain/domain";
-import { Infrastructure } from "../../src/service/architecture/infrastructure/infrastructure";
+import { Domain } from "../../src/service/layers/domain/domain";
+import { Infrastructure } from "../../src/service/layers/infrastructure/infrastructure";
 
 describe("Auto-Registration Without Service", () => {
   beforeEach(() => {
@@ -25,37 +27,39 @@ describe("Auto-Registration Without Service", () => {
       }
     }
 
-    // Create domain with autoRegister: true
+    // Create domain - always auto-registers in constructor
     new Domain({
       providers: [MyService],
-      autoRegister: true,
     });
 
     // Should be resolvable immediately without calling start()
-    const service = resolveDependency<MyService>("MyService");
+    const service = resolveDependency(MyService);
     expect(service).toBeDefined();
     expect(service.getName()).toBe("MyService");
   });
 
-  it("should NOT auto-register when autoRegister is false", () => {
+  it("should auto-register on construction (new behavior)", () => {
+    const registerSpy = vi.spyOn(container, "register");
+
     class AnotherService {
       getName() {
         return "AnotherService";
       }
     }
 
-    // Create domain WITHOUT autoRegister
-    const domain = new Domain({
+    // Create domain - now always registers in constructor
+    new Domain({
       providers: [AnotherService],
-      autoRegister: false, // explicit
     });
 
-    // Should NOT be resolvable yet
-    expect(() => resolveDependency("AnotherService")).toThrow();
+    // Should have registered immediately
+    expect(registerSpy).toHaveBeenCalledWith(
+      AnotherService,
+      { useClass: AnotherService },
+      { lifecycle: 1 },
+    );
 
-    // After calling start(), should be resolvable
-    domain.start();
-    const service = resolveDependency<AnotherService>("AnotherService");
+    const service = resolveDependency(AnotherService);
     expect(service.getName()).toBe("AnotherService");
   });
 
@@ -72,20 +76,18 @@ describe("Auto-Registration Without Service", () => {
       }
     }
 
-    // Use layers directly without Service
+    // Use layers directly without Service - auto-registers in constructor
     new Domain({
       providers: [UserService],
-      autoRegister: true,
     });
 
     new Infrastructure({
       repositories: [UserRepository],
-      autoRegister: true,
     });
 
     // Both should be resolvable
-    const userService = resolveDependency<UserService>("UserService");
-    const userRepo = resolveDependency<UserRepository>("UserRepository");
+    const userService = resolveDependency(UserService);
+    const userRepo = resolveDependency(UserRepository);
 
     expect(userService.getUser()).toEqual({ id: 1, name: "John" });
     expect(userRepo.findUser()).toEqual({ id: 1, name: "John" });
@@ -102,7 +104,7 @@ describe("Auto-Registration Without Service", () => {
       dataService: DataService;
 
       constructor() {
-        this.dataService = resolveDependency<DataService>("DataService");
+        this.dataService = resolveDependency(DataService);
       }
 
       process() {
@@ -113,16 +115,14 @@ describe("Auto-Registration Without Service", () => {
     // Register infrastructure first
     new Infrastructure({
       repositories: [DataService],
-      autoRegister: true,
     });
 
     // Register domain that depends on infrastructure
     new Domain({
       providers: [BusinessService],
-      autoRegister: true,
     });
 
-    const business = resolveDependency<BusinessService>("BusinessService");
+    const business = resolveDependency(BusinessService);
     expect(business.process()).toBe("DATA");
   });
 });

@@ -174,13 +174,23 @@ dist
 # Finder (MacOS) folder config
 .DS_Store
 
-# Vs Code
-.vscode
+# Personal (local, untracked)
+personal/
+
+# Archive (historical docs, not for version control)
+archive/
 
 # Build output
 build
 dist
 out-tsc
+
+# Examples - compiled files (should be built locally)
+examples/**/*.js
+examples/**/*.d.ts
+examples/**/*.js.map
+examples/**/*.d.ts.map
+!examples/**/node_modules/**
 
 # Compiled output
 # lib
@@ -191,3 +201,4 @@ typings
 .stylelintcache
 # Optional eslint cache
 .eslintcache
+.archive-audits/

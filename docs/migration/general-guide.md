@@ -175,7 +175,7 @@ Where:
 
 To migrate from the old micro-service architecture to the new `Service` API:
 
-1.  **Update imports**: Change all `@zacatl/*` imports to `@sentzunhat/zacatl`
+1.  **Update imports**: Use `@sentzunhat/zacatl` and its subpaths (e.g., `/configuration`, `/logs`, `/third-party/mongoose`) instead of internal aliases or legacy paths
 2.  **Update configuration**: Use `loadConfig()` or `loadConfigFromPaths()` to load a `ConfigService` object (must have `architecture` property)
 3.  **Update route handlers**: Extend `AbstractRouteHandler`, `PostRouteHandler`, or `GetRouteHandler` with `{url, schema}` in the constructor
 4.  **Register handlers**: Add handlers to `architecture.application.entryPoints.rest.routeHandlers` in the config

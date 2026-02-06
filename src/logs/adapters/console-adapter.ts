@@ -1,10 +1,10 @@
-import type { LoggerAdapter, LoggerInput } from "../types";
+import type { LoggerPort, LoggerInput } from "../types";
 
 /**
  * Lightweight console-based logger adapter for CLI, desktop apps,
  * and environments where structured logging is not needed.
  */
-export class ConsoleLoggerAdapter implements LoggerAdapter {
+export class ConsoleLoggerAdapter implements LoggerPort {
   private readonly enableColors: boolean;
   private readonly enableTimestamps: boolean;
 

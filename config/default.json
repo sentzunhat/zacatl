@@ -1,7 +1,0 @@
-{
-  "SERVICE_NAME": "zacatl-service",
-  "NODE_ENV": "development",
-  "APP_VERSION": "0.0.16",
-  "APP_ENV": "development",
-  "CONNECTION_STRING": "mongodb://localhost:27017/zacatl"
-}

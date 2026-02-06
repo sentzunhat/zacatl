@@ -1,16 +1,18 @@
-export type { I18nAdapter, I18nConfig, I18nInstance } from "./types";
+/**
+ * Localization module - i18n-node HTTP request localization
+ * @module localization
+ */
 
 export {
-  createI18n,
-  createI18nAsync,
-  setGlobalI18n,
-  getI18nOrThrow,
-} from "./localization";
+  configureI18nNode,
+  loadCatalog,
+  resolveBuiltInLocalesDir,
+  mergeCatalogs,
+} from "./i18n-node";
 
-export { FilesystemAdapter, MemoryAdapter } from "./adapters";
-
-export {
-  I18nConfigSchema,
-  validateI18nConfig,
-  safeValidateI18nConfig,
-} from "./validation";
+export type {
+  I18nCatalogType,
+  ConfigureI18nInput,
+  LoadCatalogInput,
+  MergeCatalogsInput,
+} from "./i18n-node";

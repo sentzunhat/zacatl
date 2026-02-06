@@ -6,7 +6,7 @@
 export { logger, createLogger } from "./logger";
 export type {
   Logger,
-  LoggerAdapter,
+  LoggerPort,
   LoggerInput,
   LoggerAdapterType,
   PinoLoggerConfig,

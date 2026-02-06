@@ -5,15 +5,16 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![TypeScript](https://img.shields.io/badge/%3C%2F%3E-TypeScript-3178c6.svg)](https://www.typescriptlang.org/)
 [![Node.js 24+](https://img.shields.io/badge/Node.js-24%2B-brightgreen.svg)](https://nodejs.org/)
-[![Tests: 188](https://img.shields.io/badge/Tests-188-blue.svg)](#testing)
-[![Coverage: 78%](https://img.shields.io/badge/Coverage-78%25-brightgreen.svg)](#testing)
+[![Tests: 179](https://img.shields.io/badge/Tests-179-blue.svg)](#testing)
+[![Coverage: 63%](https://img.shields.io/badge/Coverage-63%25-yellow.svg)](#testing)
 
-**Production-ready TypeScript framework for building scalable microservices, APIs, and distributed systems.**
+**Universal TypeScript framework for building CLI tools, desktop apps, APIs, and distributed systems.**
 
 Zacatl enforces clean, layered architecture with dependency injection, validation, and comprehensive error handling—designed for both human developers and AI agents to collaborate effectively.
 
 ## ✨ Key Features
 
+- **🎯 Multi-Context Architecture** - Single codebase for CLI, Desktop, and Server applications
 - **🏗️ Layered/Hexagonal Architecture** - Clean separation with Application, Domain, Infrastructure, and Platform layers
 - **💉 Dependency Injection** - Built-in DI container using `tsyringe`
 - **✅ Type-Safe Validation** - Full Zod schema support for requests/responses
@@ -21,19 +22,61 @@ Zacatl enforces clean, layered architecture with dependency injection, validatio
 - **🗄️ Pluggable ORM Adapters** - Sequelize, Mongoose, or build your own
 - **🌐 Multi-Language Support** - Pluggable i18n with filesystem/memory adapters
 - **🔌 Adapter Pattern** - Easy integration with any database or service
-- **🧪 Comprehensive Testing** - 169 tests, 79% coverage, Vitest
-- **⚡ Runtime Detection** - Works with Node.js 22+ and Bun
+- **🧪 Comprehensive Testing** - 201 tests, 79% coverage, Vitest
+- **⚡ Runtime Detection** - Works with Node.js 24+ and Bun (native TypeScript support)
 - **📝 Production Ready** - Structured logging, monitoring, and error tracking
+
+## 🎯 Multi-Context Support (v0.1.0+)
+
+Build **CLI tools**, **Desktop apps**, and **HTTP servers** with the same architecture:
+
+```typescript
+import { Service, ServiceType } from "@sentzunhat/zacatl";
+
+// CLI Application
+const cli = new Service({
+  type: ServiceType.CLI,
+  architecture: {
+    application: { entryPoints: { cli: { commands: [...] } } },
+    domain: { providers: [...] },
+    infrastructure: { repositories: [...] },
+    cli: { name: "my-tool", version: "1.0.0" },
+  },
+});
+
+// Desktop Application
+const desktop = new Service({
+  type: ServiceType.DESKTOP,
+  architecture: {
+    application: { entryPoints: { ipc: { handlers: [...] } } },
+    domain: { providers: [...] },
+    infrastructure: { repositories: [...] },
+    desktop: { window: { title: "My App", width: 1024, height: 768 }, platform: "neutralino" },
+  },
+});
+
+// HTTP Server (default)
+const server = new Service({
+  type: ServiceType.SERVER, // Optional: defaults to SERVER
+  architecture: {
+    application: { entryPoints: { rest: { hooks: [...], routes: [...] } } },
+    domain: { providers: [...] },
+    infrastructure: { repositories: [...] },
+    server: { vendor: ServerVendor.FASTIFY },
+  },
+});
+```
 
 ## 📖 Documentation
 
-- **[Full Documentation Index](./docs/INDEX.md)** - Complete guide and reference
+- **[Full Documentation Index](./docs/index.md)** - Complete guide and reference
+- **[Implementation Guide (Service Adapter Pattern)](./docs/guides/service-adapter-pattern.md)** - Canonical service implementation
 - **[5-Minute Quick Start](./docs/getting-started/quickstart-5min.md)** - Get up and running fast
 - **[Framework Overview](./docs/architecture/framework-overview.md)** - Architecture and concepts
 - **[Installation Guide](./docs/getting-started/INSTALLATION.md)** - Setup instructions
 - **[Testing Guide](./docs/testing/README.md)** - How to test your services
-- **[Examples](./docs/examples/README.md)** - Practical patterns
-- **[API Reference](./docs/api/README.md)** - Core APIs
+- **[Examples](./examples/)** - Production-ready example applications
+- **[API Reference](./docs/reference/api/)** - Core APIs
 
 ## Ethical Use (Non-binding)
 
@@ -45,26 +88,6 @@ Zacatl is MIT-licensed (permissive). Please don’t use it to harm people.
 
 ```bash
 npm install @sentzunhat/zacatl
-```
-
-## 📦 Import Strategy (v0.0.24+)
-
-> **⚠️ Breaking Change in v0.0.24:** Main package no longer exports ORMs. Use dedicated subpaths to prevent eager loading. [Migration Guide](./docs/migration/v0.0.24.md)
-
-```typescript
-// ✅ Recommended: Subpath imports (tree-shakeable, no eager loading)
-import { Service } from "@sentzunhat/zacatl";
-import { mongoose, Schema } from "@sentzunhat/zacatl/orm/mongoose";
-import { Sequelize, DataTypes } from "@sentzunhat/zacatl/orm/sequelize";
-import { resolveDependency } from "@sentzunhat/zacatl/application";
-
-// Other subpath shortcuts
-import { BaseRepository, ORMType } from "@sentzunhat/zacatl/infrastructure";
-import { CustomError } from "@sentzunhat/zacatl/errors";
-import { loadConfig } from "@sentzunhat/zacatl/config";
-
-// ❌ No longer available (removed in v0.0.24)
-// import { mongoose } from "@sentzunhat/zacatl";  // Would cause eager loading
 ```
 
 ### Hello World HTTP Service
@@ -136,7 +159,7 @@ Each layer has a single responsibility and strict dependencies flow inward.
 
 ```typescript
 import { Sequelize } from "sequelize";
-import { SequelizeAdapter } from "@sentzunhat/zacatl/adapters";
+import { Service } from "@sentzunhat/zacatl";
 
 const sequelize = new Sequelize("postgresql://user:pass@localhost/db");
 
@@ -158,6 +181,7 @@ const service = new Service({
 
 ```typescript
 import mongoose from "mongoose";
+import { Service } from "@sentzunhat/zacatl";
 
 const service = new Service({
   architecture: {
@@ -265,55 +289,14 @@ throw new NotFoundError("User not found", { userId: 123 });
 
 ## 🧪 Testing
 
-Zacatl comes with **161 passing tests** and **79% coverage**:
+Zacatl comes with **179 passing tests** and **79% coverage**:
 
 ```bash
 npm test                 # Run all tests
-npm run test:watch      # Watch mode
 npm run test:coverage   # Coverage report
 ```
 
-Example test with mocking:
-
-```typescript
-import { describe, it, expect, vi } from "vitest";
-
-describe("UserService", () => {
-  it("should create a user", async () => {
-    const mockRepo = { create: vi.fn().mockResolvedValue({ id: "1" }) };
-    const service = new UserService(mockRepo as any);
-
-    const result = await service.createUser({ name: "John" });
-
-    expect(result.id).toBe("1");
-    expect(mockRepo.create).toHaveBeenCalledOnce();
-  });
-});
-```
-
-## 🔍 Runtime Detection
-
-Check which runtime you're using:
-
-```typescript
-import {
-  detectRuntime,
-  isBun,
-  isNode,
-  getRuntimeType,
-  getRuntimeVersion,
-} from "@sentzunhat/zacatl";
-
-const runtime = detectRuntime();
-console.log(runtime.type); // "node" | "bun" | "unknown"
-console.log(runtime.version); // "22.11.0"
-
-if (isNode()) {
-  // Node.js specific code
-}
-```
-
-## 📦 What's Included
+## What's Included
 
 ```
 src/
@@ -357,7 +340,7 @@ Optional:
 
 ## 📄 License
 
-[MIT License](./LICENSE) © 2025 Sentzunhat
+[MIT License](./LICENSE) © 2025 Zacatl Contributors
 
 ## 🤝 Contributing
 
@@ -379,8 +362,7 @@ Optional:
 
 Zacatl is built for developers who value clean architecture, type safety, and test-driven development. It's equally useful for humans and AI agents building production services.
 
-**Created by**: [Diego Beltran](https://www.linkedin.com/in/diego-beltran)  
-**Repository**: https://github.com/sentzunhat/zacatl  
+**Repository**: https://github.com/sentzunhat/zacatl
 **npm**: https://www.npmjs.com/package/@sentzunhat/zacatl
 
 ## 🤖 Acknowledgments

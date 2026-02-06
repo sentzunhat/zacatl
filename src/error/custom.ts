@@ -1,5 +1,5 @@
-import { v4 as uuidv4 } from "uuid";
-import { Optional } from "../optionals";
+import { Optional } from "@zacatl/optionals";
+import { uuidv4 } from "@zacatl/third-party";
 
 export type HttpStatusCode =
   | 200 // OK
@@ -23,6 +23,10 @@ export interface CustomErrorsArgs {
   reason?: Optional<string>;
   metadata?: Optional<Record<string, unknown>>;
   error?: Optional<Error>;
+  /** Component or module where error occurred (e.g., 'ConfigLoader', 'DIContainer') */
+  component?: Optional<string>;
+  /** Operation that failed (e.g., 'loadConfig', 'registerDependency') */
+  operation?: Optional<string>;
 }
 
 export interface CustomErrorArgs {
@@ -31,6 +35,10 @@ export interface CustomErrorArgs {
   reason?: Optional<string>;
   metadata?: Optional<Record<string, unknown>>;
   error?: Optional<Error>;
+  /** Component or module where error occurred (e.g., 'ConfigLoader', 'DIContainer') */
+  component?: Optional<string>;
+  /** Operation that failed (e.g., 'loadConfig', 'registerDependency') */
+  operation?: Optional<string>;
 }
 
 export class CustomError extends Error {
@@ -42,6 +50,8 @@ export class CustomError extends Error {
   public readonly time: Date;
   public readonly id: string;
   public readonly correlationId: string;
+  public readonly component?: Optional<string>;
+  public readonly operation?: Optional<string>;
 
   constructor({
     message,
@@ -50,10 +60,12 @@ export class CustomError extends Error {
     metadata,
     error,
     correlationId,
+    component,
+    operation,
   }: CustomErrorArgs & { correlationId?: string }) {
     super(message);
     this.id = uuidv4();
-    this.correlationId = correlationId || this.id;
+    this.correlationId = correlationId ?? uuidv4();
     this.custom = true;
     this.name = this.constructor.name;
     this.code = code;
@@ -61,12 +73,15 @@ export class CustomError extends Error {
     this.metadata = metadata;
     this.error = error;
     this.time = new Date();
+    this.component = component;
+    this.operation = operation;
 
     if (Error.captureStackTrace) {
       Error.captureStackTrace(this, this.constructor);
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
   toJSON() {
     return {
       name: this.name,
@@ -74,6 +89,8 @@ export class CustomError extends Error {
       code: this.code,
       reason: this.reason,
       metadata: this.metadata,
+      component: this.component,
+      operation: this.operation,
       error: this.error
         ? {
             name: this.error.name,
@@ -100,6 +117,8 @@ export class CustomError extends Error {
       `\nCorrelationId: ` +
       this.correlationId +
       (this.code ? `\nCode: ` + this.code : "") +
+      (this.component ? `\nComponent: ` + this.component : "") +
+      (this.operation ? `\nOperation: ` + this.operation : "") +
       (this.reason ? `\nReason: ` + this.reason : "") +
       (this.metadata
         ? `\nMetadata: ` + JSON.stringify(this.metadata, null, 2)

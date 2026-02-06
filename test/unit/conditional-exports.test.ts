@@ -26,7 +26,7 @@ describe("Dual Import Strategy", () => {
   });
 
   it("should import Mongoose from dedicated subpath (minimal bundle)", async () => {
-    const mongooseExports = await import("../../src/orm/mongoose.js");
+    const mongooseExports = await import("../../src/third-party/mongoose.js");
 
     expect(mongooseExports.mongoose).toBeDefined();
     expect(mongooseExports.Schema).toBeDefined();
@@ -34,7 +34,7 @@ describe("Dual Import Strategy", () => {
   });
 
   it("should import Sequelize from dedicated subpath (minimal bundle)", async () => {
-    const sequelizeExports = await import("../../src/orm/sequelize.js");
+    const sequelizeExports = await import("../../src/third-party/sequelize.js");
 
     expect(sequelizeExports.Sequelize).toBeDefined();
     expect(sequelizeExports.DataTypes).toBeDefined();
@@ -43,8 +43,8 @@ describe("Dual Import Strategy", () => {
 
   it("should require subpath imports for ORM access", async () => {
     // Subpath imports are the ONLY way to access ORMs
-    const mongooseExports = await import("../../src/orm/mongoose.js");
-    const sequelizeExports = await import("../../src/orm/sequelize.js");
+    const mongooseExports = await import("../../src/third-party/mongoose.js");
+    const sequelizeExports = await import("../../src/third-party/sequelize.js");
 
     expect(mongooseExports.mongoose).toBeDefined();
     expect(sequelizeExports.Sequelize).toBeDefined();

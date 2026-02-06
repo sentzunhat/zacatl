@@ -139,13 +139,13 @@ export class UserService {
 
 Here's a complete feature using all layers:
 
-### 1. Domain (Interfaces)
+### 1. Domain (Ports)
 
 ```typescript
-// src/domain/IUserRepository.ts
-export interface IUserRepository {
-  findById(id: string): Promise<User | null>;
-  create(userData: CreateUserInput): Promise<User>;
+// src/domain/user-repository.port.ts
+export abstract class UserRepository {
+  abstract findById(id: string): Promise<User | null>;
+  abstract create(userData: CreateUserInput): Promise<User>;
 }
 
 // src/domain/types.ts
@@ -161,13 +161,15 @@ export interface User {
 
 ```typescript
 // src/application/services/UserService.ts
-import { inject } from "tsyringe";
+import { inject, injectable } from "tsyringe";
+import { UserRepository } from "../domain/user-repository.port";
+import { AppLogger } from "../infrastructure/logging/app-logger";
 
 @injectable()
 export class UserService {
   constructor(
-    @inject("IUserRepository") private userRepo: IUserRepository,
-    private logger: Logger,
+    @inject(UserRepository) private userRepo: UserRepository,
+    @inject(AppLogger) private logger: AppLogger,
   ) {}
 
   async createUser(input: CreateUserInput): Promise<User> {

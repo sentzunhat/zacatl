@@ -1,8 +1,8 @@
 {
   "compilerOptions": {
-    "incremental": true,
-    "target": "ES2024",
-    "lib": ["ES2024"],
+    "incremental": false,
+    "target": "ES2022",
+    "lib": ["ES2022"],
     "module": "ESNext",
     "moduleResolution": "bundler",
     "rootDir": "./src",
@@ -58,19 +58,26 @@
     "skipLibCheck": true,
 
     "paths": {
-      "@zacatl/error": ["./src/error/index.ts"],
-      "@zacatl/utils": ["./src/utils/index.ts"],
-      "@zacatl/logs": ["./src/logs/index.ts"],
-      "@zacatl/optionals": ["./src/optionals.ts"],
       "@zacatl/configuration": ["./src/configuration/index.ts"],
+      "@zacatl/dependency-injection": ["./src/dependency-injection/index.ts"],
+      "@zacatl/error": ["./src/error/index.ts"],
+      "@zacatl/localization": ["./src/localization/index.ts"],
+      "@zacatl/logs": ["./src/logs/index.ts"],
+      "@zacatl/runtime": ["./src/runtime/index.ts"],
+      "@zacatl/service": ["./src/service/index.ts"],
+      "@zacatl/utils": ["./src/utils/index.ts"],
+      "@zacatl/third-party": ["./src/third-party/index.ts"],
+      "@zacatl/third-party/uuid": ["./src/third-party/uuid.ts"],
+      "@zacatl/third-party/i18n": ["./src/third-party/i18n.ts"],
+      "@zacatl/third-party/i18next": ["./src/third-party/i18next.ts"],
+      "@zacatl/third-party/js-yaml": ["./src/third-party/js-yaml.ts"],
+      "@zacatl/optionals": ["./src/optionals.ts"],
       "@zacatl/infrastructure": [
-        "./src/service/architecture/infrastructure/index.ts"
+        "./src/service/layers/infrastructure/index.ts"
       ],
-      "@zacatl/domain": ["./src/service/architecture/domain/index.ts"],
-      "@zacatl/application": [
-        "./src/service/architecture/application/index.ts"
-      ],
-      "@zacatl/platform": ["./src/service/architecture/platform/index.ts"]
+      "@zacatl/domain": ["./src/service/layers/domain/index.ts"],
+      "@zacatl/application": ["./src/service/layers/application/index.ts"],
+      "@zacatl/platform": ["./src/service/platforms/index.ts"]
     }
   },
   "include": ["src/**/*.ts", "src/**/*.js"],

@@ -25,7 +25,7 @@ describe("Original Issue Requirements Verification", () => {
   });
 
   it("✅ Requirement 2: Dedicated Mongoose subpath exists", async () => {
-    const mongooseExports = await import("../../src/orm/mongoose.js");
+    const mongooseExports = await import("../../src/third-party/mongoose.js");
 
     expect(mongooseExports.mongoose).toBeDefined();
     expect(mongooseExports.Schema).toBeDefined();
@@ -35,7 +35,7 @@ describe("Original Issue Requirements Verification", () => {
   });
 
   it("✅ Requirement 3: Dedicated Sequelize subpath exists", async () => {
-    const sequelizeExports = await import("../../src/orm/sequelize.js");
+    const sequelizeExports = await import("../../src/third-party/sequelize.js");
 
     expect(sequelizeExports.Sequelize).toBeDefined();
     expect(sequelizeExports.DataTypes).toBeDefined();
@@ -45,14 +45,14 @@ describe("Original Issue Requirements Verification", () => {
 
   it("✅ Requirement 4: DI utilities available from application subpath", async () => {
     const appExports =
-      await import("../../src/service/architecture/application/index.js");
+      await import("../../src/service/layers/application/index.js");
 
     expect(appExports.resolveDependency).toBeDefined();
     expect(appExports.registerDependency).toBeDefined();
   });
 
   it("✅ Benefit 1: Subpath imports are isolated and tree-shakeable", async () => {
-    const fromSubpath = await import("../../src/orm/mongoose.js");
+    const fromSubpath = await import("../../src/third-party/mongoose.js");
 
     // Mongoose available ONLY via subpath
     expect(fromSubpath.mongoose).toBeDefined();
@@ -68,7 +68,7 @@ describe("Original Issue Requirements Verification", () => {
 
     // Alternative: application subpath
     const appExports =
-      await import("../../src/service/architecture/application/index.js");
+      await import("../../src/service/layers/application/index.js");
     expect(appExports.resolveDependency).toBeDefined();
   });
 

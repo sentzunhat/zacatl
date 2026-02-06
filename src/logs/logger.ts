@@ -1,11 +1,11 @@
 import { PinoLoggerAdapter } from "./adapters/pino-adapter";
-import type { Logger, LoggerAdapter, LoggerInput } from "./types";
+import type { Logger, LoggerPort, LoggerInput } from "./types";
 
 /**
  * Creates a logger instance with a specific adapter.
  * This is the recommended way to create loggers with custom adapters.
  *
- * @param adapter - LoggerAdapter implementation (defaults to PinoLoggerAdapter)
+ * @param adapter - LoggerPort implementation (defaults to PinoLoggerAdapter)
  * @returns Logger instance
  *
  * @example
@@ -19,11 +19,11 @@ import type { Logger, LoggerAdapter, LoggerInput } from "./types";
  * const cliLogger = createLogger(new ConsoleLoggerAdapter());
  *
  * // Custom adapter
- * class WinstonAdapter implements LoggerAdapter { ... }
+ * class WinstonAdapter implements LoggerPort { ... }
  * const customLogger = createLogger(new WinstonAdapter());
  * ```
  */
-export const createLogger = (adapter?: LoggerAdapter): Logger => {
+export const createLogger = (adapter?: LoggerPort): Logger => {
   const adapterInstance = adapter ?? new PinoLoggerAdapter();
 
   return {
