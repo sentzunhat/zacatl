@@ -90,6 +90,12 @@ Zacatl is MIT-licensed (permissive). Please don’t use it to harm people.
 npm install @sentzunhat/zacatl
 ```
 
+If you are running Zacatl in Node.js with extensionless imports, use the loader:
+
+```bash
+node --loader @sentzunhat/zacatl/loader your-app.js
+```
+
 ### Hello World HTTP Service
 
 ```typescript

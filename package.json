@@ -4,7 +4,7 @@
   "main": "build/index.js",
   "module": "build/index.js",
   "types": "build/index.d.ts",
-  "version": "0.0.28",
+  "version": "0.0.29",
   "packageManager": "npm@10.9.0",
   "exports": {
     ".": {
@@ -139,6 +139,9 @@
     },
     "./eslint/imports": {
       "import": "./src/eslint/imports.mjs"
+    },
+    "./loader": {
+      "import": "./build/loader.js"
     },
     "./build/*": "./build/*",
     "./package.json": "./package.json"
