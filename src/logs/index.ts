@@ -12,5 +12,5 @@ export type {
   PinoLoggerConfig,
 } from "./types";
 export { createPinoConfig, type PinoConfigOptions } from "./config";
-export { ConsoleLoggerAdapter } from "./adapters/console-adapter";
-export { PinoLoggerAdapter } from "./adapters/pino-adapter";
+export { ConsoleLoggerAdapter } from "./console-adapter";
+export { PinoLoggerAdapter } from "./pino-adapter";

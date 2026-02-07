@@ -1,10 +1,10 @@
 import { CustomError, InternalServerError } from "@zacatl/error";
 
+import { type ApiServerPort, type ProxyConfig } from "./port";
 import { resolveDependencies } from "../../../../dependency-injection/container";
 import { HookHandler, RouteHandler } from "../../../layers/application";
 import type { RestApplicationEntryPoints } from "../../../layers/application/types";
-import { type ApiServerPort, type ProxyConfig } from "../types/api-server-port";
-import { type HttpServerConfig, ApiServerType } from "../types/server-config";
+import { ApiServerType, type HttpServerConfig } from "../types/server-config";
 
 export enum HandlersType {
   HOOK = "hook",

@@ -1,14 +1,50 @@
+import proxy from "@fastify/http-proxy";
 import { logger } from "@zacatl/logs";
 import { Express, Request, Response, NextFunction } from "express";
-import express from "express";
+import { FastifyInstance } from "fastify";
+import { ZodTypeProvider } from "fastify-type-provider-zod";
 import { createProxyMiddleware } from "http-proxy-middleware";
 
+import { type ApiServerPort, type ProxyConfig } from "./port";
 import { HookHandler, RouteHandler } from "../../../layers/application";
-import { type ApiServerPort, type ProxyConfig } from "../types/api-server-port";
-import {
-  type PageServerPort,
-  type StaticConfig,
-} from "../types/page-server-port";
+
+/**
+ * FastifyApiAdapter - Implements ApiServerPort for Fastify framework
+ * Handles REST routes, hooks, and proxy registration
+ */
+export class FastifyApiAdapter implements ApiServerPort {
+  constructor(private server: FastifyInstance) {}
+
+  registerRoute(handler: RouteHandler): void {
+    this.server.withTypeProvider<ZodTypeProvider>().route({
+      url: handler.url,
+      method: handler.method,
+      schema: handler.schema,
+      handler: handler.execute.bind(handler),
+    });
+  }
+
+  registerHook(handler: HookHandler): void {
+    this.server.addHook(handler.name, handler.execute.bind(handler));
+  }
+
+  registerProxy(config: ProxyConfig): void {
+    this.server.register(proxy, {
+      upstream: config.upstream,
+      prefix: config.prefix,
+      ...(config.rewritePrefix ? { rewritePrefix: config.rewritePrefix } : {}),
+      ...(config.http2 !== undefined ? { http2: config.http2 } : {}),
+    });
+  }
+
+  async listen(port: number): Promise<void> {
+    await this.server.listen({ port, host: "0.0.0.0" });
+  }
+
+  getRawServer(): unknown {
+    return this.server;
+  }
+}
 
 /**
  * ExpressApiAdapter - Implements ApiServerPort for Express framework
@@ -53,14 +89,16 @@ export class ExpressApiAdapter implements ApiServerPort {
 
   registerHook(handler: HookHandler): void {
     if (handler.name === "onRequest" || handler.name === "preHandler") {
-      this.server.use(async (req, res, next) => {
-        try {
-          await handler.execute(req as any, res as any);
-          next();
-        } catch (err) {
-          next(err);
-        }
-      });
+      this.server.use(
+        async (req: Request, res: Response, next: NextFunction) => {
+          try {
+            await handler.execute(req as any, res as any);
+            next();
+          } catch (err) {
+            next(err);
+          }
+        },
+      );
     } else {
       logger.warn(
         `Hook ${handler.name} is not fully supported in ExpressApiAdapter yet.`,
@@ -93,35 +131,5 @@ export class ExpressApiAdapter implements ApiServerPort {
 
   getRawServer(): unknown {
     return this.server;
-  }
-}
-
-/**
- * ExpressPageAdapter - Implements PageServerPort for Express framework
- * Handles static files and SPA fallback routing
- */
-export class ExpressPageAdapter implements PageServerPort {
-  constructor(private server: Express) {}
-
-  registerStaticFiles(config: StaticConfig): void {
-    this.server.use(config.prefix || "/", express.static(config.root));
-  }
-
-  registerSpaFallback(apiPrefix: string, staticDir: string): void {
-    this.server.use((req, res, _next) => {
-      if (req.path.startsWith(apiPrefix)) {
-        res.status(404).json({
-          code: 404,
-          error: "Not Found",
-          message: `Route ${req.method}:${req.path} not found`,
-        });
-      } else {
-        res.sendFile("index.html", { root: staticDir });
-      }
-    });
-  }
-
-  async register(): Promise<void> {
-    // Custom registration logic if needed
   }
 }

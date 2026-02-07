@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { FastifyApiAdapter } from "../../../../../../../src/service/platforms/server/adapters/fastify-adapters";
+import { FastifyApiAdapter } from "../../../../../../../src/service/platforms/server/api/adapters";
 import {
   RouteHandler,
   HookHandler,

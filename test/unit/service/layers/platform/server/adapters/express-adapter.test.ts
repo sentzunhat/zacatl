@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { ExpressApiAdapter } from "../../../../../../../src/service/platforms/server/adapters/express-adapters";
+import { ExpressApiAdapter } from "../../../../../../../src/service/platforms/server/api/adapters";
 import { RouteHandler } from "../../../../../../../src/service/layers/application";
 import { z } from "zod";
 

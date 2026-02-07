@@ -1,10 +1,7 @@
 import { CustomError } from "@zacatl/error";
 
 import type { ConfigServer } from "../server";
-import {
-  type PageServerPort,
-  type StaticConfig,
-} from "../types/page-server-port";
+import { type PageServerPort, type StaticConfig } from "./port";
 
 /**
  * PageServer - Encapsulates frontend/page rendering logic

@@ -1,3 +1,3 @@
-export * from "./adapters/mongoose-adapter";
-export * from "./adapters/sequelize-adapter";
+export * from "./mongoose-adapter";
+export * from "./sequelize-adapter";
 export * from "./adapter-loader";

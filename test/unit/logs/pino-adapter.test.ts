@@ -19,7 +19,7 @@ vi.mock("pino", () => ({
   default: mockPino,
 }));
 
-import { PinoLoggerAdapter } from "../../../src/logs/adapters/pino-adapter";
+import { PinoLoggerAdapter } from "../../../src/logs/pino-adapter";
 
 describe("PinoLoggerAdapter", () => {
   beforeEach(() => {

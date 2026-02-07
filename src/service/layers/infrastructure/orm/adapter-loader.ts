@@ -12,7 +12,7 @@ export async function loadMongooseAdapter<D, I, O>(
   config: MongooseRepositoryConfig<D>,
 ): Promise<ORMPort<D, I, O>> {
   try {
-    const adapters = await import("./adapters/mongoose-adapter");
+    const adapters = await import("./mongoose-adapter");
     return new adapters.MongooseAdapter<D, I, O>(config);
   } catch (error: any) {
     if (
@@ -37,7 +37,7 @@ export async function loadSequelizeAdapter<D extends Model, I, O>(
   config: SequelizeRepositoryConfig<D>,
 ): Promise<ORMPort<D, I, O>> {
   try {
-    const adapters = await import("./adapters/sequelize-adapter");
+    const adapters = await import("./sequelize-adapter");
     return new adapters.SequelizeAdapter<D, I, O>(config);
   } catch (error: any) {
     if (

@@ -1,4 +1,4 @@
-import type { LoggerPort, LoggerInput } from "../types";
+import type { LoggerPort, LoggerInput } from "./types";
 
 /**
  * Lightweight console-based logger adapter for CLI, desktop apps,

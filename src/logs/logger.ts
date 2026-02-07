@@ -1,4 +1,4 @@
-import { PinoLoggerAdapter } from "./adapters/pino-adapter";
+import { PinoLoggerAdapter } from "./pino-adapter";
 import type { Logger, LoggerPort, LoggerInput } from "./types";
 
 /**

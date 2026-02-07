@@ -1,5 +1,30 @@
 # Release Notes
 
+## [0.0.31] - 2026-02-07
+
+### 🏗️ Architecture
+
+- **Standardized Ports & Adapters Structure**: Removed all top-level `adapters/` folders across the codebase
+  - Moved `logs/adapters/*` files to `logs/` root (console-adapter.ts, pino-adapter.ts)
+  - Moved `orm/adapters/*` files to `orm/` root (mongoose-adapter.ts, sequelize-adapter.ts)
+  - Removed `server/adapters/` re-export folder in favor of direct feature imports
+  - All adapters now live directly alongside their ports and types within feature folders
+  - Simplified import paths and improved module cohesion
+
+### ✅ Fixes
+
+- **Import Paths**: Updated all internal imports after adapter file relocations
+  - Fixed relative imports in moved adapter files
+  - Updated test file imports to reference new locations
+  - Updated adapter-loader dynamic imports
+
+### 📦 Build & Tests
+
+- All 178 tests passing after restructuring
+- Build verification successful with updated import paths
+
+---
+
 ## [0.0.28] - 2026-02-06
 
 ### ✨ Enhancements

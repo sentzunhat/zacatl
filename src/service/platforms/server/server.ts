@@ -2,22 +2,15 @@ import { CustomError, InternalServerError } from "@zacatl/error";
 import { Express } from "express";
 import { FastifyInstance } from "fastify";
 
-
-import {
-  ExpressApiAdapter,
-  ExpressPageAdapter,
-} from "./adapters/express-adapters";
-import {
-  FastifyApiAdapter,
-  FastifyPageAdapter,
-} from "./adapters/fastify-adapters";
+import { ExpressApiAdapter, FastifyApiAdapter } from "./api/adapters";
 import { ApiServer } from "./api/api-server";
+import type { ApiServerPort } from "./api/port";
 import { DatabaseServer } from "./database/database-server";
+import type { DatabaseConfig } from "./database/port";
+import { ExpressPageAdapter, FastifyPageAdapter } from "./page/adapters";
 import { PageServer } from "./page/page-server";
-import { type ApiServerPort } from "./types/api-server-port";
-import type { DatabaseConfig } from "./types/database-server-port";
-import { type PageServerPort } from "./types/page-server-port";
-import { type HttpServerConfig, ServerVendor } from "./types/server-config";
+import type { PageServerPort } from "./page/port";
+import { ServerVendor, type HttpServerConfig } from "./types/server-config";
 import type { RestApplicationEntryPoints } from "../../layers/application/types";
 
 type ServerPageConfig = {

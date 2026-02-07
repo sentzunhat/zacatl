@@ -1,5 +1,4 @@
 export * from "./server";
-export * from "./adapters";
 export * from "./api";
 export * from "./page";
 export * from "./database";

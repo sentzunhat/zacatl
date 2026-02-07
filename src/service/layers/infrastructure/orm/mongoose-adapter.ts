@@ -2,13 +2,13 @@ import { InternalServerError } from "@zacatl/error";
 import { uuidv4 } from "@zacatl/third-party";
 import { container } from "@zacatl/third-party";
 
-import type { MongooseModel } from "../../../../../third-party/mongoose";
-import { Mongoose } from "../../../../../third-party/mongoose";
+import type { MongooseModel } from "../../../../third-party/mongoose";
+import { Mongoose } from "../../../../third-party/mongoose";
 import type {
   MongooseRepositoryConfig,
   ORMPort,
   LeanWithMeta,
-} from "../../repositories/types";
+} from "../repositories/types";
 
 /**
  * MongooseAdapter - Handles Mongoose-specific ORM operations

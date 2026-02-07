@@ -1,11 +1,8 @@
 import {
   SequelizeModel as Model,
   ModelStatic,
-} from "../../../../../third-party/sequelize";
-import type {
-  SequelizeRepositoryConfig,
-  ORMPort,
-} from "../../repositories/types";
+} from "../../../../third-party/sequelize";
+import type { SequelizeRepositoryConfig, ORMPort } from "../repositories/types";
 
 /**
  * SequelizeAdapter - Handles Sequelize-specific ORM operations

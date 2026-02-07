@@ -7,7 +7,7 @@ import {
   type DatabaseServerPort,
   type DatabaseConfig,
   DatabaseVendor,
-} from "../types/database-server-port";
+} from "./port";
 
 /**
  * MongooseAdapter - Implements DatabaseServerPort for Mongoose

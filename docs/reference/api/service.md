@@ -42,11 +42,13 @@ const service = new Service({
   platforms: {
     server: {
       name: "my-service",
+      port: 3000,
       server: {
         type: ServerType.SERVER,
         vendor: ServerVendor.FASTIFY,
         instance: fastify,
       },
+      databases: [],
     },
   },
 });
@@ -55,9 +57,11 @@ const service = new Service({
 ## Start Service
 
 ```typescript
-await service.start({ port: 3000 });
+await service.start();
 // Server running on http://localhost:3000
 ```
+
+The port is specified in the `platforms.server.port` configuration.
 
 ## Configuration Interface
 
@@ -89,19 +93,7 @@ interface ConfigService {
   };
 
   platforms?: {
-    server?: {
-      name: string;
-      server: {
-        type: "SERVER" | "GATEWAY";
-        vendor: "FASTIFY" | "EXPRESS";
-        instance: FastifyInstance | Express;
-      };
-      databases?: Array<{
-        vendor: "SEQUELIZE" | "MONGOOSE";
-        instance: unknown;
-        connectionString?: string;
-      }>;
-    };
+    server?: ConfigServer; // See Server Platform API reference
     cli?: {
       name: string;
       version: string;
@@ -124,6 +116,33 @@ interface ConfigService {
 }
 ```
 
+## Server Platform Configuration
+
+The `platforms.server` property uses the `ConfigServer` type, which includes:
+
+```typescript
+type ConfigServer = {
+  name: string;
+  server: HttpServerConfig;
+  databases: Array<DatabaseConfig>;
+  page?: ServerPageConfig;
+  port: number;
+  entryPoints?: RestApplicationEntryPoints;
+};
+```
+
+For detailed documentation on server configuration types, adapters, and examples, see:
+
+- **[Server Platform API →](./server.md)** - Complete server platform reference
+
 ---
 
-**Next**: [Errors →](./errors.md)
+## Related
+
+- [Server Platform API](./server.md) - HTTP servers, page servers, and databases
+- [Configuration](./configuration.md) - Full configuration reference
+- [Errors](./errors.md) - Error handling
+
+---
+
+**Next**: [Server Platform API →](./server.md)

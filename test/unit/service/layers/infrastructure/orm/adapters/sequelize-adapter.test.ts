@@ -17,7 +17,7 @@ vi.mock("sequelize", () => {
 });
 
 import { Model } from "sequelize";
-import { SequelizeAdapter } from "../../../../../../../src/service/layers/infrastructure/orm/adapters/sequelize-adapter";
+import { SequelizeAdapter } from "../../../../../../../src/service/layers/infrastructure/orm/sequelize-adapter";
 
 // Mock Sequelize Model
 class MockModel extends Model {

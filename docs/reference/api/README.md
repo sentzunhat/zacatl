@@ -7,6 +7,10 @@ Complete Zacatl API documentation.
 - [Service](service.md) - Service class configuration and methods
 - [Configuration](configuration.md) - Config options for all layers
 
+## Platforms
+
+- [Server](server.md) - Server platform API (HTTP, page, database)
+
 ## Data Access
 
 - [Repository](repository.md) - Generic repository pattern and methods

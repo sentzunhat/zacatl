@@ -1,8 +1,8 @@
 import { CustomError } from "@zacatl/error";
 
-import { createDatabaseAdapter } from "../adapters/database-adapters";
-import type { DatabaseConfig } from "../types/database-server-port";
-import type { DatabaseServerPort } from "../types/database-server-port";
+import { createDatabaseAdapter } from "./adapters";
+import type { DatabaseConfig } from "./port";
+import type { DatabaseServerPort } from "./port";
 
 /**
  * DatabaseServer - Encapsulates database connection logic

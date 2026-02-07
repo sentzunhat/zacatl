@@ -1,7 +1,7 @@
 import pino from "pino";
 
-import { createPinoConfig } from "../config";
-import type { LoggerPort, LoggerInput } from "../types";
+import { createPinoConfig } from "./config";
+import type { LoggerPort, LoggerInput } from "./types";
 
 /**
  * Pino-based logger adapter for production microservices
