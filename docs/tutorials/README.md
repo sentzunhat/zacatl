@@ -19,7 +19,6 @@ Step-by-step guides to learn Zacatl from the ground up.
 ## Beyond the Basics
 
 - [First Service](../getting-started/first-service.md) - Build a complete, production-like service
-- [CLI App](cli-app.md) - Build command-line tools (v0.0.32+)
 
 ## Next Steps
 

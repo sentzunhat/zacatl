@@ -14,6 +14,7 @@ import {
 } from "../../src/dependency-injection";
 import { Domain } from "../../src/service/layers/domain/domain";
 import { Infrastructure } from "../../src/service/layers/infrastructure/infrastructure";
+import type { RepositoryPort } from "../../src/service/layers/infrastructure/types";
 
 describe("Auto-Registration Without Service", () => {
   beforeEach(() => {
@@ -70,7 +71,33 @@ describe("Auto-Registration Without Service", () => {
       }
     }
 
-    class UserRepository {
+    class BaseTestRepository implements RepositoryPort<unknown> {
+      async findById(): Promise<unknown | null> {
+        return null;
+      }
+
+      async findMany(): Promise<unknown[]> {
+        return [];
+      }
+
+      async create(): Promise<unknown> {
+        return {};
+      }
+
+      async update(): Promise<unknown | null> {
+        return null;
+      }
+
+      async delete(): Promise<boolean> {
+        return true;
+      }
+
+      async exists(): Promise<boolean> {
+        return false;
+      }
+    }
+
+    class UserRepository extends BaseTestRepository {
       findUser() {
         return { id: 1, name: "John" };
       }
@@ -94,9 +121,33 @@ describe("Auto-Registration Without Service", () => {
   });
 
   it("should support DI injection between auto-registered layers", () => {
-    class DataService {
+    class DataService implements RepositoryPort<unknown> {
       getData() {
         return "data";
+      }
+
+      async findById(): Promise<unknown | null> {
+        return null;
+      }
+
+      async findMany(): Promise<unknown[]> {
+        return [];
+      }
+
+      async create(): Promise<unknown> {
+        return {};
+      }
+
+      async update(): Promise<unknown | null> {
+        return null;
+      }
+
+      async delete(): Promise<boolean> {
+        return true;
+      }
+
+      async exists(): Promise<boolean> {
+        return false;
       }
     }
 

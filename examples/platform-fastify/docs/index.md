@@ -69,6 +69,5 @@ When updating examples:
 
 ## 🔗 External Links
 
-- **Framework Documentation**: [../../../docs/index.md](../../../docs/index.md)
-- **Testing Guide**: [../../../docs/testing/](../../../docs/testing/)
-- **Deployment**: [../../../docs/deployment/](../../../docs/deployment/)
+- **Framework Documentation**: [../../../docs/README.md](../../../docs/README.md)
+- **Testing Guide**: [../../../docs/testing/README.md](../../../docs/testing/README.md)

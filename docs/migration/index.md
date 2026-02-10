@@ -45,6 +45,5 @@ Documentation for migrating between versions of @sentzunhat/zacatl.
 
 ## Quick Links
 
-- [AI Migration Prompts](../prompts/migration.md)
 - [Infrastructure Usage Guide](../guides/infrastructure-usage.md)
-- [Multi-ORM Setup](../guides/multi-orm-setup.md)
+- [Multi-ORM Setup](../reference/orm/multi-orm-setup.md)

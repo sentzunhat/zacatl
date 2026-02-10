@@ -272,4 +272,4 @@ To add a new resource (e.g., "User"):
 - **SQLite Setup**: [../01-with-sqlite/docs/setup.md](../01-with-sqlite/docs/setup.md)
 - **MongoDB Setup**: [../02-with-mongodb/docs/setup.md](../02-with-mongodb/docs/setup.md)
 - **Quick Start**: [quick-start.md](quick-start.md)
-- **Framework Docs**: [../../../docs/index.md](../../../docs/index.md)
+- **Framework Docs**: [../../../docs/README.md](../../../docs/README.md)

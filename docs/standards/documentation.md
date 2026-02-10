@@ -1,6 +1,6 @@
 # Documentation Standards & Guidelines
 
-**Version:** 1.0  
+**Version:** 1.0
 **Last Updated:** 2026-01-31
 
 ## Overview
@@ -31,53 +31,43 @@ This guide defines standards for creating and maintaining documentation in the `
 
 ```
 docs/
-├── readme.md                    # Main documentation entry point
-├── index.md                     # Table of contents
+├── README.md                    # Main documentation entry point
 ├── changelog.md                 # Version history
 │
 ├── getting-started/             # New user guides
-│   ├── index.md
 │   ├── installation.md
 │   ├── quickstart.md
 │   └── first-service.md
 │
-├── guides/                      # How-to guides & tutorials
-│   ├── index.md
-│   ├── database-setup.md
-│   ├── error-handling.md
-│   └── testing.md
+├── tutorials/                   # Step-by-step learning guides
+│   ├── rest-api.md
+│   ├── working-with-databases.md
+│   └── error-handling.md
 │
-├── api/                         # API reference documentation
-│   ├── index.md
-│   ├── service.md
-│   ├── repository.md
-│   └── configuration.md
+├── guides/                      # How-to guides
+│   ├── dependency-injection.md
+│   ├── infrastructure-usage.md
+│   └── non-http-setup.md
+│
+├── reference/                   # API reference documentation
+│   ├── api/
+│   ├── orm/
+│   └── architecture/
 │
 ├── architecture/                # Architecture decisions & design
-│   ├── index.md
 │   ├── orm-architecture.md
 │   └── decisions/
 │       └── adr-001-*.md
 │
 ├── migration/                   # Version migration guides
-│   ├── index.md
 │   ├── v0.0.20.md
 │   └── prepare-v0.0.20.md
 │
-├── prompts/                     # AI prompts & automation scripts
-│   ├── index.md
-│   ├── migration-prompts.md
-│   └── development-prompts.md
-│
 ├── standards/                   # Documentation & code standards
-│   ├── index.md
 │   ├── documentation.md (this file)
 │   └── code-style.md
 │
-└── internal/                    # Internal development docs
-    ├── index.md
-    ├── roadmap.md
-    └── specifications/
+└── roadmap/                     # Roadmap and future plans
 ```
 
 ---
@@ -198,13 +188,6 @@ import stuff from "somewhere";
 - **Length**: 400-600 lines
 - **Style**: Practical, checklist-based
 - **Example**: `migration/v0.0.20.md`
-
-### 6. Prompts/Skills
-
-- **Purpose**: AI prompts and automation
-- **Length**: 300-500 lines
-- **Style**: Copy-paste ready, specific
-- **Example**: `prompts/migration-prompts.md`
 
 ---
 
@@ -409,7 +392,7 @@ Category: [getting-started|guides|api|architecture|migration|prompts]
 ### ✅ Good
 
 - Clear file name: `multi-orm-setup.md`
-- Proper category: `guides/multi-orm-setup.md`
+- Proper category: `reference/orm/multi-orm-setup.md`
 - Concise: 400 lines
 - Scannable: Good headings and code blocks
 - Actionable: Working examples

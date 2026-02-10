@@ -3,8 +3,33 @@ import {
   ConfigInfrastructure,
   Infrastructure,
 } from "../../../../../src/service/layers/infrastructure";
+import type { RepositoryPort } from "../../../../../src/service/layers/infrastructure/types";
 
-class DummyRepository {}
+class DummyRepository implements RepositoryPort<unknown> {
+  async findById(): Promise<unknown | null> {
+    return null;
+  }
+
+  async findMany(): Promise<unknown[]> {
+    return [];
+  }
+
+  async create(): Promise<unknown> {
+    return {};
+  }
+
+  async update(): Promise<unknown | null> {
+    return null;
+  }
+
+  async delete(): Promise<boolean> {
+    return true;
+  }
+
+  async exists(): Promise<boolean> {
+    return false;
+  }
+}
 
 const config: ConfigInfrastructure = {
   repositories: [DummyRepository],
