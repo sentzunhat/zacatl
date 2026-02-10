@@ -1,6 +1,6 @@
 import { z } from "@zacatl/third-party";
 import i18n from "@zacatl/third-party/i18n";
-import { HTTPMethods, FastifySchema, FastifyReply } from "fastify";
+import { HTTPMethods, FastifyReply, FastifySchema } from "fastify";
 
 import { RouteHandler } from "./route-handler";
 import type { Request } from "../common/request";
@@ -24,7 +24,7 @@ export type RouteSchema<
 export type AbstractRouteHandlerConstructor = {
   url: string;
   method: HTTPMethods;
-  schema: FastifySchema;
+  schema: RouteSchema | FastifySchema | Record<string, unknown>;
 };
 
 export type HandlerOutput<TResponse> = TResponse;
@@ -38,7 +38,7 @@ export abstract class AbstractRouteHandler<
 > implements RouteHandler<TBody, TQuerystring, TParams, THeaders> {
   public url: string;
   public method: HTTPMethods;
-  public schema: FastifySchema;
+  public schema: RouteSchema | FastifySchema | Record<string, unknown>;
 
   constructor(args: AbstractRouteHandlerConstructor) {
     this.url = args.url;

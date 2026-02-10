@@ -2,7 +2,7 @@
 
 A catalog of standalone, production-ready server applications demonstrating different patterns and use cases. Each example is fully functional, copy-paste deployable, and follows the same domain logic across different server frameworks and databases.
 
-> **📖 Quick Reference:** See [INDEX.md](./INDEX.md) for a condensed catalog view.  
+> **📖 Quick Reference:** See [INDEX.md](./INDEX.md) for a condensed catalog view.
 > **🤖 For Agents:** See [AGENTS.md](./AGENTS.md) - Comprehensive guidance for building parallel platform examples.
 
 ---
@@ -16,11 +16,11 @@ A catalog of standalone, production-ready server applications demonstrating diff
 **Choose your platform:**
 
 - **[platform-fastify/](./platform-fastify/)** ⭐ **RECOMMENDED** - Fastest & most polished
-  - `01-with-sqlite/` - Fastify + SQLite + React (Port 3001, < 1s startup)
-  - `02-with-mongodb/` - Fastify + MongoDB + React (Port 3002, < 2s startup)
+  - `01-with-sqlite/` - Fastify + SQLite + React (Backend: 8081,Frontend: 8091, < 1s startup)
+  - `02-with-mongodb/` - Fastify + MongoDB + React (Backend: 8082, Frontend: 8092, < 2s startup)
 - **[platform-express/](./platform-express/)** - Traditional Node.js patterns
-  - `01-with-sqlite/` - Express + SQLite (Port 8083, backend-only)
-  - `02-with-mongodb/` - Express + MongoDB (Port 8084, backend-only)
+  - `01-with-sqlite/` - Express + SQLite (Backend: 8181, backend-only)
+  - `02-with-mongodb/` - Express + MongoDB (Backend: 8182, backend-only)
 
 **All examples include:**
 
@@ -41,7 +41,7 @@ All tier 2 examples follow **identical architecture and endpoints** but use diff
 
 ##### 01-with-sqlite
 
-**Stack:** Express + SQLite + Zacatl  
+**Stack:** Express + SQLite + Zacatl
 **Level:** Intermediate | **Setup:** < 1 minute (no external deps)
 
 ```bash
@@ -60,7 +60,7 @@ cd platform-express/01-with-sqlite && npm install && npm run dev
 
 ##### 02-with-mongodb
 
-**Stack:** Express + MongoDB + Zacatl  
+**Stack:** Express + MongoDB + Zacatl
 **Level:** Intermediate | **Setup:** 2 minutes (requires MongoDB)
 
 ```bash
@@ -86,7 +86,7 @@ cd platform-express/02-with-mongodb && npm install && npm run dev
 
 ##### 01-with-sqlite
 
-**Stack:** Fastify + SQLite + React + Tailwind  
+**Stack:** Fastify + SQLite + React + Tailwind
 **Level:** Intermediate | **Setup:** < 1 minute
 
 ```bash
@@ -104,7 +104,7 @@ cd platform-fastify/01-with-sqlite && npm install && npm run dev
 
 ##### 02-with-mongodb
 
-**Stack:** Fastify + MongoDB + React + Tailwind  
+**Stack:** Fastify + MongoDB + React + Tailwind
 **Level:** Intermediate | **Setup:** 2 minutes (MongoDB required)
 
 ```bash

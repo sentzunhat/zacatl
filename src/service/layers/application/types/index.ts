@@ -1,9 +1,8 @@
 import type { Constructor } from "../../types";
-import type { HookHandler } from "../entry-points/rest";
+import type { HookHandler, RouteHandler } from "../entry-points/rest";
 
 export type ApplicationRestHooks = Array<Constructor<HookHandler>>;
-// Use any for route handlers to support AbstractRouteHandler with different generic parameters
-export type ApplicationRestRoutes = Array<Constructor<any>>;
+export type ApplicationRestRoutes = Array<Constructor<RouteHandler>>;
 
 export type RestApplicationEntryPoints = {
   /** Middleware for pre-/post-processing (hooks) */

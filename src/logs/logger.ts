@@ -10,7 +10,7 @@ import type { Logger, LoggerPort, LoggerInput } from "./types";
  *
  * @example
  * ```typescript
- * import { createLogger, ConsoleLoggerAdapter } from '@sentzunhat/zacatl';
+ * import { createLogger, ConsoleLoggerAdapter } from '@zacatl';
  *
  * // Default Pino logger
  * const logger = createLogger();
@@ -48,13 +48,13 @@ export const createLogger = (adapter?: LoggerPort): Logger => {
  *
  * For custom adapters, use `createLogger()`:
  * ```typescript
- * import { createLogger, ConsoleLoggerAdapter } from '@sentzunhat/zacatl';
+ * import { createLogger, ConsoleLoggerAdapter } from '@zacatl';
  * const cliLogger = createLogger(new ConsoleLoggerAdapter());
  * ```
  *
  * @example
  * ```typescript
- * import { logger } from '@sentzunhat/zacatl';
+ * import { logger } from '@zacatl';
  *
  * logger.info('Application started');
  * logger.error('Request failed', {

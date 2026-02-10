@@ -5,33 +5,36 @@ import {
 import type { SequelizeRepositoryConfig, ORMPort } from "../repositories/types";
 
 /**
- * SequelizeAdapter - Handles Sequelize-specific ORM operations
+ * Sequelize ORM adapter - handles Sequelize-specific database operations
  */
-export class SequelizeAdapter<D extends Model, I, O> implements ORMPort<
-  D,
-  I,
-  O
-> {
-  public readonly model: ModelStatic<D>;
+export class SequelizeAdapter<D, I, O> implements ORMPort<D, I, O> {
+  public readonly model: ModelStatic<Model>;
 
-  constructor(config: SequelizeRepositoryConfig<D>) {
+  constructor(config: SequelizeRepositoryConfig<object>) {
     this.model = config.model;
   }
 
   public toLean(input: unknown): O | null {
     if (!input) return null;
+
     const plain =
-      input instanceof Model ? input.get({ plain: true }) : (input as O);
+      input instanceof Model
+        ? (input.get({ plain: true }) as Record<string, unknown>)
+        : (input as Record<string, unknown>);
+
+    const idValue = plain["id"] ?? plain["_id"];
+    const createdAtValue = plain["createdAt"];
+    const updatedAtValue = plain["updatedAt"];
 
     // Normalize id, createdAt, updatedAt
     return {
       ...(plain as O),
-      id: String((plain as any).id || (plain as any)._id || ""),
-      createdAt: (plain as any).createdAt
-        ? new Date((plain as any).createdAt)
+      id: idValue !== undefined && idValue !== null ? String(idValue) : "",
+      createdAt: createdAtValue
+        ? new Date(createdAtValue as string | number | Date)
         : new Date(),
-      updatedAt: (plain as any).updatedAt
-        ? new Date((plain as any).updatedAt)
+      updatedAt: updatedAtValue
+        ? new Date(updatedAtValue as string | number | Date)
         : new Date(),
     } as O;
   }
@@ -42,14 +45,19 @@ export class SequelizeAdapter<D extends Model, I, O> implements ORMPort<
   }
 
   async create(entity: I): Promise<O> {
-    const document = await this.model.create(entity as any);
+    const document = await this.model.create(
+      entity as unknown as Record<string, unknown>,
+    );
     return this.toLean(document) as O;
   }
 
   async update(id: string, update: Partial<I>): Promise<O | null> {
-    const [affectedCount] = await this.model.update(update as any, {
-      where: { id } as any,
-    });
+    const [affectedCount] = await this.model.update(
+      update as unknown as Record<string, unknown>,
+      {
+        where: { id } as Record<string, unknown>,
+      },
+    );
 
     if (affectedCount === 0) {
       return null;
@@ -63,7 +71,7 @@ export class SequelizeAdapter<D extends Model, I, O> implements ORMPort<
     if (!entity) return null;
 
     await this.model.destroy({
-      where: { id } as any,
+      where: { id } as Record<string, unknown>,
     });
 
     return entity;

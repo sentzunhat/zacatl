@@ -1,6 +1,6 @@
 # Zacatl for Non-HTTP Services
 
-> **Elegant dependency injection for CLI tools, workers, and scripts**  
+> **Elegant dependency injection for CLI tools, workers, and scripts**
 > **Version:** 0.0.22+
 
 ---
@@ -90,22 +90,30 @@ class UserRepository extends BaseRepository<any, any, any> {
 ## 3. Service (DI Engine)
 
 ```typescript
-import { Service, resolveDependency } from "@sentzunhat/zacatl";
+import {
+  Service,
+  resolveDependency,
+  ServiceType,
+  DatabaseVendor,
+} from "@sentzunhat/zacatl";
 import mongoose from "mongoose";
 
 const service = new Service({
-  architecture: {
+  type: ServiceType.SERVER,
+  layers: {
     domain: {
-      providers: [EmailService, NotificationService],
+      services: [EmailService, NotificationService],
     },
     infrastructure: {
       repositories: [UserRepository],
     },
+  },
+  platforms: {
     server: {
       name: "my-app",
       databases: [
         {
-          vendor: "MONGOOSE",
+          vendor: DatabaseVendor.MONGOOSE,
           instance: mongoose.connect("mongodb://localhost/db"),
         },
       ],
@@ -144,7 +152,8 @@ class Calculator {
 }
 
 const service = new Service({
-  architecture: {
+  type: ServiceType.SERVER,
+  layers: {
     domain: { providers: [Calculator] },
   },
 });
@@ -187,14 +196,17 @@ class TaskWorker {
 
 // Engine
 const service = new Service({
-  architecture: {
-    domain: { providers: [TaskWorker] },
+  type: ServiceType.SERVER,
+  layers: {
+    domain: { services: [TaskWorker] },
     infrastructure: { repositories: [TaskRepository] },
+  },
+  platforms: {
     server: {
       name: "worker",
       databases: [
         {
-          vendor: "MONGOOSE",
+          vendor: DatabaseVendor.MONGOOSE,
           instance: mongoose.connect("mongodb://localhost/tasks"),
         },
       ],
@@ -243,8 +255,9 @@ class UserService {
 
 // Wire it up
 const service = new Service({
-  architecture: {
-    domain: { providers: [Logger, Database, UserService] },
+  type: ServiceType.SERVER,
+  layers: {
+    domain: { services: [Logger, Database, UserService] },
   },
 });
 
@@ -272,13 +285,16 @@ const ConfigSchema = z.object({
 const config = loadConfig("./config.yaml", "yaml", ConfigSchema);
 
 const service = new Service({
-  architecture: {
-    domain: { providers: [MyService] },
+  type: ServiceType.SERVER,
+  layers: {
+    domain: { services: [MyService] },
+  },
+  platforms: {
     server: {
       name: "app",
       databases: [
         {
-          vendor: "MONGOOSE",
+          vendor: DatabaseVendor.MONGOOSE,
           instance: mongoose.connect(config.db),
         },
       ],
@@ -356,7 +372,8 @@ class CLI {
 }
 
 const service = new Service({
-  architecture: { domain: { providers: [CLI] } },
+  type: ServiceType.CLI,
+  layers: { domain: { services: [CLI] } },
 });
 
 await service.start();
@@ -377,7 +394,8 @@ class Job {
 }
 
 const service = new Service({
-  architecture: { domain: { providers: [Job] } },
+  type: ServiceType.WORKER,
+  layers: { domain: { services: [Job] } },
 });
 
 await service.start();
@@ -397,19 +415,24 @@ class Migration {
   constructor(private sourceRepo: SourceRepository) {}
 
   async run() {
-    const data = await this.sourceRepo.getMongooseModel().find();
+    const data = await (this.sourceRepo.model as MongooseModel<Source>).find();
     // Transform and migrate
     console.log(`Migrated ${data.length} records`);
   }
 }
 
 const service = new Service({
-  architecture: {
-    domain: { providers: [Migration] },
+  type: ServiceType.SERVER,
+  layers: {
+    domain: { services: [Migration] },
     infrastructure: { repositories: [SourceRepository] },
+  },
+  platforms: {
     server: {
       name: "migration",
-      databases: [{ vendor: "MONGOOSE", instance: mongoose.connect(uri) }],
+      databases: [
+        { vendor: DatabaseVendor.MONGOOSE, instance: mongoose.connect(uri) },
+      ],
     },
   },
 });

@@ -1,7 +1,7 @@
 # Agent Guidance: Building Platform Examples
 
-> **Last Updated:** February 4, 2026  
-> **Status:** Pre-agent launch - templates and guidance ready  
+> **Last Updated:** February 4, 2026
+> **Status:** Pre-agent launch - templates and guidance ready
 > **Goal:** Build 4 production-ready backend examples (2 frameworks × 2 databases)
 
 ## Quick Overview
@@ -57,7 +57,7 @@ platform-[framework]/0[1-2]-with-[database]/
 │   │   ├── models/
 │   │   │   └── greeting.model.ts   # ORM model (Sequelize or Mongoose)
 │   │   ├── repositories/
-│   │   │   └── greeting.repository.ts  # Repository impl (Sequelize or Mongoose)
+│   │   │   └── greeting/adapter.ts  # Repository impl (Sequelize or Mongoose)
 │   │   └── database.ts             # DB connection & initialization
 │   ├── interfaces/
 │   │   └── handlers/
@@ -400,5 +400,5 @@ Before considering your example "done":
    build/ directory created with .js and .d.ts files
 ```
 
-**One example = 1-2 hours of work.** You're building two, so ~3-4 hours total.  
+**One example = 1-2 hours of work.** You're building two, so ~3-4 hours total.
 **You've got this! 🚀**

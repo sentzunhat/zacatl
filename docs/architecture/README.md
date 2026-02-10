@@ -5,7 +5,7 @@ Deep dive into Zacatl's architecture and design decisions.
 ## Core Architecture
 
 - [Framework Overview](framework-overview.md) - Layered architecture, key components
-- [Multi-Context Design](multi-context-design.md) - CLI, Desktop, Server support (v0.1.0+)
+- [Multi-Context Design](multi-context-design.md) - CLI, Desktop, Server support
 
 ## Design Decisions
 
@@ -20,7 +20,7 @@ Deep dive into Zacatl's architecture and design decisions.
 - Domain Layer - Business logic
 - Infrastructure Layer - Data access
 
-**Multi-Context Support (v0.1.0+)**
+**Multi-Context Support**
 
 - CLI applications with commands
 - Desktop apps with IPC handlers

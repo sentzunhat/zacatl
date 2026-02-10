@@ -2,8 +2,8 @@
 
 **Visual reference and folder tree of the reorganized documentation hierarchy.**
 
-**Version:** 1.0  
-**Last Updated:** February 5, 2026  
+**Version:** 1.0
+**Last Updated:** February 5, 2026
 **Status:** ✅ Complete
 
 ---
@@ -182,7 +182,7 @@ zacatl/
 │   ├── third-party/
 │   └── utils/
 │
-├── test/                               # 🧪 UNIT TESTS (201 tests, 79% coverage)
+├── test/                               # 🧪 UNIT TESTS (178 tests, 61.6% coverage)
 │   ├── tsconfig.json
 │   └── unit/
 │
@@ -229,7 +229,7 @@ zacatl/
 | ------------- | ---------------- | ----- | -------------------------- |
 | **docs/**     | Documentation    | 95+   | ✅ Reorganized             |
 | **src/**      | Source code      | 200+  | ✅ Active                  |
-| **test/**     | Unit tests       | 201   | ✅ Passing                 |
+| **test/**     | Unit tests       | 178   | ✅ Passing                 |
 | **build/**    | Compiled output  | -     | ✅ Current                 |
 | **examples/** | Working examples | 3     | 🟡 Needs update for v0.1.0 |
 
@@ -300,5 +300,5 @@ zacatl/
 
 ---
 
-**Documentation Structure Finalized:** February 5, 2026  
+**Documentation Structure Finalized:** February 5, 2026
 **Status:** ✅ Complete and Ready for Use

@@ -109,7 +109,7 @@ export class NotificationService {
 
 | Pattern             | Usage                    | Examples                                    |
 | ------------------- | ------------------------ | ------------------------------------------- |
-| `get<Type>()`       | Retrieve typed instances | `getMongooseModel()`, `getUserById()`       |
+| `get<Type>()`       | Retrieve typed instances | `getUserById()`, `getConfig()`              |
 | `register<Type>()`  | Register dependencies    | `registerRoute()`, `registerDependencies()` |
 | `create<Type>()`    | Create/instantiate       | `createUserService()`                       |
 | `find<Criterion>()` | Query data               | `findById()`, `findByEmail()`               |
@@ -139,31 +139,29 @@ export class ConfigService {
 
 #### Private Method Naming
 
-| Pattern              | Usage                 | Examples                                   |
-| -------------------- | --------------------- | ------------------------------------------ |
-| `ensure<State>()`    | Verify preconditions  | `ensureInitialized()`, `ensureConnected()` |
-| `load<Resource>()`   | Load/initialize       | `loadAdapter()`, `loadConfiguration()`     |
-| `validate<Type>()`   | Validate data         | `validateConfig()`, `validateInput()`      |
-| `register<Type>()`   | Internal registration | `registerRest()`, `registerMiddleware()`   |
-| `check<Condition>()` | Check state           | `checkPermissions()`                       |
-| `initialize<Type>()` | Setup                 | `initializeDatabase()`                     |
+| Pattern              | Usage                 | Examples                                 |
+| -------------------- | --------------------- | ---------------------------------------- |
+| `load<Resource>()`   | Load/initialize       | `loadAdapter()`, `loadConfiguration()`   |
+| `validate<Type>()`   | Validate data         | `validateConfig()`, `validateInput()`    |
+| `register<Type>()`   | Internal registration | `registerRest()`, `registerMiddleware()` |
+| `check<Condition>()` | Check state           | `checkPermissions()`                     |
+| `initialize<Type>()` | Setup                 | `initializeDatabase()`                   |
 
 ```typescript
-// ✅ DO: Ensure* and validate* patterns for private methods
+// ✅ DO: validate*, load*, and register* patterns for private methods
 export class BaseRepository<D, I, O> {
-  private async ensureInitialized(): Promise<void> { ... }
-  private async loadAdapter(): Promise<void> { ... }
+  private loadAdapter(): void { ... }
   private validateConfig(config: any): void { ... }
 }
 
 export class Service {
   private validateConfig(config: ConfigService): void { ... }
-  private async ensureAllLayersInitialized(): Promise<void> { ... }
   private registerApplicationLayer(config: ConfigService): void { ... }
+  private loadDatabase(): Promise<void> { ... }
 }
 
 // ❌ DON'T: Generic or unclear private method names
-private init(): void { ... }           // Use ensureInitialized()
+private init(): void { ... }           // Use loadAdapter() or validateConfig()
 private check(): void { ... }          // Use validateConfig()
 private setup(): void { ... }          // Use registerApplicationLayer()
 ```

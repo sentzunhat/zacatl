@@ -7,15 +7,12 @@ import {
   SequelizeRepositoryConfig,
   ORMPort,
   ORMType,
+  RepositoryModel,
 } from "./types";
-import type { MongooseModel } from "../../../../third-party/mongoose";
-import type {
-  SequelizeModel as Model,
-  ModelStatic,
-} from "../../../../third-party/sequelize";
+import type { SequelizeModel as Model } from "../../../../third-party/sequelize";
 import {
-  loadMongooseAdapter,
-  loadSequelizeAdapter,
+  createMongooseAdapter,
+  createSequelizeAdapter,
 } from "../orm/adapter-loader";
 
 export * from "./types";
@@ -33,64 +30,42 @@ const isSequelizeConfig = <D extends Model>(
 };
 
 /**
- * Abstract base repository supporting multiple ORMs via adapter pattern
+ * Abstract repository implementation supporting Mongoose and Sequelize
+ *
+ * Provides lazy adapter loading with immediate model access. Use in two ways:
+ * 1. Direct method calls: `await repo.findById()` - adapter lazy-loads on first call
+ * 2. Custom queries: `(this.model as ModelStatic<T>).find()` - type-assert model in subclass
  */
 export abstract class BaseRepository<D, I, O> implements RepositoryPort<
   D,
   I,
   O
 > {
-  private adapter?: ORMPort<D, I, O>;
+  private readonly adapter: ORMPort<D, I, O>;
   private readonly ormType: ORMType;
-  private readonly config: BaseRepositoryConfig<D>;
-  private initPromise?: Promise<void>;
+
+  /** ORM model instance - typed by subclass assertion (lazy-loaded) */
+  public get model(): RepositoryModel<D> {
+    return this.adapter.model as RepositoryModel<D>;
+  }
 
   constructor(config: BaseRepositoryConfig<D>) {
     this.ormType = config.type;
-    this.config = config;
-  }
 
-  private async ensureInitialized(): Promise<void> {
-    if (this.adapter) return;
-
-    if (!this.initPromise) {
-      this.initPromise = this.loadAdapter();
-    }
-
-    await this.initPromise;
-  }
-
-  private async loadAdapter(): Promise<void> {
-    if (isMongooseConfig<D>(this.config)) {
-      this.adapter = await loadMongooseAdapter<D, I, O>(this.config);
-    } else if (isSequelizeConfig(this.config)) {
-      // Type assertion: D could be Mongoose or Sequelize model
-      this.adapter = (await loadSequelizeAdapter<Model, I, O>(
-        this.config,
-      )) as ORMPort<D, I, O>;
+    if (isMongooseConfig<D>(config)) {
+      this.adapter = createMongooseAdapter<D, I, O>(config);
+    } else if (isSequelizeConfig(config)) {
+      this.adapter = createSequelizeAdapter<D, I, O>(config);
     } else {
-      const exhaustive: never = this.config;
+      const exhaustive: never = config;
       throw new InternalServerError({
-        message: `Invalid repository configuration. Received: ${JSON.stringify(exhaustive)}`,
-        reason: "Repository config doesn't match Mongoose or Sequelize format",
-        component: "AbstractRepository",
-        operation: "ensureInitialized",
+        message: `Invalid repository config: ${JSON.stringify(exhaustive)}`,
+        reason: "Config is neither Mongoose nor Sequelize format",
+        component: "BaseRepository",
+        operation: "constructor",
         metadata: { config: exhaustive },
       });
     }
-  }
-
-  get model(): MongooseModel<D> | ModelStatic<any> {
-    if (!this.adapter) {
-      throw new InternalServerError({
-        message:
-          "Repository not initialized. Call an async method first or await repository.ensureInitialized()",
-        reason: "Attempted to access model before repository initialization",
-        component: "AbstractRepository",
-        operation: "model",
-      });
-    }
-    return this.adapter.model;
   }
 
   public isMongoose(): boolean {
@@ -101,82 +76,23 @@ export abstract class BaseRepository<D, I, O> implements RepositoryPort<
     return this.ormType === ORMType.Sequelize;
   }
 
-  public getMongooseModel(): MongooseModel<D> {
-    if (!this.adapter) {
-      throw new InternalServerError({
-        message:
-          "Repository not initialized. Call an async method first or await repository.ensureInitialized()",
-        reason:
-          "Attempted to access Mongoose model before repository initialization",
-        component: "AbstractRepository",
-        operation: "getMongooseModel",
-      });
-    }
-    if (!this.isMongoose()) {
-      throw new InternalServerError({
-        message: "Repository is not using Mongoose",
-        reason: "Cannot get Mongoose model from non-Mongoose repository",
-        component: "AbstractRepository",
-        operation: "getMongooseModel",
-        metadata: { ormType: this.ormType },
-      });
-    }
-    return this.adapter.model as MongooseModel<D>;
-  }
-
-  public getSequelizeModel(): ModelStatic<any> {
-    if (!this.adapter) {
-      throw new InternalServerError({
-        message:
-          "Repository not initialized. Call an async method first or await repository.ensureInitialized()",
-        reason:
-          "Attempted to access Sequelize model before repository initialization",
-        component: "AbstractRepository",
-        operation: "getSequelizeModel",
-      });
-    }
-    if (!this.isSequelize()) {
-      throw new InternalServerError({
-        message: "Repository is not using Sequelize",
-        reason: "Cannot get Sequelize model from non-Sequelize repository",
-        component: "AbstractRepository",
-        operation: "getSequelizeModel",
-        metadata: { ormType: this.ormType },
-      });
-    }
-    return this.adapter.model as ModelStatic<any>;
-  }
-
   public toLean(input: unknown): O | null {
-    if (!this.adapter) {
-      throw new InternalServerError({
-        message:
-          "Repository not initialized. Call an async method first or await repository.ensureInitialized()",
-        reason: "Attempted to call toLean before repository initialization",
-        component: "AbstractRepository",
-        operation: "toLean",
-      });
-    }
     return this.adapter.toLean(input);
   }
 
   async findById(id: string): Promise<O | null> {
-    await this.ensureInitialized();
-    return this.adapter!.findById(id);
+    return this.adapter.findById(id);
   }
 
   async create(entity: I): Promise<O> {
-    await this.ensureInitialized();
-    return this.adapter!.create(entity);
+    return this.adapter.create(entity);
   }
 
   async update(id: string, update: Partial<I>): Promise<O | null> {
-    await this.ensureInitialized();
-    return this.adapter!.update(id, update);
+    return this.adapter.update(id, update);
   }
 
   async delete(id: string): Promise<O | null> {
-    await this.ensureInitialized();
-    return this.adapter!.delete(id);
+    return this.adapter.delete(id);
   }
 }

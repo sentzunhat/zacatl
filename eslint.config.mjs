@@ -41,6 +41,8 @@ export default [
     rules: {
       // Prevent circular dependencies
       "import/no-cycle": ["error", { maxDepth: Infinity }],
+      // Warn when using 'any' type - promotes type safety
+      "@typescript-eslint/no-explicit-any": "warn",
     },
   },
 ];

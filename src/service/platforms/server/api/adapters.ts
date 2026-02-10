@@ -4,6 +4,7 @@ import { Express, Request, Response, NextFunction } from "express";
 import { FastifyInstance } from "fastify";
 import { ZodTypeProvider } from "fastify-type-provider-zod";
 import { createProxyMiddleware } from "http-proxy-middleware";
+import type { ParsedQs } from "qs";
 
 import { type ApiServerPort, type ProxyConfig } from "./port";
 import { HookHandler, RouteHandler } from "../../../layers/application";
@@ -57,34 +58,60 @@ export class ExpressApiAdapter implements ApiServerPort {
     const method = handler.method.toLowerCase();
     const url = handler.url;
 
-    (this.server as any)[method](
-      url,
-      async (req: Request, res: Response, next: NextFunction) => {
-        try {
-          const schema = handler.schema as any;
+    const register = (
+      this.server as unknown as Record<
+        string,
+        (
+          path: string,
+          routeHandler: (
+            req: Request,
+            res: Response,
+            next: NextFunction,
+          ) => void,
+        ) => void
+      >
+    )[method];
 
-          if (schema) {
-            if (schema.body) {
-              req.body = await schema.body.parseAsync(req.body);
-            }
-            if (schema.querystring) {
-              req.query = await schema.querystring.parseAsync(req.query);
-            }
-            if (schema.params) {
-              req.params = await schema.params.parseAsync(req.params);
-            }
+    if (typeof register !== "function") return;
+
+    register(url, async (req: Request, res: Response, next: NextFunction) => {
+      try {
+        const schema = handler.schema as {
+          body?: { parseAsync: (input: unknown) => Promise<unknown> };
+          querystring?: { parseAsync: (input: unknown) => Promise<unknown> };
+          params?: { parseAsync: (input: unknown) => Promise<unknown> };
+        };
+
+        if (schema) {
+          if (schema.body) {
+            req.body = await schema.body.parseAsync(req.body);
           }
-
-          const result = await handler.execute(req as any, res as any);
-
-          if (!res.headersSent && result !== undefined) {
-            res.json(result);
+          if (schema.querystring) {
+            req.query = (await schema.querystring.parseAsync(
+              req.query,
+            )) as unknown as ParsedQs;
           }
-        } catch (err) {
-          next(err);
+          if (schema.params) {
+            req.params = (await schema.params.parseAsync(req.params)) as Record<
+              string,
+              string
+            >;
+          }
         }
-      },
-    );
+
+        const execute = handler.execute as unknown as (
+          request: Request,
+          reply: Response,
+        ) => Promise<unknown>;
+        const result = await execute(req, res);
+
+        if (!res.headersSent && result !== undefined) {
+          res.json(result);
+        }
+      } catch (err) {
+        next(err);
+      }
+    });
   }
 
   registerHook(handler: HookHandler): void {
@@ -92,7 +119,11 @@ export class ExpressApiAdapter implements ApiServerPort {
       this.server.use(
         async (req: Request, res: Response, next: NextFunction) => {
           try {
-            await handler.execute(req as any, res as any);
+            const execute = handler.execute as unknown as (
+              request: Request,
+              reply: Response,
+            ) => Promise<void>;
+            await execute(req, res);
             next();
           } catch (err) {
             next(err);

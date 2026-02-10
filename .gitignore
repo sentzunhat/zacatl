@@ -185,6 +185,13 @@ build
 dist
 out-tsc
 
+# Compiled TypeScript files in src (keep eslint .mjs files)
+src/**/*.js
+src/**/*.js.map
+src/**/*.d.ts
+src/**/*.d.ts.map
+!src/eslint/**/*.mjs
+
 # Examples - compiled files (should be built locally)
 examples/**/*.js
 examples/**/*.d.ts

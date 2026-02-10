@@ -1,6 +1,6 @@
 # AI Agent Guide: Scaffolding HTTP Services with Zacatl
 
-> **Version:** 0.0.23+  
+> **Version:** 0.0.23+
 > **Reference:** Production-tested structure from ictlan-service
 
 **Target Use Case:** REST APIs, HTTP microservices, web servers with clean hexagonal architecture.
@@ -84,12 +84,18 @@ import { taskRepositories } from "./tasks/infrastructure/repositories/repositori
 
 export async function buildService() {
   const service = new Service({
-    architecture: {
+    type: ServiceType.SERVER,
+    layers: {
       application: {
-        routes: [taskRoutes],
+        entryPoints: {
+          rest: {
+            routes: [taskRoutes],
+            hooks: [],
+          },
+        },
       },
       domain: {
-        providers: taskProviders,
+        services: taskProviders,
       },
       infrastructure: {
         repositories: taskRepositories,
@@ -464,13 +470,18 @@ import { tenancyRepositories } from "./areas/tenancy/infrastructure/repositories
 
 export async function buildService() {
   const service = new Service({
-    architecture: {
+    type: ServiceType.SERVER,
+    layers: {
       application: {
-        routes: [catalystRoutes, passportRoutes, tenancyRoutes],
-        hooks: [catalystHooks, authHook],
+        entryPoints: {
+          rest: {
+            routes: [catalystRoutes, passportRoutes, tenancyRoutes],
+            hooks: [catalystHooks, authHook],
+          },
+        },
       },
       domain: {
-        providers: [
+        services: [
           ...catalystProviders,
           ...passportProviders,
           ...tenancyProviders,
@@ -735,10 +746,14 @@ export async function authHook(
 **Register in service.ts:**
 
 ```typescript
-architecture: {
+layers: {
   application: {
-    hooks: [authHook],
-    routes: [...]
+    entryPoints: {
+      rest: {
+        hooks: [authHook],
+        routes: [...]
+      }
+    }
   }
 }
 ```
@@ -862,5 +877,5 @@ Reference structure from ictlan-service (multi-area pattern).
 
 ---
 
-**Generated for:** Zacatl v0.0.23+  
+**Generated for:** Zacatl v0.0.23+
 **Last Updated:** January 31, 2026

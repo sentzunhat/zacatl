@@ -4,27 +4,53 @@ Install Zacatl and dependencies.
 
 ## Prerequisites
 
-- **Node.js**: 22.x or higher
-- **npm**: 10.x or higher
+- **Node.js**: 24+ LTS (recommended)
+- **Bun**: Optional, recommended for faster builds
 - **TypeScript**: 5.3+
 
-## Install
+**Note**: Zacatl works with both Node.js and Bun. Bun provides native TypeScript support and faster execution.
+
+## Install Zacatl
 
 ```bash
+# Using npm
 npm install @sentzunhat/zacatl
+
+# Using Bun
+bun add @sentzunhat/zacatl
+
+# Using pnpm
+pnpm add @sentzunhat/zacatl
+```
+
+## Required: Reflect Metadata
+
+Zacatl uses dependency injection which requires reflect-metadata:
+
+```bash
+npm install reflect-metadata
+```
+
+Import it at the **top** of your entry file:
+
+```typescript
+import "reflect-metadata";
+// ... rest of your imports
 ```
 
 ## Install Web Framework
 
-Choose Fastify or Express:
-
-```bash
-# Fastify (recommended)
-npm install fastify
-
-# Or Express
-npm install express
-```
+Next",
+"module": "ESNext",
+"moduleResolution": "bundler",
+"experimentalDecorators": true,
+"emitDecoratorMetadata": true,
+"strict": true,
+"esModuleInterop": true,
+"skipLibCheck": true,
+"resolveJsonModule": true,
+"outDir": "./build",
+"rootDir": "./src"
 
 ## TypeScript Setup
 
@@ -90,4 +116,5 @@ npm install --save-dev tsx vitest
 
 ---
 
-**Next**: [First Service →](./first-service.md)
+**Current Version**: v0.0.32
+**Next**: [Quick Start](./quickstart.md) or [Hello World](./hello-world.md)

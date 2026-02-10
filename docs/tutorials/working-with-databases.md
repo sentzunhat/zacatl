@@ -14,14 +14,15 @@ npm install sequelize pg
 
 ```typescript
 import { Sequelize } from "sequelize";
-import { Service } from "@sentzunhat/zacatl";
+import { Service, ServiceType, DatabaseVendor } from "@sentzunhat/zacatl";
 
 const sequelize = new Sequelize("postgresql://user:pass@localhost:5432/mydb");
 
 const service = new Service({
-  architecture: {
+  type: ServiceType.SERVER,
+  platforms: {
     server: {
-      databases: [{ vendor: "SEQUELIZE", instance: sequelize }],
+      databases: [{ vendor: DatabaseVendor.SEQUELIZE, instance: sequelize }],
     },
   },
 });
@@ -101,14 +102,15 @@ npm install mongoose
 
 ```typescript
 import mongoose from "mongoose";
-import { Service } from "@sentzunhat/zacatl";
+import { Service, ServiceType, DatabaseVendor } from "@sentzunhat/zacatl";
 
 const service = new Service({
-  architecture: {
+  type: ServiceType.SERVER,
+  platforms: {
     server: {
       databases: [
         {
-          vendor: "MONGOOSE",
+          vendor: DatabaseVendor.MONGOOSE,
           instance: mongoose,
           connectionString: "mongodb://localhost:27017/mydb",
         },

@@ -2,14 +2,15 @@ import path from "path";
 
 const EXTENSIONS = [".js", ".mjs", ".cjs", ".json"];
 
-const isRelativeOrAbsolute = (specifier: string) =>
+const isRelativeOrAbsolute = (specifier: string): boolean =>
   specifier.startsWith("./") ||
   specifier.startsWith("../") ||
   specifier.startsWith("/");
 
-const hasExtension = (specifier: string) => path.extname(specifier) !== "";
+const hasExtension = (specifier: string): boolean =>
+  path.extname(specifier) !== "";
 
-const expandCandidates = (specifier: string) => [
+const expandCandidates = (specifier: string): string[] => [
   ...EXTENSIONS.map((ext) => `${specifier}${ext}`),
   ...EXTENSIONS.map((ext) => `${specifier}/index${ext}`),
 ];
@@ -21,7 +22,7 @@ export const resolve = async (
     nextSpecifier: string,
     nextContext: { parentURL?: string },
   ) => Promise<{ url: string }>,
-) => {
+): Promise<{ url: string }> => {
   if (
     !isRelativeOrAbsolute(specifier) ||
     hasExtension(specifier) ||

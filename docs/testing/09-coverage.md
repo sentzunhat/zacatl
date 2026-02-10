@@ -17,13 +17,13 @@ open coverage/lcov-report/index.html
 ## Zacatl's Coverage
 
 ```
-Statements   : 79.09% (2441/3088)
-Branches     : 71.77% (538/749)
-Functions    : 81.35% (570/700)
-Lines        : 79.14% (2437/3081)
+Statements   : 61.59%
+Branches     : 43.20%
+Functions    : 62.85%
+Lines        : 61.14%
 ```
 
-**161 tests** covering all core modules.
+**178 tests** covering all core modules.
 
 ## Coverage Goals
 

@@ -1,6 +1,6 @@
 # Testing Documentation
 
-Zacatl comes with 161 comprehensive tests and 79% code coverage. Learn how to test your services effectively.
+Zacatl comes with 178 comprehensive tests and 61.6% code coverage. Learn how to test your services effectively.
 
 ## Quick Links
 
@@ -17,11 +17,11 @@ Zacatl comes with 161 comprehensive tests and 79% code coverage. Learn how to te
 
 ## Current Test Stats
 
-- **Total Tests**: 161
-- **Statement Coverage**: 79.09%
-- **Branch Coverage**: 71.85%
-- **Function Coverage**: 81.63%
-- **Line Coverage**: 78.54%
+- **Total Tests**: 178
+- **Statement Coverage**: 61.59%
+- **Branch Coverage**: 43.20%
+- **Function Coverage**: 62.85%
+- **Line Coverage**: 61.14%
 
 ## Run Tests
 

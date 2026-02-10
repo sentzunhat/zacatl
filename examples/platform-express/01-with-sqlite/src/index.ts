@@ -15,8 +15,8 @@ import {
   DatabaseVendor,
 } from "@sentzunhat/zacatl";
 import { initGreetingModel } from "./infrastructure/models/greeting.model";
-import { SequelizeGreetingRepository } from "./infrastructure/repositories/greeting.repository";
-import { GreetingService } from "./domain/services/greeting.service";
+import { GreetingRepositoryAdapter } from "./infrastructure/greetings/repositories/greeting/adapter";
+import { GreetingServiceAdapter } from "./domain/greetings/service/adapter";
 import { GetAllGreetingsHandler } from "./application/handlers/get-all-greetings.handler";
 import { GetGreetingByIdHandler } from "./application/handlers/get-greeting-by-id.handler";
 import { CreateGreetingHandler } from "./application/handlers/create-greeting.handler";
@@ -43,13 +43,13 @@ async function main() {
     // ═══════════════════════════════════════════════════════════
 
     // 1. Infrastructure Layer (Repositories)
-    const greetingRepository = new SequelizeGreetingRepository();
+    const greetingRepository = new GreetingRepositoryAdapter();
     container.registerInstance("GreetingRepository", greetingRepository);
 
     // 2. Domain Layer (Services)
-    const greetingService = new GreetingService(greetingRepository);
+    const greetingService = new GreetingServiceAdapter(greetingRepository);
     container.registerInstance("GreetingService", greetingService);
-    container.registerInstance(GreetingService, greetingService);
+    container.registerInstance(GreetingServiceAdapter, greetingService);
 
     // 3. Application Layer (Handlers)
     container.registerSingleton(GetAllGreetingsHandler, GetAllGreetingsHandler);
@@ -70,7 +70,7 @@ async function main() {
       platforms: {
         server: {
           name: "express-sqlite",
-          port: 8083,
+          port: 8181,
           server: {
             type: ServerType.SERVER,
             vendor: ServerVendor.EXPRESS,
@@ -131,7 +131,7 @@ async function main() {
     console.log("  GET    /greetings/:id        - Get greeting by ID");
     console.log("  POST   /greetings            - Create new greeting");
     console.log("  DELETE /greetings/:id        - Delete greeting");
-    console.log("\n💡 Try: curl http://localhost:8083/greetings");
+    console.log("\n💡 Try: curl http://localhost:8181/greetings");
     console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n");
   } catch (error) {
     console.error("❌ Failed to start service:", error);

@@ -4,9 +4,9 @@ Step-by-step guides to learn Zacatl from the ground up.
 
 ## Getting Started
 
-1. [Installation](installation.md) - Install and setup Zacatl
-2. [Quick Start](quickstart.md) - Get running in 5 minutes
-3. [Hello World](hello-world.md) - Your first Zacatl service
+1. [Installation](../getting-started/installation.md) - Install and setup Zacatl
+2. [Quick Start](../getting-started/quickstart.md) - Get running in 5 minutes
+3. [Hello World](../getting-started/hello-world.md) - Your first Zacatl service
 
 ## Core Concepts
 
@@ -18,8 +18,8 @@ Step-by-step guides to learn Zacatl from the ground up.
 
 ## Beyond the Basics
 
-- [First Service](first-service.md) - Build a complete, production-like service
-- [CLI App](cli-app.md) - Build command-line tools (v0.2.0+)
+- [First Service](../getting-started/first-service.md) - Build a complete, production-like service
+- [CLI App](cli-app.md) - Build command-line tools (v0.0.32+)
 
 ## Next Steps
 

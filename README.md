@@ -5,8 +5,8 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![TypeScript](https://img.shields.io/badge/%3C%2F%3E-TypeScript-3178c6.svg)](https://www.typescriptlang.org/)
 [![Node.js 24+](https://img.shields.io/badge/Node.js-24%2B-brightgreen.svg)](https://nodejs.org/)
-[![Tests: 179](https://img.shields.io/badge/Tests-179-blue.svg)](#testing)
-[![Coverage: 63%](https://img.shields.io/badge/Coverage-63%25-yellow.svg)](#testing)
+[![Tests: 178](https://img.shields.io/badge/Tests-178-blue.svg)](#testing)
+[![Coverage: 61.6%](https://img.shields.io/badge/Coverage-61.6%25-yellow.svg)](#testing)
 
 **Universal TypeScript framework for building CLI tools, desktop apps, APIs, and distributed systems.**
 
@@ -22,11 +22,11 @@ Zacatl enforces clean, layered architecture with dependency injection, validatio
 - **🗄️ Pluggable ORM Adapters** - Sequelize, Mongoose, or build your own
 - **🌐 Multi-Language Support** - Pluggable i18n with filesystem/memory adapters
 - **🔌 Adapter Pattern** - Easy integration with any database or service
-- **🧪 Comprehensive Testing** - 201 tests, 79% coverage, Vitest
+- **🧪 Comprehensive Testing** - 178 tests, 61.6% coverage, Vitest
 - **⚡ Runtime Detection** - Works with Node.js 24+ and Bun (native TypeScript support)
 - **📝 Production Ready** - Structured logging, monitoring, and error tracking
 
-## 🎯 Multi-Context Support (v0.1.0+)
+## 🎯 Multi-Context Support
 
 Build **CLI tools**, **Desktop apps**, and **HTTP servers** with the same architecture:
 
@@ -71,7 +71,7 @@ const server = new Service({
 
 - **[Full Documentation Index](./docs/index.md)** - Complete guide and reference
 - **[Implementation Guide (Service Adapter Pattern)](./docs/guides/service-adapter-pattern.md)** - Canonical service implementation
-- **[5-Minute Quick Start](./docs/getting-started/quickstart-5min.md)** - Get up and running fast
+- **[Quick Start](./docs/getting-started/quickstart.md)** - Get up and running fast
 - **[Framework Overview](./docs/architecture/framework-overview.md)** - Architecture and concepts
 - **[Installation Guide](./docs/getting-started/INSTALLATION.md)** - Setup instructions
 - **[Testing Guide](./docs/testing/README.md)** - How to test your services
@@ -295,7 +295,7 @@ throw new NotFoundError("User not found", { userId: 123 });
 
 ## 🧪 Testing
 
-Zacatl comes with **179 passing tests** and **79% coverage**:
+Zacatl comes with **178 passing tests** and **61.6% coverage**:
 
 ```bash
 npm test                 # Run all tests

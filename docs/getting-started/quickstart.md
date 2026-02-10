@@ -20,13 +20,18 @@ npm install @sentzunhat/zacatl
 
 ```typescript
 import Fastify from "fastify";
-import { Service, ServiceType } from "@sentzunhat/zacatl";
+import {
+  Service,
+  ServiceType,
+  ServerType,
+  ServerVendor,
+} from "@sentzunhat/zacatl";
 
 const fastifyApp = Fastify();
 
 const service = new Service({
   type: ServiceType.SERVER,
-  architecture: {
+  layers: {
     application: {
       entryPoints: {
         rest: {
@@ -35,12 +40,18 @@ const service = new Service({
         },
       },
     },
-    domain: { providers: [] },
+    domain: { services: [] },
     infrastructure: { repositories: [] },
+  },
+  platforms: {
     server: {
       name: "my-service",
       port: 3000,
-      fastify: fastifyApp,
+      server: {
+        type: ServerType.SERVER,
+        vendor: ServerVendor.FASTIFY,
+        instance: fastifyApp,
+      },
     },
   },
 });
@@ -67,7 +78,8 @@ class HelloHandler extends GetRouteHandler {
 
 // Register it
 const service = new Service({
-  architecture: {
+  type: ServiceType.SERVER,
+  layers: {
     application: {
       entryPoints: {
         rest: {
@@ -75,7 +87,19 @@ const service = new Service({
         },
       },
     },
-    // ...
+    domain: { services: [] },
+    infrastructure: { repositories: [] },
+  },
+  platforms: {
+    server: {
+      name: "my-service",
+      port: 3000,
+      server: {
+        type: ServerType.SERVER,
+        vendor: ServerVendor.FASTIFY,
+        instance: fastifyApp,
+      },
+    },
   },
 });
 ```
@@ -116,19 +140,14 @@ class GetUsersHandler extends GetRouteHandler {
 }
 ```
 
-## CLI Tool (Coming in v0.2.0)
+## CLI Tool (v0.0.32+)
 
 ```typescript
 import { Service, ServiceType } from "@sentzunhat/zacatl";
 
 const service = new Service({
   type: ServiceType.CLI,
-  architecture: {
-    cli: {
-      name: "my-cli",
-      version: "1.0.0",
-      description: "My awesome CLI tool",
-    },
+  layers: {
     application: {
       entryPoints: {
         cli: {
@@ -136,20 +155,40 @@ const service = new Service({
         },
       },
     },
+    domain: { services: [] },
+    infrastructure: { repositories: [] },
+  },
+  platforms: {
+    cli: {
+      name: "my-cli",
+      version: "1.0.0",
+      description: "My awesome CLI tool",
+    },
   },
 });
 
-await service.startCLI();
+await service.start();
 ```
 
-## Desktop App (Coming in v0.3.0)
+## Desktop App (v0.0.32+)
 
 ```typescript
 import { Service, ServiceType } from "@sentzunhat/zacatl";
 
 const service = new Service({
   type: ServiceType.DESKTOP,
-  architecture: {
+  layers: {
+    application: {
+      entryPoints: {
+        ipc: {
+          handlers: [MyIPCHandler],
+        },
+      },
+    },
+    domain: { services: [] },
+    infrastructure: { repositories: [] },
+  },
+  platforms: {
     desktop: {
       window: {
         title: "My App",
@@ -158,18 +197,25 @@ const service = new Service({
       },
       platform: "neutralino",
     },
-    application: {
+  },
+});
+
+await service.start();
+```
+
       entryPoints: {
         ipc: {
           handlers: [MyIPCHandler],
         },
       },
     },
-  },
+
+},
 });
 
 await service.startDesktop();
-```
+
+````
 
 ## Import Patterns (v0.1.0+)
 
@@ -186,7 +232,7 @@ import { createI18n } from "@sentzunhat/zacatl/localization";
 // ORM packages via subpath imports only
 import { mongoose, Schema } from "@sentzunhat/zacatl/third-party/mongoose";
 import { Sequelize } from "@sentzunhat/zacatl/third-party/sequelize";
-```
+````
 
 See [Path Aliases Reference](../reference/path-aliases.md) for complete documentation.
 

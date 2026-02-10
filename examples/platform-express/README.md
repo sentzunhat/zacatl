@@ -11,7 +11,7 @@ This directory contains examples demonstrating the Zacatl framework with the Exp
 - **Framework:** Express
 - **Database:** SQLite
 - **ORM:** Sequelize
-- **Port:** 8083
+- **Port:** 8181
 
 ### 2. Express + Mongoose + MongoDB
 
@@ -20,7 +20,7 @@ This directory contains examples demonstrating the Zacatl framework with the Exp
 - **Framework:** Express
 - **Database:** MongoDB
 - **ODM:** Mongoose
-- **Port:** 8084
+- **Port:** 8182
 
 ## Key Concepts
 

@@ -273,13 +273,16 @@ const sequelizeInstance = new SequelizeClass("postgres://localhost:5432/myapp");
 
 // Create service
 const service = new Service({
-  architecture: {
+  type: ServiceType.SERVER,
+  layers: {
     infrastructure: {
       repositories: [UserRepository, ProductRepository],
     },
     domain: {
-      providers: [],
+      services: [],
     },
+  },
+  platforms: {
     server: {
       name: "my-service",
       server: {
@@ -460,16 +463,16 @@ const user = await userRepo.create({
 
 ### Quick Find & Replace
 
-1. **Find:** `import { Schema, Model } from "mongoose"`  
+1. **Find:** `import { Schema, Model } from "mongoose"`
    **Replace:** `import { Schema, Model } from "@sentzunhat/zacatl"`
 
-2. **Find:** `import { DataTypes, Sequelize } from "sequelize"`  
+2. **Find:** `import { DataTypes, Sequelize } from "sequelize"`
    **Replace:** `import { DataTypes, Sequelize } from "@sentzunhat/zacatl"`
 
-3. **Find:** `import { container } from "tsyringe"`  
+3. **Find:** `import { container } from "tsyringe"`
    **Replace:** `import { container } from "@sentzunhat/zacatl"`
 
-4. **Find:** `import { z } from "zod"`  
+4. **Find:** `import { z } from "zod"`
    **Replace:** `import { z } from "@sentzunhat/zacatl"`
 
 5. **Uninstall unused packages:**

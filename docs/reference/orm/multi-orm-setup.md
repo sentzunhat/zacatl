@@ -23,7 +23,8 @@ import { ProductRepository } from "./repositories/product.repository"; // Uses S
 
 // 3. Configure service with BOTH ORMs
 const service = new Service({
-  architecture: {
+  type: ServiceType.SERVER,
+  layers: {
     infrastructure: {
       repositories: [
         UserRepository, // MongoDB repository
@@ -31,8 +32,10 @@ const service = new Service({
       ],
     },
     domain: {
-      providers: [],
+      services: [],
     },
+  },
+  platforms: {
     server: {
       name: "my-multi-db-service",
       server: {
@@ -135,7 +138,7 @@ export class UserRepository extends BaseRepository<
 
   // Custom method using Mongoose
   async findByEmail(email: string): Promise<UserOutput | null> {
-    const user = await this.getMongooseModel()
+    const user = await (this.model as MongooseModel<User>)
       .findOne({ email })
       .lean({ virtuals: true });
     return this.toLean(user);
@@ -202,7 +205,7 @@ export class ProductRepository extends BaseRepository<
 
   // Custom method using Sequelize
   async findInStock(): Promise<ProductOutput[]> {
-    const products = await this.getSequelizeModel().findAll({
+    const products = await (this.model as ModelStatic<ProductModel>).findAll({
       where: { stock: { [Op.gt]: 0 } },
     });
     return products.map((p) => this.toLean(p)!);
@@ -235,7 +238,8 @@ const sequelizeInstance = new Sequelize({
 });
 
 const service = new Service({
-  architecture: {
+  type: ServiceType.SERVER,
+  layers: {
     infrastructure: {
       repositories: [
         UserRepository, // MongoDB
@@ -243,8 +247,10 @@ const service = new Service({
       ],
     },
     domain: {
-      providers: [],
+      services: [],
     },
+  },
+  platforms: {
     server: {
       name: "my-service",
       server: {
@@ -313,7 +319,8 @@ service.start()
 
 ```typescript
 const service = new Service({
-  architecture: {
+  type: ServiceType.SERVER,
+  layers: {
     infrastructure: {
       repositories: [
         UserRepository, // Mongoose → MongoDB
@@ -339,7 +346,8 @@ const productDb = new Sequelize({
 });
 
 const service = new Service({
-  architecture: {
+  type: ServiceType.SERVER,
+  platforms: {
     server: {
       databases: [
         {
@@ -362,10 +370,13 @@ const service = new Service({
 
 ```typescript
 const service = new Service({
-  architecture: {
+  type: ServiceType.SERVER,
+  layers: {
     infrastructure: {
       repositories: [UserRepository, ProductRepository], // Both use Mongoose
     },
+  },
+  platforms: {
     server: {
       databases: [
         {
@@ -383,10 +394,13 @@ const service = new Service({
 
 ```typescript
 const service = new Service({
-  architecture: {
+  type: ServiceType.SERVER,
+  layers: {
     infrastructure: {
       repositories: [UserRepository, ProductRepository], // Both use Sequelize
     },
+  },
+  platforms: {
     server: {
       databases: [
         {
@@ -461,20 +475,20 @@ DatabaseVendor.SEQUELIZE; // SQL databases
 
 ## Key Points
 
-✅ **Multiple ORMs**: Mix Mongoose and Sequelize in the same service  
-✅ **Type-safe**: Use `ORMType` enum instead of strings  
-✅ **Automatic DI**: ORMs registered in dependency injection container  
-✅ **Connection callbacks**: Use `onDatabaseConnected` for initialization  
-✅ **Unified interface**: All repositories have same methods regardless of ORM  
+✅ **Multiple ORMs**: Mix Mongoose and Sequelize in the same service
+✅ **Type-safe**: Use `ORMType` enum instead of strings
+✅ **Automatic DI**: ORMs registered in dependency injection container
+✅ **Connection callbacks**: Use `onDatabaseConnected` for initialization
+✅ **Unified interface**: All repositories have same methods regardless of ORM
 ✅ **Environment-aware**: Easy to switch databases based on environment
 
 ## Troubleshooting
 
-**Q: My repository can't connect to the database**  
+**Q: My repository can't connect to the database**
 A: Ensure the database is configured in `server.databases` array before repositories are registered.
 
-**Q: Can I use the same ORM for multiple databases?**  
+**Q: Can I use the same ORM for multiple databases?**
 A: Yes! Create multiple Sequelize instances with different connection strings.
 
-**Q: Do I need a server to use repositories?**  
+**Q: Do I need a server to use repositories?**
 A: No, but databases won't auto-connect. You'll need to connect manually and register in the DI container.

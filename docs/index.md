@@ -11,16 +11,16 @@ Universal TypeScript framework for building CLI tools, desktop apps, APIs, and d
 
 > **Package Managers**: The framework uses **npm** for development and testing. Examples use **Bun** for faster builds and native TypeScript support.
 
-## 🎯 Multi-Context Support (v0.1.0+)
+## 🎯 Multi-Context Support
 
-Zacatl now supports **three execution contexts** from a unified architecture:
+Zacatl supports **three execution contexts** from a unified architecture:
 
 - **CLI** - Command-line tools and automation scripts
 - **DESKTOP** - Desktop applications (Neutralino, Electron)
 - **SERVER** - HTTP/REST APIs and microservices
 
-**See**: [Multi-Context Design](./reference/architecture/multi-context-design.md)  
-**Migration**: [v0.0.26 → v0.1.0 Guide](./migration/v0.0.26-to-v0.1.0.md)
+**See**: [Multi-Context Design](./reference/architecture/multi-context-design.md)
+**Migration**: [v0.0.26 → v0.0.32 Guide](./migration/v0.0.26-to-v0.1.0.md)
 
 ## Documentation Sections
 
@@ -57,10 +57,9 @@ Zacatl now supports **three execution contexts** from a unified architecture:
 ### Migration & Upgrades
 
 - [Migration Guides](./migration/index.md)
-- **[v0.0.26 → v0.1.0](./migration/v0.0.26-to-v0.1.0.md) - Multi-context support (latest)**
+- **[v0.0.26 → v0.1.0](./migration/v0.1.0-multicontext.md) - Multi-context support (current)**
 - [v0.0.21 Migration](./migration/v0.0.21.md) - Import shortcuts
 - [v0.0.20 Migration](./migration/v0.0.20.md)
-- [Prepare for v0.0.20](./migration/prepare-v0.0.20.md)
 
 ### Development
 
@@ -71,7 +70,7 @@ Zacatl now supports **three execution contexts** from a unified architecture:
 
 ## Core Concepts
 
-**Multi-Context Architecture (v0.1.0+)**
+**Multi-Context Architecture**
 
 - ServiceType enum: CLI | DESKTOP | SERVER
 - Polymorphic entry points (cli, rest, ipc)
@@ -97,10 +96,10 @@ Zacatl now supports **three execution contexts** from a unified architecture:
 
 ## Production Ready
 
-**Test Coverage**: 201 tests, 79% coverage  
-**TypeScript**: Fully typed  
-**Node.js**: 24.x+  
-**Status**: v0.1.0
+**Test Coverage**: 178 tests, 61.6% coverage
+**TypeScript**: Fully typed
+**Node.js**: 24.x+
+**Status**: v0.0.32
 
 ---
 
@@ -109,18 +108,18 @@ Zacatl now supports **three execution contexts** from a unified architecture:
 ### "I want to build a CLI tool"
 
 1. [Multi-Context Design](./architecture/MULTI-CONTEXT-CLEANUP-DESIGN.md)
-2. [Migration Guide v0.1.0](./migration/v0.0.26-to-v0.1.0.md) - See CLI example
+2. [Migration Guide v0.0.32](./migration/v0.0.26-to-v0.1.0.md) - See CLI example
 3. [Examples - CLI App](./examples/02-cli-app.md)
 
 ### "I want to build a Desktop app"
 
 1. [Multi-Context Design](./architecture/MULTI-CONTEXT-CLEANUP-DESIGN.md)
-2. [Migration Guide v0.1.0](./migration/v0.0.26-to-v0.1.0.md) - See Desktop example
+2. [Migration Guide v0.0.32](./migration/v0.0.26-to-v0.1.0.md) - See Desktop example
 3. [Desktop Module Spec](./internal/desktop-module-spec.md) (future)
 
 ### "I want to build a REST API"
 
-1. [5-Minute Quick Start](./getting-started/quickstart-5min.md)
+1. [Quick Start](./getting-started/quickstart.md)
 2. [Examples - REST API](./examples/03-rest-api.md)
 3. [Testing Guide](./testing/README.md)
 
@@ -140,7 +139,7 @@ Zacatl now supports **three execution contexts** from a unified architecture:
 ### "I want to scaffold a new HTTP service"
 
 1. **[AI Agent: Scaffold HTTP Service](./guides/ai-agent-scaffold-http-service.md)** - Start here!
-2. [5-Minute Quick Start](./getting-started/quickstart-5min.md)
+2. [Quick Start](./getting-started/quickstart.md)
 3. [Examples - REST API](./examples/03-rest-api.md)
 
 ### "I need to test my code"
@@ -164,15 +163,15 @@ Zacatl now supports **three execution contexts** from a unified architecture:
 
 ## 📊 Framework Statistics
 
-- **161 unit tests** - Comprehensive test coverage
-- **79% code coverage** - Statements, branches, functions
+- **178 unit tests** - Comprehensive test coverage
+- **61.6% code coverage** - Statements, branches, functions
 - **Zero compilation errors** - Strict TypeScript
 - **Production ready** - Used in real services
 - **Modular architecture** - Pick what you need
 
 ### Supported Platforms
 
-- **Node.js** 22.x+ (LTS recommended)
+- **Node.js** 24.x+ (LTS recommended)
 - **Bun** 1.3+ (development/package management)
 
 ### Built-in Adapters
@@ -328,7 +327,7 @@ docs/
 1. **Start with the Quick Start** - Get a working example in 5 minutes
 2. **Follow the structure** - Use the recommended directory layout
 3. **Read the examples** - Real-world code patterns for common tasks
-4. **Write tests early** - 79% coverage benchmark to follow
+4. **Write tests early** - 61.6% coverage benchmark to follow
 5. **Use TypeScript strictly** - Catch errors at compile time
 6. **Check the error guide** - Use custom errors properly
 7. **Test your code** - Use Vitest with the provided fixtures
@@ -344,9 +343,9 @@ docs/
 
 ---
 
-**Version**: 0.0.20  
-**Last Updated**: 2026  
-**License**: MIT  
+**Version**: 0.0.32
+**Last Updated**: 2026-02-07
+**License**: MIT
 **Maintainer**: Zacatl Contributors
 
 ## More Resources

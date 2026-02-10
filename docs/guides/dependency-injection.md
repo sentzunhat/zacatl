@@ -337,9 +337,10 @@ class UserProvider {
 
 // Service auto-registers everything
 const service = new Service({
-  architecture: {
+  type: ServiceType.SERVER,
+  layers: {
     domain: {
-      providers: [EmailProvider, UserProvider],
+      services: [EmailProvider, UserProvider],
     },
   },
 });
@@ -478,8 +479,9 @@ registerSingletonWithDependencies(MyService, [MyRepo]);
 
 // ✅ Full REST API - use Service architecture
 const service = new Service({
-  architecture: {
-    domain: { providers: [MyService, MyRepo] },
+  type: ServiceType.SERVER,
+  layers: {
+    domain: { services: [MyService, MyRepo] },
   },
 });
 ```

@@ -39,7 +39,7 @@ class UserRepository extends BaseRepository<User, CreateUser, UserDTO> {
   }
 
   async findByEmail(email: string) {
-    const model = this.getMongooseModel();
+    const model = this.model as MongooseModel<User>;
     return this.toLean(await model.findOne({ email }).lean());
   }
 }
@@ -106,6 +106,7 @@ await repo.delete(id);
 repo.toLean(document);
 repo.isMongoose();
 repo.isSequelize();
-repo.getMongooseModel();
-repo.getSequelizeModel();
+// Use model directly with type assertion:
+// (repo.model as MongooseModel<T>) for Mongoose
+// (repo.model as ModelStatic<T>) for Sequelize
 ```

@@ -75,22 +75,33 @@ class UserRepository implements IRepository<User> {
 ### Register
 
 ```typescript
+import {
+  Service,
+  ServiceType,
+  ServerType,
+  ServerVendor,
+  DatabaseVendor,
+} from "@sentzunhat/zacatl";
+
 const service = new Service({
-  architecture: {
+  type: ServiceType.SERVER,
+  layers: {
     // ... other config
     infrastructure: {
       repositories: [UserRepository],
     },
+  },
+  platforms: {
     server: {
       name: "my-service",
       server: {
-        type: "SERVER",
-        vendor: "FASTIFY",
+        type: ServerType.SERVER,
+        vendor: ServerVendor.FASTIFY,
         instance: fastify,
       },
       databases: [
         {
-          vendor: "SEQUELIZE",
+          vendor: DatabaseVendor.SEQUELIZE,
           instance: sequelize,
         },
       ],
@@ -159,14 +170,17 @@ class UserRepository implements IRepository<User> {
 ### Register
 
 ```typescript
+import { Service, ServiceType, DatabaseVendor } from "@sentzunhat/zacatl";
+
 const service = new Service({
-  architecture: {
-    // ... other config
+  type: ServiceType.SERVER,
+  // ... other config
+  platforms: {
     server: {
       // ... other server config
       databases: [
         {
-          vendor: "MONGOOSE",
+          vendor: DatabaseVendor.MONGOOSE,
           instance: mongoose,
         },
       ],

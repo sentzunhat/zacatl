@@ -1,6 +1,6 @@
 import { CustomError } from "@zacatl/error";
 import { container } from "@zacatl/third-party";
-import type { Mongoose } from "mongoose";
+import { Mongoose } from "mongoose";
 import type { Sequelize } from "sequelize";
 
 import {
@@ -44,7 +44,8 @@ export class MongooseAdapter implements DatabaseServerPort {
       await onDatabaseConnected(mongoose);
     }
 
-    container.register<Mongoose>(mongoose.constructor.name, {
+    // Register Mongoose instance in DI container for ORM adapters
+    container.register(Mongoose, {
       useValue: mongoose,
     });
   }

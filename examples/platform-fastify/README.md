@@ -16,14 +16,14 @@
 - **Stack**: Fastify, SQLite (Sequelize), React, Tailwind
 - **Best for**: Rapid prototyping, small apps, zero-infrastructure setups
 - **Startup**: < 1 second
-- **Ports**: API: 3001, UI: 5001
+- **Ports**: Backend: 8081, Frontend: 8091
 
 ### 2. [MongoDB + React (02-with-mongodb)](./02-with-mongodb)
 
 - **Stack**: Fastify, MongoDB (Mongoose), React, Tailwind
 - **Best for**: Scalable document-based applications
 - **Startup**: < 2 seconds (with MongoDB connection)
-- **Ports**: API: 3002, UI: 5002
+- **Ports**: Backend: 8082, Frontend: 8092
 
 ## 🏗️ Architecture
 
@@ -57,8 +57,11 @@ bun run dev  # Starts both backend + frontend
 # Open http://localhost:5001 (SQLite) or http://localhost:5002 (MongoDB)
 ```
 
-## 📚 Learn More
+## 📚 Documentation
 
-- [Quick Start Guide](./QUICK_START.md) - Detailed setup instructions
-- [Architecture Details](./01-with-sqlite/README.md) - How it all works
-- [Main Documentation](../../docs/) - Full Zacatl framework docs
+- **[Quick Start Guide](./docs/quick-start.md)** - Complete setup walkthrough
+- **[Production Patterns](./docs/production-patterns.md)** - Framework-agnostic patterns
+- **[Validation Checklist](./docs/validation-checklist.md)** - Transformation details
+- **[SQLite Setup](./01-with-sqlite/docs/setup.md)** - Database-specific guide
+- **[MongoDB Setup](./02-with-mongodb/docs/setup.md)** - Database-specific guide
+- **[Framework Docs](../../docs/)** - Full Zacatl documentation

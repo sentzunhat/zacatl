@@ -1,5 +1,24 @@
 # Release Notes
 
+## [0.0.32] - 2026-02-07
+
+### 📦 Release
+
+- **Version Sync**: Bumped package version to 0.0.32
+
+### 📚 Documentation
+
+- **Docs & Examples**: Updated version references, test counts, and Node requirements
+- **Coverage Update**: Updated all documentation to reflect current test coverage (61.6%)
+- **Internal Docs**: Archived historical audit documents to `docs/archive/`
+
+### ✅ Code Quality
+
+- **Lint Fixes**: Added explicit TypeScript return types in `src/loader.ts`
+- **Test Suite**: 178 tests passing with 61.6% coverage (61.59% statements, 43.20% branches, 62.85% functions, 61.14% lines)
+
+---
+
 ## [0.0.31] - 2026-02-07
 
 ### 🏗️ Architecture
@@ -170,14 +189,13 @@ const server = new Service({
 - Added [Multi-Context Cleanup Design](./architecture/MULTI-CONTEXT-CLEANUP-DESIGN.md)
 - Added [Migration Guide v0.0.26 → v0.1.0](./migration/v0.0.26-to-v0.1.0.md)
 - Updated README with multi-context examples
-- Updated test count badges (201 tests, 79% coverage)
+- Updated test count badges (201 tests at that time)
 
 ---
 
 ### 🧪 Testing
 
 - **201 tests passing** (up from 188)
-- **79% code coverage** (maintained)
 - Added tests for new validation logic
 - Updated existing tests to use new property names
 

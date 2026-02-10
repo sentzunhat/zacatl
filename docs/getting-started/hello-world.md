@@ -6,7 +6,12 @@ Minimal Fastify API to get started quickly.
 
 ```typescript
 import Fastify from "fastify";
-import { Service } from "@sentzunhat/zacatl";
+import {
+  Service,
+  ServiceType,
+  ServerType,
+  ServerVendor,
+} from "@sentzunhat/zacatl";
 
 const fastify = Fastify({ logger: true });
 
@@ -17,15 +22,27 @@ fastify.get("/hello", async () => {
 
 // Create service
 const service = new Service({
-  architecture: {
+  type: ServiceType.SERVER,
+  layers: {
     application: {
-      entryPoints: { rest: { hookHandlers: [], routeHandlers: [] } },
+      entryPoints: {
+        rest: {
+          hooks: [],
+          routes: [],
+        },
+      },
     },
-    domain: { providers: [] },
+    domain: { services: [] },
     infrastructure: { repositories: [] },
+  },
+  platforms: {
     server: {
       name: "hello-service",
-      server: { type: "SERVER", vendor: "FASTIFY", instance: fastify },
+      server: {
+        type: ServerType.SERVER,
+        vendor: ServerVendor.FASTIFY,
+        instance: fastify,
+      },
     },
   },
 });

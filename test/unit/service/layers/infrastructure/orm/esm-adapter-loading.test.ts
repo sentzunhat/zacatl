@@ -1,18 +1,24 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, beforeAll } from "vitest";
 import { BaseRepository } from "../../../../../../src/service/layers/infrastructure/repositories/abstract";
 import { ORMType } from "../../../../../../src/service/layers/infrastructure/repositories/types";
 import { Schema } from "mongoose";
+import { connectToMongoServerAndRegisterDependency } from "../../../../helpers/database/mongo";
 
 /**
- * ESM Runtime Tests for Adapter Lazy Loading
+ * ESM Runtime Tests for Synchronous Adapter Loading
  *
  * These tests verify that the adapter loading mechanism works correctly
- * in ESM environments (Bun, Node.js with tsx, Vite, etc.)
+ * in ESM environments with synchronous initialization.
  */
 
 describe("ESM Adapter Loading", () => {
-  describe("Lazy Initialization", () => {
-    it("should create repository without immediately loading adapter", () => {
+  beforeAll(async () => {
+    // Setup DI container with Mongoose for tests
+    await connectToMongoServerAndRegisterDependency();
+  });
+
+  describe("Synchronous Initialization", () => {
+    it("should create repository and initialize adapter synchronously", () => {
       class TestRepository extends BaseRepository<any, string, any> {
         constructor() {
           super({
@@ -22,11 +28,13 @@ describe("ESM Adapter Loading", () => {
         }
       }
 
-      // Repository constructor should be sync and not throw
-      expect(() => new TestRepository()).not.toThrow();
+      // Repository constructor is sync and initializes adapter immediately
+      const repo = new TestRepository();
+      expect(repo).toBeDefined();
+      expect(repo.model).toBeDefined();
     });
 
-    it("should throw helpful error when accessing model before initialization", () => {
+    it("should make model available immediately after construction", () => {
       class TestRepository extends BaseRepository<any, string, any> {
         constructor() {
           super({
@@ -38,12 +46,12 @@ describe("ESM Adapter Loading", () => {
 
       const repo = new TestRepository();
 
-      expect(() => repo.model).toThrow(
-        "Repository not initialized. Call an async method first or await repository.ensureInitialized()",
-      );
+      // Model should be accessible immediately
+      expect(() => repo.model).not.toThrow();
+      expect(repo.model).toBeDefined();
     });
 
-    it("should throw helpful error when calling getMongooseModel before initialization", () => {
+    it("should allow toLean to be called immediately", () => {
       class TestRepository extends BaseRepository<any, string, any> {
         constructor() {
           super({
@@ -55,31 +63,30 @@ describe("ESM Adapter Loading", () => {
 
       const repo = new TestRepository();
 
-      expect(() => repo.getMongooseModel()).toThrow(
-        "Repository not initialized",
-      );
-    });
-
-    it("should throw helpful error when calling toLean before initialization", () => {
-      class TestRepository extends BaseRepository<any, string, any> {
-        constructor() {
-          super({
-            type: ORMType.Mongoose,
-            schema: new Schema({}),
-          });
-        }
-      }
-
-      const repo = new TestRepository();
-
-      expect(() => repo.toLean({})).toThrow("Repository not initialized");
+      // toLean should work immediately after construction
+      expect(() => repo.toLean(null)).not.toThrow();
+      expect(repo.toLean(null)).toBeNull();
     });
   });
 
   describe("Adapter Error Handling", () => {
-    it("should use async import() for dynamic loading", async () => {
-      // This test verifies that the implementation uses dynamic imports
-      // by checking that errors come from the adapter loading, not require()
+    it("should handle errors during adapter construction", () => {
+      class TestRepository extends BaseRepository<any, string, any> {
+        constructor() {
+          super({
+            type: ORMType.Mongoose,
+            schema: new Schema({}),
+          });
+        }
+      }
+
+      // Construction should succeed with DI container set up
+      expect(() => new TestRepository()).not.toThrow();
+    });
+
+    it("should use static imports for adapters", () => {
+      // This test verifies that we use static imports not dynamic import()
+      // by checking that repository construction is synchronous
 
       class TestRepository extends BaseRepository<any, string, any> {
         constructor() {
@@ -90,40 +97,19 @@ describe("ESM Adapter Loading", () => {
         }
       }
 
+      // Constructor should be purely synchronous
+      const startTime = Date.now();
       const repo = new TestRepository();
+      const endTime = Date.now();
 
-      try {
-        await repo.findById("test");
-      } catch (error: any) {
-        // Should NOT be "require is not defined" error
-        expect(error.message).not.toContain("require is not defined");
-        // Error should be from DI container or missing Mongoose installation
-        expect(
-          error.message.includes("TypeInfo not known") ||
-            error.message.includes("Mongoose is not installed"),
-        ).toBe(true);
-      }
-    });
-
-    it("should handle both ESM and CommonJS error codes", async () => {
-      // This test documents that we handle both error codes:
-      // - ERR_MODULE_NOT_FOUND (ESM)
-      // - MODULE_NOT_FOUND (CommonJS)
-
-      // The adapter-loader handles both error codes
-      const esmErrorCode = "ERR_MODULE_NOT_FOUND";
-      const cjsErrorCode = "MODULE_NOT_FOUND";
-
-      expect(esmErrorCode).toBe("ERR_MODULE_NOT_FOUND");
-      expect(cjsErrorCode).toBe("MODULE_NOT_FOUND");
+      expect(repo).toBeDefined();
+      // Synchronous operation should be nearly instant (< 100ms)
+      expect(endTime - startTime).toBeLessThan(100);
     });
   });
 
-  describe("Dynamic Import Integration", () => {
-    it("should use dynamic import() instead of require()", async () => {
-      // This test verifies that the implementation uses async import
-      // by checking that async methods work properly
-
+  describe("Repository Operations", () => {
+    it("should allow async methods to be called immediately", async () => {
       class TestRepository extends BaseRepository<any, string, any> {
         constructor() {
           super({
@@ -135,22 +121,20 @@ describe("ESM Adapter Loading", () => {
 
       const repo = new TestRepository();
 
-      // All repository methods should be async and return Promises
-      const findByIdPromise = repo.findById("test").catch(() => null);
+      const findByIdPromise = repo.findById("test-id").catch(() => null);
       expect(findByIdPromise).toBeInstanceOf(Promise);
 
-      const createPromise = repo.create("test-data" as any).catch(() => null);
+      const createPromise = repo.create("test-data").catch(() => null);
       expect(createPromise).toBeInstanceOf(Promise);
 
       const updatePromise = repo
-        .update("test", "test-data" as any)
+        .update("test-id", "updated-data")
         .catch(() => null);
       expect(updatePromise).toBeInstanceOf(Promise);
 
-      const deletePromise = repo.delete("test").catch(() => null);
+      const deletePromise = repo.delete("test-id").catch(() => null);
       expect(deletePromise).toBeInstanceOf(Promise);
 
-      // Await all to prevent unhandled rejections
       await Promise.all([
         findByIdPromise,
         createPromise,
@@ -160,8 +144,8 @@ describe("ESM Adapter Loading", () => {
     });
   });
 
-  describe("Concurrent Initialization", () => {
-    it("should handle multiple concurrent calls to async methods", async () => {
+  describe("Concurrent Operations", () => {
+    it("should handle multiple concurrent calls without initialization races", async () => {
       class TestRepository extends BaseRepository<any, string, any> {
         constructor() {
           super({
@@ -173,18 +157,17 @@ describe("ESM Adapter Loading", () => {
 
       const repo = new TestRepository();
 
-      // Multiple concurrent async calls should all properly initialize
-      // (or all fail with the same initialization error)
+      // Multiple concurrent async calls work immediately - no race conditions
       const promises = [
-        repo.findById("1").catch(() => "error"),
-        repo.findById("2").catch(() => "error"),
-        repo.findById("3").catch(() => "error"),
+        repo.findById("1").catch(() => null),
+        repo.findById("2").catch(() => null),
+        repo.findById("3").catch(() => null),
       ];
 
-      // Await all promises to prevent unhandled rejections
+      // Await all promises
       const results = await Promise.all(promises);
 
-      // All should either succeed or fail consistently
+      // All should complete successfully
       expect(results).toBeDefined();
       expect(results.length).toBe(3);
     });

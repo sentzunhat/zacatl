@@ -16,7 +16,7 @@ export interface PinoConfigOptions {
  *
  * @example Basic usage
  * ```typescript
- * import { PinoLoggerAdapter, createPinoConfig } from '@sentzunhat/zacatl/logs';
+ * import { PinoLoggerAdapter, createPinoConfig } from '@zacatl/logs';
  * const logger = new PinoLoggerAdapter(createPinoConfig());
  * ```
  *

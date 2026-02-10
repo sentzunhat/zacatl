@@ -90,9 +90,8 @@ class UserRepository extends BaseRepository<User, CreateUser, UserDTO> {
     });
   }
 
-  // Add your methods
   async findByEmail(email: string) {
-    const model = this.getMongooseModel();
+    const model = this.model as MongooseModel<User>;
     const user = await model.findOne({ email }).lean({ virtuals: true });
     return this.toLean(user);
   }
@@ -161,7 +160,7 @@ class ProductRepository extends BaseRepository<
   }
 
   async findByPriceRange(min: number, max: number): Promise<ProductDTO[]> {
-    const model = this.getSequelizeModel();
+    const model = this.model as ModelStatic<ProductModel>;
     const products = await model.findAll({
       where: {
         price: { [Op.between]: [min, max] },
@@ -417,23 +416,19 @@ class BaseRepository<D, I, O> {
   isMongoose(): boolean;
   isSequelize(): boolean;
 
-  // ORM-specific model access
-  getMongooseModel(): MongooseModel<D>;
-  getSequelizeModel(): ModelStatic<any>;
-
-  // Generic model access
-  get model(): MongooseModel<D> | ModelStatic<any>;
+  // Direct model access - cast to ORM-specific type
+  readonly model: RepositoryModel<D>;
 }
 ```
 
 ## Benefits
 
-✅ **No Circular Dependencies** - Type-only imports prevent module loops  
-✅ **Type Safe** - Full TypeScript support with generics  
-✅ **Extensible** - Easy to add new ORM adapters  
-✅ **Clean Architecture** - Separation between repositories and ORM logic  
-✅ **Testable** - Mock adapters for unit testing  
-✅ **Multi-Database** - Use different databases in same application  
+✅ **No Circular Dependencies** - Type-only imports prevent module loops
+✅ **Type Safe** - Full TypeScript support with generics
+✅ **Extensible** - Easy to add new ORM adapters
+✅ **Clean Architecture** - Separation between repositories and ORM logic
+✅ **Testable** - Mock adapters for unit testing
+✅ **Multi-Database** - Use different databases in same application
 ✅ **Framework Agnostic** - Users can bring their own ORM
 
 ## Best Practices
@@ -467,17 +462,18 @@ See the [examples](../examples/) directory for complete working examples:
 ```
 BaseRepository (Facade)
 ├─ Hardcoded type discrimination: if (config.type === 'mongoose')
-├─ Exposing ORM specifics: getMongooseModel(), getSequelizeModel()
-├─ Leaky abstraction: isMongoose(), isSequelize()
-├─ MongooseRepository implementation
-└─ SequelizeRepository implementation
+├─ Direct model property access: this.model
+├─ Type guards: isMongoose(), isSequelize()
+├─ MongooseAdapter implementation
+└─ SequelizeAdapter implementation
 ```
 
-**Issues:**
+**Benefits:**
 
-- Not truly pluggable - new ORMs require code changes to BaseRepository
-- Type coupling - consumers can access ORM-specific methods
-- Open/Closed Principle violation
+- Synchronous initialization - model ready immediately in constructor
+- Clean API - direct access to model property without getter methods
+- Type safe - consumers can assert the correct ORM type
+- No async ceremony - no need to wait for adapter loading
 
 ---
 

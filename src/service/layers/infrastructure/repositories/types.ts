@@ -8,7 +8,6 @@ import type {
   IfAny,
 } from "../../../../third-party/mongoose";
 import type {
-  SequelizeModel,
   ModelStatic,
   SequelizeModel as Model,
 } from "../../../../third-party/sequelize";
@@ -58,31 +57,40 @@ export type MongooseRepositoryConfig<D = unknown> = {
   readonly schema: Schema<D>;
 };
 
-export type SequelizeRepositoryConfig<D extends Model = Model> = {
+export type SequelizeRepositoryConfig<D extends object> = {
   readonly type: ORMType.Sequelize;
-  readonly model: ModelStatic<D>;
+  readonly model: ModelStatic<Model<D>>;
 };
 
 export type BaseRepositoryConfig<D = unknown> =
   | MongooseRepositoryConfig<D>
   | SequelizeRepositoryConfig<Model>;
 
-export type RepositoryPort<D, I, O> = {
-  model: MongooseModel<D> | ModelStatic<SequelizeModel<any, any>>;
+/** Model types for each ORM */
+export type MongooseRepositoryModel<D> = MongooseModel<D>;
+export type SequelizeRepositoryModel = ModelStatic<Model>;
 
-  toLean(input: unknown): O | null;
-  findById(id: string): Promise<O | null>;
-  create(entity: I): Promise<O>;
-  update(id: string, update: Partial<I>): Promise<O | null>;
-  delete(id: string): Promise<O | null>;
-};
+/** Union of all supported model types */
+export type RepositoryModel<D> =
+  | MongooseRepositoryModel<D>
+  | SequelizeRepositoryModel;
 
-/** ORM port interface for pluggable ORM implementations */
+/** ORM adapter interface - implemented by Mongoose and Sequelize adapters */
 export interface ORMPort<D, I, O> {
-  readonly model: MongooseModel<D> | ModelStatic<any>;
+  readonly model: RepositoryModel<D>;
   toLean(input: unknown): O | null;
   findById(id: string): Promise<O | null>;
   create(entity: I): Promise<O>;
   update(id: string, update: Partial<I>): Promise<O | null>;
   delete(id: string): Promise<O | null>;
 }
+
+/** Repository contract - public interface for consumers */
+export type RepositoryPort<D, I, O> = {
+  model: RepositoryModel<D>;
+  toLean(input: unknown): O | null;
+  findById(id: string): Promise<O | null>;
+  create(entity: I): Promise<O>;
+  update(id: string, update: Partial<I>): Promise<O | null>;
+  delete(id: string): Promise<O | null>;
+};

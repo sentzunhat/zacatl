@@ -1,58 +1,29 @@
-import { InternalServerError } from "@zacatl/error";
-
-import type { SequelizeModel as Model } from "../../../../third-party/sequelize";
+import { MongooseAdapter } from "./mongoose-adapter";
+import { SequelizeAdapter } from "./sequelize-adapter";
 import type {
   MongooseRepositoryConfig,
   SequelizeRepositoryConfig,
   ORMPort,
 } from "../repositories/types";
 
-/** Lazy-loads MongooseAdapter when needed */
-export async function loadMongooseAdapter<D, I, O>(
+/**
+ * Creates a Mongoose adapter
+ * @param config Mongoose repository configuration
+ * @returns ORMPort implementation for Mongoose
+ */
+export function createMongooseAdapter<D, I, O>(
   config: MongooseRepositoryConfig<D>,
-): Promise<ORMPort<D, I, O>> {
-  try {
-    const adapters = await import("./mongoose-adapter");
-    return new adapters.MongooseAdapter<D, I, O>(config);
-  } catch (error: any) {
-    if (
-      error.code === "ERR_MODULE_NOT_FOUND" ||
-      error.code === "MODULE_NOT_FOUND"
-    ) {
-      throw new InternalServerError({
-        message:
-          "Mongoose is not installed. Install it with: npm install mongoose",
-        reason: "Mongoose dependency is missing",
-        component: "ORMAdapterLoader",
-        operation: "loadMongooseAdapter",
-        error,
-      });
-    }
-    throw error;
-  }
+): ORMPort<D, I, O> {
+  return new MongooseAdapter<D, I, O>(config);
 }
 
-/** Lazy-loads SequelizeAdapter when needed */
-export async function loadSequelizeAdapter<D extends Model, I, O>(
-  config: SequelizeRepositoryConfig<D>,
-): Promise<ORMPort<D, I, O>> {
-  try {
-    const adapters = await import("./sequelize-adapter");
-    return new adapters.SequelizeAdapter<D, I, O>(config);
-  } catch (error: any) {
-    if (
-      error.code === "ERR_MODULE_NOT_FOUND" ||
-      error.code === "MODULE_NOT_FOUND"
-    ) {
-      throw new InternalServerError({
-        message:
-          "Sequelize is not installed. Install it with: npm install sequelize",
-        reason: "Sequelize dependency is missing",
-        component: "ORMAdapterLoader",
-        operation: "loadSequelizeAdapter",
-        error,
-      });
-    }
-    throw error;
-  }
+/**
+ * Creates a Sequelize adapter
+ * @param config Sequelize repository configuration
+ * @returns ORMPort implementation for Sequelize
+ */
+export function createSequelizeAdapter<D, I, O>(
+  config: SequelizeRepositoryConfig<object>,
+): ORMPort<D, I, O> {
+  return new SequelizeAdapter<D, I, O>(config);
 }

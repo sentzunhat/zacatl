@@ -30,20 +30,20 @@ From a **single, unified codebase** with clean architecture.
 - ✅ **Database Adapters** - Sequelize (SQL) and Mongoose (MongoDB)
 - ✅ **Logging** - Structured logging with Pino
 - ✅ **Localization** - Multi-language support with i18n
-- ✅ **Testing** - 201 unit tests, 79% coverage
+- ✅ **Testing** - 178 unit tests, 61.6% coverage
 
 ---
 
 ## 📊 Framework Statistics
 
-| Metric                  | Value                 |
-| ----------------------- | --------------------- |
-| **Version**             | 0.0.27 (0.1.0 coming) |
-| **Unit Tests**          | 201                   |
-| **Code Coverage**       | 79%                   |
-| **Node.js Requirement** | 24+ LTS               |
-| **License**             | MIT                   |
-| **TypeScript**          | Fully typed           |
+| Metric                  | Value       |
+| ----------------------- | ----------- |
+| **Version**             | 0.0.32      |
+| **Unit Tests**          | 178         |
+| **Code Coverage**       | 61.6%       |
+| **Node.js Requirement** | 24+ LTS     |
+| **License**             | MIT         |
+| **TypeScript**          | Fully typed |
 
 ---
 
@@ -79,14 +79,13 @@ The documentation is organized into these categories:
 
 View the full [Changelog](./changelog.md) for version history, features, and breaking changes.
 
-### Latest Release: v0.0.27
+### Latest Release: v0.0.32
 
+- **Multi-Context Architecture** - CLI, Desktop, and Server support
 - **Bun Runtime Support** - Native TypeScript compilation in Bun
 - **Dependency Updates** - Latest stable versions of all libraries
 - **DI Stability** - Improved error handling in dependency injection
 - **Type Safety** - Fixed strict TypeScript violations
-
-**Next Release:** v0.1.0 with Multi-Context Architecture support
 
 ---
 
@@ -98,4 +97,4 @@ View the full [Changelog](./changelog.md) for version history, features, and bre
 
 ---
 
-**Last Updated:** February 5, 2026
+**Last Updated:** February 7, 2026

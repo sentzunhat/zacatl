@@ -7,6 +7,10 @@ import "reflect-metadata";
 import "./init-di";
 import Fastify from "fastify";
 import { Sequelize } from "sequelize";
+import {
+  serializerCompiler,
+  validatorCompiler,
+} from "fastify-type-provider-zod";
 import { Service } from "@sentzunhat/zacatl/service";
 import { config, createServiceConfig } from "./config";
 
@@ -17,6 +21,28 @@ async function main() {
   try {
     // Initialize Fastify
     const fastify = Fastify({ logger: false });
+
+    // Set up Zod validation for Fastify
+    fastify.setValidatorCompiler(validatorCompiler);
+    fastify.setSerializerCompiler(serializerCompiler);
+
+    // Centralized error handler (real-world pattern)
+    fastify.setErrorHandler(
+      async (error: Error & { statusCode?: number }, request, reply) => {
+        const statusCode = error.statusCode || 500;
+
+        // Log error for debugging
+        console.error(`[${request.method}] ${request.url}:`, error.message);
+
+        // Send clean error response
+        await reply.status(statusCode).send({
+          error: {
+            message: error.message || "Internal Server Error",
+            statusCode,
+          },
+        });
+      },
+    );
 
     // Initialize Sequelize
     const sequelize = new Sequelize({

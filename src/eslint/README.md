@@ -113,7 +113,7 @@ Enforces Hexagonal Architecture naming patterns.
 - **Error Classes**: `*Error` suffix
   - Examples: `ValidationError`, `NotFoundError`
 - **Methods**: camelCase with verb+noun patterns
-  - Examples: `findById()`, `validateUser()`, `ensureInitialized()`
+  - Examples: `findById()`, `validateUser()`, `loadAdapter()`
 
 **Import:**
 

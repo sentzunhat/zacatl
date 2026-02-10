@@ -1,4 +1,4 @@
-# Zacatl Dependencies Reference (v0.0.27+)
+# Zacatl Dependencies Reference (v0.0.32+)
 
 ## Runtime Support
 
@@ -121,7 +121,8 @@ class MyService {
 }
 
 const service = new Service({
-  architecture: { domain: { providers: [MyService] } },
+  type: ServiceType.SERVER,
+  layers: { domain: { services: [MyService] } },
 });
 
 await service.start();
@@ -160,13 +161,16 @@ class UserRepository extends BaseRepository<any, any, any> {
 }
 
 const service = new Service({
-  architecture: {
+  type: ServiceType.SERVER,
+  layers: {
     infrastructure: { repositories: [UserRepository] },
+  },
+  platforms: {
     server: {
       name: "app",
       databases: [
         {
-          vendor: "MONGOOSE",
+          vendor: DatabaseVendor.MONGOOSE,
           instance: mongoose.connect("mongodb://localhost/db"),
         },
       ],
@@ -210,13 +214,16 @@ class UserRepository extends BaseRepository<any, any, any> {
 }
 
 const service = new Service({
-  architecture: {
+  type: ServiceType.SERVER,
+  layers: {
     infrastructure: { repositories: [UserRepository] },
+  },
+  platforms: {
     server: {
       name: "app",
       databases: [
         {
-          vendor: "SEQUELIZE",
+          vendor: DatabaseVendor.SEQUELIZE,
           instance: sequelize,
         },
       ],
@@ -287,7 +294,7 @@ import { Service, singleton, resolveDependency } from "@sentzunhat/zacatl";
 
 ---
 
-## Current Package Versions (v0.0.27)
+## Current Package Versions (v0.0.32)
 
 ### Core Runtime Dependencies
 
@@ -326,7 +333,7 @@ import { Service, singleton, resolveDependency } from "@sentzunhat/zacatl";
 
 ## Version Info
 
-- **Zacatl:** 0.0.27
+- **Zacatl:** 0.0.32
 - **Node.js:** 24.0.0+
 - **TypeScript:** 5.9.3+ (recommended)
 - **Bun:** Latest (optional, for faster package management)

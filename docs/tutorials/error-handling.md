@@ -85,7 +85,12 @@ export function setupErrorHandler(fastify: FastifyInstance) {
 
 ```typescript
 import Fastify from "fastify";
-import { Service } from "@sentzunhat/zacatl";
+import {
+  Service,
+  ServiceType,
+  ServerType,
+  ServerVendor,
+} from "@sentzunhat/zacatl";
 import { setupErrorHandler } from "./middleware/error-handler";
 
 const fastify = Fastify();
@@ -94,9 +99,14 @@ setupErrorHandler(fastify);
 // Your routes...
 
 const service = new Service({
-  architecture: {
+  type: ServiceType.SERVER,
+  platforms: {
     server: {
-      server: { type: "SERVER", vendor: "FASTIFY", instance: fastify },
+      server: {
+        type: ServerType.SERVER,
+        vendor: ServerVendor.FASTIFY,
+        instance: fastify,
+      },
     },
   },
 });
@@ -121,10 +131,10 @@ Errors return this structure:
 
 ## Best Practices
 
-✅ **Use specific error types** - NotFoundError, ValidationError, etc.  
-✅ **Include metadata** - Add context for debugging  
-✅ **Log correlation IDs** - Track errors across systems  
-✅ **Set up global handler** - Catch all errors consistently  
+✅ **Use specific error types** - NotFoundError, ValidationError, etc.
+✅ **Include metadata** - Add context for debugging
+✅ **Log correlation IDs** - Track errors across systems
+✅ **Set up global handler** - Catch all errors consistently
 ❌ **Don't expose stack traces** - Keep production responses clean
 
 ## Error Types Reference

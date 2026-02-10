@@ -12,7 +12,7 @@ import type { Constructor } from "../service/layers/types";
  *
  * @example
  * ```typescript
- * import { registerDependency, resolveDependency } from '@sentzunhat/zacatl';
+ * import { registerDependency, resolveDependency } from '@zacatl';
  *
  * // Manual registration (advanced use case)
  * class CustomService { ... }

@@ -31,7 +31,7 @@ export class Infrastructure {
 
     // Register repositories - tsyringe auto-injects from @injectable metadata
     for (const repository of this.config.repositories) {
-      container.registerSingleton(repository as any, repository as any);
+      container.registerSingleton(repository, repository);
     }
 
     const resolvedRepositories =

@@ -7,7 +7,7 @@ In-depth technical documentation for Zacatl.
 - **[API Reference](./api/README.md)** - Complete API documentation
 - **[Architecture](./architecture/README.md)** - System design and patterns
 - **[ORM & Databases](./orm/README.md)** - Database integration guide
-- **[Path Aliases](./path-aliases.md)** - TypeScript path aliases (v0.1.0+)
+- **[Path Aliases](./path-aliases.md)** - TypeScript path aliases
 - **[Third-Party Dependencies](./third-party.md)** - Re-exported packages
 
 ## Quick Links
@@ -29,7 +29,7 @@ In-depth technical documentation for Zacatl.
 ### Architecture
 
 - [Framework Overview](./architecture/framework-overview.md) - How Zacatl works
-- [Multi-Context Design](./architecture/multi-context-design.md) - CLI, Desktop, Server support (v0.1.0+)
+- [Multi-Context Design](./architecture/multi-context-design.md) - CLI, Desktop, Server support
 - [Architecture Decisions](./architecture/decisions/) - Design decision records
 
 ### ORM & Databases
@@ -42,6 +42,6 @@ In-depth technical documentation for Zacatl.
 
 ## Learning Path
 
-**New to Zacatl?** Start with [Tutorials](../tutorials/README.md)  
-**Building something?** Check [Guides](../guides/README.md)  
+**New to Zacatl?** Start with [Tutorials](../tutorials/README.md)
+**Building something?** Check [Guides](../guides/README.md)
 **Need details?** You're in the right place!

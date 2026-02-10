@@ -2,11 +2,13 @@
  * Mongoose ORM exports
  *
  * @example Minimal bundle (tree-shakeable)
- * import { mongoose, Schema } from "@sentzunhat/zacatl/third-party/mongoose";
+ * import { mongoose, Schema } from "@zacatl/third-party/mongoose";
  *
  * @example Convenience (from main package)
- * import { mongoose, Schema } from "@sentzunhat/zacatl";
+ * import { mongoose, Schema } from "@zacatl";
  */
+
+import mongooseDefault from "mongoose";
 
 export {
   default as mongoose,
@@ -15,8 +17,10 @@ export {
   Model,
   Document,
   connect,
-  connection,
 } from "mongoose";
+
+// Re-export connection from the default export
+export const connection = mongooseDefault.connection;
 
 // Type-only exports
 export type {

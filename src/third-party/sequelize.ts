@@ -2,10 +2,10 @@
  * Sequelize ORM exports
  *
  * @example Minimal bundle (tree-shakeable)
- * import { Sequelize, DataTypes } from "@sentzunhat/zacatl/third-party/sequelize";
+ * import { Sequelize, DataTypes } from "@zacatl/third-party/sequelize";
  *
  * @example Convenience (from main package)
- * import { Sequelize, DataTypes } from "@sentzunhat/zacatl";
+ * import { Sequelize, DataTypes } from "@zacatl";
  */
 
 export { Sequelize, Model as SequelizeModel, DataTypes, Op } from "sequelize";

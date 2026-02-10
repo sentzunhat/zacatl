@@ -129,7 +129,9 @@ export class UserRepository extends BaseRepository<
 
   // Optional: Add custom methods
   async findByEmail(email: string): Promise<UserOutput | null> {
-    const user = await this.getMongooseModel().findOne({ email }).lean();
+    const user = await (this.model as MongooseModel<User>)
+      .findOne({ email })
+      .lean();
     return this.toLean(user);
   }
 }
@@ -170,7 +172,7 @@ export class ProductRepository extends BaseRepository<
 
   // Optional: Add custom methods
   async findInStock(): Promise<ProductOutput[]> {
-    const products = await this.getSequelizeModel().findAll({
+    const products = await (this.model as ModelStatic<ProductModel>).findAll({
       where: { stock: { [Op.gt]: 0 } },
     });
     return products.map((p) => this.toLean(p)!);
@@ -181,12 +183,13 @@ export class ProductRepository extends BaseRepository<
 ### 3. Register in Service
 
 ```typescript
-import { Service } from "@/service";
+import { Service, ServiceType } from "@/service";
 import { UserRepository } from "./repositories/user.repository";
 import { ProductRepository } from "./repositories/product.repository";
 
 const service = new Service({
-  architecture: {
+  type: ServiceType.SERVER,
+  layers: {
     infrastructure: {
       repositories: [
         UserRepository, // Uses Mongoose (MongoDB)
@@ -231,8 +234,11 @@ const foundProduct = await productRepo.findById(product.id);
 ## Mix Multiple ORMs in One Service
 
 ```typescript
+import { Service, ServiceType } from "@sentzunhat/zacatl";
+
 const service = new Service({
-  architecture: {
+  type: ServiceType.SERVER,
+  layers: {
     infrastructure: {
       repositories: [
         // MongoDB repositories
@@ -253,12 +259,12 @@ const service = new Service({
 
 ## Benefits
 
-✅ **Choose the right tool**: Use MongoDB for users, PostgreSQL for products  
-✅ **No coupling**: Each repository independently chooses its ORM  
-✅ **Unified interface**: All repos have same CRUD methods  
-✅ **Type-safe**: Full TypeScript support  
-✅ **Dependency injection**: Automatic registration  
-✅ **Easy testing**: Mock repositories or swap ORMs  
+✅ **Choose the right tool**: Use MongoDB for users, PostgreSQL for products
+✅ **No coupling**: Each repository independently chooses its ORM
+✅ **Unified interface**: All repos have same CRUD methods
+✅ **Type-safe**: Full TypeScript support
+✅ **Dependency injection**: Automatic registration
+✅ **Easy testing**: Mock repositories or swap ORMs
 ✅ **Future-proof**: Add Prisma, TypeORM, etc. by creating new adapters
 
 ## Available ORM Adapters

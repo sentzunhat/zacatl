@@ -27,8 +27,9 @@ class MyBusinessService {
 
 // 2. Start the service
 const service = new Service({
-  architecture: {
-    domain: { providers: [MyBusinessService] },
+  type: ServiceType.SERVER,
+  layers: {
+    domain: { services: [MyBusinessService] },
   },
 });
 
@@ -102,14 +103,17 @@ class UserService {
 const mongoUri = "mongodb://localhost:27017/mydb";
 
 const service = new Service({
-  architecture: {
-    domain: { providers: [UserService] },
+  type: ServiceType.SERVER,
+  layers: {
+    domain: { services: [UserService] },
     infrastructure: { repositories: [UserRepository] },
+  },
+  platforms: {
     server: {
       name: "my-cli-tool",
       databases: [
         {
-          vendor: "MONGOOSE",
+          vendor: DatabaseVendor.MONGOOSE,
           instance: mongoose.connect(mongoUri),
         },
       ],
@@ -159,8 +163,9 @@ class NotificationService {
 
 // Register in Service
 const service = new Service({
-  architecture: {
-    domain: { providers: [EmailService, NotificationService] },
+  type: ServiceType.SERVER,
+  layers: {
+    domain: { services: [EmailService, NotificationService] },
     infrastructure: { repositories: [UserRepository] },
   },
 });
@@ -233,14 +238,22 @@ class OrderService {
 
 // Register all
 const service = new Service({
-  architecture: {
-    domain: { providers: [OrderService] },
+  type: ServiceType.SERVER,
+  layers: {
+    domain: { services: [OrderService] },
     infrastructure: {
       repositories: [UserRepository, ProductRepository, OrderRepository],
     },
+  },
+  platforms: {
     server: {
       name: "order-processor",
-      databases: [{ vendor: "MONGOOSE", instance: mongoose.connect(mongoUri) }],
+      databases: [
+        {
+          vendor: DatabaseVendor.MONGOOSE,
+          instance: mongoose.connect(mongoUri),
+        },
+      ],
     },
   },
 });
@@ -271,13 +284,16 @@ const config = loadConfig("./config/app.yaml", "yaml", ConfigSchema);
 
 // Use in service
 const service = new Service({
-  architecture: {
-    domain: { providers: [MyService] },
+  type: ServiceType.SERVER,
+  layers: {
+    domain: { services: [MyService] },
+  },
+  platforms: {
     server: {
       name: config.app.name,
       databases: [
         {
-          vendor: "MONGOOSE",
+          vendor: DatabaseVendor.MONGOOSE,
           instance: mongoose.connect(config.database.uri),
         },
       ],
@@ -400,7 +416,7 @@ class TaskService {
 
   async listTasks() {
     // Note: You'd add a findMany method to your repository
-    const model = this.taskRepo.getMongooseModel();
+    const model = this.taskRepo.model as MongooseModel<Task>;
     return model.find();
   }
 
@@ -412,14 +428,17 @@ class TaskService {
 // CLI Main
 async function main() {
   const service = new Service({
-    architecture: {
-      domain: { providers: [TaskService] },
+    type: ServiceType.SERVER,
+    layers: {
+      domain: { services: [TaskService] },
       infrastructure: { repositories: [TaskRepository] },
+    },
+    platforms: {
       server: {
         name: "task-cli",
         databases: [
           {
-            vendor: "MONGOOSE",
+            vendor: DatabaseVendor.MONGOOSE,
             instance: mongoose.connect(config.mongodb),
           },
         ],
@@ -500,8 +519,9 @@ class EmailWorker {
 }
 
 const service = new Service({
-  architecture: {
-    domain: { providers: [EmailWorker, EmailService] },
+  type: ServiceType.SERVER,
+  layers: {
+    domain: { services: [EmailWorker, EmailService] },
   },
 });
 
@@ -522,7 +542,7 @@ class MigrationService {
   ) {}
 
   async migrate() {
-    const oldModel = this.oldRepo.getMongooseModel();
+    const oldModel = this.oldRepo.model as MongooseModel<OldData>;
     const oldData = await oldModel.find();
 
     for (const item of oldData) {
@@ -536,12 +556,17 @@ class MigrationService {
 
 // Run migration
 const service = new Service({
-  architecture: {
-    domain: { providers: [MigrationService] },
+  type: ServiceType.SERVER,
+  layers: {
+    domain: { services: [MigrationService] },
     infrastructure: { repositories: [OldDataRepository, NewDataRepository] },
+  },
+  platforms: {
     server: {
       name: "migration",
-      databases: [{ vendor: "MONGOOSE", instance: mongoose.connect(uri) }],
+      databases: [
+        { vendor: DatabaseVendor.MONGOOSE, instance: mongoose.connect(uri) },
+      ],
     },
   },
 });

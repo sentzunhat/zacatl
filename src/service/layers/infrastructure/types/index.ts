@@ -8,9 +8,8 @@ export type InfrastructureRepository =
 /**
  * Infrastructure repositories that handle data persistence.
  * Repositories implement the repository pattern for data access.
- * Use any to support custom repository interfaces beyond RepositoryPort
  */
-export type InfrastructureRepositories = Array<Constructor<any>>;
+export type InfrastructureRepositories = Array<InfrastructureRepository>;
 
 export type ConfigInfrastructure = {
   repositories?: InfrastructureRepositories;

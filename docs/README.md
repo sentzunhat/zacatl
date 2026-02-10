@@ -15,7 +15,7 @@
 
 ### Learning Tutorials
 
-- [Installation](tutorials/installation.md) - Install and setup
+- [Installation](getting-started/installation.md) - Install and setup
 - [Quick Start](tutorials/quickstart.md) - Get started in 5 minutes
 - [Hello World](tutorials/hello-world.md) - Your first service
 - [REST API](tutorials/rest-api.md) - Build HTTP services
@@ -48,7 +48,7 @@
 ### Migration & Upgrades
 
 - [Migration Index](migration/index.md) - All migration guides
-- [v0.0.26 → v0.1.0](migration/v0.0.26-to-v0.1.0.md) - Multi-context support (latest)
+- [v0.0.26 → v0.0.32](migration/v0.0.26-to-v0.1.0.md) - Multi-context support (current)
 - [v0.0.21 Migration](migration/v0.0.21.md) - Import shortcuts
 - [v0.0.20 Migration](migration/v0.0.20.md) - Post-release migration
 - [Prepare for v0.0.20](migration/prepare-v0.0.20.md) - Pre-release prep

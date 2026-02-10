@@ -11,28 +11,27 @@ import type {
 } from "../repositories/types";
 
 /**
- * MongooseAdapter - Handles Mongoose-specific ORM operations
+ * Mongoose ORM adapter - handles Mongoose-specific database operations
  */
 export class MongooseAdapter<D, I, O> implements ORMPort<D, I, O> {
-  public readonly model: MongooseModel<D>;
+  private _model: MongooseModel<D> | null = null;
   private readonly config: MongooseRepositoryConfig<D>;
 
   constructor(config: MongooseRepositoryConfig<D>) {
     this.config = config;
-    // Mongoose instance from DI container allows per-database configuration
-    const mongoose = container.resolve<Mongoose>(Mongoose);
+  }
 
-    const { name, schema } = this.config;
+  public get model(): MongooseModel<D> {
+    if (!this._model) {
+      const mongoose = container.resolve(Mongoose);
+      const { name, schema } = this.config;
 
-    if (name) {
-      this.model = mongoose.model<D>(name, schema);
-    } else {
-      this.model = mongoose.model<D>(uuidv4(), schema);
+      this._model = mongoose.model<D>(name || uuidv4(), schema);
+      this._model.createCollection();
+      this._model.createIndexes();
+      this._model.init();
     }
-
-    this.model.createCollection();
-    this.model.createIndexes();
-    this.model.init();
+    return this._model;
   }
 
   public toLean(input: unknown): O | null {
@@ -51,7 +50,7 @@ export class MongooseAdapter<D, I, O> implements ORMPort<D, I, O> {
     ) {
       base = (
         input as unknown as {
-          toObject: (opt: any) => LeanWithMeta<O>;
+          toObject: (opt: Record<string, unknown>) => LeanWithMeta<O>;
         }
       ).toObject({
         virtuals: true,
@@ -97,7 +96,7 @@ export class MongooseAdapter<D, I, O> implements ORMPort<D, I, O> {
   }
 
   async create(entity: I): Promise<O> {
-    const document = await this.model.create(entity as any);
+    const document = await this.model.create(entity as unknown as D);
 
     const leanDocument = this.toLean(document);
 
@@ -115,7 +114,7 @@ export class MongooseAdapter<D, I, O> implements ORMPort<D, I, O> {
 
   async update(id: string, update: Partial<I>): Promise<O | null> {
     const entity = await this.model
-      .findByIdAndUpdate(id, update as any, { new: true })
+      .findByIdAndUpdate(id, update as unknown as Partial<D>, { new: true })
       .lean<O>({ virtuals: true })
       .exec();
 

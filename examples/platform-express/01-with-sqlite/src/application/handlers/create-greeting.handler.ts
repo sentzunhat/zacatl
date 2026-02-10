@@ -1,10 +1,10 @@
 import { injectable } from "tsyringe";
 import type { Request, Response } from "express";
-import { GreetingService } from "../../domain/services/greeting.service";
+import { GreetingServiceAdapter } from "../../domain/greetings/service/adapter";
 
 @injectable()
 export class CreateGreetingHandler {
-  constructor(private readonly greetingService: GreetingService) {}
+  constructor(private readonly greetingService: GreetingServiceAdapter) {}
 
   async handle(req: Request, res: Response): Promise<void> {
     try {

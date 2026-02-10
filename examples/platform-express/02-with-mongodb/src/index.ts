@@ -62,7 +62,7 @@ async function main() {
       platforms: {
         server: {
           name: "express-mongodb",
-          port: 8082,
+          port: 8182,
           server: {
             type: ServerType.SERVER,
             vendor: ServerVendor.EXPRESS,
@@ -116,7 +116,7 @@ async function main() {
     );
     console.log("  POST   /greetings              - Create new greeting");
     console.log("  DELETE /greetings/:id          - Delete greeting");
-    console.log("\n💡 Try: curl http://localhost:8084/greetings");
+    console.log("\n💡 Try: curl http://localhost:8182/greetings");
     console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n");
   } catch (error) {
     console.error("❌ Failed to start service:", error);

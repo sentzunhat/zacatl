@@ -8,8 +8,8 @@ The following features are documented here but are not part of the current produ
 
 ### CLI Service Feature
 
-**Status:** Specification Only  
-**Target:** Future Release (v0.2.0+)  
+**Status:** Specification Only
+**Target:** Future Release (v0.2.0+)
 **Folder:** [cli-service-feature/](./cli-service-feature/)
 
 Command-line interface support for building CLI applications using Zacatl's architecture patterns.
@@ -22,8 +22,8 @@ Command-line interface support for building CLI applications using Zacatl's arch
 
 ### Desktop Service Feature
 
-**Status:** Specification Only  
-**Target:** Future Release (v0.3.0+)  
+**Status:** Specification Only
+**Target:** Future Release (v0.3.0+)
 **Folder:** [desktop-service-feature/](./desktop-service-feature/)
 
 Desktop application support with IPC handlers for Neutralino and Electron platforms.
@@ -36,8 +36,7 @@ Desktop application support with IPC handlers for Neutralino and Electron platfo
 
 ### Multi-Context Architecture
 
-**Status:** Foundation Complete, Implementation Deferred  
-**Target:** Future Release  
+**Status:** ✅ Complete (v0.0.32)
 **File:** [v0.0.26-to-v0.1.0.md](./v0.0.26-to-v0.1.0.md), [multi-context-design.md](./multi-context-design.md)
 
 Unified architecture supporting CLI, Desktop, and Server contexts from a single codebase.

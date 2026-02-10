@@ -21,7 +21,7 @@ export class Domain {
     if (this.config.providers && this.config.providers.length > 0) {
       // Providers registered - tsyringe auto-injects from @injectable metadata
       for (const provider of this.config.providers) {
-        container.registerSingleton(provider as any, provider as any);
+        container.registerSingleton(provider, provider);
       }
     }
   }
@@ -30,7 +30,7 @@ export class Domain {
     if (this.config.services && this.config.services.length > 0) {
       // Services registered - tsyringe auto-injects repositories from @injectable metadata
       for (const service of this.config.services) {
-        container.registerSingleton(service as any, service as any);
+        container.registerSingleton(service, service);
       }
     }
   }

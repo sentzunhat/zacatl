@@ -12,13 +12,13 @@ import {
   DatabaseVendor,
 } from "@sentzunhat/zacatl";
 import type { ApplicationRestRoutes } from "@sentzunhat/zacatl/service";
-import { GreetingRepositoryAdapter } from "./infrastructure/repositories/greeting.repository";
-import { GreetingService } from "./domain/services/greeting.service";
-import { GetAllGreetingsHandler } from "./application/handlers/get-all-greetings.handler";
-import { GetGreetingByIdHandler } from "./application/handlers/get-greeting-by-id.handler";
-import { CreateGreetingHandler } from "./application/handlers/create-greeting.handler";
-import { DeleteGreetingHandler } from "./application/handlers/delete-greeting.handler";
-import { GetRandomGreetingHandler } from "./application/handlers/get-random-greeting.handler";
+import { repositories } from "./infrastructure/greetings/repositories/repositories";
+import { GreetingServiceAdapter } from "./domain/greetings/service";
+import { GetAllGreetingsHandler } from "./application/handlers/greetings/get-all/handler";
+import { GetGreetingByIdHandler } from "./application/handlers/greetings/get-by-id/handler";
+import { CreateGreetingHandler } from "./application/handlers/greetings/create/handler";
+import { DeleteGreetingHandler } from "./application/handlers/greetings/delete/handler";
+import { GetRandomGreetingHandler } from "./application/handlers/greetings/get-random/handler";
 
 export interface AppConfig {
   port: number;
@@ -26,7 +26,7 @@ export interface AppConfig {
 }
 
 export const config: AppConfig = {
-  port: Number(process.env.PORT ?? 3002),
+  port: Number(process.env.PORT ?? 8082),
   mongoUri:
     process.env.MONGO_URI ?? "mongodb://local:local@localhost:27017/appdb",
 };
@@ -65,10 +65,10 @@ export function createServiceConfig(
     },
     layers: {
       infrastructure: {
-        repositories: [GreetingRepositoryAdapter],
+        repositories,
       },
       domain: {
-        services: [GreetingService],
+        services: [GreetingServiceAdapter],
       },
       application: {
         entryPoints: {

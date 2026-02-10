@@ -1,0 +1,46 @@
+{
+  "name": "zacatl-fastify-postgres-monorepo",
+  "version": "1.0.0",
+  "description": "Full-stack monorepo: Fastify + PostgreSQL backend with React frontend",
+  "private": true,
+  "type": "module",
+  "packageManager": "bun@1.x",
+  "workspaces": [
+    "apps/backend",
+    "apps/frontend"
+  ],
+  "scripts": {
+    "backend:dev": "cd apps/backend && bun run dev",
+    "backend:start": "cd apps/backend && bun run start",
+    "backend:build": "cd apps/backend && bun run build",
+    "frontend:dev": "cd apps/frontend && bun run dev",
+    "frontend:build": "cd apps/frontend && bun run build",
+    "frontend:preview": "cd apps/frontend && bun run preview",
+    "dev": "bun run backend:dev & bun run frontend:dev",
+    "build": "bun run backend:build && bun run frontend:build",
+    "start": "bun run backend:start",
+    "clean": "rm -rf apps/*/dist apps/*/node_modules && rm -f bun.lock"
+  },
+  "dependencies": {
+    "@sentzunhat/zacatl": "file:../../..",
+    "fastify": "^5.0.0",
+    "sequelize": "^6.35.2",
+    "pg": "^8.11.5",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "reflect-metadata": "^0.2.2",
+    "tsyringe": "^4.10.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.16",
+    "@types/react": "^18.2.66",
+    "@types/react-dom": "^18.2.22",
+    "@vitejs/plugin-react": "^4.2.0",
+    "autoprefixer": "^10.4.19",
+    "postcss": "^8.4.38",
+    "tailwindcss": "^3.4.4",
+    "tsx": "^4.7.0",
+    "typescript": "^5.3.3",
+    "vite": "^5.2.0"
+  }
+}

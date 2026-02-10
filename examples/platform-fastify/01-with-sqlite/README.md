@@ -1,116 +1,75 @@
 # Fastify + SQLite + React Example
 
-⚡ **The simplest, fastest way** to start with Zacatl.
+Production-grade Zacatl example with zero-config SQLite database.
 
-- **Backend**: Fastify + SQLite (Sequelize) - ~50 lines to start
-- **Frontend**: React + Tailwind CSS + Vite
-- **Architecture**: Clean monorepo with shared types
-- **Performance**: < 1 second startup, zero config
+## Quick Start
 
-## ⚡ Why This Example?
-
-- ✅ **Zero Infrastructure**: No database servers needed (SQLite file)
-- ✅ **InstanOptimized for **Bun\*\* for maximum speed. Zacatl works with any runtime
-- ✅ **Type Safe**: Full TypeScript with shared types
-- ✅ **Clean DI**: Class-token injection, no manual wiring
-- ✅ **Minimal**: Only essential features, nothing extra
-
-## 🚀 Quick Start
-
-**Prerequisites**: Bun 1.x (recommended) or Node.js 18+
-
-> **Note**: This example is optimized for **Bun**. The Zacatl framework uses npm for development and is tested with Vitest.
-
-1. **Install dependencies**:
-
-   ```bash
-   bun install
-   ```
-
-2. **Start Development (Frontend + Backend)**:
-   ```bash
-   # Starts both in parallel
-   bun run dev
-   ```
-   _Or run individually:_
-   ```bash
-   bun run backend:dev   # Port 3001
-   bun run frontend:dev  # Port 5001
-   ```
-
-## 📂 Project Structure
-
-```
-01-with-sqlite/
-├── apps/
-│   ├── backend/      # Fastify API (Port 3001)
-│   └── frontend/     # React Dashboard (Port 5001)
-├── shared/           # Shared types & domain logic
-└── package.json      # Workspace configuration
+```bash
+cd examples/platform-fastify/01-with-sqlite
+bun install
+bun run dev
 ```
 
-## 🔥 Features
+**Ports**: Backend: 8081, Frontend: 8091
 
-- **DI System**: Class-token injection using `tsyringe`
-- **Simplified Layering**: Minimal hexagonal architecture
-- **Type Safety**: Shared types between frontend and backend
-- **Zero Config**: SQLite file created automatically
+## What's Included
 
-## 🧩 Dependency Injection
+✅ **Zod validation** - Type-safe request schemas
+✅ **DTO pattern** - Clean domain/API separation
+✅ **Repository pattern** - Swappable data layer
+✅ **Dependency injection** - Auto-wired with tsyringe
+✅ **Error handling** - Centralized handler
+✅ **SQLite + Sequelize** - File-based, zero setup
 
-Classes use class-token injection with `@singleton()` and `@inject(Class)`.
+## Project Structure
 
-````ts
-import { singleton, inject } from "tsyringe";
+```
+apps/
+├── backend/          # Fastify API
+│   └── src/
+│       ├── application/    # Handlers, schemas
+│       ├── domain/         # Services, models, ports
+│       └── infrastructure/ # Repositories, DB models
+└── frontend/         # React + Vite
+shared/               # Shared types
+```
 
-@singleton()
-export class GreetingService {
-  constructor( - Get all greetings
-- `GET /greetings/:id` - Get greeting by ID
-- `GET /greetings/random/:language` - Get random greeting
-- `POST /greetings` - Create greeting: `{ "message": string, "language": string }`
+## API Endpoints
+
+- `GET /greetings` - All greetings (optional `?language=en`)
+- `GET /greetings/:id` - Single greeting
+- `GET /greetings/random/:language` - Random greeting
+- `POST /greetings` - Create: `{"message": "...", "language": "..."}`
 - `DELETE /greetings/:id` - Delete greeting
 
-**Note**: This example uses `message` in the request payload. The MongoDB example uses `text` instead.
+## Test It
 
-## 🎯 Why This is Simple & Fast
+```bash
+curl -X POST http://localhost:3001/greetings \
+  -H "Content-Type: application/json" \
+  -d '{"message": "Hello World", "language": "en"}'
 
-**Minimal Entry Point** ([apps/backend/src/index.ts](apps/backend/src/index.ts)):
-```typescript
-import "reflect-metadata";
-import "./init-di";
-import Fastify from "fastify";
-import { Sequelize } from "sequelize";
-import { Service } from "@sentzunhat/zacatl/service";
-import { config, createServiceConfig } from "./config";
+curl http://localhost:3001/greetings
+```
 
-const fastify = Fastify({ logger: false });
-const sequelize = new Sequelize({ dialect: "sqlite", storage: "database.sqlite" });
-const service = new Service(createServiceConfig(fastify, sequelize));
+## Documentation
 
-await service.start({ port: 3001 });
-````
+- **Setup & Database**: [docs/setup.md](docs/setup.md)
+- **Production Patterns**: [../docs/production-patterns.md](../docs/production-patterns.md)
+- **Quick Start Guide**: [../docs/quick-start.md](../docs/quick-start.md)
 
-**That's it!** No middleware, no complex setup. Zacatl handles:
+## Why SQLite?
 
-- ✅ DI container registration (via config layers)
-- ✅ Route registration (from handlers)
-- ✅ Database connection & sync
-- ✅ Graceful shutdown
+✅ Zero infrastructure - no database server
+✅ < 1s startup time
+✅ Perfect for learning, prototyping, edge deployments
 
-**Performance Tips:**
+⚠️ Single connection limit - not ideal for high concurrency
 
-- Use Bun for 2-3x faster startup vs Node.js
-- SQLite is in-memory fast (no network latency)
-- No logger in production = faster responses
-- Minimal dependencies = smaller bundle
+Compare with [MongoDB example](../02-with-mongodb/) for scalable alternative.
 
-## 📚 API Endpoints
+## Next Steps
 
-- `GET /greetings`
-- `GET /greetings/:id`
-- `GET /greetings/random/:language`
-- `POST /greetings` - Body: `{ "message": string, "language": string }`
-- `DELETE /greetings/:id`
-
-**Note**: This example uses `message` in the request payload. The MongoDB example uses `text` instead.
+- Read [production patterns](../docs/production-patterns.md) to understand the architecture
+- Follow [setup guide](docs/setup.md) for database details
+- Add features using the [extension guide](../docs/production-patterns.md#adding-new-features)

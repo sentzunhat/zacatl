@@ -8,6 +8,7 @@ Internal development documentation for framework contributors and maintainers.
 
 - **[Implementation Roadmap](./roadmap.md)** - Feature roadmap and implementation plan
 - **[Architecture Decision Records (ADRs)](./adr-platform-server-refactoring.md)** - Design decisions and rationale
+- **[Code Quality & Source Cleanliness](./code-quality.md)** - Best practices for maintaining clean, scalable code
 
 ---
 

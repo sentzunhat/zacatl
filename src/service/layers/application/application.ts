@@ -32,13 +32,13 @@ export class Application {
     // Register handlers - tsyringe auto-injects services from @injectable metadata
     if (restHooks && restHooks.length > 0) {
       for (const hook of restHooks) {
-        container.registerSingleton(hook as any, hook as any);
+        container.registerSingleton(hook, hook);
       }
     }
 
     if (restRoutes && restRoutes.length > 0) {
       for (const route of restRoutes) {
-        container.registerSingleton(route as any, route as any);
+        container.registerSingleton(route, route);
       }
     }
 

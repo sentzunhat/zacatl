@@ -16,10 +16,12 @@ export type ConfigLayers = {
 };
 
 /**
- * Constructor type that accepts classes with any parameter signature
- * Uses contravariant unknown[] to allow flexibility in DI container
+ * Constructor type that accepts classes with arbitrary parameter signatures
+ * Uses contravariant any[] to allow flexibility in DI container
  * Supports both manual instantiation and automatic DI resolution
+ * Note: any[] is intentional here for constructor signature compatibility
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type Constructor<T = object> = new (...args: any[]) => T;
 
 /**

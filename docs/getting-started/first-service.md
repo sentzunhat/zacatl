@@ -8,7 +8,12 @@ Build a simple REST API with Zacatl.
 
 ```typescript
 import Fastify from "fastify";
-import { Service } from "@sentzunhat/zacatl";
+import {
+  Service,
+  ServiceType,
+  ServerType,
+  ServerVendor,
+} from "@sentzunhat/zacatl";
 
 const fastify = Fastify({ logger: true });
 
@@ -19,18 +24,25 @@ fastify.get("/health", async () => ({
 }));
 
 const service = new Service({
-  architecture: {
-    domain: {
-      providers: [],
+  type: ServiceType.SERVER,
+  layers: {
+    application: {
+      entryPoints: {
+        rest: {
+          hooks: [],
+          routes: [],
+        },
+      },
     },
-    infrastructure: {
-      repositories: [],
-    },
+    domain: { services: [] },
+    infrastructure: { repositories: [] },
+  },
+  platforms: {
     server: {
       name: "my-first-service",
       server: {
-        type: "SERVER",
-        vendor: "FASTIFY",
+        type: ServerType.SERVER,
+        vendor: ServerVendor.FASTIFY,
         instance: fastify,
       },
     },

@@ -192,16 +192,16 @@ npm test -- MyTest      # Run specific test file
 
 ## Best Practices
 
-✅ **Test behaviors, not implementation** - Focus on what, not how  
-✅ **Mock external dependencies** - Database, APIs, etc.  
-✅ **Use fixtures** - Reusable test data  
-✅ **Test error cases** - Don't just test happy paths  
-✅ **Keep tests focused** - One test per behavior  
+✅ **Test behaviors, not implementation** - Focus on what, not how
+✅ **Mock external dependencies** - Database, APIs, etc.
+✅ **Use fixtures** - Reusable test data
+✅ **Test error cases** - Don't just test happy paths
+✅ **Keep tests focused** - One test per behavior
 ❌ **Don't test third-party code** - Trust your dependencies
 
 ## Coverage Goals
 
-Zacatl maintains **79% coverage**. Aim for:
+Zacatl maintains **61.6% coverage**. Aim for:
 
 - **Statements**: 75%+
 - **Branches**: 70%+

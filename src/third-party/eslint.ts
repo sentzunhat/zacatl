@@ -5,10 +5,10 @@
  * which don't require strict TypeScript typing.
  *
  * @example Import from third-party
- * import { tsEslintParser, tseslint, importPlugin } from "@sentzunhat/zacatl/third-party/eslint";
+ * import { tsEslintParser, tseslint, importPlugin } from "@zacatl/third-party/eslint";
  *
  * @example Usage in eslint config
- * import { tsEslintParser, tseslint } from "@sentzunhat/zacatl/third-party/eslint";
+ * import { tsEslintParser, tseslint } from "@zacatl/third-party/eslint";
  * const config = {
  *   languageOptions: { parser: tsEslintParser },
  *   plugins: { "@typescript-eslint": tseslint.plugin }

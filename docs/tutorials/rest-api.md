@@ -180,7 +180,12 @@ export class UserHandler {
 
 ```typescript
 import Fastify from "fastify";
-import { Service } from "@sentzunhat/zacatl";
+import {
+  Service,
+  ServiceType,
+  ServerType,
+  ServerVendor,
+} from "@sentzunhat/zacatl";
 import { UserRepository } from "./infrastructure/repositories/user-repository";
 import { UserService } from "./domain/services/user-service";
 import { UserHandler } from "./application/handlers/user-handler";
@@ -198,15 +203,22 @@ fastify.put("/users/:id", userHandler.updateUser);
 fastify.delete("/users/:id", userHandler.deleteUser);
 
 const service = new Service({
-  architecture: {
+  type: ServiceType.SERVER,
+  layers: {
     application: {
-      entryPoints: { rest: { hookHandlers: [], routeHandlers: [UserHandler] } },
+      entryPoints: { rest: { hooks: [], routes: [UserHandler] } },
     },
-    domain: { providers: [UserService] },
+    domain: { services: [UserService] },
     infrastructure: { repositories: [UserRepository] },
+  },
+  platforms: {
     server: {
       name: "user-api",
-      server: { type: "SERVER", vendor: "FASTIFY", instance: fastify },
+      server: {
+        type: ServerType.SERVER,
+        vendor: ServerVendor.FASTIFY,
+        instance: fastify,
+      },
     },
   },
 });
@@ -239,10 +251,10 @@ curl -X DELETE http://localhost:3000/users/1
 
 ## Key Patterns
 
-✅ **Layered Architecture** - Domain, Infrastructure, Application  
-✅ **Dependency Injection** - Services injected into handlers  
-✅ **Validation** - Zod schemas for input  
-✅ **Error Handling** - Custom errors with proper status codes  
+✅ **Layered Architecture** - Domain, Infrastructure, Application
+✅ **Dependency Injection** - Services injected into handlers
+✅ **Validation** - Zod schemas for input
+✅ **Error Handling** - Custom errors with proper status codes
 ✅ **Type Safety** - Full TypeScript types throughout
 
 **Next**: [Database Integration →](./04-database.md)

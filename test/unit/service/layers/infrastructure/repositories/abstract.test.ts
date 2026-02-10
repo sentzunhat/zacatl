@@ -3,6 +3,7 @@ import { singleton } from "tsyringe";
 
 import { BaseRepository } from "../../../../../../src/service/layers/infrastructure/repositories/abstract";
 import { ORMType } from "../../../../../../src/service/layers/infrastructure/repositories/types";
+import type { MongooseModel } from "../../../../../../src/third-party/mongoose";
 import { connectToMongoServerAndRegisterDependency } from "../../../../helpers/database/mongo";
 
 interface UserTest {
@@ -54,8 +55,9 @@ describe("BaseRepository", () => {
     if (!repository) return; // Skip if repository couldn't be initialized
     // Initialize adapter by calling an async method first
     await repository.create({ name: "test" });
-    expect(repository.getMongooseModel().modelName).toBe("User");
-    expect(repository.getMongooseModel().schema).toBe(schemaUserTest);
+    const model = repository.model as MongooseModel<UserTest>;
+    expect(model.modelName).toBe("User");
+    expect(model.schema).toBe(schemaUserTest);
   });
 
   it("should call create() and return the created user document", async () => {
@@ -64,7 +66,8 @@ describe("BaseRepository", () => {
 
     // Initialize adapter first, then spy
     await repository.create({ name: "init" });
-    const spyFunction = vi.spyOn(repository.getMongooseModel(), "create");
+    const model = repository.model as MongooseModel<UserTest>;
+    const spyFunction = vi.spyOn(model, "create");
 
     const result = await repository.create(user);
 
@@ -75,7 +78,8 @@ describe("BaseRepository", () => {
   it("should call findById() and return the user document", async () => {
     if (!repository) return; // Skip if repository couldn't be initialized
     const user = await repository.create({ name: "Alice" });
-    const spyFunction = vi.spyOn(repository.getMongooseModel(), "findById");
+    const model = repository.model as MongooseModel<UserTest>;
+    const spyFunction = vi.spyOn(model, "findById");
     const result = await repository.findById(user.id);
     expect(spyFunction).toHaveBeenNthCalledWith(1, user.id);
     expect(result).toMatchObject({ name: user.name });
@@ -88,10 +92,8 @@ describe("BaseRepository", () => {
 
     const update = { name: "Alice Updated" };
 
-    const spyFunction = vi.spyOn(
-      repository.getMongooseModel(),
-      "findByIdAndUpdate",
-    );
+    const model = repository.model as MongooseModel<UserTest>;
+    const spyFunction = vi.spyOn(model, "findByIdAndUpdate");
 
     const result = await repository.update(user.id, update);
 
@@ -104,10 +106,8 @@ describe("BaseRepository", () => {
   it("should call delete() and return the deleted user document", async () => {
     if (!repository) return; // Skip if repository couldn't be initialized
     const user = await repository.create({ name: "Alice" });
-    const spyFunction = vi.spyOn(
-      repository.getMongooseModel(),
-      "findByIdAndDelete",
-    );
+    const model = repository.model as MongooseModel<UserTest>;
+    const spyFunction = vi.spyOn(model, "findByIdAndDelete");
     const result = await repository.delete(user.id);
     expect(spyFunction).toHaveBeenNthCalledWith(1, user.id);
     // Patch: allow for id only (ignore _id)

@@ -1,4 +1,4 @@
-import { FastifySchema, HTTPMethods } from "fastify";
+import { HTTPMethods, FastifySchema } from "fastify";
 
 import { Handler } from "../common/handler";
 
@@ -7,10 +7,10 @@ export type RouteHandler<
   TQuerystring = void,
   TParams = void,
   THeaders = void,
-  TReply = unknown
+  TReply = unknown,
 > = {
   url: string;
   method: HTTPMethods;
-  schema: FastifySchema;
+  schema: Record<string, unknown> | FastifySchema;
   execute: Handler<TBody, TQuerystring, TParams, THeaders, TReply>;
 };

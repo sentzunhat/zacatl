@@ -1,134 +1,87 @@
 # Fastify + MongoDB + React Example
 
-⚡ **Production-ready with scalable NoSQL** - Fast setup with Zacatl.
+Production-grade Zacatl example with scalable MongoDB database.
 
-- **Backend**: Fastify + MongoDB (Mongoose) - ~50 lines to start
-- **Frontend**: React + Tailwind CSS + Vite
-- **Architecture**: Clean monorepo with shared types
-- **Performance**: < 2 seconds startup with MongoDB
+## Quick Start
 
-## ⚡ Why This Example?
-
-- ✅ **Scalable**: MongoDB for production workloads
-- ✅ **Simple Setup**: Same clean pattern as SQLite example
-- ✅ **Type Safe**: Full TypeScript with shared types
-- ✅ **Clean DI**: Class-token injection, auto-wired
-- ✅ **Production Ready**: Mongoose models + validation
-
-## 🚀 Quick Start
-
-**Prerequisites**: Node.js 18+ or Bun, MongoDB running locally or Docker.
-
-**Quick MongoDB Setup:**
+### Start MongoDB
 
 ```bash
-# Option 1: Docker (recommended)
-docker run -d -p 27017:27017 --name mongo \
-  -e MONGO_INITDB_ROOT_USERNAME=local \
-  -e MONGO_INITDB_ROOT_PASSWORD=local \
-  mongo:latest
+# Docker (recommended)
+docker run -d -p 27017:27017 --name mongo mongo:latest
 
-# Option 2: Local MongoDB
-brew install mongodb-community  # macOS
-# or follow https://www.mongodb.com/docs/manual/installation/
+# Or install locally: brew install mongodb-community
 ```
 
-1. **Install dependencies**:
+### Run Example
 
-   ```bash
-   bun install
-   # or npm install
-   ```
+```bash
+cd examples/platform-fastify/02-with-mongodb
+bun install
+bun run dev
+```
 
-2. **Start Development (Frontend + Backend)**:
-   ```bash
-   # Starts both in parallel
-   bun run dev
-   ```
-   _Or run individually:_
-   ```bash
-   bun run backend:dev   # Port 3002
-   bun run frontend:dev  # Port 5002
-   ```
+**Ports**: Backend: 8082, Frontend: 8092
 
-## 📂 Project Structure (same as SQLite)
+## What's Included
 
-- **Mongoose Integration**: Document models with schema validation
-- **Type Safety**: Shared types between frontend and backend
-- **Scalable**: Ready for production workloads
+✅ **Zod validation** - Type-safe request schemas
+✅ **DTO pattern** - Clean domain/API separation
+✅ **Repository pattern** - Swappable data layer
+✅ **Dependency injection** - Auto-wired with tsyringe
+✅ **Error handling** - Centralized handler
+✅ **MongoDB + Mongoose** - Scalable, production-ready
 
-## 🎯 Differences from SQLite Example
+## Project Structure
 
-| Feature       | SQLite Example         | MongoDB Example              |
-| ------------- | ---------------------- | ---------------------------- |
-| Database      | SQLite (Sequelize)     | MongoDB (Mongoose)           |
-| Payload field | `message`              | `text`                       |
-| Connection    | File-based             | Network (localhost or cloud) |
-| Best for      | Prototypes, small apps | Production, scalable apps    |
-| Startup time  | < 1s                   | < 2s                         |
+```
+apps/
+├── backend/          # Fastify API
+│   └── src/
+│       ├── application/    # Handlers, schemas
+│       ├── domain/         # Services, models, ports
+│       └── infrastructure/ # Repositories, Mongoose models
+└── frontend/         # React + Vite
+shared/               # Shared types
+```
 
-├── apps/
-│ ├── backend/ # Fastify API (Port 3002)
-│ └── frontend/ # React Dashboard (Port 5002)
-├── shared/ # Shared types & domain logic
-└── package.json # Workspace configuration
+## API Endpoints
 
-````
-
-## 🔥 Features
-
-- **DI System**: Class-token injection using `tsyringe`
-- **Simplified Layering**: Hexagonal architecture with local service adapters
-- **Type Safety**: Shared types between frontend and backend
-- **Resilient UI**: React frontend with Tailwind CSS
-
-## 🧩 Dependency Injection
-
-Classes use class-token injection with `@singleton()` and `@inject(Class)`.
-
-```ts
-import { singleton, inject } from "tsyringe";
-
-@singleton()
-export class Greet - Get all greetings
-- `GET /greetings/:id` - Get greeting by ID
-- `GET /greetings/random/:language` - Get random greeting
-- `POST /greetings` - Create greeting: `{ "text": string, "language": string }`
+- `GET /greetings` - All greetings (optional `?language=en`)
+- `GET /greetings/:id` - Single greeting
+- `GET /greetings/random/:language` - Random greeting
+- `POST /greetings` - Create: `{"message": "...", "language": "..."}`
 - `DELETE /greetings/:id` - Delete greeting
 
-**Note**: This example uses `text` in the request payload. The SQLite example uses `message` instead.
+## Test It
 
-## 🎯 Minimal Entry Point
+```bash
+curl -X POST http://localhost:8082/greetings \
+  -H "Content-Type: application/json" \
+  -d '{"message": "Hello World", "language": "en"}'
 
-**Same simplicity as SQLite** ([apps/backend/src/index.ts](apps/backend/src/index.ts)):
-```typescript
-import "reflect-metadata";
-import "./di";
-import { Fastify } from "@sentzunhat/zacatl/third-party/fastify";
-import mongoose from "mongoose";
-import { Service } from "@sentzunhat/zacatl/service";
-import { config, createServiceConfig } from "./config";
+curl http://localhost:8082/greetings
+```
 
-const fastify = Fastify({ logger: false });
-const serviceConfig = createServiceConfig(fastify, mongoose);
-const service = new Service(serviceConfig);
+## Documentation
 
-await service.start({ port: 8082 });
-````
+- **Setup & Database**: [docs/setup.md](docs/setup.md)
+- **Production Patterns**: [../docs/production-patterns.md](../docs/production-patterns.md)
+- **Quick Start Guide**: [../docs/quick-start.md](../docs/quick-start.md)
 
-**Performance Tips:**
+## Why MongoDB?
 
-- Use connection pooling for production
-- Enable MongoDB indexing on frequently queried fields
-- Consider MongoDB Atlas for cloud deployments
-- Use Bun for faster cold starts
+✅ Horizontally scalable via replica sets
+✅ Flexible schema evolution
+✅ Production-proven (Atlas, DocumentDB)
+✅ Cloud-native
 
-## 📚 API Endpoints
+⚠️ Requires MongoDB server (but Docker makes it easy)
 
-- `GET /greetings`
-- `GET /greetings/:id`
-- `GET /greetings/random/:language`
-- `POST /greetings` - Body: `{ "text": string, "language": string }`
-- `DELETE /greetings/:id`
+Compare with [SQLite example](../01-with-sqlite/) for zero-config alternative.
 
-**Note**: This example uses `text` in the request payload. The SQLite example uses `message` instead.
+## Next Steps
+
+- Read [production patterns](../docs/production-patterns.md) to understand the architecture
+- Follow [setup guide](docs/setup.md) for database details
+- Add features using the [extension guide](../docs/production-patterns.md#adding-new-features)
