@@ -1,7 +1,7 @@
 # CLI Module Migration Spec
 
-**Purpose**: Guide for migrating CLI patterns from Ujti to `@sentzunhat/zacatl/cli`  
-**Status**: Specification for future migration  
+**Purpose**: Guide for migrating CLI patterns from Ujti to `@sentzunhat/zacatl/cli`
+**Status**: Specification for future migration
 **Date**: January 26, 2026
 
 ---
@@ -10,7 +10,7 @@
 
 This spec describes how to migrate the proven CLI architecture from Ujti (where it's being developed and refined) into Zacatl as a reusable module.
 
-**Current State**: CLI patterns are being developed in Ujti repository  
+**Current State**: CLI patterns are being developed in Ujti repository
 **Future State**: `@sentzunhat/zacatl/cli` module available for any project
 
 ---
@@ -82,12 +82,10 @@ Review Ujti CLI implementation and extract:
 
 ```typescript
 // src/cli/architecture/cli-architecture.ts
-import { detectRuntime } from "../../runtime";
 import { logger } from "../../logs";
 
 export abstract class CLIArchitecture {
   protected commands: Map<string, Command> = new Map();
-  protected readonly runtime = detectRuntime();
 
   protected registerCommand(command: Command): void {
     this.commands.set(command.name, command);

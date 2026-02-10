@@ -1,4 +1,4 @@
-import { FastifyReply, FastifyRequest } from "fastify";
+import { FastifyReply, FastifyRequest } from "@zacatl/third-party/fastify";
 
 export type HookHandlerName =
   | "onRequest"

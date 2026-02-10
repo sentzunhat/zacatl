@@ -1,7 +1,7 @@
 # Desktop Module Migration Spec
 
-**Purpose**: Guide for migrating Desktop app patterns from Ujti to `@sentzunhat/zacatl/desktop`  
-**Status**: Specification for future migration  
+**Purpose**: Guide for migrating Desktop app patterns from Ujti to `@sentzunhat/zacatl/desktop`
+**Status**: Specification for future migration
 **Date**: January 26, 2026
 
 ---
@@ -10,7 +10,7 @@
 
 This spec describes how to migrate the proven Desktop architecture from Ujti UI (where it's being developed and refined) into Zacatl as a reusable module.
 
-**Current State**: Desktop patterns are being developed in Ujti UI repository (Neutralino-based)  
+**Current State**: Desktop patterns are being developed in Ujti UI repository (Neutralino-based)
 **Future State**: `@sentzunhat/zacatl/desktop` module available for any project
 
 ---
@@ -82,7 +82,6 @@ Review Ujti UI implementation and extract:
 
 ```typescript
 // src/desktop/architecture/desktop-architecture.ts
-import { detectRuntime } from "../../runtime";
 import { logger } from "../../logs";
 
 export interface DesktopConfig {
@@ -95,7 +94,6 @@ export interface DesktopConfig {
 
 export abstract class DesktopArchitecture {
   protected config: DesktopConfig;
-  protected readonly runtime = detectRuntime();
 
   constructor(config: DesktopConfig = {}) {
     this.config = {

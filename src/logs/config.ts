@@ -1,4 +1,4 @@
-import type pino from "pino";
+import type { LoggerOptions } from "@zacatl/third-party/pino";
 
 export interface PinoConfigOptions {
   env?: string;
@@ -6,7 +6,7 @@ export interface PinoConfigOptions {
   appVersion?: string;
   appEnv?: string;
   /** Override or extend the generated Pino config */
-  pinoConfig?: Partial<pino.LoggerOptions>;
+  pinoConfig?: Partial<LoggerOptions>;
 }
 
 /**
@@ -51,7 +51,7 @@ export interface PinoConfigOptions {
  */
 export const createPinoConfig = (
   options?: PinoConfigOptions,
-): pino.LoggerOptions => {
+): LoggerOptions => {
   const env = options?.env ?? process.env["NODE_ENV"] ?? "development";
   const isPretty = env !== "production";
 
@@ -64,7 +64,7 @@ export const createPinoConfig = (
       }
     : undefined;
 
-  const baseConfig: pino.LoggerOptions = {
+  const baseConfig: LoggerOptions = {
     level: process.env["LOG_LEVEL"] ?? "info",
     ...(transport ? { transport } : {}),
     formatters: {

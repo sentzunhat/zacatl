@@ -1,6 +1,9 @@
 import "reflect-metadata";
-import { container as tsyringeContainer } from "@zacatl/third-party";
-import type { DependencyContainer, InjectionToken } from "@zacatl/third-party";
+import { container as tsyringeContainer } from "@zacatl/third-party/tsyringe";
+import type {
+  DependencyContainer,
+  InjectionToken,
+} from "@zacatl/third-party/tsyringe";
 
 import type { Constructor } from "../service/layers/types";
 
@@ -86,75 +89,18 @@ export const resolveDependencies = <T extends object>(
   );
 };
 
-// ============================================================================
-// ADVANCED / LEGACY FUNCTIONS
-// The following functions are for advanced use cases or testing.
-// Most users should rely on Service layers for automatic DI registration.
-// ============================================================================
-
 /**
- * @deprecated Use Service layers for automatic registration.
- * Advanced: Register a dependency with explicit dependencies (no decorator metadata required)
- * Useful for tsx/ts-node environments or testing where decorator metadata is unavailable.
- */
-export const registerWithDependencies = <T extends object>(
-  serviceClass: Constructor<T>,
-  dependencies: Constructor[] = [],
-): void => {
-  tsyringeContainer.register(serviceClass, {
-    useFactory: () => {
-      const resolvedDeps = dependencies.map((dep) => {
-        if (!tsyringeContainer.isRegistered(dep)) {
-          const depName = (dep as { name?: string }).name || "Unknown";
-          const serviceName =
-            (serviceClass as { name?: string }).name || "Unknown";
-          throw new Error(
-            `Dependency ${depName} not registered, required by ${serviceName}`,
-          );
-        }
-        return tsyringeContainer.resolve(dep);
-      });
-      return new serviceClass(...resolvedDeps);
-    },
-  } as never);
-};
-
-/**
- * @deprecated Use Service layers for automatic registration.
- * Advanced: Register a singleton with explicit dependencies (no decorator metadata required)
- */
-export const registerSingletonWithDependencies = <T extends object>(
-  serviceClass: Constructor<T>,
-  dependencies: Constructor[] = [],
-): void => {
-  let instance: T | null = null;
-
-  tsyringeContainer.register(serviceClass, {
-    useFactory: () => {
-      if (instance) {
-        return instance;
-      }
-
-      const resolvedDeps = dependencies.map((dep) => {
-        if (!tsyringeContainer.isRegistered(dep)) {
-          const depName = (dep as { name?: string }).name || "Unknown";
-          const serviceName =
-            (serviceClass as { name?: string }).name || "Unknown";
-          throw new Error(
-            `Dependency ${depName} not registered, required by ${serviceName}`,
-          );
-        }
-        return tsyringeContainer.resolve(dep);
-      });
-      instance = new serviceClass(...resolvedDeps);
-      return instance;
-    },
-  } as never);
-};
-
-/**
- * @deprecated Use Service layers for automatic registration.
- * Advanced: Register multiple dependencies at once
+ * Register multiple dependencies at once
+ *
+ * Batch register classes with the DI container.
+ * Typically used by Service layers for layer composition.
+ *
+ * @param dependencies - Array of class constructors to register
+ *
+ * @example
+ * ```typescript
+ * registerDependencies([UserRepository, ProductRepository]);
+ * ```
  */
 export const registerDependencies = <T extends object>(
   dependencies: Array<Constructor<T>>,
@@ -167,8 +113,18 @@ export const registerDependencies = <T extends object>(
 };
 
 /**
- * @deprecated Use Service layers for automatic registration.
- * Advanced: Register and resolve dependencies immediately (convenience function)
+ * Register and resolve dependencies immediately (convenience function)
+ *
+ * Combines registration and resolution in a single call.
+ * Useful for quick initialization patterns.
+ *
+ * @param dependencies - Array of class constructors to register and resolve
+ * @returns Array of resolved instances in the same order
+ *
+ * @example
+ * ```typescript
+ * const services = registerAndResolve([UserService, ProductService]);
+ * ```
  */
 export const registerAndResolve = <T extends object>(
   dependencies: Array<Constructor<T>>,

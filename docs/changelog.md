@@ -176,7 +176,6 @@ const server = new Service({
   - `@types/bun`: 1.3.6 → 1.3.8
   - `@types/node`: 24.10.1 → 25.2.1
   - `fastify`: 5.6.2 → 5.7.4
-  - `i18next`: 25.8.0 → 25.8.4
   - `knip`: 5.71.0 → 5.83.0
   - `mongodb-memory-server`: 10.4.1 → 11.0.1
   - `mongoose`: 9.0.0 → 9.1.6
@@ -440,7 +439,6 @@ Layered/hexagonal architecture:
 ✅ Pino logging
 ✅ i18n adapters
 ✅ YAML/JSON configuration
-✅ Runtime detection (Node/Bun)
 
 ## No Breaking Changes
 

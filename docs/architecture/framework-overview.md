@@ -122,7 +122,6 @@ export class UserService {
 | **i18n/Localization**    | ✅ 100% coverage | Filesystem & memory adapters      |
 | **ORM Adapters**         | ✅ 100% coverage | Sequelize & Mongoose              |
 | **Server Adapters**      | ✅ 55% coverage  | Express & Fastify                 |
-| **Runtime Detection**    | ✅ 90% coverage  | Node.js/Bun detection             |
 
 ### ✅ Testing Infrastructure
 

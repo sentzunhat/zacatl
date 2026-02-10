@@ -98,7 +98,7 @@ export class ApiServer {
       return;
     }
 
-    const hooks = resolveDependencies<HookHandler>(restEntryPoints.hooks);
+    const hooks = resolveDependencies(restEntryPoints.hooks);
 
     await this.registerHandlers({
       handlers: hooks,
@@ -116,7 +116,7 @@ export class ApiServer {
       return;
     }
 
-    const routes = resolveDependencies<RouteHandler>(restEntryPoints.routes);
+    const routes = resolveDependencies(restEntryPoints.routes);
 
     await this.registerHandlers({
       handlers: routes,

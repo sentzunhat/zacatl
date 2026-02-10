@@ -1,13 +1,17 @@
-import { FastifyReply, HTTPMethods, FastifySchema } from "fastify";
+import {
+  FastifyReply,
+  HTTPMethods,
+  FastifySchema,
+} from "@zacatl/third-party/fastify";
 
 import type { Request } from "../common/request";
 
 export interface RouteHandler<
-  TBody = void,
-  TQuerystring = void,
-  TResponse = void,
-  TParams = void,
-  THeaders = void,
+  TBody = unknown,
+  TQuerystring = unknown,
+  TResponse = unknown,
+  TParams = unknown,
+  THeaders = unknown,
 > {
   url: string;
   method: HTTPMethods;

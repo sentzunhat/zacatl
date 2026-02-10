@@ -5,4 +5,4 @@
 export { z } from "zod";
 
 // Type-only exports
-export type { ZodSchema, ZodType, ZodError } from "zod";
+export type { ZodType, ZodError } from "zod";

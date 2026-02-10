@@ -3,9 +3,6 @@
  *
  * @example Minimal bundle (tree-shakeable)
  * import { mongoose, Schema } from "@zacatl/third-party/mongoose";
- *
- * @example Convenience (from main package)
- * import { mongoose, Schema } from "@zacatl";
  */
 
 import mongooseDefault from "mongoose";

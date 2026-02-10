@@ -2,8 +2,6 @@
 
 Complete guide to dependency injection patterns in Zacatl.
 
-> **📦 v0.0.26:** Added `registerWithDependencies` and `registerSingletonWithDependencies` helpers for tsx/ts-node compatibility
-
 > **⚠️ Class Tokens vs String Tokens:** The canonical pattern uses **class-based tokens** (`@inject(MyClass)`) for automatic type safety and resolution. String tokens (`@inject("myToken")`) require manual registration and are only for advanced use cases. See [String Token Warning](#string-token-warning) below.
 
 ---
@@ -12,11 +10,10 @@ Complete guide to dependency injection patterns in Zacatl.
 
 Zacatl uses [tsyringe](https://github.com/microsoft/tsyringe) for dependency injection. There are **three recommended approaches** depending on your build setup and preferences.
 
-| Approach                    | Best For                                 | Pros                                                                                        | Cons                                                                          |
-| --------------------------- | ---------------------------------------- | ------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
-| **1. Decorators**           | Production apps with TypeScript compiler | ✅ Clean syntax<br>✅ Auto-registration<br>✅ Standard tsyringe pattern                     | ⚠️ Requires `emitDecoratorMetadata: true`<br>⚠️ May not work with tsx/ts-node |
-| **2. Helper Functions**     | tsx/ts-node environments                 | ✅ Works without decorator metadata<br>✅ Explicit dependencies<br>✅ Great for CLI/scripts | ⚠️ Manual registration order                                                  |
-| **3. Service Architecture** | Full-stack applications                  | ✅ Automatic DI<br>✅ Layer-based structure<br>✅ Best practices enforced                   | ⚠️ More boilerplate                                                           |
+| Approach                    | Best For                                 | Pros                                                                      | Cons                                      |
+| --------------------------- | ---------------------------------------- | ------------------------------------------------------------------------- | ----------------------------------------- |
+| **1. Decorators**           | Production apps with TypeScript compiler | ✅ Clean syntax<br>✅ Auto-registration<br>✅ Standard tsyringe pattern   | ⚠️ Requires `emitDecoratorMetadata: true` |
+| **2. Service Architecture** | Full-stack applications                  | ✅ Automatic DI<br>✅ Layer-based structure<br>✅ Best practices enforced | ⚠️ More setup boilerplate                 |
 
 ---
 
@@ -159,153 +156,9 @@ export class AttestOptionsProviderAdapter {
 
 ---
 
-## Approach 2: Helper Functions (tsx/ts-node Compatible)
-
-**Best for:** CLI tools, scripts, tsx/ts-node environments, or when you prefer explicit control
-
-> **New in v0.0.26:** Helpers that don't require `emitDecoratorMetadata`
-
-### Setup
-
-```typescript
-import {
-  registerWithDependencies,
-  registerSingletonWithDependencies,
-  resolveDependency,
-} from "@sentzunhat/zacatl";
-```
-
-### Basic Usage
-
-```typescript
-import {
-  registerWithDependencies,
-  registerSingletonWithDependencies,
-  resolveDependency,
-} from "@sentzunhat/zacatl";
-
-// Define classes without decorators
-class Logger {
-  log(message: string) {
-    console.log(`[LOG] ${message}`);
-  }
-}
-
-class Database {
-  constructor(private logger: Logger) {}
-
-  async query(sql: string) {
-    this.logger.log(`Executing: ${sql}`);
-    return [{ id: 1, name: "Result" }];
-  }
-}
-
-class UserService {
-  constructor(
-    private db: Database,
-    private logger: Logger,
-  ) {}
-
-  async getUsers() {
-    this.logger.log("Fetching users");
-    return await this.db.query("SELECT * FROM users");
-  }
-}
-
-// Register dependencies BEFORE dependents
-registerSingletonWithDependencies(Logger); // No dependencies
-registerSingletonWithDependencies(Database, [Logger]); // Depends on Logger
-registerSingletonWithDependencies(UserService, [Database, Logger]); // Depends on both
-
-// Resolve and use
-const userService = resolveDependency<UserService>(UserService);
-const users = await userService.getUsers();
-```
-
-### Important: Registration Order
-
-Dependencies **must be registered before** classes that depend on them:
-
-```typescript
-// ✅ CORRECT - Logger first, then Database
-registerSingletonWithDependencies(Logger);
-registerSingletonWithDependencies(Database, [Logger]);
-
-// ❌ WRONG - Database registered before Logger
-registerSingletonWithDependencies(Database, [Logger]); // Error!
-registerSingletonWithDependencies(Logger);
-```
-
-The helpers will throw clear errors if order is wrong:
-
-```
-Error: Dependency Logger not registered. Register it before Database.
-```
-
-### Transient vs Singleton
-
-```typescript
-// Transient - new instance every time
-registerWithDependencies(TransientService, [Logger]);
-
-const instance1 = resolveDependency<TransientService>(TransientService);
-const instance2 = resolveDependency<TransientService>(TransientService);
-console.log(instance1 === instance2); // false
-
-// Singleton - same instance every time
-registerSingletonWithDependencies(SingletonService, [Logger]);
-
-const instance1 = resolveDependency<SingletonService>(SingletonService);
-const instance2 = resolveDependency<SingletonService>(SingletonService);
-console.log(instance1 === instance2); // true
-```
-
-### CLI Tool Example
-
-```typescript
-#!/usr/bin/env tsx
-import {
-  registerSingletonWithDependencies,
-  resolveDependency,
-} from "@sentzunhat/zacatl";
-
-class ConfigLoader {
-  load() {
-    return { apiKey: process.env.API_KEY };
-  }
-}
-
-class ApiClient {
-  constructor(private config: ConfigLoader) {}
-
-  async fetch(endpoint: string) {
-    const config = this.config.load();
-    // Use config.apiKey
-  }
-}
-
-class CliApp {
-  constructor(private api: ApiClient) {}
-
-  async run() {
-    const data = await this.api.fetch("/users");
-    console.log(data);
-  }
-}
-
-// Register in order
-registerSingletonWithDependencies(ConfigLoader);
-registerSingletonWithDependencies(ApiClient, [ConfigLoader]);
-registerSingletonWithDependencies(CliApp, [ApiClient]);
-
-// Run
-const app = resolveDependency<CliApp>(CliApp);
-await app.run();
-```
-
 ---
 
-## Approach 3: Service Architecture (Full-Stack Apps)
+## Approach 2: Service Architecture (Full-Stack Apps)
 
 **Best for:** REST APIs, microservices, full applications
 

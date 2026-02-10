@@ -1,5 +1,5 @@
 import { Optional } from "@zacatl/optionals";
-import { uuidv4 } from "@zacatl/third-party";
+import { uuidv4 } from "@zacatl/third-party/uuid";
 
 export type HttpStatusCode =
   | 200 // OK

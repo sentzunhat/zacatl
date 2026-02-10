@@ -1,10 +1,11 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import {
   clearContainer,
-  registerWithDependencies,
+  resolveDependency,
   registerDependencies,
   resolveDependencies,
   registerAndResolve,
+  registerDependency,
 } from "../../../../src/dependency-injection";
 
 describe("Layer Registration Pattern", () => {
@@ -20,27 +21,28 @@ describe("Layer Registration Pattern", () => {
       }
     }
 
-    // Domain layer (with dependencies - use registerWithDependencies)
+    // Domain layer - manually register dependencies
     class UserService {
-      constructor(public repo: UserRepository) {}
+      public repo: UserRepository;
+
+      constructor(repo: UserRepository) {
+        this.repo = repo;
+      }
 
       getUser() {
         return this.repo.getData();
       }
     }
 
-    // Register infrastructure first
-    registerDependencies([UserRepository]);
+    // Register in correct order
+    registerDependency(UserRepository, UserRepository);
 
-    // Register domain with explicit dependencies
-    registerWithDependencies(UserService, [UserRepository]);
+    // For UserService with constructor dependency, manually instantiate
+    const userRepo = resolveDependency<UserRepository>(UserRepository);
+    const userService = new UserService(userRepo);
 
-    // Resolve
-    const services = resolveDependencies([UserService]);
-    const service = services[0];
-
-    expect(service).toBeInstanceOf(UserService);
-    expect(service!.getUser()).toBe("user-data");
+    expect(userService).toBeInstanceOf(UserService);
+    expect(userService.getUser()).toBe("user-data");
   });
 
   it("should support registerAndResolve convenience function", () => {

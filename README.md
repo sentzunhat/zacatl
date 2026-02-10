@@ -5,8 +5,8 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![TypeScript](https://img.shields.io/badge/%3C%2F%3E-TypeScript-3178c6.svg)](https://www.typescriptlang.org/)
 [![Node.js 24+](https://img.shields.io/badge/Node.js-24%2B-brightgreen.svg)](https://nodejs.org/)
-[![Tests: 178](https://img.shields.io/badge/Tests-178-blue.svg)](#testing)
-[![Coverage: 61.6%](https://img.shields.io/badge/Coverage-61.6%25-yellow.svg)](#testing)
+[![Tests: 214](https://img.shields.io/badge/Tests-214-blue.svg)](#testing)
+[![Coverage: 52.45%](https://img.shields.io/badge/Coverage-52.45%25-yellow.svg)](#testing)
 
 **Universal TypeScript framework for building CLI tools, desktop apps, APIs, and distributed systems.**
 
@@ -22,8 +22,7 @@ Zacatl enforces clean, layered architecture with dependency injection, validatio
 - **🗄️ Pluggable ORM Adapters** - Sequelize, Mongoose, or build your own
 - **🌐 Multi-Language Support** - Pluggable i18n with filesystem/memory adapters
 - **🔌 Adapter Pattern** - Easy integration with any database or service
-- **🧪 Comprehensive Testing** - 178 tests, 61.6% coverage, Vitest
-- **⚡ Runtime Detection** - Works with Node.js 24+ and Bun (native TypeScript support)
+- **🧪 Comprehensive Testing** - 214 tests, 52.45% coverage, Vitest
 - **📝 Production Ready** - Structured logging, monitoring, and error tracking
 
 ## 🎯 Multi-Context Support
@@ -97,12 +96,6 @@ Zacatl is MIT-licensed (permissive). Please don’t use it to harm people.
 
 ```bash
 npm install @sentzunhat/zacatl
-```
-
-If you are running Zacatl in Node.js with extensionless imports, use the loader:
-
-```bash
-node --loader @sentzunhat/zacatl/loader your-app.js
 ```
 
 ### Hello World HTTP Service
@@ -359,7 +352,7 @@ src/
 ├── error/                      # 7 custom error types
 ├── localization/               # i18n with adapters
 ├── logs/                       # Pino logging
-└── utils/                      # Runtime detection, base64, HMAC
+└── utils/                      # base64, HMAC
 ```
 
 ## 🛠️ Development

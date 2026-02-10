@@ -1,7 +1,6 @@
 import { InternalServerError } from "@zacatl/error";
-import { container } from "@zacatl/third-party";
+import { container } from "@zacatl/third-party/tsyringe";
 
-import { HookHandler, RouteHandler } from "./entry-points/rest";
 import type { ConfigApplication } from "./types";
 import { resolveDependencies } from "../../../dependency-injection/container";
 
@@ -43,10 +42,8 @@ export class Application {
     }
 
     // Verify all handlers can be resolved
-    const hooks = restHooks ? resolveDependencies<HookHandler>(restHooks) : [];
-    const routes = restRoutes
-      ? resolveDependencies<RouteHandler>(restRoutes)
-      : [];
+    const hooks = restHooks ? resolveDependencies(restHooks) : [];
+    const routes = restRoutes ? resolveDependencies(restRoutes) : [];
 
     if (
       hooks.length !== (restHooks?.length || 0) ||

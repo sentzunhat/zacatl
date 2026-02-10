@@ -19,7 +19,6 @@ export default defineConfig({
       "@zacatl/localization": path.resolve(__dirname, "./src/localization"),
       "@zacatl/logs": path.resolve(__dirname, "./src/logs"),
       "@zacatl/orm": path.resolve(__dirname, "./src/orm"),
-      "@zacatl/runtime": path.resolve(__dirname, "./src/runtime"),
       "@zacatl/service": path.resolve(__dirname, "./src/service"),
       "@zacatl/utils": path.resolve(__dirname, "./src/utils"),
       "@zacatl/third-party": path.resolve(__dirname, "./src/third-party"),

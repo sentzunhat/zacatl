@@ -1,12 +1,12 @@
 import { readFileSync } from "fs";
 
 import { BadRequestError, NotFoundError, ValidationError } from "@zacatl/error";
-import type { ZodSchema } from "@zacatl/third-party";
+import type { ZodType } from "@zacatl/third-party/zod";
 import { isNodeError, isSyntaxError, isZodError } from "@zacatl/utils";
 
 export function loadJSON<T = unknown>(
   filePath: string,
-  schema?: ZodSchema<T>,
+  schema?: ZodType<T>,
 ): T {
   try {
     const content = readFileSync(filePath, "utf-8");

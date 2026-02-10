@@ -1,7 +1,6 @@
-import { FastifySchema } from "fastify";
+import { FastifySchema } from "@zacatl/third-party/fastify";
 
 import { AbstractRouteHandler } from "./abstract";
-
 export type { Request } from "./abstract";
 
 export type PostRouteHandlerConstructor = {

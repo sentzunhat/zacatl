@@ -1,4 +1,4 @@
-import { z } from "@zacatl/third-party";
+import { z } from "@zacatl/third-party/zod";
 
 export const makeSchema = <T extends z.ZodRawShape>(
   schema: z.ZodObject<T>,

@@ -21,7 +21,6 @@
       "@zacatl/error": ["../../../../../src/error/index.ts"],
       "@zacatl/localization": ["../../../../../src/localization/index.ts"],
       "@zacatl/logs": ["../../../../../src/logs/index.ts"],
-      "@zacatl/runtime": ["../../../../../src/runtime/index.ts"],
       "@zacatl/utils": ["../../../../../src/utils/index.ts"],
       "@zacatl/third-party": ["../../../../../src/third-party/index.ts"],
       "@zacatl/third-party/uuid": ["../../../../../src/third-party/uuid.ts"],

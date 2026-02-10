@@ -32,11 +32,9 @@ Internal development documentation for framework contributors and maintainers.
 
 ### Phase 1: Foundation (**ACTIVE**)
 
-- ✅ Bun runtime compatibility
 - ✅ Structured logging
 - ✅ Configuration system
 - ✅ Error handling enhancements
-- ✅ Runtime detection
 
 ### Phase 2-3: Multi-Context (**DEFERRED**)
 

@@ -1,6 +1,10 @@
-import { z } from "@zacatl/third-party";
+import {
+  HTTPMethods,
+  FastifyReply,
+  FastifySchema,
+} from "@zacatl/third-party/fastify";
 import i18n from "@zacatl/third-party/i18n";
-import { HTTPMethods, FastifyReply, FastifySchema } from "fastify";
+import { z } from "@zacatl/third-party/zod";
 
 import { RouteHandler } from "./route-handler";
 import type { Request } from "../common/request";
@@ -14,11 +18,11 @@ export type RouteSchema<
   THeaders = void,
   TResponse = void,
 > = {
-  body?: z.ZodSchema<TBody>;
-  querystring?: z.ZodSchema<TQuerystring>;
-  params?: z.ZodSchema<TParams>;
-  headers?: z.ZodSchema<THeaders>;
-  response?: z.ZodSchema<TResponse>;
+  body?: z.ZodType<TBody>;
+  querystring?: z.ZodType<TQuerystring>;
+  params?: z.ZodType<TParams>;
+  headers?: z.ZodType<THeaders>;
+  response?: z.ZodType<TResponse>;
 };
 
 export type AbstractRouteHandlerConstructor = {

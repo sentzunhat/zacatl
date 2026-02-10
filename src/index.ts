@@ -7,7 +7,6 @@ export * from "./service";
 export { Service } from "./service/service";
 export type { ConfigService } from "./service/service";
 export * from "./logs";
-export * from "./runtime";
 export * from "./localization";
 
 export * from "./service/layers/infrastructure";

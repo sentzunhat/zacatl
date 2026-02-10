@@ -1,3 +1,3 @@
-import { DomainPort } from "./domain-port";
+import { DomainPort } from "./domain";
 
 export interface ProviderPort extends DomainPort {}

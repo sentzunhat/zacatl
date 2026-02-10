@@ -3,7 +3,7 @@ import type { HookHandler, RouteHandler } from "../entry-points/rest";
 
 export type ApplicationRestHooks = Array<Constructor<HookHandler>>;
 export type ApplicationRestRoutes = Array<
-  Constructor<RouteHandler<any, any, any, any, any>>
+  Constructor<RouteHandler<unknown, unknown, unknown, unknown, unknown>>
 >;
 
 export type RestApplicationEntryPoints = {

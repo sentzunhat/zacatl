@@ -77,7 +77,6 @@ import {
 
   // Validation
   z,
-  ZodSchema,
   ZodType,
   ZodError,
 } from "@sentzunhat/zacatl";
@@ -493,7 +492,7 @@ const user = await userRepo.create({
 | `mongoose`  | ✅ Schema, Model, Types, connect, connection, and all types |
 | `sequelize` | ✅ Sequelize, DataTypes, Model class, and all types         |
 | `tsyringe`  | ✅ container, DependencyContainer                           |
-| `zod`       | ✅ z, ZodSchema, ZodType, ZodError                          |
+| `zod`       | ✅ z, ZodType, ZodError                                     |
 | `fastify`   | ❌ Import separately (many server options)                  |
 | `express`   | ❌ Import separately (many server options)                  |
 

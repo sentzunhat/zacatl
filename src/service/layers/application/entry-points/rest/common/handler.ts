@@ -1,4 +1,4 @@
-import { FastifyReply } from "fastify";
+import { FastifyReply } from "@zacatl/third-party/fastify";
 
 import { Request } from "./request";
 

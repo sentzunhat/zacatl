@@ -1,5 +1,5 @@
 import type { CustomError } from "@zacatl/error";
-import type { ZodError } from "@zacatl/third-party";
+import type { ZodError } from "@zacatl/third-party/zod";
 
 /**
  * Type guard to check if error is a standard Error instance

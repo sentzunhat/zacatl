@@ -1,4 +1,4 @@
-import { container } from "@zacatl/third-party";
+import { container } from "@zacatl/third-party/tsyringe";
 
 import type { ConfigDomain } from "./types";
 

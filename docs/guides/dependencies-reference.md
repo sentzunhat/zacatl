@@ -257,7 +257,7 @@ All TypeScript types are included automatically:
 ```typescript
 import type {
   DependencyContainer,
-  ZodSchema,
+  ZodType,
   ZodError,
   ConfigServer,
 } from "@sentzunhat/zacatl";
@@ -308,7 +308,6 @@ import { Service, singleton, resolveDependency } from "@sentzunhat/zacatl";
 | `reflect-metadata` | ^0.2.2  | DI metadata support      |
 | `uuid`             | ^13.0.0 | UUID generation          |
 | `i18n`             | ^0.15.3 | i18n support             |
-| `i18next`          | ^25.8.4 | Advanced i18n            |
 | `js-yaml`          | ^4.1.1  | YAML parsing             |
 | `config`           | ^4.1.1  | Configuration management |
 

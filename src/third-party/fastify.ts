@@ -13,4 +13,5 @@ export {
   type FastifySchema,
   type HTTPMethods,
   type FastifyServerOptions,
+  type RawServerBase,
 } from "fastify";

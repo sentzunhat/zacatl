@@ -12,7 +12,6 @@ import { container } from "@zacatl/dependency-injection";
 import { CustomError, BadRequestError } from "@zacatl/error";
 import { createI18n } from "@zacatl/localization";
 import { logger } from "@zacatl/logs";
-import { detectRuntime } from "@zacatl/runtime";
 import { Service } from "@zacatl/service";
 import { hmac } from "@zacatl/utils";
 ```
@@ -70,7 +69,6 @@ import { logger } from "@zacatl/logs";
 | `@zacatl/error`                | `src/error/`                               | Error classes              |
 | `@zacatl/localization`         | `src/localization/`                        | i18n support               |
 | `@zacatl/logs`                 | `src/logs/`                                | Logging                    |
-| `@zacatl/runtime`              | `src/runtime/`                             | Runtime detection          |
 | `@zacatl/service`              | `src/service/`                             | Service class              |
 | `@zacatl/utils`                | `src/utils/`                               | Utility functions          |
 | `@zacatl/third-party`          | `src/third-party/`                         | tsyringe, zod re-exports   |

@@ -53,7 +53,6 @@ Unified architecture supporting CLI, Desktop, and Server contexts from a single 
 - ✅ REST API development
 - ✅ Layered architecture (Infrastructure, Domain, Application)
 - ✅ Dependency injection
-- ✅ Runtime detection (Bun, Node.js)
 
 **Not yet supported:**
 
