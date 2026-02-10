@@ -1,8 +1,12 @@
 import { InternalServerError } from "@zacatl/error";
 import { configureI18nNode } from "@zacatl/localization";
+import { container } from "@zacatl/third-party";
+import { Mongoose } from "@zacatl/third-party/mongoose";
+import { Sequelize } from "@zacatl/third-party/sequelize";
 
 import { Layers } from "./layers";
 import { Platforms } from "./platforms/platforms";
+import { DatabaseVendor } from "./platforms/server/database/port";
 import { ServiceType } from "./types";
 import type { ConfigService } from "./types";
 
@@ -21,6 +25,22 @@ export class Service {
     this.config = config;
 
     const { layers, platforms, run } = config;
+
+    // Pre-register database instances BEFORE instantiating layers
+    // This ensures repositories can resolve database instances in their constructors
+    if (platforms?.server?.databases) {
+      for (const dbConfig of platforms.server.databases) {
+        if (dbConfig.vendor === DatabaseVendor.MONGOOSE) {
+          container.register(Mongoose, {
+            useValue: dbConfig.instance,
+          });
+        } else if (dbConfig.vendor === DatabaseVendor.SEQUELIZE) {
+          container.register(Sequelize, {
+            useValue: dbConfig.instance,
+          });
+        }
+      }
+    }
 
     if (layers) {
       new Layers(layers);

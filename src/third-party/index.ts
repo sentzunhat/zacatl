@@ -7,6 +7,6 @@ export * from "./js-yaml";
 export * from "./fastify";
 export * from "./reflect-metadata";
 
-// ORM exports are available via subpath imports only:
-// - @zacatl/third-party/mongoose
-// - @zacatl/third-party/sequelize
+// ORM exports are available via subpath imports only to avoid naming conflicts:
+// - @zacatl/third-party/mongoose (exports Schema, connect, etc.)
+// - @zacatl/third-party/sequelize (exports DataTypes, Op, etc.)

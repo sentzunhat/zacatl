@@ -2,9 +2,37 @@
 
 ---
 
-## [0.0.33] - Current
+## [0.0.35] - Current
 
-**Status**: Current stable release
+**Status**: Current release
+
+### 🐛 Bug Fixes
+
+- Fixed "TypeInfo not known for Mongoose/Sequelize" error in dependency injection container
+- Fixed database instance registration timing issue where repositories were instantiated before database instances were registered
+- Pre-register database instances in Service constructor before layers are instantiated
+
+### ✨ Improvements
+
+- Service now automatically registers Mongoose and Sequelize instances from config
+- Improved database vendor detection and registration in Service initialization
+- Enhanced documentation for ORM subpath-only imports
+
+---
+
+## [0.0.34] - 2026-02-10
+
+**Status**: Patch release
+
+### 🔧 Maintenance
+
+- Version bump for upcoming database registration fixes
+
+---
+
+## [0.0.33] - 2026-02-07
+
+**Status**: Previous stable release
 
 See version 0.0.32 below for latest changes. Version 0.0.33 is a minor version bump.
 
