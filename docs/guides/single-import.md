@@ -371,11 +371,15 @@ import { UserRepository } from "./repositories/user.repository";
 
 // Start service (auto-registers repositories)
 const service = new Service({
-  architecture: {
+  type: ServiceType.SERVER,
+  layers: {
     infrastructure: {
       repositories: [UserRepository],
     },
-    domain: { providers: [] },
+    domain: { services: [] },
+  },
+  platforms: {
+    server: { name: "my-service" },
   },
 });
 

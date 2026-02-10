@@ -44,6 +44,16 @@ export class SequelizeAdapter<D, I, O> implements ORMPort<D, I, O> {
     return this.toLean(entity);
   }
 
+  async findMany(filter: Record<string, unknown> = {}): Promise<O[]> {
+    const entities = await this.model.findAll({
+      where: filter as Record<string, unknown>,
+    });
+
+    return entities
+      .map((entity) => this.toLean(entity))
+      .filter((entity): entity is O => Boolean(entity));
+  }
+
   async create(entity: I): Promise<O> {
     const document = await this.model.create(
       entity as unknown as Record<string, unknown>,
@@ -75,5 +85,12 @@ export class SequelizeAdapter<D, I, O> implements ORMPort<D, I, O> {
     });
 
     return entity;
+  }
+
+  async exists(id: string): Promise<boolean> {
+    const count = await this.model.count({
+      where: { id } as Record<string, unknown>,
+    });
+    return count > 0;
   }
 }

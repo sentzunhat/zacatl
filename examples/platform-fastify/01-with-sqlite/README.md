@@ -12,6 +12,12 @@ bun run dev
 
 **Ports**: Backend: 8081, Frontend: 8091
 
+## Database Setup
+
+- **Storage**: SQLite file at `apps/backend/database.sqlite`
+- **Auto-init**: Schema is created on app start
+- **Connection**: `apps/backend/src/infrastructure/database/connection.ts`
+
 ## What's Included
 
 ✅ **Zod validation** - Type-safe request schemas
@@ -54,9 +60,9 @@ curl http://localhost:3001/greetings
 
 ## Documentation
 
-- **Setup & Database**: [docs/setup.md](docs/setup.md)
 - **Production Patterns**: [../docs/production-patterns.md](../docs/production-patterns.md)
 - **Quick Start Guide**: [../docs/quick-start.md](../docs/quick-start.md)
+- **Framework Database Guide**: [../../../docs/tutorials/database-setup.md](../../../docs/tutorials/database-setup.md)
 
 ## Why SQLite?
 
@@ -71,5 +77,5 @@ Compare with [MongoDB example](../02-with-mongodb/) for scalable alternative.
 ## Next Steps
 
 - Read [production patterns](../docs/production-patterns.md) to understand the architecture
-- Follow [setup guide](docs/setup.md) for database details
+- Review the [framework database guide](../../../docs/tutorials/database-setup.md) for shared ORM patterns
 - Add features using the [extension guide](../docs/production-patterns.md#adding-new-features)

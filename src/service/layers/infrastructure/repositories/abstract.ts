@@ -84,6 +84,10 @@ export abstract class BaseRepository<D, I, O> implements RepositoryPort<
     return this.adapter.findById(id);
   }
 
+  async findMany(filter?: Record<string, unknown>): Promise<O[]> {
+    return this.adapter.findMany(filter);
+  }
+
   async create(entity: I): Promise<O> {
     return this.adapter.create(entity);
   }
@@ -94,5 +98,9 @@ export abstract class BaseRepository<D, I, O> implements RepositoryPort<
 
   async delete(id: string): Promise<O | null> {
     return this.adapter.delete(id);
+  }
+
+  async exists(id: string): Promise<boolean> {
+    return this.adapter.exists(id);
   }
 }

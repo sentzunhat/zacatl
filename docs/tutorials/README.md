@@ -6,7 +6,7 @@ Step-by-step guides to learn Zacatl from the ground up.
 
 1. [Installation](../getting-started/installation.md) - Install and setup Zacatl
 2. [Quick Start](../getting-started/quickstart.md) - Get running in 5 minutes
-3. [Hello World](../getting-started/hello-world.md) - Your first Zacatl service
+3. [First Service](../getting-started/first-service.md) - Your first Zacatl service
 
 ## Core Concepts
 
@@ -25,4 +25,4 @@ Step-by-step guides to learn Zacatl from the ground up.
 - **[API Reference](../reference/api/README.md)** - Detailed API documentation
 - **[Architecture](../reference/architecture/README.md)** - How Zacatl works internally
 - **[Guides](../guides/README.md)** - Topic-specific how-tos
-- **[Migration Guides](../migration/index.md)** - Upgrade between versions
+- **[Migration Guides](../migration/README.md)** - Upgrade between versions

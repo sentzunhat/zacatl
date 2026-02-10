@@ -5,10 +5,10 @@ import { Request } from "./request";
 export type Handler<
   TBody = void,
   TQuerystring = void,
+  TResponse = void,
   TParams = void,
   THeaders = void,
-  TReply = unknown
 > = (
   request: Request<TBody, TQuerystring, TParams, THeaders>,
-  reply: FastifyReply
-) => Promise<TReply>;
+  reply: FastifyReply,
+) => Promise<TResponse> | TResponse;

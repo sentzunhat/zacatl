@@ -23,6 +23,12 @@ bun run dev
 
 **Ports**: Backend: 8082, Frontend: 8092
 
+## Database Setup
+
+- **Connection**: `mongodb://localhost:27017/greetings-db`
+- **Connection file**: `apps/backend/src/infrastructure/database/connection.ts`
+- **Local run**: `docker run -d -p 27017:27017 --name mongo mongo:latest`
+
 ## What's Included
 
 ✅ **Zod validation** - Type-safe request schemas
@@ -65,9 +71,9 @@ curl http://localhost:8082/greetings
 
 ## Documentation
 
-- **Setup & Database**: [docs/setup.md](docs/setup.md)
 - **Production Patterns**: [../docs/production-patterns.md](../docs/production-patterns.md)
 - **Quick Start Guide**: [../docs/quick-start.md](../docs/quick-start.md)
+- **Framework Database Guide**: [../../../docs/tutorials/database-setup.md](../../../docs/tutorials/database-setup.md)
 
 ## Why MongoDB?
 
@@ -83,5 +89,5 @@ Compare with [SQLite example](../01-with-sqlite/) for zero-config alternative.
 ## Next Steps
 
 - Read [production patterns](../docs/production-patterns.md) to understand the architecture
-- Follow [setup guide](docs/setup.md) for database details
+- Review the [framework database guide](../../../docs/tutorials/database-setup.md) for shared ORM patterns
 - Add features using the [extension guide](../docs/production-patterns.md#adding-new-features)

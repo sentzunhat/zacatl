@@ -95,6 +95,17 @@ export class MongooseAdapter<D, I, O> implements ORMPort<D, I, O> {
     return this.toLean(entity);
   }
 
+  async findMany(filter: Record<string, unknown> = {}): Promise<O[]> {
+    const entities = (await this.model
+      .find(filter)
+      .lean<LeanWithMeta<O>[]>({ virtuals: true })
+      .exec()) as LeanWithMeta<O>[];
+
+    return entities
+      .map((entity) => this.toLean(entity))
+      .filter((entity): entity is O => Boolean(entity));
+  }
+
   async create(entity: I): Promise<O> {
     const document = await this.model.create(entity as unknown as D);
 
@@ -128,5 +139,10 @@ export class MongooseAdapter<D, I, O> implements ORMPort<D, I, O> {
       .exec();
 
     return this.toLean(entity);
+  }
+
+  async exists(id: string): Promise<boolean> {
+    const result = await this.model.exists({ _id: id });
+    return Boolean(result);
   }
 }

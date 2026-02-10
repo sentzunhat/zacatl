@@ -8,7 +8,6 @@ Installation, setup, and your first Zacatl service.
 
 - **[Installation](./installation.md)** - Install Zacatl and dependencies
 - **[Quick Start](./quickstart.md)** - Get running in 5 minutes
-- **[Hello World](./hello-world.md)** - Your first service
 - **[First Service](./first-service.md)** - Build a complete example
 
 ---
@@ -27,11 +26,7 @@ npm install @sentzunhat/zacatl fastify
 
 Get a basic HTTP service running in 5 minutes. See [Quick Start](./quickstart.md).
 
-### 3. Hello World
-
-Build your first "Hello, World!" service. See [Hello World](./hello-world.md).
-
-### 4. First Real Service
+### 3. First Service
 
 Build a complete service with routing, configuration, and error handling. See [First Service](./first-service.md).
 

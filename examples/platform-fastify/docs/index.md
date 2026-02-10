@@ -11,13 +11,11 @@ examples/platform-fastify/
 │   ├── quick-start.md                  # 6.0KB - Complete walkthrough
 │   └── validation-checklist.md         # 10.4KB - Transformation record
 ├── 01-with-sqlite/
-│   ├── docs/
-│   │   └── setup.md                    # 3.6KB - SQLite specifics
-│   └── README.md                       # 2.2KB - Quick reference
+│   └── README.md                       # Quick reference + database setup
 └── 02-with-mongodb/
-    ├── docs/
-    │   └── setup.md                    # 4.0KB - MongoDB specifics
-    └── README.md                       # 2.4KB - Quick reference
+    └── README.md                       # Quick reference + database setup
+└── 03-with-postgres/
+    └── README.md                       # Quick reference + database setup
 ```
 
 **Total**: ~40KB (lean, organized, no duplication)
@@ -32,9 +30,10 @@ examples/platform-fastify/
 ### For Learning Patterns
 
 1. **[docs/production-patterns.md](production-patterns.md)** - Read this first
-2. Example-specific setup:
-   - **[01-with-sqlite/docs/setup.md](../01-with-sqlite/docs/setup.md)**
-   - **[02-with-mongodb/docs/setup.md](../02-with-mongodb/docs/setup.md)**
+2. Example-specific setup in each README:
+   - **[01-with-sqlite/README.md](../01-with-sqlite/README.md#database-setup)**
+   - **[02-with-mongodb/README.md](../02-with-mongodb/README.md#database-setup)**
+   - **[03-with-postgres/README.md](../03-with-postgres/README.md#database-setup)**
 
 ### For Reference
 
@@ -54,7 +53,7 @@ examples/platform-fastify/
 | File Type              | Purpose                    | Size Target |
 | ---------------------- | -------------------------- | ----------- |
 | README.md              | Quick start, API reference | < 3KB       |
-| setup.md               | Database configuration     | < 5KB       |
+| README.md              | Setup + database details   | < 4KB       |
 | production-patterns.md | Framework patterns         | < 8KB       |
 | quick-start.md         | Complete walkthrough       | < 7KB       |
 
@@ -62,7 +61,7 @@ examples/platform-fastify/
 
 When updating examples:
 
-1. **Code changes**: Update corresponding setup.md
+1. **Code changes**: Update corresponding example README
 2. **New patterns**: Add to production-patterns.md
 3. **Breaking changes**: Update all READMEs
 4. **File moves**: Update all internal links

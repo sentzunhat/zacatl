@@ -11,8 +11,15 @@ export abstract class GetRouteHandler<
   TBody = void,
   TQuerystring = void,
   TResponse = void,
-  TParams = void
-> extends AbstractRouteHandler<TBody, TQuerystring, TResponse, TParams> {
+  TParams = void,
+  THeaders = void,
+> extends AbstractRouteHandler<
+  TBody,
+  TQuerystring,
+  TResponse,
+  TParams,
+  THeaders
+> {
   constructor(args: GetRouteHandlerConstructor) {
     super({
       url: args.url,

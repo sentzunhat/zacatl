@@ -11,10 +11,17 @@ export type PostRouteHandlerConstructor = {
 
 export abstract class PostRouteHandler<
   TBody = void,
-  TResponse = void,
   TQuerystring = void,
+  TResponse = void,
   TParams = void,
-> extends AbstractRouteHandler<TBody, TQuerystring, TResponse, TParams> {
+  THeaders = void,
+> extends AbstractRouteHandler<
+  TBody,
+  TQuerystring,
+  TResponse,
+  TParams,
+  THeaders
+> {
   constructor(args: PostRouteHandlerConstructor) {
     super({
       url: args.url,

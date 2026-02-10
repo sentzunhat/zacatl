@@ -8,7 +8,6 @@ Environment: Target Node.js 24+ LTS; Bun is optional and best used as a fast pac
 
 - [Installation](getting-started/installation.md)
 - [Quick Start](getting-started/quickstart.md)
-- [Hello World](getting-started/hello-world.md)
 - [First Service](getting-started/first-service.md)
 
 ## Tutorials
@@ -42,8 +41,8 @@ Environment: Target Node.js 24+ LTS; Bun is optional and best used as a fast pac
 
 ## Migration
 
-- [Migration Index](migration/index.md)
-- [v0.0.26 to v0.1.0](migration/v0.0.26-to-v0.1.0.md)
+- [Migration Index](migration/README.md)
+- [v0.1.0 Multi-Context Migration](migration/v0.1.0-multicontext.md)
 
 ## Testing
 

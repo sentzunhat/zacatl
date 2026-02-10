@@ -36,10 +36,12 @@ import { Service, ServiceType } from "@sentzunhat/zacatl";
 // CLI Application
 const cli = new Service({
   type: ServiceType.CLI,
-  architecture: {
+  layers: {
     application: { entryPoints: { cli: { commands: [...] } } },
-    domain: { providers: [...] },
+    domain: { services: [...] },
     infrastructure: { repositories: [...] },
+  },
+  platforms: {
     cli: { name: "my-tool", version: "1.0.0" },
   },
 });
@@ -47,10 +49,12 @@ const cli = new Service({
 // Desktop Application
 const desktop = new Service({
   type: ServiceType.DESKTOP,
-  architecture: {
+  layers: {
     application: { entryPoints: { ipc: { handlers: [...] } } },
-    domain: { providers: [...] },
+    domain: { services: [...] },
     infrastructure: { repositories: [...] },
+  },
+  platforms: {
     desktop: { window: { title: "My App", width: 1024, height: 768 }, platform: "neutralino" },
   },
 });
@@ -58,22 +62,27 @@ const desktop = new Service({
 // HTTP Server (default)
 const server = new Service({
   type: ServiceType.SERVER, // Optional: defaults to SERVER
-  architecture: {
+  layers: {
     application: { entryPoints: { rest: { hooks: [...], routes: [...] } } },
-    domain: { providers: [...] },
+    domain: { services: [...] },
     infrastructure: { repositories: [...] },
-    server: { vendor: ServerVendor.FASTIFY },
+  },
+  platforms: {
+    server: {
+      name: "my-service",
+      server: { type: ServerType.SERVER, vendor: ServerVendor.FASTIFY, instance: fastify }
+    },
   },
 });
 ```
 
 ## 📖 Documentation
 
-- **[Full Documentation Index](./docs/index.md)** - Complete guide and reference
+- **[Full Documentation Index](./docs/README.md)** - Complete guide and reference
 - **[Implementation Guide (Service Adapter Pattern)](./docs/guides/service-adapter-pattern.md)** - Canonical service implementation
 - **[Quick Start](./docs/getting-started/quickstart.md)** - Get up and running fast
 - **[Framework Overview](./docs/architecture/framework-overview.md)** - Architecture and concepts
-- **[Installation Guide](./docs/getting-started/INSTALLATION.md)** - Setup instructions
+- **[Installation Guide](./docs/getting-started/installation.md)** - Setup instructions
 - **[Testing Guide](./docs/testing/README.md)** - How to test your services
 - **[Examples](./examples/)** - Production-ready example applications
 - **[API Reference](./docs/reference/api/)** - Core APIs
@@ -105,15 +114,22 @@ import { Service } from "@sentzunhat/zacatl";
 const fastify = Fastify();
 
 const service = new Service({
-  architecture: {
+  type: ServiceType.SERVER,
+  layers: {
     application: {
-      entryPoints: { rest: { hookHandlers: [], routeHandlers: [] } },
+      entryPoints: { rest: { hooks: [], routes: [] } },
     },
-    domain: { providers: [] },
+    domain: { services: [] },
     infrastructure: { repositories: [] },
+  },
+  platforms: {
     server: {
       name: "hello-service",
-      server: { type: "SERVER", vendor: "FASTIFY", instance: fastify },
+      server: {
+        type: ServerType.SERVER,
+        vendor: ServerVendor.FASTIFY,
+        instance: fastify,
+      },
     },
   },
 });
@@ -131,8 +147,12 @@ class MyService {
 }
 
 const service = new Service({
-  architecture: {
-    domain: { providers: [MyService] },
+  type: ServiceType.CLI,
+  layers: {
+    domain: { services: [MyService] },
+  },
+  platforms: {
+    cli: { name: "my-cli", version: "1.0.0" },
   },
 });
 
@@ -170,11 +190,23 @@ import { Service } from "@sentzunhat/zacatl";
 const sequelize = new Sequelize("postgresql://user:pass@localhost/db");
 
 const service = new Service({
-  architecture: {
+  type: ServiceType.SERVER,
+  layers: {
+    application: { entryPoints: { rest: { hooks: [], routes: [] } } },
+    domain: { services: [] },
+    infrastructure: { repositories: [] },
+  },
+  platforms: {
     server: {
+      name: "my-service",
+      server: {
+        type: ServerType.SERVER,
+        vendor: ServerVendor.FASTIFY,
+        instance: fastify,
+      },
       databases: [
         {
-          vendor: "SEQUELIZE",
+          vendor: DatabaseVendor.SEQUELIZE,
           instance: sequelize,
         },
       ],
@@ -190,11 +222,23 @@ import mongoose from "mongoose";
 import { Service } from "@sentzunhat/zacatl";
 
 const service = new Service({
-  architecture: {
+  type: ServiceType.SERVER,
+  layers: {
+    application: { entryPoints: { rest: { hooks: [], routes: [] } } },
+    domain: { services: [] },
+    infrastructure: { repositories: [] },
+  },
+  platforms: {
     server: {
+      name: "my-service",
+      server: {
+        type: ServerType.SERVER,
+        vendor: ServerVendor.FASTIFY,
+        instance: fastify,
+      },
       databases: [
         {
-          vendor: "MONGOOSE",
+          vendor: DatabaseVendor.MONGOOSE,
           instance: mongoose,
           connectionString: "mongodb://localhost/mydb",
         },
@@ -360,7 +404,7 @@ Optional:
 
 ## 📞 Support
 
-- 📖 [Documentation](./docs/INDEX.md)
+- 📖 [Documentation](./docs/README.md)
 - 🐛 [Issue Tracker](https://github.com/sentzunhat/zacatl/issues)
 - 💬 [Discussions](https://github.com/sentzunhat/zacatl/discussions)
 

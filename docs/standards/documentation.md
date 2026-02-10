@@ -127,9 +127,13 @@ Add when relevant:
 import { Service } from "@sentzunhat/zacatl";
 
 const service = new Service({
-  architecture: {
+  type: ServiceType.SERVER,
+  layers: {
     infrastructure: { repositories: [] },
-    domain: { providers: [] },
+    domain: { services: [] },
+  },
+  platforms: {
+    server: { name: "my-service" },
   },
 });
 ```
@@ -187,7 +191,7 @@ import stuff from "somewhere";
 - **Purpose**: Help users upgrade versions
 - **Length**: 400-600 lines
 - **Style**: Practical, checklist-based
-- **Example**: `migration/v0.0.20.md`
+- **Example**: `migration/v0.1.0-multicontext.md`
 
 ---
 
@@ -237,7 +241,7 @@ tags: [database, orm, sequelize]
 
 - Add `Last Updated` date to major docs
 - Keep migration docs for each version
-- Archive old docs to `archive/` folder if outdated
+- Remove outdated docs or replace with current versions
 
 ---
 
@@ -274,7 +278,7 @@ Before publishing documentation:
    > **⚠️ DEPRECATED**: This approach is deprecated. See [new-approach.md](./new-approach.md)
    ```
 
-2. After 2 major versions, move to `archive/`
+2. After 2 major versions, remove outdated guides
 
 3. Update index to remove deprecated docs
 
@@ -428,4 +432,4 @@ Category: [getting-started|guides|api|architecture|migration|prompts]
 
 ---
 
-For questions about documentation standards, see the [index](../index.md) or create an issue.
+For questions about documentation standards, see the [documentation index](../README.md) or create an issue.

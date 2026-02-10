@@ -1,16 +1,19 @@
-import { HTTPMethods, FastifySchema } from "fastify";
+import { FastifyReply, HTTPMethods, FastifySchema } from "fastify";
 
-import { Handler } from "../common/handler";
+import type { Request } from "../common/request";
 
-export type RouteHandler<
+export interface RouteHandler<
   TBody = void,
   TQuerystring = void,
+  TResponse = void,
   TParams = void,
   THeaders = void,
-  TReply = unknown,
-> = {
+> {
   url: string;
   method: HTTPMethods;
   schema: Record<string, unknown> | FastifySchema;
-  execute: Handler<TBody, TQuerystring, TParams, THeaders, TReply>;
-};
+  execute(
+    request: Request<TBody, TQuerystring, TParams, THeaders>,
+    reply: FastifyReply,
+  ): Promise<TResponse> | TResponse;
+}

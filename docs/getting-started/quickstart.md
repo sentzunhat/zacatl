@@ -300,6 +300,6 @@ class UserService {
 
 ## Help & Resources
 
-- [Documentation Index](../index.md)
+- [Documentation Index](../README.md)
 - [GitHub Issues](https://github.com/sentzunhat/zacatl/issues)
-- [Migration Guides](../migration/index.md)
+- [Migration Guides](../migration/README.md)

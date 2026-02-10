@@ -80,9 +80,11 @@ export interface ORMPort<D, I, O> {
   readonly model: RepositoryModel<D>;
   toLean(input: unknown): O | null;
   findById(id: string): Promise<O | null>;
+  findMany(filter?: Record<string, unknown>): Promise<O[]>;
   create(entity: I): Promise<O>;
   update(id: string, update: Partial<I>): Promise<O | null>;
   delete(id: string): Promise<O | null>;
+  exists(id: string): Promise<boolean>;
 }
 
 /** Repository contract - public interface for consumers */
@@ -90,7 +92,9 @@ export type RepositoryPort<D, I, O> = {
   model: RepositoryModel<D>;
   toLean(input: unknown): O | null;
   findById(id: string): Promise<O | null>;
+  findMany(filter?: Record<string, unknown>): Promise<O[]>;
   create(entity: I): Promise<O>;
   update(id: string, update: Partial<I>): Promise<O | null>;
   delete(id: string): Promise<O | null>;
+  exists(id: string): Promise<boolean>;
 };

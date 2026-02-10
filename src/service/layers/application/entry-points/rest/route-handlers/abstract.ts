@@ -35,7 +35,7 @@ export abstract class AbstractRouteHandler<
   TResponse = void,
   TParams = void,
   THeaders = void,
-> implements RouteHandler<TBody, TQuerystring, TParams, THeaders> {
+> implements RouteHandler<TBody, TQuerystring, TResponse, TParams, THeaders> {
   public url: string;
   public method: HTTPMethods;
   public schema: RouteSchema | FastifySchema | Record<string, unknown>;
@@ -54,7 +54,7 @@ export abstract class AbstractRouteHandler<
   public async execute(
     request: Request<TBody, TQuerystring, TParams, THeaders>,
     reply: FastifyReply,
-  ): Promise<void> {
+  ): Promise<HandlerOutput<TResponse>> {
     const response = await this.handler(request, reply);
 
     const defaultMessage = i18n.__("SUCCESS_MESSAGES.DEFAULT");
@@ -64,5 +64,7 @@ export abstract class AbstractRouteHandler<
       message: defaultMessage,
       data: response,
     });
+
+    return response;
   }
 }

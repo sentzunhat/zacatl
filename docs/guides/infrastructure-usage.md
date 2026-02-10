@@ -5,8 +5,6 @@
 > ```typescript
 > import { BaseRepository, ORMType } from "@sentzunhat/zacatl/infrastructure";
 > ```
->
-> See [v0.0.21 Migration Guide](../migration/v0.0.21.md) for more shortcuts.
 
 ## Modular ORM System
 

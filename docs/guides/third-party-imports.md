@@ -346,4 +346,4 @@ import { BaseRepository, mongooseSupport } from "@sentzunhat/zacatl";
 
 ---
 
-**Next:** [Back to Guides](./index.md) | [Main Docs](../index.md)
+**Next:** [Back to Guides](./README.md) | [Main Docs](../README.md)

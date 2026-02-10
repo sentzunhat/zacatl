@@ -2,7 +2,6 @@
 
 A catalog of standalone, production-ready server applications demonstrating different patterns and use cases. Each example is fully functional, copy-paste deployable, and follows the same domain logic across different server frameworks and databases.
 
-> **📖 Quick Reference:** See [INDEX.md](./INDEX.md) for a condensed catalog view.
 > **🤖 For Agents:** See [AGENTS.md](./AGENTS.md) - Comprehensive guidance for building parallel platform examples.
 
 ---
@@ -246,9 +245,6 @@ cd platform-fastify/01-with-sqlite && npm install && npm run dev
 ## 📚 Additional Resources
 
 - **[AGENTS.md](./AGENTS.md)** - Guidance for AI agents building new examples
-- **[INDEX.md](./INDEX.md)** - Quick reference catalog
-- **[CATALOG.md](./CATALOG.md)** - Visual map of all examples
-- **[COMPARISON.md](./COMPARISON.md)** - Architecture comparison
 - **[shared/domain/README.md](./shared/domain/README.md)** - Domain logic documentation
 
 ---

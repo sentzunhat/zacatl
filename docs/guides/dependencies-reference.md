@@ -340,4 +340,4 @@ import { Service, singleton, resolveDependency } from "@sentzunhat/zacatl";
 
 ---
 
-**Next:** [Non-HTTP Setup Guide](./non-http-elegant.md) | [Full Docs](../index.md)
+**Next:** [Non-HTTP Setup Guide](./non-http-elegant.md) | [Full Docs](../README.md)

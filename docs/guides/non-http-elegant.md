@@ -506,4 +506,4 @@ No HTTP? Skip: application layer
 
 ---
 
-**Next:** [Full Documentation](../INDEX.md) | [Examples](../examples/README.md)
+**Next:** [Full Documentation](../README.md) | [Examples](../../examples/README.md)

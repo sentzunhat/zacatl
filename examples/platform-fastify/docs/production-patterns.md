@@ -269,7 +269,8 @@ To add a new resource (e.g., "User"):
 
 ## See Also
 
-- **SQLite Setup**: [../01-with-sqlite/docs/setup.md](../01-with-sqlite/docs/setup.md)
-- **MongoDB Setup**: [../02-with-mongodb/docs/setup.md](../02-with-mongodb/docs/setup.md)
+- **SQLite Setup**: [../01-with-sqlite/README.md#database-setup](../01-with-sqlite/README.md#database-setup)
+- **MongoDB Setup**: [../02-with-mongodb/README.md#database-setup](../02-with-mongodb/README.md#database-setup)
+- **PostgreSQL Setup**: [../03-with-postgres/README.md#database-setup](../03-with-postgres/README.md#database-setup)
 - **Quick Start**: [quick-start.md](quick-start.md)
 - **Framework Docs**: [../../../docs/README.md](../../../docs/README.md)

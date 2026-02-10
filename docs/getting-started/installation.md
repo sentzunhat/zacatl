@@ -40,17 +40,37 @@ import "reflect-metadata";
 
 ## Install Web Framework
 
-Next",
-"module": "ESNext",
-"moduleResolution": "bundler",
-"experimentalDecorators": true,
-"emitDecoratorMetadata": true,
-"strict": true,
-"esModuleInterop": true,
-"skipLibCheck": true,
-"resolveJsonModule": true,
-"outDir": "./build",
-"rootDir": "./src"
+Choose your preferred HTTP framework:
+
+### Fastify (Recommended)
+
+```bash
+npm install fastify
+```
+
+### Express
+
+```bash
+npm install express
+npm install --save-dev @types/express
+```
+
+## Optional: Database ORM
+
+### Sequelize (SQL databases)
+
+```bash
+npm install sequelize sqlite3
+# Or for other databases:
+# npm install pg pg-hstore (PostgreSQL)
+# npm install mysql2 (MySQL)
+```
+
+### Mongoose (MongoDB)
+
+```bash
+npm install mongoose
+```
 
 ## TypeScript Setup
 
@@ -72,8 +92,9 @@ Create `tsconfig.json`:
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "moduleResolution": "node",
-    "experimentalDecorators": true
+    "moduleResolution": "bundler",
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "build", "test"]
@@ -117,4 +138,4 @@ npm install --save-dev tsx vitest
 ---
 
 **Current Version**: v0.0.32
-**Next**: [Quick Start](./quickstart.md) or [Hello World](./hello-world.md)
+**Next**: [Quick Start](./quickstart.md) or [First Service](./first-service.md)

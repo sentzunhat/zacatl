@@ -39,8 +39,6 @@ import { createLogger } from "@sentzunhat/zacatl";
 import { createI18n } from "@sentzunhat/zacatl";
 ```
 
-See [v0.0.21 Migration Guide](../migration/v0.0.21.md) for all available import shortcuts.
-
 ---
 
 **Start here**: [Service API →](./service.md)

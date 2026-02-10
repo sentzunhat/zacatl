@@ -452,7 +452,6 @@ See the [examples](../examples/) directory for complete working examples:
 ## Related Documentation
 
 - [ADAPTER_PATTERN_IMPLEMENTATION.md](./ADAPTER_PATTERN_IMPLEMENTATION.md) - Technical implementation details
-- [quickstart.md](../../migration/quickstart.md) - Getting started guide
 - [Repository Pattern](https://martinfowler.com/eaaCatalog/repository.html) - Martin Fowler's pattern reference
 
 ---

@@ -25,6 +25,13 @@
 - **Startup**: < 2 seconds (with MongoDB connection)
 - **Ports**: Backend: 8082, Frontend: 8092
 
+### 3. [PostgreSQL + React (03-with-postgres)](./03-with-postgres)
+
+- **Stack**: Fastify, PostgreSQL (Sequelize), React, Tailwind
+- **Best for**: Relational workflows and production SQL
+- **Startup**: < 2 seconds (with PostgreSQL connection)
+- **Ports**: Backend: 8083, Frontend: 8093
+
 ## 🏗️ Architecture
 
 Both examples use a clean, consistent monorepo structure:
@@ -62,6 +69,5 @@ bun run dev  # Starts both backend + frontend
 - **[Quick Start Guide](./docs/quick-start.md)** - Complete setup walkthrough
 - **[Production Patterns](./docs/production-patterns.md)** - Framework-agnostic patterns
 - **[Validation Checklist](./docs/validation-checklist.md)** - Transformation details
-- **[SQLite Setup](./01-with-sqlite/docs/setup.md)** - Database-specific guide
-- **[MongoDB Setup](./02-with-mongodb/docs/setup.md)** - Database-specific guide
+- **Database Setup**: See each example README under "Database Setup"
 - **[Framework Docs](../../docs/)** - Full Zacatl documentation

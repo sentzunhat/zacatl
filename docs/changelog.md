@@ -1,6 +1,73 @@
 # Release Notes
 
+---
+
+## [0.0.33] - Current
+
+**Status**: Current stable release
+
+See version 0.0.32 below for latest changes. Version 0.0.33 is a minor version bump.
+
+---
+
 ## [0.0.32] - 2026-02-07
+
+> **Note**: The features below are planned for v0.1.0 but not yet released.
+> **Current stable version**: 0.0.33
+
+### 🎯 Multi-Context Architecture Support (Planned)
+
+**Major Feature:** Zacatl will support CLI, Desktop, and Server applications from a single, unified architecture.
+
+#### New ServiceType Enum (Already Implemented)
+
+```typescript
+import { Service, ServiceType } from "@sentzunhat/zacatl";
+
+// CLI Application
+const cli = new Service({
+  type: ServiceType.CLI,
+  layers: {
+    application: { entryPoints: { cli: { commands: [...] } } },
+  },
+  platforms: {
+    cli: { name: "my-tool", version: "1.0.0" },
+    // ... rest of config
+  },
+});
+
+// Desktop Application
+const desktop = new Service({
+  type: ServiceType.DESKTOP,
+  layers: {
+    application: { entryPoints: { ipc: { handlers: [...] } } },
+  },
+  platforms: {
+    desktop: {
+      window: { title: "My App", width: 1024, height: 768 },
+      platform: "neutralino"
+    },
+    // ... rest of config
+  },
+});
+
+// HTTP Server (default - backward compatible)
+const server = new Service({
+  type: ServiceType.SERVER, // Optional: defaults to SERVER
+  layers: {
+    application: { entryPoints: { rest: { hooks: [...], routes: [...] } } },
+  },
+  platforms: {
+    server: {
+      name: "my-service",
+      server: { type: ServerType.SERVER, vendor: ServerVendor.FASTIFY, instance: fastify }
+    },
+    // ... rest of config
+  },
+});
+```
+
+#### Breaking Changes (with Backward Compatibility)
 
 ### 📦 Release
 
@@ -10,7 +77,7 @@
 
 - **Docs & Examples**: Updated version references, test counts, and Node requirements
 - **Coverage Update**: Updated all documentation to reflect current test coverage (61.6%)
-- **Internal Docs**: Archived historical audit documents to `docs/archive/`
+- **Internal Docs**: Cleaned up historical audit documents
 
 ### ✅ Code Quality
 
@@ -98,125 +165,7 @@
   - Buffer access using globalThis for Node.js compatibility
 - **Tests**: All 183 unit tests passing with updated dependencies
 
-**Migration Guide:** [docs/migration/v0.0.26-to-v0.0.27.md](./migration/v0.0.26-to-v0.0.27.md)
-
----
-
-## [0.1.0] - 2026-02-03
-
-### 🎯 Multi-Context Architecture Support
-
-**Major Feature:** Zacatl now supports CLI, Desktop, and Server applications from a single, unified architecture.
-
-#### New ServiceType Enum
-
-```typescript
-import { Service, ServiceType } from "@sentzunhat/zacatl";
-
-// CLI Application
-const cli = new Service({
-  type: ServiceType.CLI,
-  architecture: {
-    application: { entryPoints: { cli: { commands: [...] } } },
-    cli: { name: "my-tool", version: "1.0.0" },
-    // ... rest of config
-  },
-});
-
-// Desktop Application
-const desktop = new Service({
-  type: ServiceType.DESKTOP,
-  architecture: {
-    application: { entryPoints: { ipc: { handlers: [...] } } },
-    desktop: {
-      window: { title: "My App", width: 1024, height: 768 },
-      platform: "neutralino"
-    },
-    // ... rest of config
-  },
-});
-
-// HTTP Server (default - backward compatible)
-const server = new Service({
-  type: ServiceType.SERVER, // Optional: defaults to SERVER
-  architecture: {
-    application: { entryPoints: { rest: { hooks: [...], routes: [...] } } },
-    server: { vendor: ServerVendor.FASTIFY },
-    // ... rest of config
-  },
-});
-```
-
-#### Breaking Changes (with Backward Compatibility)
-
-**Property Renames** for clarity and consistency:
-
-| Old Name                   | New Name            | Compatibility               |
-| -------------------------- | ------------------- | --------------------------- |
-| `hookHandlers`             | `hooks`             | ✅ Legacy getters available |
-| `routeHandlers`            | `routes`            | ✅ Legacy getters available |
-| `ApplicationHookHandlers`  | `ApplicationHooks`  | ✅ Type alias available     |
-| `ApplicationRouteHandlers` | `ApplicationRoutes` | ✅ Type alias available     |
-
-**Config Structure Changes:**
-
-- `ApplicationEntryPoints` is now polymorphic (supports `cli`, `rest`, `ipc`)
-- `ConfigService` now includes optional `type: ServiceType` field
-- New types: `ConfigCLI`, `ConfigDesktop`
-
-**Backward Compatibility:**
-
-- ✅ Old property names still work via legacy getters
-- ✅ `type` defaults to `ServiceType.SERVER` if not specified
-- ✅ Existing HTTP server configs work without changes
-- ✅ All 201 tests passing
-
-**Migration Guide:** [docs/migration/v0.0.26-to-v0.1.0.md](./migration/v0.0.26-to-v0.1.0.md)
-
----
-
-### 🏗️ Architecture Improvements
-
-- **Type Safety**: Added validation for type-specific configurations
-- **Polymorphic Entry Points**: Support for multiple application contexts
-- **Cleaner API**: Shorter property names without losing clarity
-- **Better Errors**: Helpful validation messages for config mismatches
-
----
-
-### 📚 Documentation Updates
-
-- Added [Multi-Context Cleanup Design](./architecture/MULTI-CONTEXT-CLEANUP-DESIGN.md)
-- Added [Migration Guide v0.0.26 → v0.1.0](./migration/v0.0.26-to-v0.1.0.md)
-- Updated README with multi-context examples
-- Updated test count badges (201 tests at that time)
-
----
-
-### 🧪 Testing
-
-- **201 tests passing** (up from 188)
-- Added tests for new validation logic
-- Updated existing tests to use new property names
-
----
-
-### 📦 New Exports
-
-```typescript
-// New type exports
-export { ServiceType } from "@sentzunhat/zacatl";
-export type { ConfigCLI, ConfigDesktop } from "@sentzunhat/zacatl";
-export type { ApplicationHooks, ApplicationRoutes } from "@sentzunhat/zacatl";
-```
-
----
-
-### 🔮 Future Roadmap
-
-- **v0.2.0**: CLI implementation complete (command execution, arg parsing)
-- **v0.3.0**: Desktop implementation complete (IPC, window management)
-- **v1.0.0**: Remove legacy getters, finalize API
+**Migration Guide:** See migration archive for historical versions
 
 ---
 
@@ -317,7 +266,7 @@ export async function loadMongooseAdapter(config) {
 
 **Impact:** Framework now works in all JavaScript runtimes without `require is not defined` errors.
 
-**Migration:** See [Migration Guide v0.0.22](./migration/v0.0.22.md) for details. Most users need no code changes.
+**Migration:** See migration archive for details. Most users need no code changes.
 
 ---
 
@@ -402,7 +351,7 @@ import { loadConfig } from "@sentzunhat/zacatl/config";
 
 #### 📚 Documentation
 
-- Added [v0.0.21 Migration Guide](./migration/v0.0.21.md)
+- Added v0.0.21 Migration Guide
 - Updated README with import shortcuts section
 - All examples remain backward compatible
 
@@ -418,7 +367,7 @@ import { loadConfig } from "@sentzunhat/zacatl/config";
 ###Migration Path
 No code changes required. Projects already using both ORMs will continue to work. Projects wanting to use a single ORM can now uninstall the unused one.
 
-See [v0.0.21 Migration Guide](./migration/v0.0.21.md) for details.
+See migration archive for details.
 
 ---
 

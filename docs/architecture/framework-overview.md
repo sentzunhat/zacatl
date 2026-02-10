@@ -334,17 +334,17 @@ Real performance depends on:
 
 Zacatl includes:
 
-✅ Error handling with proper HTTP status codes  
-✅ Structured logging for debugging  
-✅ Configuration management for different environments  
-✅ Type safety to catch bugs at compile time  
-✅ Unit tests with 79% code coverage  
+✅ Error handling with proper HTTP status codes
+✅ Structured logging for debugging
+✅ Configuration management for different environments
+✅ Type safety to catch bugs at compile time
+✅ Unit tests with 79% code coverage
 ✅ ACID transactions support via adapters
 
 ## Next Steps
 
 1. **[Quick Start](./getting-started/QUICKSTART_5MIN.md)** - Get running in 5 minutes
-2. **[Installation](./getting-started/INSTALLATION.md)** - Detailed setup
+2. **[Installation](../getting-started/installation.md)** - Detailed setup
 3. **[Architecture Fundamentals](./architecture/FUNDAMENTALS.md)** - Understand patterns
 4. **[Building Repositories](./guides/REPOSITORIES.md)** - First feature
 

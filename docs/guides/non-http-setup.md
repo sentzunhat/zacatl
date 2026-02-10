@@ -604,7 +604,7 @@ await migration.migrate();
 
 ## Next Steps
 
-- 📖 [Full Documentation](../index.md)
+- 📖 [Full Documentation](../README.md)
 - 🏗️ [Architecture Overview](../architecture/framework-overview.md)
 - 🧪 [Testing Guide](../testing/README.md)
 - 🔍 [Examples](../examples/README.md)

@@ -12,6 +12,12 @@ bun run dev
 
 **Ports**: Backend: 8083, Frontend: 8093
 
+## Database Setup
+
+- **Env var**: `DATABASE_URL`
+- **Example**: `postgres://local:local@localhost:5432/appdb`
+- **Connection file**: `apps/backend/src/index.ts`
+
 ## What's Included
 
 ✅ **Zod validation** - Type-safe request schemas
@@ -53,9 +59,9 @@ curl http://localhost:3001/greetings
 
 ## Documentation
 
-- **Setup & Database**: [docs/setup.md](docs/setup.md)
 - **Production Patterns**: [../docs/production-patterns.md](../docs/production-patterns.md)
 - **Quick Start Guide**: [../docs/quick-start.md](../docs/quick-start.md)
+- **Framework Database Guide**: [../../../docs/tutorials/database-setup.md](../../../docs/tutorials/database-setup.md)
 
 ## Why PostgreSQL?
 
@@ -68,5 +74,5 @@ Compare with [MongoDB example](../02-with-mongodb/) for document workflows.
 ## Next Steps
 
 - Read [production patterns](../docs/production-patterns.md) to understand the architecture
-- Follow [setup guide](docs/setup.md) for database details
+- Review the [framework database guide](../../../docs/tutorials/database-setup.md) for shared ORM patterns
 - Add features using the [extension guide](../docs/production-patterns.md#adding-new-features)

@@ -125,26 +125,29 @@ export const userRoutes = (fastify: FastifyInstance) => {
 import { userRoutes } from "./routes/user-routes";
 
 const service = new Service({
-  architecture: {
+  type: ServiceType.SERVER,
+  layers: {
     application: {
       entryPoints: {
         rest: {
-          hookHandlers: [],
-          routeHandlers: [userRoutes],
+          hooks: [],
+          routes: [],
         },
       },
     },
     domain: {
-      providers: [UserService],
+      services: [UserService],
     },
     infrastructure: {
       repositories: [],
     },
+  },
+  platforms: {
     server: {
       name: "my-service",
       server: {
-        type: "SERVER",
-        vendor: "FASTIFY",
+        type: ServerType.SERVER,
+        vendor: ServerVendor.FASTIFY,
         instance: fastify,
       },
     },
