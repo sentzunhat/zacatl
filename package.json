@@ -4,7 +4,7 @@
   "main": "build/index.js",
   "module": "build/index.js",
   "types": "build/index.d.ts",
-  "version": "0.0.36",
+  "version": "0.0.37",
   "packageManager": "npm@10.9.0",
   "exports": {
     ".": {
@@ -57,6 +57,11 @@
       "types": "./build/third-party/pino.d.ts",
       "bun": "./src/third-party/pino.ts",
       "import": "./build/third-party/pino.js"
+    },
+    "./third-party/zod": {
+      "types": "./build/third-party/zod.d.ts",
+      "bun": "./src/third-party/zod.ts",
+      "import": "./build/third-party/zod.js"
     },
     "./third-party/js-yaml": {
       "types": "./build/third-party/js-yaml.d.ts",

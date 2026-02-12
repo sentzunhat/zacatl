@@ -1,4 +1,4 @@
-import "reflect-metadata";
+import "@zacatl/third-party/reflect-metadata";
 import { container as tsyringeContainer } from "@zacatl/third-party/tsyringe";
 import type {
   DependencyContainer,

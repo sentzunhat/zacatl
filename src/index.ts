@@ -35,10 +35,4 @@ export {
 export { HandlersType } from "./service/platforms/server/api/api-server";
 export type { ConfigServer } from "./service/platforms/server/server";
 
-export * from "./service";
-
 export * from "./third-party";
-
-export * from "./utils";
-
-export * from "./optionals";
