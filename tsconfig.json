@@ -1,10 +1,11 @@
 {
   "compilerOptions": {
-    "incremental": true,
+    "incremental": false,
     "target": "ESNext",
     "lib": ["ESNext"],
     "module": "ESNext",
     "moduleResolution": "bundler",
+    "baseUrl": "./",
     "rootDir": "./src",
 
     "types": ["vitest/globals", "node", "bun"],
@@ -76,6 +77,9 @@
       "@zacatl/third-party/zod": ["./src/third-party/zod.ts"],
       "@zacatl/third-party/mongoose": ["./src/third-party/mongoose.ts"],
       "@zacatl/third-party/sequelize": ["./src/third-party/sequelize.ts"],
+      "@zacatl/third-party/reflect-metadata": [
+        "./src/third-party/reflect-metadata.ts"
+      ],
       "@zacatl/third-party/eslint": ["./src/third-party/eslint.ts"],
       "@zacatl/optionals": ["./src/optionals.ts"],
       "@zacatl/infrastructure": [
