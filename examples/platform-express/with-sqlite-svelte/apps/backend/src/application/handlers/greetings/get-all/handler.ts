@@ -33,9 +33,7 @@ export class GetAllGreetingsHandler extends AbstractRouteHandler<
 
   async handler(
     request: Request<void, { language?: string }>,
-    reply: FastifyReply,
   ): Promise<GreetingListResponse> {
-    void reply;
     const language = request.query?.language as string | undefined;
 
     const greetings = await this.greetingService.getAllGreetings(language);

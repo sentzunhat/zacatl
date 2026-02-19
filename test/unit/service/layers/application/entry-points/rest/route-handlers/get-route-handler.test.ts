@@ -8,7 +8,7 @@ import {
 import { Request } from "../../../../../../../../src/service/layers/application";
 
 class TestGetRouteHandler extends GetRouteHandler<unknown, string, unknown> {
-  async handler(_: unknown, __: unknown): Promise<string> {
+  async handler(_: unknown): Promise<string> {
     return "Test GET response";
   }
 }

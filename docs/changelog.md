@@ -2,9 +2,38 @@
 
 ---
 
-## [0.0.39] - 2026-02-19
+## [0.0.40] - 2026-02-19
 
 **Status**: Current release
+
+### ✨ Improvements
+
+- **Pure Handler Functions**: Handlers are now pure business logic - no HTTP concerns
+  - Handler signature: `handler(request)` returns data
+  - No access to `reply` parameter - cleaner separation of concerns
+  - HTTP concerns (status codes, serialization, sending) handled by `execute()` method
+  - Custom response shapes via `buildResponse()` override, not manual reply handling
+  - Simpler, more testable handler implementations
+
+### 🔧 Architecture
+
+- **Clean Separation of Concerns**:
+  - `handler()` = Business logic, returns domain data
+  - `execute()` = HTTP protocol handling (status, headers, serialization)
+  - `buildResponse()` = Optional serialization/envelope customization
+- Both Fastify and Express handlers follow same pure function pattern
+
+### 📚 Documentation
+
+- Updated handler documentation to remove manual reply handling examples
+- Clarified that handlers should be pure functions
+- Updated all 37 example handlers to demonstrate new clean API
+
+---
+
+## [0.0.39] - 2026-02-19
+
+**Status**: Previous release
 
 ### ✨ Improvements
 

@@ -17,8 +17,6 @@ class DummyHookHandler implements HookHandler {
   async execute(_: FastifyRequest): Promise<void> {}
 }
 
-import { FastifyReply } from "fastify";
-
 class DummyRouteHandler extends AbstractRouteHandler {
   constructor() {
     super({
@@ -28,7 +26,7 @@ class DummyRouteHandler extends AbstractRouteHandler {
     });
   }
 
-  async handler(_: Request, __: FastifyReply): Promise<void> {
+  async handler(_: Request): Promise<void> {
     // Dummy implementation
   }
 }

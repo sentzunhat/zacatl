@@ -40,9 +40,7 @@ export class CreateGreetingHandler extends AbstractRouteHandler<
 
   async handler(
     request: Request<CreateGreetingBody>,
-    reply: FastifyReply,
   ): Promise<GreetingResponse> {
-    void reply;
 
     const { message, language } = request.body;
 

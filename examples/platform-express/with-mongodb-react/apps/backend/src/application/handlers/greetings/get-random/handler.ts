@@ -34,9 +34,7 @@ export class GetRandomGreetingHandler extends AbstractRouteHandler<
 
   async handler(
     request: Request<void, void, GreetingParams>,
-    reply: FastifyReply,
   ): Promise<GreetingResponse | null> {
-    void reply;
 
     const { language } = request.params;
 

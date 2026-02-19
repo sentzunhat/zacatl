@@ -63,18 +63,15 @@ export abstract class AbstractRouteHandler<
   }
 
   abstract handler(
-    request: ExpressRequest,
-    reply: Response,
+    request: ExpressRequest<TParams, TResponse, TBody, TQuerystring>,
   ): Promise<HandlerOutput<TResponse>> | HandlerOutput<TResponse>;
 
   /**
    * Override this to customise the success response shape.
    *
    * By default, the raw value returned by `handler()` is sent with status 200.
-   * Handlers that need a different status code or envelope should either:
-   *   1. Call `reply.status(N).send(payload)` directly inside `handler()` — the
-   *      adapter will detect that the reply is already sent and skip auto-send.
-   *   2. Override `buildResponse()` to wrap the data differently.
+   * Handlers that need a different status code or envelope should override
+   * `buildResponse()` to wrap the data differently.
    *
    * @example
    * // Standard JSON envelope (opt-in):
@@ -89,10 +86,10 @@ export abstract class AbstractRouteHandler<
   }
 
   public async execute(
-    request: ExpressRequest,
+    request: ExpressRequest<TParams, TResponse, TBody, TQuerystring>,
     reply: Response,
   ): Promise<HandlerOutput<TResponse>> {
-    const response = await this.handler(request, reply);
+    const response = await this.handler(request);
 
     // Only auto-send if the handler has not already sent the reply
     if (!reply.headersSent) {

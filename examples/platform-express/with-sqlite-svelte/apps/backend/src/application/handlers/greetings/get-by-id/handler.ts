@@ -37,9 +37,7 @@ export class GetGreetingByIdHandler extends AbstractRouteHandler<
 
   async handler(
     request: Request<void, void, GreetingIdParams>,
-    reply: FastifyReply,
   ): Promise<GreetingResponse | null> {
-    void reply;
     const { id } = request.params;
 
     const greeting = await this.greetingService.getGreeting(id);

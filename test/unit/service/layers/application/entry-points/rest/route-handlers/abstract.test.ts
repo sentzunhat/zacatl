@@ -42,13 +42,14 @@ class HandlerWithManualReply extends AbstractRouteHandler<
     super({ url: "/manual", schema: {}, method: "POST" });
   }
 
-  async handler(
-    _: Request<void, void, void>,
-    reply: any,
-  ): Promise<{ custom: string }> {
-    // Handler sends the reply itself with custom status
-    await reply.code(201).send({ custom: "value", manually: true });
+  async handler(_: Request<void, void, void>): Promise<{ custom: string }> {
+    // Handler just returns data - buildResponse can customize the envelope
     return { custom: "value" };
+  }
+
+  protected override buildResponse(data: { custom: string }) {
+    // Override buildResponse to customize response shape
+    return { ...data, manually: true };
   }
 }
 
@@ -60,11 +61,7 @@ class HandlerWithCustomEnvelope extends TestRouteHandler {
 
 describe("AbstractRouteHandler", () => {
   it("auto-sends the raw handler return value with status 200", async () => {
-    const fakeRequest = createFakeFastifyRequest() as Request<
-      void,
-      Record<string, string>,
-      void
-    >;
+    const fakeRequest = createFakeFastifyRequest() as Request<void, Record<string, string>, void>;
     const fakeReply: any = createFakeFastifyReply();
 
     const handler = new TestRouteHandler();
@@ -75,7 +72,7 @@ describe("AbstractRouteHandler", () => {
     expect(fakeReply.send).toHaveBeenCalledWith({ id: 1, name: "Test" });
   });
 
-  it("skips auto-send if the handler already sent the reply", async () => {
+  it("allows overriding buildResponse to customize response shape", async () => {
     const fakeRequest = createFakeFastifyRequest() as any;
     const fakeReply: any = {
       sent: false,
@@ -89,24 +86,19 @@ describe("AbstractRouteHandler", () => {
     const handler = new HandlerWithManualReply();
     const result = await handler.execute(fakeRequest, fakeReply);
 
-    // Handler called reply.code(201).send(...) inside handler()
-    expect(fakeReply.code).toHaveBeenCalledWith(201);
+    // Handler returns { custom: "value" }
+    // buildResponse adds { manually: true }
+    expect(fakeReply.code).toHaveBeenCalledWith(200);
     expect(fakeReply.send).toHaveBeenCalledWith({
       custom: "value",
       manually: true,
     });
 
-    // execute() should NOT have called reply.code(200).send() again
-    expect(fakeReply.code).toHaveBeenCalledTimes(1); // Only the 201 from handler
     expect(result).toEqual({ custom: "value" });
   });
 
   it("allows overriding buildResponse to wrap the data", async () => {
-    const fakeRequest = createFakeFastifyRequest() as Request<
-      void,
-      Record<string, string>,
-      void
-    >;
+    const fakeRequest = createFakeFastifyRequest() as Request<void, Record<string, string>, void>;
     const fakeReply: any = createFakeFastifyReply();
 
     const handler = new HandlerWithCustomEnvelope();

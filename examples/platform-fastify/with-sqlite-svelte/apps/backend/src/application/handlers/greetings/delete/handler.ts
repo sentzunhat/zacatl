@@ -33,9 +33,7 @@ export class DeleteGreetingHandler extends AbstractRouteHandler<
 
   async handler(
     request: Request<void, void, GreetingIdParams>,
-    reply: FastifyReply,
   ): Promise<{ success: boolean }> {
-    void reply;
     const { id } = request.params;
     const success = await this.greetingService.deleteGreeting(id);
     return { success };
