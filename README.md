@@ -77,14 +77,18 @@ const server = new Service({
 
 ## 📖 Documentation
 
-- **[Full Documentation Index](./docs/README.md)** - Complete guide and reference
-- **[Implementation Guide (Service Adapter Pattern)](./docs/guides/service-adapter-pattern.md)** - Canonical service implementation
-- **[Quick Start](./docs/getting-started/quickstart.md)** - Get up and running fast
-- **[Framework Overview](./docs/architecture/framework-overview.md)** - Architecture and concepts
-- **[Installation Guide](./docs/getting-started/installation.md)** - Setup instructions
-- **[Testing Guide](./docs/testing/README.md)** - How to test your services
+- **[Architecture Overview](./docs/guidelines/framework-overview.md)** - System design and module map
+- **[Release Notes](./docs/changelog.md)** - Version history and changes
+- **[Service Module](./docs/service/README.md)** - Service configuration and platform APIs
+- **[Dependency Injection](./docs/dependency-injection/README.md)** - DI patterns and container usage
+- **[Configuration](./docs/configuration/README.md)** - Configuration loading
+- **[Errors](./docs/error/README.md)** - Error types and usage
+- **[Logs](./docs/logs/README.md)** - Logging adapters and patterns
+- **[Localization](./docs/localization/README.md)** - i18n usage and adapters
+- **[Third-Party + ORM](./docs/third-party/README.md)** - Re-exports and ORM guidance
+- **[ESLint](./docs/eslint/README.md)** - Shared ESLint configuration
+- **[Utils](./docs/utils/README.md)** - Utility helpers and path aliases
 - **[Examples](./examples/)** - Production-ready example applications
-- **[API Reference](./docs/reference/api/)** - Core APIs
 
 ## Ethical Use (Non-binding)
 
@@ -316,18 +320,10 @@ const config = loadConfig("./config/app.yaml", "yaml", AppConfigSchema);
 Zacatl includes 7 custom error types with built-in correlation IDs:
 
 ```typescript
-import {
-  BadRequestError,
-  NotFoundError,
-  UnauthorizedError,
-  ForbiddenError,
-  ValidationError,
-  InternalServerError,
-  BadResourceError,
-} from "@sentzunhat/zacatl";
+import { BadRequestError, NotFoundError, UnauthorizedError, ForbiddenError, ValidationError, InternalServerError, BadResourceError } from "@sentzunhat/zacatl";
 
-throw new ValidationError("Email is required");
-throw new NotFoundError("User not found", { userId: 123 });
+throw new ValidationError({ message: "Email is required" });
+throw new NotFoundError({ message: "User not found", metadata: { userId: 123 } });
 ```
 
 ## 🧪 Testing
@@ -343,16 +339,15 @@ npm run test:coverage   # Coverage report
 
 ```
 src/
-├── service/architecture/       # Core framework
-│   ├── application/            # HTTP handlers, validation
-│   ├── domain/                 # Business logic
-│   ├── infrastructure/         # Repositories, adapters
-│   └── platform/               # DI setup, server startup
 ├── configuration/              # Config loading & validation
-├── error/                      # 7 custom error types
-├── localization/               # i18n with adapters
-├── logs/                       # Pino logging
-└── utils/                      # base64, HMAC
+├── dependency-injection/       # DI container and helpers
+├── error/                      # Error types
+├── eslint/                     # Shared ESLint configs
+├── localization/               # i18n adapters and helpers
+├── logs/                       # Logging adapters
+├── service/                    # Service layers and platforms
+├── third-party/                # Re-exported dependencies
+└── utils/                      # Utility helpers
 ```
 
 ## 🛠️ Development
@@ -377,10 +372,6 @@ npm run type:check # TypeScript checking
 - **npm**: 10.0.0 or higher (bundled with Node 24)
 - **TypeScript**: 5.9+ (we use 5.9.3)
 
-Optional:
-
-- **Bun**: Latest for fast package management (development only)
-
 ## 📄 License
 
 [MIT License](./LICENSE) © 2025 Zacatl Contributors
@@ -397,7 +388,7 @@ Optional:
 
 ## 📞 Support
 
-- 📖 [Documentation](./docs/README.md)
+- 📖 [Documentation](./docs/guidelines/framework-overview.md)
 - 🐛 [Issue Tracker](https://github.com/sentzunhat/zacatl/issues)
 - 💬 [Discussions](https://github.com/sentzunhat/zacatl/discussions)
 

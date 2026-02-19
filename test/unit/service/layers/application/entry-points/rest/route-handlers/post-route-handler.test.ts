@@ -1,33 +1,34 @@
-import { describe, it, expect, vi } from "vitest";
-import i18n from "i18n";
+import { describe, it, expect } from "vitest";
 
 import {
   PostRouteHandler,
   Request,
-} from "../../../../../../../../src/service/layers/application/entry-points/rest/route-handlers/post-route-handler";
+} from "../../../../../../../../src/service/layers/application/entry-points/rest/fastify/handlers/post-route-handler";
 import {
   createFakeFastifyReply,
   createFakeFastifyRequest,
 } from "../../../../../../helpers/common/common";
 
-class TestPostRouteHandler extends PostRouteHandler<{}, {}, {}, {}> {
+class TestPostRouteHandler extends PostRouteHandler<
+  {},
+  {},
+  { id: number },
+  {}
+> {
   constructor() {
     super({
       url: "/post-test",
-      schema: {}, // Use an empty schema for test purposes.
+      schema: {},
     });
   }
 
-  handler(_: Request<{}, {}, {}>): {} | Promise<{}> {
-    // Dummy implementation
-    return {};
+  async handler(_: Request<{}, {}, {}>): Promise<{ id: number }> {
+    return { id: 1 };
   }
 }
 
 describe("PostRouteHandler", () => {
-  it("executes POST handler and sends proper response", async () => {
-    vi.spyOn(i18n, "__").mockReturnValue("Default success POST");
-
+  it("executes POST handler and sends raw response by default", async () => {
     const testHandler = new TestPostRouteHandler();
 
     const fakeRequest = createFakeFastifyRequest() as Request<{}, {}, {}>;
@@ -36,10 +37,7 @@ describe("PostRouteHandler", () => {
     await testHandler.execute(fakeRequest, fakeReply);
 
     expect(fakeReply.code).toHaveBeenCalledWith(200);
-    expect(fakeReply.send).toHaveBeenCalledWith({
-      ok: true,
-      message: "Default success POST",
-      data: {},
-    });
+    // Default behavior: raw data sent, no forced envelope
+    expect(fakeReply.send).toHaveBeenCalledWith({ id: 1 });
   });
 });

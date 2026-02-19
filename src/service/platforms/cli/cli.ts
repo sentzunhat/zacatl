@@ -1,27 +1,35 @@
+import { InternalServerError } from "@zacatl/error";
+
 import type { ConfigCLI } from "./types";
 
 /**
- * CLI Platform implementation
- * Handles command-line interface execution context
+ * CLI platform stub for ServiceType.CLI execution.
+ *
+ * @param config - CLI name/version configuration.
+ * @returns Calling start throws InternalServerError; stop is a no-op.
+ *
+ * @example
+ * const cli = new CLI({ name: "my-cli", version: "0.1.0" });
  */
 export class CLI {
   private name: string;
   private version: string;
-  private description: string | undefined;
 
   constructor(config: ConfigCLI) {
     this.name = config.name;
     this.version = config.version;
-    this.description = config.description;
   }
 
   public async start(_input?: unknown): Promise<void> {
-    // TODO [@deadline: 2026-03-01]: Implement CLI command handler resolution and execution
-    // Should: Parse CLI args, resolve command handlers from DI, execute with proper error handling
-    console.log(`Starting CLI platform: ${this.name} v${this.version}`);
-    if (this.description) {
-      console.log(this.description);
-    }
+    throw new InternalServerError({
+      message: `CLI platform '${this.name}' is not yet implemented`,
+      reason:
+        "ServiceType.CLI is declared but CLI command routing and argument parsing are not implemented. " +
+        "This feature is planned for v0.1.0. Use ServiceType.SERVER for HTTP-based services.",
+      component: "CLI",
+      operation: "start",
+      metadata: { name: this.name, version: this.version },
+    });
   }
 
   public async stop(): Promise<void> {}

@@ -2,19 +2,146 @@
 
 ---
 
-## [0.0.35] - Current
+## [0.0.39] - 2026-02-19
 
 **Status**: Current release
+
+### ✨ Improvements
+
+- **Unified ESM Fix Script**: Consolidated `cli-fix-esm.mjs` and `fix-esm-exports.mjs` into single `fix-esm.mjs` script
+- **Unified Dependency Export Strategy**: All dependencies (frameworks, ORMs, utilities) exported via library subpaths; examples import only from `@sentzunhat/zacatl` for a single source of truth
+  - Express: `@sentzunhat/zacatl/third-party/express`
+  - Fastify: `@sentzunhat/zacatl/third-party/fastify`
+  - Mongoose: `@sentzunhat/zacatl/third-party/mongoose`
+  - Sequelize: `@sentzunhat/zacatl/third-party/sequelize`
+  - Utilities: Zod, UUID, Pino, i18n, YAML via subpaths or root exports
+- **Shared HTTP Methods**: Created unified `HTTPMethod` type in common module for consistent method naming across Fastify and Express
+- **Express Framework Support**: Full Express.js handler implementation with adapters matching Fastify patterns
+  - Added `AbstractExpressRouteHandler` base class and method-specific handlers (Get, Post, Put, Patch, Delete, Head, Options)
+  - `ExpressApiServerAdapter` for route registration and lifecycle management
+- **Separated Provider Folders**: Reorganized handlers into provider-specific folders (`fastify/handlers/`, `express/handlers/`)
+- **Removed Code Duplication**: Both frameworks now share common HTTP method types and utilities
+
+### 🔧 Architecture
+
+- **Framework Separation**: Each framework (Fastify/Express) has isolated handler implementations in separate module trees
+- **Common Utilities**: HTTP methods, request types, and base interfaces in `rest/common/`
+- **Port-Adapter Pattern**: Handlers adapt framework-specific types to domain logic (consistent with Fastify)
+
+### 📚 Documentation
+
+- Added comprehensive REST handlers guide (`docs/service/rest-handlers.md`)
+- Documented HTTP method types and framework-specific implementations
+- Migration guide for switching between Fastify and Express
+
+### 🗺️ Roadmap
+
+**In Progress - Express Platform Examples:**
+
+Three Express examples targeting parity with existing Fastify examples:
+
+- `04-with-sqlite` (Express + SQLite via Sequelize)
+  - Backend API with full CRUD greetings endpoint
+  - React frontend loading from Express API
+  - E2E verified: API call → handler → service → repository → SQLite → response
+
+- `05-with-mongodb` (Express + MongoDB via Mongoose)
+  - Backend API with full CRUD greetings endpoint
+  - React frontend loading from Express API
+  - E2E verified: API call → handler → service → repository → MongoDB → response
+
+- `06-with-postgres` (Express + PostgreSQL via Sequelize)
+  - Backend API with full CRUD greetings endpoint
+  - React frontend loading from Express API
+  - E2E verified: API call → handler → service → repository → PostgreSQL → response
+
+Each example will include:
+
+- Docker multi-stage build with distroless Node.js 24
+- ESM build pipeline using `fix-esm.mjs`
+- Same monorepo structure as Fastify examples (apps/backend, apps/frontend)
+- Verified end-to-end with live API calls and DB persistence
+
+---
+
+## [0.0.38] - 2026-02-14
+
+**Status**: Current release
+
+### ✨ Improvements
+
+- **Repository Type Safety**: Added typed model property support for Mongoose and Sequelize repositories
+- **Standalone Repository Classes**: Introduced a new standalone repository pattern for advanced use cases
+- **DI Auto-Registration**: Fixed automatic registration of repositories and dependencies
+
+### 🔧 Maintenance
+
+- Updated all examples to use the new repository pattern (platform-fastify examples)
+- Cleaned up documentation and aligned with the current implementation
+- Fixed import paths for package exports
+
+### 📚 Documentation
+
+- Enhanced service module documentation with a testing section
+- Added examples for new repository patterns
+- Improved repository type safety documentation
+
+---
+
+## [0.0.37] - 2026-02-12
+
+**Status**: Patch release
+
+### ✨ Improvements
+
+- Enhanced package export conditions and type definitions
+- Improved type inference for service configuration
+
+### 🔧 Maintenance
+
+- Updated all internal type definitions
+- Optimized export resolution paths
+- Fixed TypeScript strict mode violations
+
+---
+
+## [0.0.36] - 2026-02-10
+
+**Status**: Patch release
+
+### 🔧 Maintenance
+
+- **i18n Simplification**: Removed runtime detection and i18next dependency bloat
+- **Logging Adapters**: Reorganized logging adapters for a cleaner module structure
+- **DI Utilities**: Cleaned up dependency injection utilities and simplified registration
+
+### ✨ Improvements
+
+- Streamlined dependency injection initialization
+- Simplified logging adapter loading
+- Better error messages for missing adapters
+
+### 📚 Documentation
+
+- Updated DI patterns documentation
+- Clarified logging adapter usage
+- Removed references to deprecated i18next patterns
+
+---
+
+## [0.0.35] - 2026-02-10
+
+**Status**: Stable release
 
 ### 🐛 Bug Fixes
 
 - Fixed "TypeInfo not known for Mongoose/Sequelize" error in dependency injection container
 - Fixed database instance registration timing issue where repositories were instantiated before database instances were registered
-- Pre-register database instances in Service constructor before layers are instantiated
+- Pre-register database instances in the Service constructor before layers are instantiated
 
 ### ✨ Improvements
 
-- Service now automatically registers Mongoose and Sequelize instances from config
+- Service now automatically registers Mongoose and Sequelize instances from the config
 - Improved database vendor detection and registration in Service initialization
 - Enhanced documentation for ORM subpath-only imports
 
@@ -34,13 +161,13 @@
 
 **Status**: Previous stable release
 
-See version 0.0.32 below for latest changes. Version 0.0.33 is a minor version bump.
+See version 0.0.32 below for the latest changes. Version 0.0.33 is a minor version bump.
 
 ---
 
 ## [0.0.32] - 2026-02-07
 
-> **Note**: The features below are planned for v0.1.0 but not yet released.
+> **Note**: The features below are planned for v0.1.0 but have not yet released.
 > **Current stable version**: 0.0.33
 
 ### 🎯 Multi-Context Architecture Support (Planned)
@@ -95,7 +222,7 @@ const server = new Service({
 });
 ```
 
-#### Breaking Changes (with Backward Compatibility)
+#**Breaking Changes (with Backward Compatibility)**
 
 ### 📦 Release
 
@@ -225,7 +352,7 @@ import { Sequelize, DataTypes } from "@sentzunhat/zacatl/third-party/sequelize";
 
 **No Breaking Changes:** Both import styles work - choose based on your needs.
 
-**See:** [docs/guides/orm-import-strategies.md](./guides/orm-import-strategies.md)
+**See:** [third-party/orm/orm-import-strategies.md](third-party/orm/orm-import-strategies.md)
 
 ---
 

@@ -1,6 +1,7 @@
-import type { Optional } from "@zacatl/optionals";
 import type { Mongoose } from "mongoose";
 import type { Sequelize } from "sequelize";
+
+import type { Optional } from "../../../../utils/optionals";
 
 export enum DatabaseVendor {
   MONGOOSE = "MONGOOSE",

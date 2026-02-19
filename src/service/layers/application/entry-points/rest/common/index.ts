@@ -1,2 +1,3 @@
 export * from "./handler";
 export * from "./request";
+export * from "./http-methods";

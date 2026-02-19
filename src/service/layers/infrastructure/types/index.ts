@@ -2,10 +2,10 @@ import type { Constructor } from "../../types";
 import type { RepositoryPort as BaseRepositoryPort } from "../repositories/types";
 
 export type RepositoryPort<
-  D = unknown,
+  M = unknown,
   I = unknown,
   O = unknown,
-> = BaseRepositoryPort<D, I, O>;
+> = BaseRepositoryPort<M, I, O>;
 
 export type InfrastructureUnknownRepository = RepositoryPort<
   unknown,

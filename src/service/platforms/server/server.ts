@@ -31,9 +31,13 @@ export type ConfigServer = {
 };
 
 /**
- * Server - Orchestrates REST API, page server, and database connections
- * Creates shared HTTP adapter used by both ApiServer and PageServer
- * Handles database configuration and startup
+ * Server orchestration for REST, pages, and database connections.
+ *
+ * @param config - Service server configuration and entry points.
+ * @returns Starts HTTP listening and initializes configured databases.
+ *
+ * @example
+ * const server = new Server({ name: "api", server: serverConfig, databases: [], port: 3000 });
  */
 export class Server {
   private readonly config: ConfigServer;
@@ -93,10 +97,7 @@ export class Server {
     this.pageServer = new PageServer(this.config, this.pageAdapter);
 
     if (this.config.databases && this.config.databases.length > 0) {
-      this.databaseServer = new DatabaseServer(
-        this.config.name,
-        this.config.databases,
-      );
+      this.databaseServer = new DatabaseServer(this.config.name, this.config.databases);
     }
   }
 
@@ -112,9 +113,7 @@ export class Server {
   /**
    * Register entry points from Application layer
    */
-  public async registerEntrypoints(
-    entryPoints: RestApplicationEntryPoints,
-  ): Promise<void> {
+  public async registerEntrypoints(entryPoints: RestApplicationEntryPoints): Promise<void> {
     if (this.apiServer) {
       await this.apiServer.registerEntrypoints(entryPoints);
     }

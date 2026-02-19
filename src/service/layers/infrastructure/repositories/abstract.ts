@@ -3,13 +3,14 @@ import { InternalServerError } from "@zacatl/error";
 import {
   BaseRepositoryConfig,
   RepositoryPort,
-  MongooseRepositoryConfig,
-  SequelizeRepositoryConfig,
+  MongooseBaseRepositoryConfig,
+  MongooseRepositoryModel,
+  SequelizeBaseRepositoryConfig,
+  SequelizeRepositoryModel,
+  RepositoryModel,
   ORMPort,
   ORMType,
-  RepositoryModel,
 } from "./types";
-import type { SequelizeModel as Model } from "../../../../third-party/sequelize";
 import {
   createMongooseAdapter,
   createSequelizeAdapter,
@@ -17,15 +18,15 @@ import {
 
 export * from "./types";
 
-const isMongooseConfig = <D>(
+const isMongooseConfig = <D extends object>(
   config: BaseRepositoryConfig<D>,
-): config is MongooseRepositoryConfig<D> => {
+): config is MongooseBaseRepositoryConfig<D> => {
   return config.type === ORMType.Mongoose;
 };
 
-const isSequelizeConfig = <D extends Model>(
+const isSequelizeConfig = <D extends object>(
   config: BaseRepositoryConfig<D>,
-): config is SequelizeRepositoryConfig<D> => {
+): config is SequelizeBaseRepositoryConfig<D> => {
   return config.type === ORMType.Sequelize;
 };
 
@@ -36,17 +37,22 @@ const isSequelizeConfig = <D extends Model>(
  * 1. Direct method calls: `await repo.findById()` - adapter lazy-loads on first call
  * 2. Custom queries: `(this.model as ModelStatic<T>).find()` - type-assert model in subclass
  */
-export abstract class BaseRepository<D, I, O> implements RepositoryPort<
-  D,
+export abstract class BaseRepository<
+  D extends object,
   I,
-  O
-> {
-  private readonly adapter: ORMPort<D, I, O>;
+  O,
+> implements RepositoryPort<RepositoryModel<D>, I, O> {
+  private readonly adapter:
+    | ORMPort<MongooseRepositoryModel<D>, I, O>
+    | ORMPort<SequelizeRepositoryModel<D>, I, O>;
   private readonly ormType: ORMType;
 
-  /** ORM model instance - typed by subclass assertion (lazy-loaded) */
+  /**
+   * ORM model instance - requires type assertion based on ORM type
+   * Use isMongoose() or isSequelize() to safely narrow the type
+   */
   public get model(): RepositoryModel<D> {
-    return this.adapter.model as RepositoryModel<D>;
+    return this.adapter.model;
   }
 
   constructor(config: BaseRepositoryConfig<D>) {
@@ -54,7 +60,7 @@ export abstract class BaseRepository<D, I, O> implements RepositoryPort<
 
     if (isMongooseConfig<D>(config)) {
       this.adapter = createMongooseAdapter<D, I, O>(config);
-    } else if (isSequelizeConfig(config)) {
+    } else if (isSequelizeConfig<D>(config)) {
       this.adapter = createSequelizeAdapter<D, I, O>(config);
     } else {
       const exhaustive: never = config;
@@ -74,6 +80,33 @@ export abstract class BaseRepository<D, I, O> implements RepositoryPort<
 
   public isSequelize(): boolean {
     return this.ormType === ORMType.Sequelize;
+  }
+
+  /**
+   * Initialize the ORM model (create collections, indexes, etc.)
+   * For Mongoose: creates collection and indexes
+   * For Sequelize: no-op (use Sequelize.sync() in onDatabaseConnected instead)
+   *
+   * Call this method from the onDatabaseConnected callback to ensure
+   * async setup operations complete at startup instead of during first query.
+   *
+   * @example
+   * ```typescript
+   * onDatabaseConnected: async (mongoose: Mongoose) => {
+   *   const userRepo = container.resolve(UserRepository);
+   *   await userRepo.initializeModel();
+   * }
+   * ```
+   */
+  public async initializeModel(): Promise<void> {
+    // Type guard: check if adapter has initialize method (Mongoose)
+    if (
+      "initialize" in this.adapter &&
+      typeof this.adapter.initialize === "function"
+    ) {
+      await this.adapter.initialize();
+    }
+    // Sequelize adapters don't need this - users call sequelize.sync() directly
   }
 
   public toLean(input: unknown): O | null {

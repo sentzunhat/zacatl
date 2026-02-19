@@ -1,5 +1,4 @@
-import type { Optional } from "@zacatl/optionals";
-
+import type { Optional } from "../../../utils/optionals";
 import type { ConfigApplication } from "../application";
 import type { ConfigDomain, ProviderPort } from "../domain";
 import type { ConfigInfrastructure } from "../infrastructure";

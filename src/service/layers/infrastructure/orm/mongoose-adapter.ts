@@ -1,11 +1,10 @@
-import { InternalServerError } from "@zacatl/error";
-import { uuidv4 } from "@zacatl/third-party";
-import { container } from "@zacatl/third-party";
-
-import type { MongooseModel } from "../../../../third-party/mongoose";
+import { InternalServerError } from "../../../../error";
+import { uuidv4 } from "../../../../third-party";
+import { container } from "../../../../third-party";
 import { Mongoose } from "../../../../third-party/mongoose";
 import type {
   MongooseRepositoryConfig,
+  MongooseRepositoryModel,
   ORMPort,
   LeanWithMeta,
 } from "../repositories/types";
@@ -13,25 +12,47 @@ import type {
 /**
  * Mongoose ORM adapter - handles Mongoose-specific database operations
  */
-export class MongooseAdapter<D, I, O> implements ORMPort<D, I, O> {
-  private _model: MongooseModel<D> | null = null;
+export class MongooseAdapter<D, I, O> implements ORMPort<
+  MongooseRepositoryModel<D>,
+  I,
+  O
+> {
+  private _model: MongooseRepositoryModel<D> | null = null;
   private readonly config: MongooseRepositoryConfig<D>;
 
   constructor(config: MongooseRepositoryConfig<D>) {
     this.config = config;
   }
 
-  public get model(): MongooseModel<D> {
-    if (!this._model) {
-      const mongoose = container.resolve(Mongoose);
-      const { name, schema } = this.config;
-
-      this._model = mongoose.model<D>(name || uuidv4(), schema);
-      this._model.createCollection();
-      this._model.createIndexes();
-      this._model.init();
+  public get model(): MongooseRepositoryModel<D> {
+    const existingModel = this._model;
+    if (existingModel) {
+      return existingModel;
     }
-    return this._model;
+
+    const mongoose = container.resolve(Mongoose);
+    const { name, schema } = this.config;
+
+    // mongoose.model() is synchronous — registers the model with Mongoose's registry.
+    // Async bootstrapping (createCollection, createIndexes, init) must NOT be called
+    // fire-and-forget here; they are handled explicitly via initialize() during
+    // DatabaseServer.configure() so we can await and surface errors at startup.
+    const model = mongoose.model<D>(name || uuidv4(), schema);
+    this._model = model;
+
+    return model;
+  }
+
+  /**
+   * Explicitly initialise the model: creates the collection and indexes.
+   * Called by MongooseAdapter users during database setup (DatabaseServer.configure),
+   * not lazily during first query — so failures surface at startup, not mid-request.
+   */
+  public async initialize(): Promise<void> {
+    const m = this.model; // ensure _model is set
+    await m.createCollection();
+    await m.createIndexes();
+    await m.init();
   }
 
   public toLean(input: unknown): O | null {
@@ -87,12 +108,17 @@ export class MongooseAdapter<D, I, O> implements ORMPort<D, I, O> {
   }
 
   async findById(id: string): Promise<O | null> {
-    const entity = await this.model
-      .findById(id)
-      .lean<O>({ virtuals: true })
-      .exec();
+    try {
+      const entity = await this.model
+        .findById(id)
+        .lean<O>({ virtuals: true })
+        .exec();
 
-    return this.toLean(entity);
+      return this.toLean(entity);
+    } catch {
+      // Silently handle invalid ObjectId errors
+      return null;
+    }
   }
 
   async findMany(filter: Record<string, unknown> = {}): Promise<O[]> {
@@ -124,25 +150,40 @@ export class MongooseAdapter<D, I, O> implements ORMPort<D, I, O> {
   }
 
   async update(id: string, update: Partial<I>): Promise<O | null> {
-    const entity = await this.model
-      .findByIdAndUpdate(id, update as unknown as Partial<D>, { new: true })
-      .lean<O>({ virtuals: true })
-      .exec();
+    try {
+      const entity = await this.model
+        .findByIdAndUpdate(id, update as unknown as Partial<D>, { new: true })
+        .lean<O>({ virtuals: true })
+        .exec();
 
-    return this.toLean(entity);
+      return this.toLean(entity);
+    } catch {
+      // Silently handle invalid ObjectId errors
+      return null;
+    }
   }
 
   async delete(id: string): Promise<O | null> {
-    const entity = await this.model
-      .findByIdAndDelete(id)
-      .lean<O>({ virtuals: true })
-      .exec();
+    try {
+      const entity = await this.model
+        .findByIdAndDelete(id)
+        .lean<O>({ virtuals: true })
+        .exec();
 
-    return this.toLean(entity);
+      return this.toLean(entity);
+    } catch {
+      // Silently handle invalid ObjectId errors
+      return null;
+    }
   }
 
   async exists(id: string): Promise<boolean> {
-    const result = await this.model.exists({ _id: id });
-    return Boolean(result);
+    try {
+      const result = await this.model.exists({ _id: id });
+      return Boolean(result);
+    } catch {
+      // Silently handle invalid ObjectId errors
+      return false;
+    }
   }
 }

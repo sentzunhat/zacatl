@@ -2,35 +2,41 @@
   "extends": "../tsconfig.json",
   "compilerOptions": {
     "lib": ["ES2022", "DOM"],
+    "baseUrl": ".",
     "rootDir": "../",
-    "noEmit": true
+    "noEmit": true,
+    "paths": {
+      "@zacatl": ["../src/index.ts"],
+      "@zacatl/service": ["../src/service/index.ts"],
+      "@zacatl/third-party/fastify": ["../src/third-party/fastify.ts"],
+      "@zacatl/configuration": ["../src/configuration/index.ts"],
+      "@zacatl/dependency-injection": ["../src/dependency-injection/index.ts"],
+      "@zacatl/error": ["../src/error/index.ts"],
+      "@zacatl/localization": ["../src/localization/index.ts"],
+      "@zacatl/logs": ["../src/logs/index.ts"],
+      "@zacatl/utils": ["../src/utils/index.ts"],
+      "@zacatl/third-party": ["../src/third-party/index.ts"],
+      "@zacatl/third-party/uuid": ["../src/third-party/uuid.ts"],
+      "@zacatl/third-party/i18n": ["../src/third-party/i18n.ts"],
+      "@zacatl/third-party/tsyringe": ["../src/third-party/tsyringe.ts"],
+      "@zacatl/third-party/pino": ["../src/third-party/pino.ts"],
+      "@zacatl/third-party/js-yaml": ["../src/third-party/js-yaml.ts"],
+      "@zacatl/third-party/zod": ["../src/third-party/zod.ts"],
+      "@zacatl/third-party/mongoose": ["../src/third-party/mongoose.ts"],
+      "@zacatl/third-party/sequelize": ["../src/third-party/sequelize.ts"],
+      "@zacatl/third-party/reflect-metadata": [
+        "../src/third-party/reflect-metadata.ts"
+      ],
+      "@zacatl/third-party/eslint": ["../src/third-party/eslint.ts"],
+      "@zacatl/optionals": ["../src/utils/optionals.ts"],
+      "@zacatl/infrastructure": [
+        "../src/service/layers/infrastructure/index.ts"
+      ],
+      "@zacatl/domain": ["../src/service/layers/domain/index.ts"],
+      "@zacatl/application": ["../src/service/layers/application/index.ts"],
+      "@zacatl/platform": ["../src/service/platforms/index.ts"]
+    }
   },
   "include": ["./**/*.ts"],
-  "paths": {
-    "@zacatl": ["../src/index.ts"],
-    "@zacatl/service": ["../src/service/index.ts"],
-    "@zacatl/third-party/fastify": ["../src/third-party/fastify.ts"],
-    "@zacatl/configuration": ["../src/configuration/index.ts"],
-    "@zacatl/dependency-injection": ["../src/dependency-injection/index.ts"],
-    "@zacatl/error": ["../src/error/index.ts"],
-    "@zacatl/localization": ["../src/localization/index.ts"],
-    "@zacatl/logs": ["../src/logs/index.ts"],
-    "@zacatl/utils": ["../src/utils/index.ts"],
-    "@zacatl/third-party": ["../src/third-party/index.ts"],
-    "@zacatl/third-party/uuid": ["../src/third-party/uuid.ts"],
-    "@zacatl/third-party/i18n": ["../src/third-party/i18n.ts"],
-    "@zacatl/third-party/tsyringe": ["../src/third-party/tsyringe.ts"],
-    "@zacatl/third-party/pino": ["../src/third-party/pino.ts"],
-    "@zacatl/third-party/js-yaml": ["../src/third-party/js-yaml.ts"],
-    "@zacatl/third-party/zod": ["../src/third-party/zod.ts"],
-    "@zacatl/third-party/mongoose": ["../src/third-party/mongoose.ts"],
-    "@zacatl/third-party/sequelize": ["../src/third-party/sequelize.ts"],
-    "@zacatl/third-party/eslint": ["../src/third-party/eslint.ts"],
-    "@zacatl/optionals": ["../src/optionals.ts"],
-    "@zacatl/infrastructure": ["../src/service/layers/infrastructure/index.ts"],
-    "@zacatl/domain": ["../src/service/layers/domain/index.ts"],
-    "@zacatl/application": ["../src/service/layers/application/index.ts"],
-    "@zacatl/platform": ["../src/service/platforms/index.ts"]
-  },
   "exclude": ["node_modules", "build", "coverage"]
 }

@@ -1,0 +1,128 @@
+# Internationalization API Reference
+
+Multi-language support with i18n-node.
+
+## Import
+
+```typescript
+import {
+  configureI18nNode,
+  loadCatalog,
+  mergeCatalogs,
+  resolveBuiltInLocalesDir,
+} from "@sentzunhat/zacatl";
+
+import type {
+  ConfigureI18nInput,
+  I18nCatalogType,
+  LoadCatalogInput,
+  MergeCatalogsInput,
+} from "@sentzunhat/zacatl";
+```
+
+## Filesystem Adapter
+
+```typescript
+const i18n = createI18n(new FilesystemAdapter("./src/localization/locales"));
+```
+
+**Expected structure:** `localesDir/language.json`
+
+### `MemoryAdapter`
+
+In-memory translations (useful for testing).
+
+```typescript
+import { MemoryAdapter, createI18n } from "@sentzunhat/zacatl";
+
+const i18n = createI18n(
+  new MemoryAdapter({
+    en: { translation: { greeting: "Hello" } },
+    es: { translation: { greeting: "Hola" } },
+  }),
+);
+```
+
+## Custom Adapter
+
+Implement the `I18nPort` interface:
+
+```typescript
+import type { I18nPort } from "@sentzunhat/zacatl";
+
+class MyAdapter implements I18nPort {
+  async init?() {
+    // Optional initialization
+  }
+
+  loadResources(language: string, namespace: string) {
+    // Load and return translations
+    return { greeting: "Hello" };
+  }
+
+  saveResources?(
+    language: string,
+    namespace: string,
+    resources: Record<string, unknown>,
+  ) {
+    // Optional: Save translations
+  }
+}
+```
+
+## Usage Examples
+
+### Basic Translation
+
+```typescript
+i18n.t("welcome"); // "Welcome"
+
+await i18n.setLanguage("es");
+i18n.t("welcome"); // "Bienvenido"
+```
+
+### With Variables (Interpolation)
+
+```typescript
+// en.json: { "greeting": "Hello, {{name}}!" }
+i18n.t("greeting", { name: "John" }); // "Hello, John!"
+```
+
+### Nested Keys (Object Notation)
+
+```typescript
+// en.json
+{
+  "errors": {
+    "notFound": "Resource not found",
+    "validation": "Invalid input"
+  }
+}
+
+i18n.t("errors.notFound"); // "Resource not found"
+```
+
+## File Structure
+
+```
+locales/
+├── en.json
+├── es.json
+└── fr.json
+```
+
+**Example `en.json`:**
+
+```json
+{
+  "greeting": "Hello {{name}}",
+  "errors": {
+    "notFound": "Not found",
+    "validation": "Invalid input"
+  }
+}
+```
+
+---
+
+**Next**: [Repository →](../service/repository.md)

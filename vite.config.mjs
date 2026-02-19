@@ -11,10 +11,7 @@ export default defineConfig({
     extensions: [".ts", ".tsx", ".js", ".mjs", ".json"],
     alias: {
       "@zacatl/configuration": path.resolve(__dirname, "./src/configuration"),
-      "@zacatl/dependency-injection": path.resolve(
-        __dirname,
-        "./src/dependency-injection",
-      ),
+      "@zacatl/dependency-injection": path.resolve(__dirname, "./src/dependency-injection"),
       "@zacatl/error": path.resolve(__dirname, "./src/error"),
       "@zacatl/localization": path.resolve(__dirname, "./src/localization"),
       "@zacatl/logs": path.resolve(__dirname, "./src/logs"),
@@ -27,18 +24,9 @@ export default defineConfig({
         __dirname,
         "./src/service/architecture/infrastructure",
       ),
-      "@zacatl/domain": path.resolve(
-        __dirname,
-        "./src/service/architecture/domain",
-      ),
-      "@zacatl/application": path.resolve(
-        __dirname,
-        "./src/service/architecture/application",
-      ),
-      "@zacatl/platform": path.resolve(
-        __dirname,
-        "./src/service/architecture/platform",
-      ),
+      "@zacatl/domain": path.resolve(__dirname, "./src/service/architecture/domain"),
+      "@zacatl/application": path.resolve(__dirname, "./src/service/architecture/application"),
+      "@zacatl/platform": path.resolve(__dirname, "./src/service/architecture/platform"),
     },
   },
   test: {
@@ -59,11 +47,13 @@ export default defineConfig({
       reporter: ["lcov", "text"],
       reportsDirectory: "./coverage",
       all: true,
-      include: ["src/*"],
+      include: ["src/**/*.ts"],
       provider: "istanbul",
       exclude: [
         // Generated files:
         "**/*.d.ts",
+        // macOS metadata files:
+        "**/.DS_Store",
       ],
     },
     /*

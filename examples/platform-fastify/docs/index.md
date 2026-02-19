@@ -10,11 +10,11 @@ examples/platform-fastify/
 │   ├── production-patterns.md          # 6.7KB - Framework patterns
 │   ├── quick-start.md                  # 6.0KB - Complete walkthrough
 │   └── validation-checklist.md         # 10.4KB - Transformation record
-├── 01-with-sqlite/
+├── with-sqlite-react/
 │   └── README.md                       # Quick reference + database setup
-└── 02-with-mongodb/
-    └── README.md                       # Quick reference + database setup
-└── 03-with-postgres/
+├── with-mongodb-react/
+│   └── README.md                       # Quick reference + database setup
+└── with-postgres-react/
     └── README.md                       # Quick reference + database setup
 ```
 
@@ -31,9 +31,9 @@ examples/platform-fastify/
 
 1. **[docs/production-patterns.md](production-patterns.md)** - Read this first
 2. Example-specific setup in each README:
-   - **[01-with-sqlite/README.md](../01-with-sqlite/README.md#database-setup)**
-   - **[02-with-mongodb/README.md](../02-with-mongodb/README.md#database-setup)**
-   - **[03-with-postgres/README.md](../03-with-postgres/README.md#database-setup)**
+   - **[with-sqlite-react/README.md](../with-sqlite-react/README.md#database-setup)**
+   - **[with-mongodb-react/README.md](../with-mongodb-react/README.md#database-setup)**
+   - **[with-postgres-react/README.md](../with-postgres-react/README.md#database-setup)**
 
 ### For Reference
 
@@ -68,5 +68,4 @@ When updating examples:
 
 ## 🔗 External Links
 
-- **Framework Documentation**: [../../../docs/README.md](../../../docs/README.md)
-- **Testing Guide**: [../../../docs/testing/README.md](../../../docs/testing/README.md)
+- **Framework Documentation**: [../../../README.md](../../../README.md)

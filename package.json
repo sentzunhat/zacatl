@@ -4,133 +4,136 @@
   "main": "build/index.js",
   "module": "build/index.js",
   "types": "build/index.d.ts",
-  "version": "0.0.38",
+  "version": "0.0.39",
   "packageManager": "npm@10.9.0",
   "exports": {
     ".": {
       "types": "./build/index.d.ts",
-      "bun": "./src/index.ts",
       "import": "./build/index.js",
       "require": "./build/index.js"
     },
     "./service": {
       "types": "./build/service/index.d.ts",
-      "bun": "./src/service/index.ts",
       "import": "./build/service/index.js"
     },
     "./third-party": {
       "types": "./build/third-party/index.d.ts",
-      "bun": "./src/third-party/index.ts",
       "import": "./build/third-party/index.js"
     },
     "./error": {
       "types": "./build/error/index.d.ts",
-      "bun": "./src/error/index.ts",
       "import": "./build/error/index.js"
     },
     "./third-party/mongoose": {
       "types": "./build/third-party/mongoose.d.ts",
-      "bun": "./src/third-party/mongoose.ts",
       "import": "./build/third-party/mongoose.js"
     },
     "./third-party/sequelize": {
       "types": "./build/third-party/sequelize.d.ts",
-      "bun": "./src/third-party/sequelize.ts",
       "import": "./build/third-party/sequelize.js"
     },
     "./third-party/uuid": {
       "types": "./build/third-party/uuid.d.ts",
-      "bun": "./src/third-party/uuid.ts",
       "import": "./build/third-party/uuid.js"
     },
     "./third-party/i18n": {
       "types": "./build/third-party/i18n.d.ts",
-      "bun": "./src/third-party/i18n.ts",
       "import": "./build/third-party/i18n.js"
     },
     "./third-party/tsyringe": {
       "types": "./build/third-party/tsyringe.d.ts",
-      "bun": "./src/third-party/tsyringe.ts",
       "import": "./build/third-party/tsyringe.js"
+    },
+    "./third-party/reflect-metadata": {
+      "types": "./build/third-party/reflect-metadata.d.ts",
+      "import": "./build/third-party/reflect-metadata.js"
     },
     "./third-party/pino": {
       "types": "./build/third-party/pino.d.ts",
-      "bun": "./src/third-party/pino.ts",
       "import": "./build/third-party/pino.js"
     },
     "./third-party/zod": {
       "types": "./build/third-party/zod.d.ts",
-      "bun": "./src/third-party/zod.ts",
       "import": "./build/third-party/zod.js"
     },
     "./third-party/js-yaml": {
       "types": "./build/third-party/js-yaml.d.ts",
-      "bun": "./src/third-party/js-yaml.ts",
       "import": "./build/third-party/js-yaml.js"
     },
     "./third-party/fastify": {
       "types": "./build/third-party/fastify.d.ts",
-      "bun": "./src/third-party/fastify.ts",
       "import": "./build/third-party/fastify.js"
+    },
+    "./third-party/express": {
+      "types": "./build/third-party/express.d.ts",
+      "import": "./build/third-party/express.js"
+    },
+    "./third-party/http-proxy-middleware": {
+      "types": "./build/third-party/http-proxy-middleware.d.ts",
+      "import": "./build/third-party/http-proxy-middleware.js"
     },
     "./third-party/eslint": {
       "types": "./build/third-party/eslint.d.ts",
-      "bun": "./src/third-party/eslint.ts",
       "import": "./build/third-party/eslint.js"
     },
     "./infrastructure": {
       "types": "./build/service/layers/infrastructure/repositories/abstract.d.ts",
-      "bun": "./src/service/layers/infrastructure/repositories/abstract.ts",
       "import": "./build/service/layers/infrastructure/repositories/abstract.js"
+    },
+    "./repository/mongoose": {
+      "types": "./build/service/layers/infrastructure/repositories/mongoose.d.ts",
+      "import": "./build/service/layers/infrastructure/repositories/mongoose.js"
+    },
+    "./repository/sequelize": {
+      "types": "./build/service/layers/infrastructure/repositories/sequelize.d.ts",
+      "import": "./build/service/layers/infrastructure/repositories/sequelize.js"
+    },
+    "./handlers/fastify": {
+      "types": "./build/service/layers/application/entry-points/rest/fastify/handlers/index.d.ts",
+      "import": "./build/service/layers/application/entry-points/rest/fastify/handlers/index.js"
+    },
+    "./handlers/express": {
+      "types": "./build/service/layers/application/entry-points/rest/express/handlers/index.d.ts",
+      "import": "./build/service/layers/application/entry-points/rest/express/handlers/index.js"
     },
     "./domain": {
       "types": "./build/service/layers/domain/index.d.ts",
-      "bun": "./src/service/layers/domain/index.ts",
       "import": "./build/service/layers/domain/index.js"
     },
     "./application": {
       "types": "./build/service/layers/application/index.d.ts",
-      "bun": "./src/service/layers/application/index.ts",
       "import": "./build/service/layers/application/index.js"
     },
     "./errors": {
       "types": "./build/error/index.d.ts",
-      "bun": "./src/error/index.ts",
       "import": "./build/error/index.js"
     },
     "./dependency-injection": {
       "types": "./build/dependency-injection/index.d.ts",
-      "bun": "./src/dependency-injection/index.ts",
       "import": "./build/dependency-injection/index.js"
     },
     "./utils": {
       "types": "./build/utils/index.d.ts",
-      "bun": "./src/utils/index.ts",
       "import": "./build/utils/index.js"
     },
     "./optionals": {
       "types": "./build/optionals.d.ts",
-      "bun": "./src/optionals.ts",
       "import": "./build/optionals.js"
     },
     "./logs": {
       "types": "./build/logs/index.d.ts",
-      "bun": "./src/logs/index.ts",
       "import": "./build/logs/index.js"
     },
     "./localization": {
       "types": "./build/localization/index.d.ts",
-      "bun": "./src/localization/index.ts",
       "import": "./build/localization/index.js"
     },
     "./configuration": {
       "types": "./build/configuration/index.d.ts",
-      "bun": "./src/configuration/index.ts",
       "import": "./build/configuration/index.js"
     },
     "./config": {
       "types": "./build/configuration/index.d.ts",
-      "bun": "./src/configuration/index.ts",
       "import": "./build/configuration/index.js"
     },
     "./eslint": {
@@ -147,6 +150,9 @@
     },
     "./build/*": "./build/*",
     "./package.json": "./package.json"
+  },
+  "bin": {
+    "zacatl-fix-esm": "./scripts/fix-esm.mjs"
   },
   "repository": {
     "type": "git",
@@ -200,7 +206,7 @@
   },
   "scripts": {
     "start": "npx tsx src/index.ts --project ./tsconfig.json",
-    "build": "npm run clean:src && tsc --project tsconfig.json && tsc-alias -p tsconfig.json && npm run clean:src",
+    "build": "npm run clean:src && tsc --project tsconfig.json && tsc-alias -p tsconfig.json && node scripts/fix-esm.mjs && npm run clean:src",
     "build:watch": "tsc --project tsconfig.json --watch",
     "test": "NODE_ENV=test ENV=test vitest run",
     "test:watch": "NODE_ENV=test ENV=test vitest",
@@ -216,7 +222,8 @@
     "clean:src": "find src -type f \\( -name '*.js' -o -name '*.d.ts' -o -name '*.js.map' -o -name '*.d.ts.map' \\) -delete 2>/dev/null; true",
     "clean:build": "rm -rf build dist *.tsbuildinfo && npm run clean:src",
     "clean": "npm run clean:build && npm run clean:modules:all",
-    "prepublish": "npm run clean:src && npm run test:coverage && npm run type:check && npm run lint && npm run build",
+    "prepublish:guard": "node scripts/prepublish-guard.mjs",
+    "prepublish": "npm run prepublish:guard && npm run clean:src && npm run test:coverage && npm run type:check && npm run lint && npm run build",
     "publish:latest": "npm run prepublish && npm publish --access public --tag latest",
     "publish:otp": "npm run prepublish && npm publish --access public --tag latest --otp",
     "publish:dry": "npm run prepublish && npm publish --dry-run",
@@ -225,7 +232,6 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.3",
     "@eslint/js": "^9.39.1",
-    "@types/bun": "^1.3.8",
     "@types/config": "^3.3.5",
     "@types/i18n": "^0.13.12",
     "@types/js-yaml": "^4.0.9",
@@ -237,7 +243,6 @@
     "@vitest/coverage-istanbul": "^4.0.15",
     "eslint": "^9.39.1",
     "eslint-plugin-import": "^2.32.0",
-    "knip": "^5.83.0",
     "mongodb-memory-server": "^11.0.1",
     "tsc-alias": "^1.8.16",
     "tsx": "^4.21.0",

@@ -11,43 +11,68 @@
 
 ## Available Examples
 
-### 1. [SQLite + React (01-with-sqlite)](./01-with-sqlite)
+### 1. [SQLite + React (with-sqlite-react)](./with-sqlite-react)
 
 - **Stack**: Fastify, SQLite (Sequelize), React, Tailwind
 - **Best for**: Rapid prototyping, small apps, zero-infrastructure setups
 - **Startup**: < 1 second
-- **Ports**: Backend: 8081, Frontend: 8091
+- **Ports**: Backend: 8081, Frontend: 5001
 
-### 2. [MongoDB + React (02-with-mongodb)](./02-with-mongodb)
+### 1b. [SQLite + Svelte (with-sqlite-svelte)](./with-sqlite-svelte)
+
+- **Stack**: Fastify, SQLite (Sequelize), Svelte 5, Tailwind
+- **Best for**: Smaller bundles, simpler reactivity, rapid prototyping
+- **Startup**: < 1 second
+- **Ports**: Backend: 8081, Frontend: 5001
+- **Note**: Same backend as React version, different frontend framework
+
+### 2. [MongoDB + React (with-mongodb-react)](./with-mongodb-react)
 
 - **Stack**: Fastify, MongoDB (Mongoose), React, Tailwind
 - **Best for**: Scalable document-based applications
 - **Startup**: < 2 seconds (with MongoDB connection)
-- **Ports**: Backend: 8082, Frontend: 8092
+- **Ports**: Backend: 8082, Frontend: 5002
 
-### 3. [PostgreSQL + React (03-with-postgres)](./03-with-postgres)
+### 3. [PostgreSQL + React (with-postgres-react)](./with-postgres-react)
 
 - **Stack**: Fastify, PostgreSQL (Sequelize), React, Tailwind
 - **Best for**: Relational workflows and production SQL
 - **Startup**: < 2 seconds (with PostgreSQL connection)
-- **Ports**: Backend: 8083, Frontend: 8093
+- **Ports**: Backend: 8083, Frontend: 5003
 
-## 🏗️ Architecture
+## 🏗️ Architecture & Folder Structure
 
-Both examples use a clean, consistent monorepo structure:
+All examples follow the same clean, scalable architecture:
 
 ```
-example-root/
-├── apps/
-│   ├── backend/    # Fastify Server (TypeScript)
-│   └── frontend/   # React + Vite + Tailwind
-└── shared/         # Shared types & domain models
+apps/backend/src/
+├── application/        # HTTP handlers (entry points)
+│   └── handlers/
+│       └── greetings/  # Feature: Greetings CRUD
+├── domain/             # Business logic (framework-independent)
+│   ├── greetings/      # Feature: Greetings
+│   │   ├── greeting.model.ts
+│   │   ├── greeting.service.ts
+│   │   └── greeting.service.port.ts
+│   └── models/
+├── infrastructure/     # Database & external services
+│   ├── greetings/
+│   │   ├── models/
+│   │   └── repositories/
+│   └── database/
+├── config.ts
+└── index.ts
 ```
 
-**Key Patterns:**
+**See [ARCHITECTURE.md](./ARCHITECTURE.md) for detailed patterns, best practices, and how to add new features.**
 
-- Class-token DI with `@singleton()` and `@inject()`
-- Handler → Service → Repository layers
+**Key Architectural Principles:**
+
+- **Layered Architecture**: Clear separation of concerns (application, domain, infrastructure)
+- **Hexagonal/Ports-and-Adapters**: Domain defines contracts, infrastructure provides implementations
+- **Feature-Based Organization**: Group related code by business domain/feature
+- **Type Safety**: Full TypeScript with strict typing throughout
+- **Dependency Injection**: Class-token DI with `@singleton()` and `@inject()`
 - Shared TypeScript types between frontend/backend
 - Zero config needed (works out of the box)
 
@@ -55,13 +80,13 @@ example-root/
 
 ```bash
 # Choose your example
-cd 01-with-sqlite  # or 02-with-mongodb
+cd with-sqlite-react  # or with-mongodb-react or with-postgres-react
 
 # Install & run
-bun install
-bun run dev  # Starts both backend + frontend
+npm install
+npm run dev  # Starts both backend + frontend
 
-# Open http://localhost:5001 (SQLite) or http://localhost:5002 (MongoDB)
+# Open http://localhost:5001 (SQLite) or http://localhost:5002 (MongoDB) or http://localhost:5003 (PostgreSQL)
 ```
 
 ## 📚 Documentation

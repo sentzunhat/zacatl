@@ -1,0 +1,47 @@
+services:
+  backend:
+    build:
+      context: ../../..
+      dockerfile: examples/platform-fastify/with-sqlite/Dockerfile
+    image: zacatl-fastify-sqlite
+    container_name: fastify-sqlite-backend
+    ports:
+      - "8081:8081"
+    environment:
+      - NODE_ENV=production
+      - PORT=8081
+      - DATABASE_URL=sqlite:database.sqlite
+    volumes:
+      # Persist SQLite database
+      - ./data:/app/data
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://localhost:8081/greetings').catch(() => process.exit(1))",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    restart: unless-stopped
+
+  # frontend:
+  #   build:
+  #     context: ../../..
+  #     dockerfile: examples/platform-fastify/with-sqlite/apps/frontend/Dockerfile
+  #   image: zacatl-fastify-sqlite-frontend
+  #   container_name: fastify-sqlite-frontend
+  #   ports:
+  #     - "3000:3000"
+  #   environment:
+  #     - VITE_API_URL=http://localhost:8081
+  #   depends_on:
+  #     backend:
+  #       condition: service_healthy
+  #   restart: unless-stopped
+
+volumes:
+  data:

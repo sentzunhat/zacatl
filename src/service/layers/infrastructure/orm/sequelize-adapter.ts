@@ -1,16 +1,21 @@
-import {
-  SequelizeModel as Model,
-  ModelStatic,
-} from "../../../../third-party/sequelize";
-import type { SequelizeRepositoryConfig, ORMPort } from "../repositories/types";
+import { SequelizeModel as Model } from "../../../../third-party/sequelize";
+import type {
+  SequelizeRepositoryConfig,
+  SequelizeRepositoryModel,
+  ORMPort,
+} from "../repositories/types";
 
 /**
  * Sequelize ORM adapter - handles Sequelize-specific database operations
  */
-export class SequelizeAdapter<D, I, O> implements ORMPort<D, I, O> {
-  public readonly model: ModelStatic<Model>;
+export class SequelizeAdapter<D extends object, I, O> implements ORMPort<
+  SequelizeRepositoryModel<D>,
+  I,
+  O
+> {
+  public readonly model: SequelizeRepositoryModel<D>;
 
-  constructor(config: SequelizeRepositoryConfig<object>) {
+  constructor(config: SequelizeRepositoryConfig<D>) {
     this.model = config.model;
   }
 
@@ -46,7 +51,7 @@ export class SequelizeAdapter<D, I, O> implements ORMPort<D, I, O> {
 
   async findMany(filter: Record<string, unknown> = {}): Promise<O[]> {
     const entities = await this.model.findAll({
-      where: filter as Record<string, unknown>,
+      where: filter as never,
     });
 
     return entities
@@ -55,19 +60,14 @@ export class SequelizeAdapter<D, I, O> implements ORMPort<D, I, O> {
   }
 
   async create(entity: I): Promise<O> {
-    const document = await this.model.create(
-      entity as unknown as Record<string, unknown>,
-    );
+    const document = await this.model.create(entity as never);
     return this.toLean(document) as O;
   }
 
   async update(id: string, update: Partial<I>): Promise<O | null> {
-    const [affectedCount] = await this.model.update(
-      update as unknown as Record<string, unknown>,
-      {
-        where: { id } as Record<string, unknown>,
-      },
-    );
+    const [affectedCount] = await this.model.update(update as never, {
+      where: { id } as never,
+    });
 
     if (affectedCount === 0) {
       return null;
@@ -81,7 +81,7 @@ export class SequelizeAdapter<D, I, O> implements ORMPort<D, I, O> {
     if (!entity) return null;
 
     await this.model.destroy({
-      where: { id } as Record<string, unknown>,
+      where: { id } as never,
     });
 
     return entity;
@@ -89,8 +89,8 @@ export class SequelizeAdapter<D, I, O> implements ORMPort<D, I, O> {
 
   async exists(id: string): Promise<boolean> {
     const count = await this.model.count({
-      where: { id } as Record<string, unknown>,
+      where: { id } as never,
     });
-    return count > 0;
+    return (Array.isArray(count) ? count.length : count) > 0;
   }
 }

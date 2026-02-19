@@ -44,14 +44,18 @@ describe("ExpressApiAdapter", () => {
       );
     });
 
-    it("should handle request validation", async () => {
+    it("should handle request validation and call handler", async () => {
       const handler: RouteHandler = {
         method: "POST",
         url: "/validate",
         schema: {
           body: z.object({ name: z.string() }),
         },
-        execute: vi.fn().mockResolvedValue({ success: true }),
+        execute: vi.fn().mockImplementation(async (_req, reply: any) => {
+          // Handler calls reply.send() which translates to res.json()
+          await reply.code(200).send({ success: true });
+          return { success: true };
+        }),
       } as any;
 
       adapter.registerRoute(handler);
@@ -68,6 +72,7 @@ describe("ExpressApiAdapter", () => {
         status: vi.fn().mockReturnThis(),
         json: vi.fn(),
         send: vi.fn(),
+        setHeader: vi.fn(),
         headersSent: false,
       };
       const next = vi.fn();
@@ -75,6 +80,7 @@ describe("ExpressApiAdapter", () => {
       await callback(req, res, next);
 
       expect(handler.execute).toHaveBeenCalled();
+      expect(res.status).toHaveBeenCalledWith(200);
       expect(res.json).toHaveBeenCalledWith({ success: true });
     });
 
@@ -100,6 +106,8 @@ describe("ExpressApiAdapter", () => {
       const res = {
         status: vi.fn().mockReturnThis(),
         json: vi.fn(),
+        setHeader: vi.fn(),
+        headersSent: false,
       };
       const next = vi.fn();
 

@@ -3,13 +3,13 @@ import { FastifyRequest } from "fastify";
 import { container } from "tsyringe";
 
 import {
-  AbstractRouteHandler,
   Application,
   ConfigApplication,
   HookHandler,
   HookHandlerName,
-  Request,
 } from "../../../../../src/service/layers/application";
+import { AbstractRouteHandler } from "../../../../../src/service/layers/application/entry-points/rest/fastify/handlers/abstract";
+import type { Request } from "../../../../../src/service/layers/application/entry-points/rest/common/request";
 
 class DummyHookHandler implements HookHandler {
   public name: HookHandlerName = "onRequest";
@@ -28,9 +28,8 @@ class DummyRouteHandler extends AbstractRouteHandler {
     });
   }
 
-  handler(_: Request, __: FastifyReply): void | Promise<void> {
+  async handler(_: Request, __: FastifyReply): Promise<void> {
     // Dummy implementation
-    return;
   }
 }
 

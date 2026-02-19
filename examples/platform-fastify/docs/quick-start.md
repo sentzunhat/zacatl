@@ -1,315 +1,88 @@
-# 🚀 Quick Start Guide - Full-Stack Monorepo Examples
+# Quick Start - Fastify Monorepo Examples
 
-## ⚡ Choose Your Path
+## Prerequisites
 
-### Option 1: SQLite (Fastest to Start)
+- Node.js 24+
+- npm 10+
+- Docker (only for MongoDB/PostgreSQL databases)
 
-```bash
-cd examples/platform-fastify/01-with-sqlite
-```
-
-**Perfect for**: Learning, prototyping, demos, edge deployments
-**Pros**: Zero infrastructure, < 1s startup, single file database
-**Cons**: Single connection limit, not ideal for high concurrency
-
-### Option 2: MongoDB (Production Ready)
+## SQLite (fastest)
 
 ```bash
-cd examples/platform-fastify/02-with-mongodb
+cd examples/platform-fastify/with-sqlite
+npm ci
+npm run dev
 ```
 
-**Perfect for**: Production apps, microservices, scalable workloads
-**Pros**: Horizontal scaling, flexible schemas, cloud-ready
-**Cons**: Requires MongoDB server (but Docker makes it easy)
+- Backend: http://localhost:3001
+- Frontend: http://localhost:5001
 
----
-
-## ⚡ 30-Second Setup
-
-### Prerequisites
+## MongoDB
 
 ```bash
-# Install Bun (fastest runtime) - https://bun.sh
-curl -fsSL https://bun.sh/install | bash
+docker run -d -p 27017:27017 --name mongo mongo:latest
 
-# Verify installation
-bun --version
+cd examples/platform-fastify/with-mongodb
+npm ci
+npm run dev
 ```
 
-> **Why Bun?** 2-3 (Zero Infrastructure)
+- Backend: http://localhost:3002
+- Frontend: http://localhost:5002
+
+## PostgreSQL
 
 ```bash
-cd examples/platform-fastify/01-with-sqlite
+docker run -d --name pg-zacatl \
+  -e POSTGRES_USER=local \
+  -e POSTGRES_PASSWORD=local \
+  -e POSTGRES_DB=appdb \
+  -p 5432:5432 postgres:16
 
-# Install dependencies
-bun install
-
-# Option 1: Run both backend + frontend together
-bun run dev
-
-# Option 2: Run separately in different terminals
-bun run backend:dev   # Terminal 1 - http://localhost:3001
-bun run frontend:dev  # Terminal 2 - http://localhost:5001
+cd examples/platform-fastify/with-postgres
+export DATABASE_URL=postgres://local:local@localhost:5432/appdb
+npm ci
+npm run dev
 ```
 
-✅ **That's it!** No database setup needed. Open http://localhost:5001
+- Backend: http://localhost:3001
+- Frontend: http://localhost:5001
 
-### MongoDB Example (Production Setup)
+## Build and start (production flow)
 
 ```bash
-cd examples/platform-fastify/02-with-mongodb
-
-# Step 1: Start MongoDB
-docker run -d -p 27017:27017 --name mongo \
-  -e MONGO_INITDB_ROOT_USERNAME=local \
-  -e MONGO_INITDB_ROOT_PASSWORD=local \
-  mongo:latest
-
-# Step 2: Install dependencies
-bun install
-
-# Step 3: Run the app
-bun run dev  # or run backend:dev and frontend:dev separately
+npm run build
+npm start
 ```
 
-✅ **Done!** Backend on http://localhost:3002, Frontend on http://localhost:5002
-
-# Open http://localhost:5002
-
-````
-
----
-
-## 📋 Common Commands
-
-### Build
+## Useful commands
 
 ```bash
-# Build everything
-bun run build
+npm run backend:dev
+npm run frontend:dev
+npm run backend:build
+npm run frontend:build
+npm run clean
+```
 
-# Build just backend
-bun run backend:build
+## Troubleshooting
 
-# Build just frontend
-bun run frontend:build
-````
-
-### Development
+### Dependencies look stale
 
 ```bash
-# Backend with file watching
-bun run backend:dev
-
-# Frontend with hot reload
-bun run frontend:dev
+rm -rf node_modules package-lock.json
+npm install
 ```
 
-### Production
+### Port already in use
 
 ```bash
-# Build for deployment
-bun run build
-
-# Start backend only
-bun run backend:start
+lsof -i :3001
+lsof -i :5001
 ```
 
-### Cleanup
+### Docker database check
 
 ```bash
-# Remove build artifacts
-bun run clean
+docker ps
 ```
-
----
-
-## 🐳 Docker
-
-### Build Image
-
-```bash
-docker build -t my-app:latest .
-```
-
-### Run Container
-
-```bash
-# SQLite
-docker run -p 3001:3001 my-app:latest
-
-# MongoDB
-docker run -p 3002:3002 \
-  -e MONGODB_URI=mongodb://mongo:27017/zacatl \
-  my-app:latest
-```
-
-### Docker Compose
-
-```bash
-# Start all services
-docker-compose up --build
-
-# With MongoDB only (MongoDB example)
-docker-compose up mongo -d
-
-# Stop services
-docker-compose down
-```
-
----
-
-## 🔗 API Testing
-
-### SQLite Backend (3001)
-
-```bash
-# List greetings
-curl http://localhost:3001/greetings
-
-# Create greeting
-curl -X POST http://localhost:3001/greetings \
-  -H "Content-Type: application/json" \
-  -d '{"message":"Hello","language":"en"}'
-
-# Get random
-curl http://localhost:3001/greetings/random/en
-
-# Delete
-curl -X DELETE http://localhost:3001/greetings/1
-```
-
-### MongoDB Backend (3002)
-
-```bash
-# List greetings
-curl http://localhost:3002/greetings
-
-# Create greeting
-curl -X POST http://localhost:3002/greetings \
-  -H "Content-Type: application/json" \
-  -d '{"text":"Hello","language":"en"}'
-
-# Get random
-curl http://localhost:3002/greetings/random/en
-
-# Delete
-curl -X DELETE http://localhost:3002/greetings/ID
-```
-
----
-
-## 🧠 Project Structure
-
-```
-example/
-├── apps/
-│   ├── backend/          # Fastify API
-│   │   ├── src/
-│   │   ├── dist/         (compiled)
-│   │   ├── package.json
-│   │   └── tsconfig.json
-│   └── frontend/         # React SPA
-│       ├── src/
-│       ├── dist/         (built)
-│       ├── package.json
-│       └── vite.config.ts
-├── shared/               # Domain models
-├── package.json          # Root (Bun workspaces)
-├── bun.lock              # Dependencies
-├── Dockerfile
-├── docker-compose.yml
-└── README.md
-```
-
----
-
-## 🔍 Key Files to Modify
-
-### Add Backend Endpoint
-
-1. Create handler: `apps/backend/src/application/handlers/my.handler.ts`
-2. Register in: `apps/backend/src/config.ts`
-3. Test with frontend
-
-### Update Frontend UI
-
-1. Edit: `apps/frontend/src/app.tsx` or `App.tsx`
-2. Auto-reload via Vite dev server
-
-### Change API Port
-
-1. SQLite: Search for `8081` in code
-2. MongoDB: Search for `8082` in code
-3. Update `vite.config.ts` proxy settings
-
----
-
-## 🆘 Troubleshooting
-
-### "bun command not found"
-
-```bash
-# Install bun
-curl -fsSL https://bun.sh/install | bash
-
-# Or use npm
-npm install -g bun
-```
-
-### Build fails: "Cannot find module"
-
-```bash
-# Clean and reinstall
-rm -rf node_modules bun.lock
-bun install
-```
-
-### Port 8081 already in use
-
-```bash
-# Find process using port
-lsof -i :8081
-
-# Kill it
-kill -9 <PID>
-```
-
-### MongoDB connection error
-
-```bash
-# Ensure MongoDB is running
-docker-compose up mongo -d
-
-# Check connection string in backend logs
-```
-
-### Frontend shows blank page
-
-1. Check console for errors: F12 → Console
-2. Verify backend is running: `curl http://localhost:8081/api/health`
-3. Check CORS settings in backend
-
----
-
-## 📚 Learn More
-
-- **Zacatl Framework**: https://github.com/sentzunhat/zacatl
-- **Bun Documentation**: https://bun.sh/docs
-- **Fastify Guide**: https://www.fastify.io/docs
-- **React Hooks**: https://react.dev/reference/react/hooks
-- **Vite Config**: https://vitejs.dev/config/
-
----
-
-## 💡 Pro Tips
-
-1. **Hot Reload**: Frontend auto-updates on save via Vite
-2. **API Proxy**: Vite dev server proxies `/api` to backend
-3. **TypeScript**: Full type safety in backend and frontend
-4. **Monorepo Scripts**: Use `bun run build` from root for both apps
-5. **Docker Compose**: Perfect for local development with all services
-
----
-
-**Ready to build?** Pick your example above and run the 60-second setup! 🎉

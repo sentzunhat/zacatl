@@ -6,30 +6,30 @@ import {
 import type { RepositoryPort } from "../../../../../src/service/layers/infrastructure/types";
 import type { RepositoryModel } from "../../../../../src/service/layers/infrastructure/repositories/types";
 
-class DummyRepository implements RepositoryPort<unknown> {
-  public model = {} as RepositoryModel<unknown>;
+class DummyRepository implements RepositoryPort<object> {
+  public model = {} as RepositoryModel<object>;
 
-  public toLean(input: unknown): unknown | null {
-    return input ? (input as unknown) : null;
+  public toLean(input: object): object | null {
+    return input ? (input as object) : null;
   }
 
-  async findById(_id: string): Promise<unknown | null> {
+  async findById(_id: string): Promise<object | null> {
     return null;
   }
 
-  async findMany(_filter?: Record<string, unknown>): Promise<unknown[]> {
+  async findMany(_filter?: Record<string, unknown>): Promise<object[]> {
     return [];
   }
 
-  async create(_data: Partial<unknown>): Promise<unknown> {
+  async create(_data: Partial<object>): Promise<object> {
     return {};
   }
 
-  async update(_id: string, _data: Partial<unknown>): Promise<unknown | null> {
+  async update(_id: string, _data: Partial<object>): Promise<object | null> {
     return null;
   }
 
-  async delete(_id: string): Promise<unknown | null> {
+  async delete(_id: string): Promise<object | null> {
     return null;
   }
 

@@ -1,5 +1,6 @@
-import { Optional } from "@zacatl/optionals";
 import { uuidv4 } from "@zacatl/third-party/uuid";
+
+import type { Optional } from "../utils/optionals";
 
 export type HttpStatusCode =
   | 200 // OK
@@ -120,9 +121,7 @@ export class CustomError extends Error {
       (this.component ? `\nComponent: ` + this.component : "") +
       (this.operation ? `\nOperation: ` + this.operation : "") +
       (this.reason ? `\nReason: ` + this.reason : "") +
-      (this.metadata
-        ? `\nMetadata: ` + JSON.stringify(this.metadata, null, 2)
-        : "") +
+      (this.metadata ? `\nMetadata: ` + JSON.stringify(this.metadata, null, 2) : "") +
       (this.error ? `\nCaused by: ` + this.error.toString() : "") +
       (this.stack ? `\nStack: ` + this.stack : "")
     );

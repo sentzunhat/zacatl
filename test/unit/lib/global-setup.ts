@@ -58,7 +58,7 @@ export const setup = async (): Promise<void> => {
   logger.log({
     level: "info",
     action: "setup",
-    msg: `environment: NODE_ENV=${process.env.NODE_ENV || "unknown"}, ENV=${process.env["ENV"] || "unknown"}`,
+    msg: `environment: NODE_ENV=${process.env["NODE_ENV"] || "unknown"}, ENV=${process.env["ENV"] || "unknown"}`,
   });
   logger.log({
     level: "info",

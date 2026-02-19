@@ -1,0 +1,14 @@
+{
+  "name": "zacatl-express-mongodb-backend",
+  "version": "1.0.0",
+  "description": "Express + MongoDB backend using Zacatl framework",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node dist/index.js",
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc && node ../../node_modules/@sentzunhat/zacatl/scripts/fix-esm.mjs dist",
+    "clean": "rm -rf dist"
+  },
+  "devDependencies": {}
+}

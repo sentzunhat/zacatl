@@ -71,6 +71,7 @@ export const clearContainer = (): void => {
  *
  * Retrieve instances of already-registered classes.
  * Dependencies must be registered first (Service layers handle this automatically).
+ * For classes not yet registered, auto-registers them as singletons before resolving.
  *
  * @param dependencies - Array of class constructors to resolve
  * @returns Array of resolved instances in the same order
@@ -84,9 +85,29 @@ export const clearContainer = (): void => {
 export const resolveDependencies = <T extends object>(
   dependencies: Array<Constructor<T>>,
 ): T[] => {
-  return dependencies.map((dependency) =>
-    tsyringeContainer.resolve<T>(dependency),
-  );
+  return dependencies.map((dependency) => {
+    // Check registration before attempting to resolve
+    if (!tsyringeContainer.isRegistered(dependency)) {
+      const name = (dependency as { name?: string }).name ?? String(dependency);
+      throw new Error(
+        `[DI] Failed to resolve '${name}' from the container. ` +
+          `Make sure the class is decorated with @injectable() (or @singleton()) ` +
+          `and is registered before resolution. ` +
+          `If this class is a repository, ensure it is listed under 'layers.infrastructure.repositories'. ` +
+          `If it is a domain service, ensure it is listed under 'layers.domain.providers'.`,
+      );
+    }
+
+    try {
+      return tsyringeContainer.resolve<T>(dependency);
+    } catch (err) {
+      const name = (dependency as { name?: string }).name ?? String(dependency);
+      throw new Error(
+        `[DI] Failed to resolve '${name}' from the container. ` +
+          `Original error: ${err instanceof Error ? err.message : String(err)}`,
+      );
+    }
+  });
 };
 
 /**

@@ -9,6 +9,33 @@ import type { ParsedQs } from "qs";
 import { type ApiServerPort, type ProxyConfig } from "./port";
 import { HookHandler, RouteHandler } from "../../../layers/application";
 
+// ---------------------------------------------------------------------------
+// Shared Zod schema validation helper (used by ExpressApiAdapter)
+// ---------------------------------------------------------------------------
+
+type RouteSchema = {
+  body?: { parseAsync: (input: unknown) => Promise<unknown> };
+  querystring?: { parseAsync: (input: unknown) => Promise<unknown> };
+  params?: { parseAsync: (input: unknown) => Promise<unknown> };
+};
+
+async function applyZodSchema(schema: unknown, req: Request): Promise<void> {
+  const s = schema as RouteSchema | undefined;
+  if (!s) return;
+  if (s.body) req.body = await s.body.parseAsync(req.body);
+  if (s.querystring)
+    req.query = (await s.querystring.parseAsync(req.query)) as ParsedQs;
+  if (s.params)
+    req.params = (await s.params.parseAsync(req.params)) as Record<
+      string,
+      string
+    >;
+}
+
+// ---------------------------------------------------------------------------
+// FastifyApiAdapter
+// ---------------------------------------------------------------------------
+
 /**
  * FastifyApiAdapter - Implements ApiServerPort for Fastify framework
  * Handles REST routes, hooks, and proxy registration
@@ -72,46 +99,55 @@ export class ExpressApiAdapter implements ApiServerPort {
       >
     )[method];
 
-    if (typeof register !== "function") return;
+    if (typeof register !== "function") {
+      logger.warn(
+        `ExpressApiAdapter: HTTP method '${handler.method}' is not supported by Express. ` +
+          `Handler '${handler.constructor.name}' for '${url}' was not registered.`,
+      );
+      return;
+    }
 
-    register(url, async (req: Request, res: Response, next: NextFunction) => {
-      try {
-        const schema = handler.schema as {
-          body?: { parseAsync: (input: unknown) => Promise<unknown> };
-          querystring?: { parseAsync: (input: unknown) => Promise<unknown> };
-          params?: { parseAsync: (input: unknown) => Promise<unknown> };
-        };
+    register.call(
+      this.server,
+      url,
+      async (req: Request, res: Response, next: NextFunction) => {
+        try {
+          // Apply Zod schema validation (body, querystring, params) if present
+          await applyZodSchema(handler.schema, req);
 
-        if (schema) {
-          if (schema.body) {
-            req.body = await schema.body.parseAsync(req.body);
+          // Fastify-compatible reply wrapper so handlers written against FastifyReply
+          // work transparently on Express
+          const replyAdapter = {
+            sent: false as boolean,
+            code: (statusCode: number) => {
+              res.status(statusCode);
+              return replyAdapter;
+            },
+            send: (payload: unknown) => {
+              if (!res.headersSent) {
+                replyAdapter.sent = true;
+                res.json(payload);
+              }
+              return replyAdapter;
+            },
+            header: (key: string, value: string) => {
+              res.setHeader(key, value);
+              return replyAdapter;
+            },
+          };
+
+          await handler.execute(req as never, replyAdapter as never);
+
+          // If the handler returned without sending (e.g. reply.sent is still false),
+          // send a 204 No Content so the request is not left hanging
+          if (!res.headersSent) {
+            res.status(204).end();
           }
-          if (schema.querystring) {
-            req.query = (await schema.querystring.parseAsync(
-              req.query,
-            )) as unknown as ParsedQs;
-          }
-          if (schema.params) {
-            req.params = (await schema.params.parseAsync(req.params)) as Record<
-              string,
-              string
-            >;
-          }
+        } catch (err) {
+          next(err);
         }
-
-        const execute = handler.execute as unknown as (
-          request: Request,
-          reply: Response,
-        ) => Promise<unknown>;
-        const result = await execute(req, res);
-
-        if (!res.headersSent && result !== undefined) {
-          res.json(result);
-        }
-      } catch (err) {
-        next(err);
-      }
-    });
+      },
+    );
   }
 
   registerHook(handler: HookHandler): void {
@@ -132,7 +168,8 @@ export class ExpressApiAdapter implements ApiServerPort {
       );
     } else {
       logger.warn(
-        `Hook ${handler.name} is not fully supported in ExpressApiAdapter yet.`,
+        `ExpressApiAdapter: Hook '${handler.name}' is not supported in Express. ` +
+          `Supported hooks: onRequest, preHandler.`,
       );
     }
   }

@@ -1,3 +1,22 @@
+# eslint
+
+Flat ESLint config with naming, imports, and conventions rules.
+
+→ Full docs: [../../docs/eslint/README.md](../../docs/eslint/README.md)
+
+## Exports
+
+recommended, baseConfig, importsConfig, namingConventions, fileNamingRules
+
+## Quick use
+
+```javascript
+import { recommended } from "@sentzunhat/zacatl/eslint";
+export default [...recommended];
+```
+
+---
+
 # Zacatl ESLint Configuration
 
 Shareable ESLint configurations for TypeScript projects following Hexagonal Architecture (Port-Adapter) patterns.

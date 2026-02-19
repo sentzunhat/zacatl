@@ -1,8 +1,15 @@
+import { InternalServerError } from "@zacatl/error";
+
 import type { ConfigDesktop } from "./types";
 
 /**
- * Desktop Platform implementation
- * Handles desktop application execution context (e.g., Electron, Neutralino)
+ * Desktop platform stub for ServiceType.DESKTOP execution.
+ *
+ * @param config - Desktop window and platform configuration.
+ * @returns Calling start throws InternalServerError; stop is a no-op.
+ *
+ * @example
+ * const desktop = new Desktop({ window: { title: "App" }, platform: "neutralino" });
  */
 export class Desktop {
   private window: ConfigDesktop["window"];
@@ -14,12 +21,22 @@ export class Desktop {
   }
 
   public async start(_input?: unknown): Promise<void> {
-    // TODO [@deadline: 2026-03-15]: Implement Desktop window initialization and IPC handler registration
-    // Should: Detect platform (Electron/Neutralino), create window, resolve IPC handlers from DI
-    console.log(
-      `Starting Desktop platform (${this.platform}): ${this.window.title}`,
-    );
-    console.log(`Window size: ${this.window.width}x${this.window.height}`);
+    throw new InternalServerError({
+      message: `Desktop platform '${this.window.title}' (${this.platform}) is not yet implemented`,
+      reason:
+        "ServiceType.DESKTOP is declared but window initialization and IPC handler registration are not implemented. " +
+        "This feature is planned for v0.1.0. Use ServiceType.SERVER for HTTP-based services.",
+      component: "Desktop",
+      operation: "start",
+      metadata: {
+        platform: this.platform,
+        window: {
+          title: this.window.title,
+          width: this.window.width,
+          height: this.window.height,
+        },
+      },
+    });
   }
 
   public async stop(): Promise<void> {}

@@ -1,26 +1,10 @@
 /**
- * ESLint Naming Convention Rules for Zacatl
+ * ESLint naming convention rules for Zacatl ports/adapters.
  *
- * Hexagonal Architecture (Port-Adapter Pattern):
- * - Interfaces (contracts): Port suffix (e.g., UserRepositoryPort, EmailServicePort)
- * - Implementations: Adapter suffix (e.g., MongoUserRepositoryAdapter, SendGridEmailAdapter)
- * - Type aliases: Input, Output, Config, Document, Type suffixes
- * - Methods: Verb+Noun patterns (get*, register*, validate*, etc.)
- * - Variables: camelCase throughout
+ * @returns Flat config object; no side effects.
  *
- * Install dependencies:
- * npm install --save-dev @typescript-eslint/eslint-plugin @typescript-eslint/parser
- *
- * Usage:
+ * @example
  * import { namingConventions } from "@sentzunhat/zacatl/eslint";
- * // or
- * import namingConventions from "@sentzunhat/zacatl/eslint/naming-conventions";
- *
- * export default [
- *   // ... your other configs
- *   namingConventions,
- *   // ... project-specific overrides
- * ];
  */
 
 import tsEslintParser from "@typescript-eslint/parser";

@@ -1,0 +1,35 @@
+{
+  "name": "zacatl-express-sqlite-svelte-monorepo",
+  "version": "1.0.0",
+  "description": "Full-stack monorepo: Express + SQLite backend with Svelte frontend",
+  "private": true,
+  "type": "module",
+  "packageManager": "npm@10.9.0",
+  "engines": {
+    "node": ">=24.0.0",
+    "npm": ">=10.0.0"
+  },
+  "workspaces": [
+    "apps/backend",
+    "apps/frontend"
+  ],
+  "scripts": {
+    "backend:dev": "npm --prefix apps/backend run dev",
+    "backend:start": "npm --prefix apps/backend run start",
+    "backend:build": "npm --prefix apps/backend run build",
+    "frontend:dev": "npm --prefix apps/frontend run dev",
+    "frontend:build": "npm --prefix apps/frontend run build",
+    "frontend:preview": "npm --prefix apps/frontend run preview",
+    "dev": "npm run backend:dev & npm run frontend:dev",
+    "build": "npm run backend:build && npm run frontend:build",
+    "start": "npm run backend:start",
+    "clean": "rm -rf apps/*/dist apps/*/node_modules"
+  },
+  "dependencies": {
+    "@sentzunhat/zacatl": "file:../../.."
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.16",
+    "typescript": "^5.3.3"
+  }
+}

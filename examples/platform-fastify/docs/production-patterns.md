@@ -63,11 +63,7 @@ export const toGreetingResponse = (greeting: Greeting): GreetingResponse => ({
 
 ```typescript
 @singleton()
-export class CreateGreetingHandler extends AbstractRouteHandler<
-  CreateGreetingBody,
-  void,
-  GreetingResponse
-> {
+export class CreateGreetingHandler extends AbstractRouteHandler<CreateGreetingBody, void, GreetingResponse> {
   async handler(request, reply): Promise<GreetingResponse> {
     const { message, language } = request.body;
     const greeting = await this.greetingService.createGreeting({
@@ -132,10 +128,7 @@ export interface GreetingRepositoryPort {
 
 ```typescript
 @singleton()
-export class GreetingRepositoryAdapter
-  extends BaseRepository<GreetingModel, CreateGreetingInput, Greeting>
-  implements GreetingRepositoryPort
-{
+export class GreetingRepositoryAdapter extends BaseRepository<GreetingModel, CreateGreetingInput, Greeting> implements GreetingRepositoryPort {
   constructor() {
     super({ type: ORMType.Sequelize, model: GreetingModel });
   }
@@ -143,9 +136,7 @@ export class GreetingRepositoryAdapter
   async findAll(filter?: { language?: string }): Promise<Greeting[]> {
     const where = filter?.language ? { language: filter.language } : {};
     const models = await (this.model as any).findAll({ where });
-    return models
-      .map((model) => this.toLean(model))
-      .filter((item): item is Greeting => item !== null);
+    return models.map((model) => this.toLean(model)).filter((item): item is Greeting => item !== null);
   }
 }
 ```
@@ -269,8 +260,8 @@ To add a new resource (e.g., "User"):
 
 ## See Also
 
-- **SQLite Setup**: [../01-with-sqlite/README.md#database-setup](../01-with-sqlite/README.md#database-setup)
-- **MongoDB Setup**: [../02-with-mongodb/README.md#database-setup](../02-with-mongodb/README.md#database-setup)
-- **PostgreSQL Setup**: [../03-with-postgres/README.md#database-setup](../03-with-postgres/README.md#database-setup)
+- **SQLite Setup**: [../with-sqlite-react/README.md#database-setup](../with-sqlite-react/README.md#database-setup)
+- **MongoDB Setup**: [../with-mongodb-react/README.md#database-setup](../with-mongodb-react/README.md#database-setup)
+- **PostgreSQL Setup**: [../with-postgres-react/README.md#database-setup](../with-postgres-react/README.md#database-setup)
 - **Quick Start**: [quick-start.md](quick-start.md)
-- **Framework Docs**: [../../../docs/README.md](../../../docs/README.md)
+- **Framework Docs**: [../../../README.md](../../../README.md)

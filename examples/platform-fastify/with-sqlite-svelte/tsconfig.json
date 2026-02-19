@@ -1,0 +1,28 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ES2022",
+    "lib": ["ES2022"],
+    "moduleResolution": "bundler",
+    "outDir": "./dist",
+    "baseUrl": ".",
+    "strict": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "esModuleInterop": true,
+    "paths": {
+      "@sentzunhat/zacatl": ["../../../../../src/index.ts"],
+      "@sentzunhat/zacatl/service": ["../../../../../src/service/index.ts"],
+      "@sentzunhat/zacatl/third-party/fastify": [
+        "../../../../../src/third-party/fastify.ts"
+      ],
+      "@sentzunhat/zacatl/third-party/sequelize": [
+        "../../../../../src/third-party/sequelize.ts"
+      ]
+    }
+  },
+  "include": ["apps/*/src/**/*"],
+  "exclude": ["node_modules", "dist", "apps/*/dist", "apps/*/node_modules"]
+}

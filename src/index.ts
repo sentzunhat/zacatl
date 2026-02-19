@@ -1,4 +1,3 @@
-export * from "./optionals";
 export * from "./configuration";
 export * from "./utils";
 export * from "./error";
@@ -27,12 +26,9 @@ export type {
 } from "./service/layers/application";
 
 // Server types
-export {
-  DatabaseVendor,
-  ServerVendor,
-  ServerType,
-} from "./service/platforms/server/types";
-export { HandlersType } from "./service/platforms/server/api/api-server";
+export { DatabaseVendor, ServerVendor, ServerType } from "./service/platforms/server/types";
 export type { ConfigServer } from "./service/platforms/server/server";
 
-export * from "./third-party";
+// All third-party dependencies are exported via specific subpaths for consistency
+// Examples: @sentzunhat/zacatl/third-party/zod, ./third-party/uuid, ./third-party/tsyringe
+// See package.json exports field for complete list

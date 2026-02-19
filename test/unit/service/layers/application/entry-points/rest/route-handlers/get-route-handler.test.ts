@@ -1,7 +1,6 @@
-import { describe, it, expect, vi } from "vitest";
-import i18n from "i18n";
+import { describe, it, expect } from "vitest";
 
-import { GetRouteHandler } from "../../../../../../../../src/service/layers/application/entry-points/rest/route-handlers/get-route-handler";
+import { GetRouteHandler } from "../../../../../../../../src/service/layers/application/entry-points/rest/fastify/handlers/get-route-handler";
 import {
   createFakeFastifyReply,
   createFakeFastifyRequest,
@@ -15,12 +14,10 @@ class TestGetRouteHandler extends GetRouteHandler<unknown, string, unknown> {
 }
 
 describe("GetRouteHandler", () => {
-  it("executes GET handler and sends proper response", async () => {
-    vi.spyOn(i18n, "__").mockReturnValue("Default success GET");
-
+  it("executes GET handler and sends raw response by default", async () => {
     const testHandler = new TestGetRouteHandler({
       url: "/get-test",
-      schema: {}, // Use an empty schema for test purposes.
+      schema: {},
     });
 
     const fakeRequest = createFakeFastifyRequest() as Request<unknown, string>;
@@ -29,10 +26,7 @@ describe("GetRouteHandler", () => {
     await testHandler.execute(fakeRequest, fakeReply);
 
     expect(fakeReply.code).toHaveBeenCalledWith(200);
-    expect(fakeReply.send).toHaveBeenCalledWith({
-      ok: true,
-      message: "Default success GET",
-      data: "Test GET response",
-    });
+    // Default behavior: raw data sent, no forced envelope
+    expect(fakeReply.send).toHaveBeenCalledWith("Test GET response");
   });
 });
