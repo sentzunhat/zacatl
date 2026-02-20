@@ -1,0 +1,13 @@
+.github/
+.vscode/
+coverage/
+docs/
+examples/
+node_modules/
+scripts/
+src/
+test/
+*.log
+*.tsbuildinfo
+npm-debug.log*
+package-lock.json

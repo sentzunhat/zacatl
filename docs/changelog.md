@@ -2,9 +2,19 @@
 
 ---
 
-## [0.0.41] - 2026-02-19
+## [0.0.42] - 2026-02-19
 
 **Status**: Current release
+
+### 🔧 Maintenance
+
+- **npm package metadata**: Added .npmignore for publish hygiene and expanded keywords for discoverability.
+
+---
+
+## [0.0.41] - 2026-02-19
+
+**Status**: Previous release
 
 ### ✨ Improvements
 
