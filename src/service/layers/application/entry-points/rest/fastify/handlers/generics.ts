@@ -1,20 +1,4 @@
-import { z } from "@zacatl/third-party/zod";
-
-export const makeSchema = <T extends z.ZodRawShape>(
-  schema: z.ZodObject<T>,
-): z.ZodObject<T> => {
-  return schema;
-};
-
-export const makeWithDefaultResponse = <T extends z.ZodRawShape>(
-  schema: z.ZodObject<T>,
-): z.ZodObject<{
-  ok: z.ZodBoolean;
-  message: z.ZodString;
-  data: z.ZodObject<T>;
-}> =>
-  z.object({
-    ok: z.boolean(),
-    message: z.string(),
-    data: makeSchema(schema),
-  });
+// Re-export shared schema utilities from common so Fastify-specific imports
+// continue to resolve. The implementation lives in common/ and is also
+// reachable via the main @sentzunhat/zacatl import for both platforms.
+export { makeWithDefaultResponse } from "../../common/schema";

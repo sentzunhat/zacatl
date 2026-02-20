@@ -8,52 +8,84 @@ _Last Updated: 2026-02-04_
 
 This document defines the **canonical DI registration patterns** for Zacatl services using `tsyringe`.
 
+All examples use Zacatl's DI helpers:
+
+```typescript
+import {
+  registerDependency,
+  registerSingleton,
+  registerValue,
+  registerDependencies,
+  registerAndResolve,
+} from "@sentzunhat/zacatl/dependency-injection";
+```
+
 ## Registration Methods
 
-### `registerInstance()`
+Zacatl exposes small helper functions that wrap tsyringe. Prefer these helpers over
+calling `container.register(...)` directly so registration stays consistent and traceable.
 
-**Use for:** Services and repositories you instantiate yourself with dependencies.
+### `registerDependency()`
+
+**Use for:** Class-based registration when you want the container to instantiate for you.
 
 **Pattern:**
 
 ```typescript
-const repository = new MyRepository();
-container.registerInstance(MyRepository, repository);
+import { registerDependency } from "@sentzunhat/zacatl/dependency-injection";
 
-const service = new MyService(repository);
-container.registerInstance(MyService, service);
+registerDependency(MyService, MyService);
 ```
 
-**Why:** You control instantiation and can pass dependencies explicitly.
+**Why:** Keeps class registration consistent and avoids direct `useClass` usage.
+
+### `registerValue()`
+
+**Use for:** Instances you create yourself (DB clients, SDKs, external connections).
+
+**Pattern:**
+
+```typescript
+import { registerValue } from "@sentzunhat/zacatl/dependency-injection";
+
+const repository = new MyRepository();
+registerValue(MyRepository, repository);
+```
+
+**Why:** Explicitly registers instances without relying on raw `useValue` calls.
 
 ### `registerSingleton()`
 
-**Use for:** Handlers that depend on services via DI.
+**Use for:** Handlers or services that should be singletons.
 
 **Pattern:**
 
 ```typescript
-container.registerSingleton(GetAllHandler, GetAllHandler);
-container.registerSingleton(CreateHandler, CreateHandler);
+import { registerSingleton } from "@sentzunhat/zacatl/dependency-injection";
+
+registerSingleton(GetAllHandler, GetAllHandler);
+registerSingleton(CreateHandler, CreateHandler);
 ```
 
-**Why:** Handlers have `@injectable()` decorator and dependencies injected via `@inject()`. The container auto-resolves them.
+**Why:** Matches tsyringe singleton semantics and keeps handler wiring consistent.
 
-## ❌ Deprecated Patterns
+### `registerDependencies()` and `registerAndResolve()`
 
-### DO NOT USE: `useValue` / `useClass`
+**Use for:** Batch registration/resolution in advanced setup.
 
 ```typescript
-// ❌ WRONG - Old tsyringe syntax
-container.register("Repository", { useValue: repository });
-container.register(Service, { useClass: Service });
+import { registerDependencies, registerAndResolve } from "@sentzunhat/zacatl/dependency-injection";
+
+registerDependencies([UserRepository, ProductRepository]);
+const services = registerAndResolve([UserService, ProductService]);
 ```
 
-**Why deprecated:**
+**Why:** Keeps larger manual setups concise and consistent.
 
-- Verbose and error-prone
-- Inconsistent with modern tsyringe usage
-- Makes DI flow harder to trace
+## Avoid Direct `container.register(...)`
+
+Do not call `container.register(..., { useClass/useValue })` directly in app code.
+These are still used internally, but the helper APIs are the supported public surface.
 
 ## Complete Registration Flow
 
@@ -65,7 +97,7 @@ import { MySequelizeRepository } from "./infrastructure/repositories/my.reposito
 import { MyRepositoryPort } from "./domain/ports/my-repository.port";
 
 const myRepository = new MySequelizeRepository();
-container.registerInstance(MyRepositoryPort, myRepository);
+registerValue(MyRepositoryPort, myRepository);
 ```
 
 **Key points:**
@@ -81,7 +113,7 @@ container.registerInstance(MyRepositoryPort, myRepository);
 import { MyService } from "./domain/services/my.service";
 
 const myService = new MyService(myRepository);
-container.registerInstance(MyService, myService); // Class token
+registerValue(MyService, myService); // Class token
 ```
 
 **Key points:**
@@ -96,8 +128,8 @@ container.registerInstance(MyService, myService); // Class token
 import { GetAllHandler } from "./application/handlers/get-all.handler";
 import { CreateHandler } from "./application/handlers/create.handler";
 
-container.registerSingleton(GetAllHandler, GetAllHandler);
-container.registerSingleton(CreateHandler, CreateHandler);
+registerSingleton(GetAllHandler, GetAllHandler);
+registerSingleton(CreateHandler, CreateHandler);
 ```
 
 **Key points:**
@@ -141,14 +173,14 @@ export class MyHandler extends AbstractRouteHandler<Body, Query, Reply> {
 ```typescript
 // 1. Infrastructure first (no dependencies)
 const repository = new MyRepository();
-container.registerInstance(MyRepository, repository);
+registerValue(MyRepository, repository);
 
 // 2. Domain services next (depend on repositories)
 const service = new MyService(repository);
-container.registerInstance(MyService, service);
+registerValue(MyService, service);
 
 // 3. Handlers last (depend on services via @inject)
-container.registerSingleton(MyHandler, MyHandler);
+registerSingleton(MyHandler, MyHandler);
 ```
 
 **Why:** Each layer depends on the previous layer. Out-of-order registration causes resolution failures.
@@ -199,7 +231,7 @@ routes: [MyHandler];
 ### Class Tokens (Recommended)
 
 ```typescript
-container.registerInstance(MyService, service);
+registerValue(MyService, service);
 
 // Injected as:
 @inject(MyService) private service: MyService
@@ -214,7 +246,7 @@ abstract class MyRepositoryPort {
   abstract findById(id: string): Promise<MyEntity | null>;
 }
 
-container.registerInstance(MyRepositoryPort, repository);
+registerValue(MyRepositoryPort, repository);
 
 // Injected as:
 @inject(MyRepositoryPort) private repo: MyRepositoryPort

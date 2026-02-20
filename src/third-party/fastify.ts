@@ -15,3 +15,6 @@ export {
   type FastifyServerOptions,
   type RawServerBase,
 } from "fastify";
+
+// Type provider for Zod schema validation at the type level
+export type { ZodTypeProvider } from "fastify-type-provider-zod";

@@ -59,7 +59,10 @@ describe("resolveDependencies — descriptive error on missing registration", ()
       thrown = e as Error;
     }
 
-    expect(thrown!.message).toMatch(/@injectable/);
+    // Check that error contains @injectable hint in reason field
+    const errorWithReason = thrown as { reason?: string };
+    expect(errorWithReason.reason).toBeDefined();
+    expect(errorWithReason.reason).toMatch(/@injectable/);
   });
 
   it("error message mentions layers config paths", () => {
@@ -70,7 +73,10 @@ describe("resolveDependencies — descriptive error on missing registration", ()
       thrown = e as Error;
     }
 
-    expect(thrown!.message).toMatch(/layers\./);
+    // Check that error contains layers config hint in reason field
+    const errorWithReason = thrown as { reason?: string };
+    expect(errorWithReason.reason).toBeDefined();
+    expect(errorWithReason.reason).toMatch(/layers\./);
   });
 
   it("resolves successfully when the class is properly registered", () => {
@@ -88,8 +94,8 @@ describe("resolveDependencies — descriptive error on missing registration", ()
     registerSingleton(RegisteredService, RegisteredService);
 
     // Mix of registered + unregistered in one call
-    expect(() =>
-      resolveDependencies([RegisteredService, UnregisteredService]),
-    ).toThrow(/UnregisteredService/);
+    expect(() => resolveDependencies([RegisteredService, UnregisteredService])).toThrow(
+      /UnregisteredService/,
+    );
   });
 });

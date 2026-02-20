@@ -3,11 +3,7 @@ import { container } from "@zacatl/third-party";
 import { Mongoose } from "mongoose";
 import type { Sequelize } from "sequelize";
 
-import {
-  type DatabaseServerPort,
-  type DatabaseConfig,
-  DatabaseVendor,
-} from "./port";
+import { type DatabaseServerPort, type DatabaseConfig, DatabaseVendor } from "./port";
 
 /**
  * MongooseAdapter - Implements DatabaseServerPort for Mongoose
@@ -91,9 +87,7 @@ export class SequelizeAdapter implements DatabaseServerPort {
 /**
  * Create appropriate database adapter based on vendor
  */
-export function createDatabaseAdapter(
-  vendor: DatabaseVendor,
-): DatabaseServerPort {
+export const createDatabaseAdapter = (vendor: DatabaseVendor): DatabaseServerPort => {
   switch (vendor) {
     case DatabaseVendor.MONGOOSE:
       return new MongooseAdapter();
@@ -106,4 +100,4 @@ export function createDatabaseAdapter(
         reason: "database vendor not supported",
       });
   }
-}
+};

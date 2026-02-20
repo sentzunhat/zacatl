@@ -9,12 +9,7 @@ import {
   createFakeFastifyRequest,
 } from "../../../../../../helpers/common/common";
 
-class TestPostRouteHandler extends PostRouteHandler<
-  {},
-  {},
-  { id: number },
-  {}
-> {
+class TestPostRouteHandler extends PostRouteHandler<{}, {}, { id: number }, {}> {
   constructor() {
     super({
       url: "/post-test",

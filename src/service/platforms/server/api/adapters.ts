@@ -1,8 +1,7 @@
 import proxy from "@fastify/http-proxy";
 import { logger } from "@zacatl/logs";
+import { FastifyInstance, ZodTypeProvider } from "@zacatl/third-party/fastify";
 import { Express, Request, Response, NextFunction } from "express";
-import { FastifyInstance } from "fastify";
-import { ZodTypeProvider } from "fastify-type-provider-zod";
 import { createProxyMiddleware } from "http-proxy-middleware";
 import type { ParsedQs } from "qs";
 
@@ -19,18 +18,13 @@ type RouteSchema = {
   params?: { parseAsync: (input: unknown) => Promise<unknown> };
 };
 
-async function applyZodSchema(schema: unknown, req: Request): Promise<void> {
+const applyZodSchema = async (schema: unknown, req: Request): Promise<void> => {
   const s = schema as RouteSchema | undefined;
   if (!s) return;
   if (s.body) req.body = await s.body.parseAsync(req.body);
-  if (s.querystring)
-    req.query = (await s.querystring.parseAsync(req.query)) as ParsedQs;
-  if (s.params)
-    req.params = (await s.params.parseAsync(req.params)) as Record<
-      string,
-      string
-    >;
-}
+  if (s.querystring) req.query = (await s.querystring.parseAsync(req.query)) as ParsedQs;
+  if (s.params) req.params = (await s.params.parseAsync(req.params)) as Record<string, string>;
+};
 
 // ---------------------------------------------------------------------------
 // FastifyApiAdapter
@@ -90,11 +84,7 @@ export class ExpressApiAdapter implements ApiServerPort {
         string,
         (
           path: string,
-          routeHandler: (
-            req: Request,
-            res: Response,
-            next: NextFunction,
-          ) => void,
+          routeHandler: (req: Request, res: Response, next: NextFunction) => void,
         ) => void
       >
     )[method];
@@ -107,65 +97,59 @@ export class ExpressApiAdapter implements ApiServerPort {
       return;
     }
 
-    register.call(
-      this.server,
-      url,
-      async (req: Request, res: Response, next: NextFunction) => {
-        try {
-          // Apply Zod schema validation (body, querystring, params) if present
-          await applyZodSchema(handler.schema, req);
+    register.call(this.server, url, async (req: Request, res: Response, next: NextFunction) => {
+      try {
+        // Apply Zod schema validation (body, querystring, params) if present
+        await applyZodSchema(handler.schema, req);
 
-          // Fastify-compatible reply wrapper so handlers written against FastifyReply
-          // work transparently on Express
-          const replyAdapter = {
-            sent: false as boolean,
-            code: (statusCode: number) => {
-              res.status(statusCode);
-              return replyAdapter;
-            },
-            send: (payload: unknown) => {
-              if (!res.headersSent) {
-                replyAdapter.sent = true;
-                res.json(payload);
-              }
-              return replyAdapter;
-            },
-            header: (key: string, value: string) => {
-              res.setHeader(key, value);
-              return replyAdapter;
-            },
-          };
+        // Fastify-compatible reply wrapper so handlers written against FastifyReply
+        // work transparently on Express
+        const replyAdapter = {
+          sent: false as boolean,
+          code: (statusCode: number) => {
+            res.status(statusCode);
+            return replyAdapter;
+          },
+          send: (payload: unknown) => {
+            if (!res.headersSent) {
+              replyAdapter.sent = true;
+              res.json(payload);
+            }
+            return replyAdapter;
+          },
+          header: (key: string, value: string) => {
+            res.setHeader(key, value);
+            return replyAdapter;
+          },
+        };
 
-          await handler.execute(req as never, replyAdapter as never);
+        await handler.execute(req as never, replyAdapter as never);
 
-          // If the handler returned without sending (e.g. reply.sent is still false),
-          // send a 204 No Content so the request is not left hanging
-          if (!res.headersSent) {
-            res.status(204).end();
-          }
-        } catch (err) {
-          next(err);
+        // If the handler returned without sending (e.g. reply.sent is still false),
+        // send a 204 No Content so the request is not left hanging
+        if (!res.headersSent) {
+          res.status(204).end();
         }
-      },
-    );
+      } catch (err) {
+        next(err);
+      }
+    });
   }
 
   registerHook(handler: HookHandler): void {
     if (handler.name === "onRequest" || handler.name === "preHandler") {
-      this.server.use(
-        async (req: Request, res: Response, next: NextFunction) => {
-          try {
-            const execute = handler.execute as unknown as (
-              request: Request,
-              reply: Response,
-            ) => Promise<void>;
-            await execute(req, res);
-            next();
-          } catch (err) {
-            next(err);
-          }
-        },
-      );
+      this.server.use(async (req: Request, res: Response, next: NextFunction) => {
+        try {
+          const execute = handler.execute as unknown as (
+            request: Request,
+            reply: Response,
+          ) => Promise<void>;
+          await execute(req, res);
+          next();
+        } catch (err) {
+          next(err);
+        }
+      });
     } else {
       logger.warn(
         `ExpressApiAdapter: Hook '${handler.name}' is not supported in Express. ` +

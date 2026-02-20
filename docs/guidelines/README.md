@@ -5,9 +5,9 @@ This folder contains reusable coding standards and best practices extracted from
 ## Documents
 
 1. **[QUICK_REFERENCE.md](./QUICK_REFERENCE.md)** — One-page cheat sheet (print-friendly!)
-2. **[code-style.md](./code-style.md)** — Formatting, naming conventions, language-specific rules, and editor settings
-3. **[architecture.md](./architecture.md)** — Folder structure, module organization, layering patterns, and dependency management
-4. **[testing.md](./testing.md)** — Test structure, naming conventions, test framework setup, and coverage expectations
+2. **[code-style.md](./code-style.md)** — Formatting, naming conventions, language-specific rules, build process, logging, and configuration patterns
+3. **[architecture.md](./architecture.md)** — Folder structure, module organization, layering patterns, dependency management, and common pitfalls
+4. **[testing.md](./testing.md)** — Test structure, naming conventions, test framework setup, coverage expectations, and real examples
 5. **[documentation.md](./documentation.md)** — Comment and docstring conventions, README guidelines, changelog format
 6. **[git-workflow.md](./git-workflow.md)** — Commit message formats, branch naming, versioning strategy, release procedure
 7. **[framework-overview.md](./framework-overview.md)** — High-level framework map and module index
@@ -19,16 +19,19 @@ This folder contains reusable coding standards and best practices extracted from
 - **Language**: TypeScript (strict mode)
 - **Runtime**: Node.js 24+
 - **Package Manager**: npm 10.9.0+
-- **Build**: TypeScript compiler (tsc) + path alias resolution + ESM fixing
+- **Build**: TypeScript compiler (tsc) + path alias resolution (tsc-alias) + ESM fixing (fix-esm.mjs)
 - **Testing**: Vitest
 - **Linting**: ESLint (flat config)
 
 ### Core Patterns
 
 - **Architecture**: Hexagonal/Layered (Application, Domain, Infrastructure, Platforms)
-- **DI**: Container-based with auto-registration
+- **DI**: Container-based with auto-registration (tsyringe)
 - **Configuration**: JSON/YAML with Zod schema validation
 - **Module System**: ES Modules (ESM)
+- **Validation**: Zod (recommended); future support for Yup and optional validation — see [Roadmap](../roadmap/index.md#schema-validation-flexibility-v0040--v010)
+- **Logging**: Structured logging with Pino (default) or custom adapters
+- **Error Handling**: Typed error classes extending CustomError base class
 
 ### Naming at a Glance
 

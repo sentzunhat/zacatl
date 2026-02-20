@@ -24,9 +24,12 @@ const namingConventionsConfig = {
   rules: {
     "@typescript-eslint/naming-convention": [
       "warn",
-      // TODO: Revisit type alias naming conventions - currently disabled to allow flexibility
-      // Type aliases can use any PascalCase format without suffix requirements
-      // Plan: Define clear suffix rules in future (Input, Output, Config, Document, Type, etc.)
+      // Type Aliases Naming Convention:
+      // - PascalCase for all type aliases
+      // - Common suffixes: Input, Output, Config, Options, Type, Document, Schema, Handler
+      // - No prefix patterns (avoid T-prefix, I-prefix)
+      // - Examples: CreateUserInput, UserOutput, ServerConfig, RouteHandler
+      // Note: Suffix requirements are intentionally flexible to allow domain-specific naming
 
       // Interfaces (Ports) - Hexagonal Architecture pattern
       // Primary ports: Use "Port" suffix for architectural boundaries

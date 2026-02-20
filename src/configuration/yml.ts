@@ -5,7 +5,7 @@ import type { ZodType } from "@zacatl/third-party";
 import { isNodeError, isZodError } from "@zacatl/utils";
 import { load } from "js-yaml";
 
-export function loadYML<T = unknown>(filePath: string, schema?: ZodType<T>): T {
+export const loadYML = <T = unknown>(filePath: string, schema?: ZodType<T>): T => {
   try {
     const content = readFileSync(filePath, "utf-8");
     const data = load(content);
@@ -48,6 +48,6 @@ export function loadYML<T = unknown>(filePath: string, schema?: ZodType<T>): T {
 
     throw error;
   }
-}
+};
 
 export const loadYAML = loadYML;

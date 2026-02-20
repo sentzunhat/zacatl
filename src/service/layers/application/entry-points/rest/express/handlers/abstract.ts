@@ -67,16 +67,23 @@ export abstract class AbstractRouteHandler<
   ): Promise<HandlerOutput<TResponse>> | HandlerOutput<TResponse>;
 
   /**
-   * Override this to customise the success response shape.
+   * Wraps the handler response before sending to the client.
    *
-   * By default, the raw value returned by `handler()` is sent with status 200.
-   * Handlers that need a different status code or envelope should override
-   * `buildResponse()` to wrap the data differently.
+   * Override this method to customize the response shape (e.g., add an envelope,
+   * change the status code, or return raw data).
+   *
+   * @default Returns the handler result as-is; use `buildResponse()` to wrap it
    *
    * @example
-   * // Standard JSON envelope (opt-in):
+   * // Add standard envelope:
    * protected buildResponse(data: TResponse) {
-   *   return { ok: true, message: 'Success', data };
+   *   return { ok: true, message: "Success", data };
+   * }
+   *
+   * @example
+   * // Return raw data:
+   * protected buildResponse(data: TResponse) {
+   *   return data;
    * }
    */
   protected buildResponse(

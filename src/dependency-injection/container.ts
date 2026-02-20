@@ -1,9 +1,7 @@
 import "../third-party/reflect-metadata";
+import { InternalServerError } from "@zacatl/error";
 import { container as tsyringeContainer } from "@zacatl/third-party/tsyringe";
-import type {
-  DependencyContainer,
-  InjectionToken,
-} from "@zacatl/third-party/tsyringe";
+import type { DependencyContainer, InjectionToken } from "@zacatl/third-party/tsyringe";
 
 import type { Constructor } from "../service/layers/types";
 
@@ -82,30 +80,36 @@ export const clearContainer = (): void => {
  * const services = resolveDependencies<Service>([UserService, ProductService]);
  * ```
  */
-export const resolveDependencies = <T extends object>(
-  dependencies: Array<Constructor<T>>,
-): T[] => {
+export const resolveDependencies = <T extends object>(dependencies: Array<Constructor<T>>): T[] => {
   return dependencies.map((dependency) => {
     // Check registration before attempting to resolve
     if (!tsyringeContainer.isRegistered(dependency)) {
       const name = (dependency as { name?: string }).name ?? String(dependency);
-      throw new Error(
-        `[DI] Failed to resolve '${name}' from the container. ` +
-          `Make sure the class is decorated with @injectable() (or @singleton()) ` +
-          `and is registered before resolution. ` +
-          `If this class is a repository, ensure it is listed under 'layers.infrastructure.repositories'. ` +
-          `If it is a domain service, ensure it is listed under 'layers.domain.providers'.`,
-      );
+      throw new InternalServerError({
+        message: `Failed to resolve '${name}' from the DI container`,
+        reason:
+          "Make sure the class is decorated with @injectable() (or @singleton()) " +
+          "and is registered before resolution. " +
+          "If this class is a repository, ensure it is listed under 'layers.infrastructure.repositories'. " +
+          "If it is a domain service, ensure it is listed under 'layers.domain.providers'.",
+        component: "DIContainer",
+        operation: "resolveDependencies",
+        metadata: { dependencyName: name },
+      });
     }
 
     try {
       return tsyringeContainer.resolve<T>(dependency);
     } catch (err) {
       const name = (dependency as { name?: string }).name ?? String(dependency);
-      throw new Error(
-        `[DI] Failed to resolve '${name}' from the container. ` +
-          `Original error: ${err instanceof Error ? err.message : String(err)}`,
-      );
+      throw new InternalServerError({
+        message: `Failed to resolve '${name}' from the DI container`,
+        reason: err instanceof Error ? err.message : String(err),
+        component: "DIContainer",
+        operation: "resolveDependencies",
+        metadata: { dependencyName: name },
+        error: err instanceof Error ? err : undefined,
+      });
     }
   });
 };
@@ -147,9 +151,7 @@ export const registerDependencies = <T extends object>(
  * const services = registerAndResolve([UserService, ProductService]);
  * ```
  */
-export const registerAndResolve = <T extends object>(
-  dependencies: Array<Constructor<T>>,
-): T[] => {
+export const registerAndResolve = <T extends object>(dependencies: Array<Constructor<T>>): T[] => {
   registerDependencies(dependencies);
   return resolveDependencies(dependencies);
 };

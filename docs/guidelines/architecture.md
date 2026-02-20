@@ -585,6 +585,329 @@ container.register(
 
 ---
 
+## Common Pitfalls & Solutions
+
+### Pitfall 1: Domain Layer Depends on Frameworks
+
+**❌ Problem:**
+
+```typescript
+// src/service/layers/domain/greeting-service.ts
+import { FastifyRequest } from "fastify"; // Framework in domain!
+
+export class GreetingService {
+  async create(req: FastifyRequest) {
+    // Couples domain to Fastify
+  }
+}
+```
+
+**✅ Solution:**
+
+```typescript
+// Domain accepts plain objects
+export class GreetingService {
+  async create(input: CreateGreetingInput) {
+    // Framework-agnostic
+    if (!input.message?.trim()) {
+      throw new BadRequestError({ message: "Message is required" });
+    }
+    return this.repository.save(input);
+  }
+}
+
+// Handler translates framework request → domain input
+export class CreateGreetingHandler extends PostRouteHandler {
+  async execute(request: FastifyRequest): Promise<Greeting> {
+    const input: CreateGreetingInput = {
+      message: request.body.message,
+      author: request.body.author,
+    };
+    return this.service.create(input);
+  }
+}
+```
+
+### Pitfall 2: Circular Dependencies
+
+**❌ Problem:**
+
+```typescript
+// user-service.ts
+import { OrderService } from "./order-service";
+
+export class UserService {
+  constructor(private orderService: OrderService) {}
+}
+
+// order-service.ts
+import { UserService } from "./user-service"; // Circular!
+
+export class OrderService {
+  constructor(private userService: UserService) {}
+}
+```
+
+**✅ Solution:**
+
+```typescript
+// Refactor to break cycle — use events or separate shared service
+export class UserService {
+  constructor(private eventBus: EventBus) {}
+
+  async createUser(input: CreateUserInput) {
+    const user = await this.repository.save(input);
+    this.eventBus.emit("user.created", { userId: user.id });
+    return user;
+  }
+}
+
+export class OrderService {
+  constructor(private eventBus: EventBus) {
+    this.eventBus.on("user.created", this.handleUserCreated);
+  }
+
+  private handleUserCreated(event: UserCreatedEvent) {
+    // React to user creation
+  }
+}
+```
+
+### Pitfall 3: God Objects / Services Doing Too Much
+
+**❌ Problem:**
+
+```typescript
+export class UserService {
+  async createUser() {}
+  async updateUser() {}
+  async deleteUser() {}
+  async sendWelcomeEmail() {} // Different responsibility!
+  async generateReport() {} // Different responsibility!
+  async processPayment() {} // Different responsibility!
+}
+```
+
+**✅ Solution:**
+
+```typescript
+// Split into focused services
+export class UserService {
+  async createUser() {}
+  async updateUser() {}
+  async deleteUser() {}
+}
+
+export class EmailService {
+  async sendWelcomeEmail(user: User) {}
+}
+
+export class ReportService {
+  async generateUserReport(userId: string) {}
+}
+
+export class PaymentService {
+  async processPayment(payment: Payment) {}
+}
+```
+
+### Pitfall 4: Hard-Coded Dependencies
+
+**❌ Problem:**
+
+```typescript
+export class GreetingService {
+  private repository = new GreetingRepository(); // Hard-coded!
+  private logger = console; // Hard-coded!
+}
+```
+
+**✅ Solution:**
+
+```typescript
+export class GreetingService {
+  constructor(
+    private repository: GreetingRepository,
+    private logger: Logger,
+  ) {} // Injected dependencies
+}
+```
+
+### Pitfall 5: Mixing Concerns in Handlers
+
+**❌ Problem:**
+
+```typescript
+export class GetGreetingsHandler extends GetRouteHandler {
+  async execute(): Promise<Greeting[]> {
+    // Don't put business logic here!
+    const greetings = await this.repository.findAll();
+
+    // Filtering logic belongs in domain
+    return greetings.filter((g) => g.message.length > 5);
+  }
+}
+```
+
+**✅ Solution:**
+
+```typescript
+// Domain service handles business logic
+export class GreetingService {
+  async getValidGreetings(): Promise<Greeting[]> {
+    const greetings = await this.repository.findAll();
+    return greetings.filter((g) => g.message.length > 5);
+  }
+}
+
+// Handler delegates to service
+export class GetGreetingsHandler extends GetRouteHandler {
+  constructor(private service: GreetingService) {}
+
+  async execute(): Promise<Greeting[]> {
+    return this.service.getValidGreetings();
+  }
+}
+```
+
+### Pitfall 6: Leaking Infrastructure Details
+
+**❌ Problem:**
+
+```typescript
+// Exposes Mongoose document type to domain layer
+export interface GreetingPort {
+  findAll(): Promise<Document<Greeting>[]>; // Mongoose-specific!
+}
+```
+
+**✅ Solution:**
+
+```typescript
+// Port uses plain domain types
+export interface GreetingPort {
+  findAll(): Promise<Greeting[]>; // Plain objects
+}
+
+// Repository handles conversion
+export class MongooseGreetingRepository implements GreetingPort {
+  async findAll(): Promise<Greeting[]> {
+    const docs = await this.model.find();
+    return docs.map((doc) => doc.toObject()); // Convert to plain object
+  }
+}
+```
+
+---
+
+## Real-World Examples from Codebase
+
+### Example 1: CustomError Base Class
+
+```typescript
+// src/error/custom.ts
+export class CustomError extends Error {
+  public readonly custom: boolean;
+  public readonly code: ErrorCode;
+  public readonly correlationId: string;
+  public readonly metadata?: Record<string, unknown>;
+  public readonly component?: string;
+  public readonly operation?: string;
+
+  constructor(args: CustomErrorArgs & { correlationId?: string }) {
+    super(args.message);
+    this.id = uuidv4();
+    this.correlationId = args.correlationId ?? uuidv4();
+    this.custom = true;
+    this.name = this.constructor.name;
+    this.code = args.code;
+    this.metadata = args.metadata;
+    this.component = args.component;
+    this.operation = args.operation;
+
+    if (Error.captureStackTrace) {
+      Error.captureStackTrace(this, this.constructor);
+    }
+  }
+
+  toJSON() {
+    return {
+      name: this.name,
+      message: this.message,
+      code: this.code,
+      correlationId: this.correlationId,
+      metadata: this.metadata,
+      component: this.component,
+      operation: this.operation,
+    };
+  }
+}
+```
+
+### Example 2: Dependency Injection Container
+
+```typescript
+// src/dependency-injection/container.ts
+export const registerDependencies = <T extends object>(dependencies: Constructor<T>[], lifecycle: Lifecycle = Lifecycle.SINGLETON): void => {
+  dependencies.forEach((dep) => {
+    const token = dep.name || dep;
+    registerSingleton(token, dep);
+  });
+};
+
+export const resolveDependencies = <T extends object>(dependencies: Constructor<T>[]): T[] => {
+  return dependencies.map((dep) => {
+    const token = dep.name || dep;
+    return resolveDependency<T>(token);
+  });
+};
+```
+
+### Example 3: Configuration Loading with Validation
+
+```typescript
+// src/configuration/json.ts
+export const loadJSON = <T>(filePath: string, schema: ZodSchema<T>): T => {
+  try {
+    if (!existsSync(filePath)) {
+      throw new BadResourceError({
+        message: `Configuration file not found: ${filePath}`,
+        component: "ConfigLoader",
+        operation: "loadJSON",
+      });
+    }
+
+    const fileContent = readFileSync(filePath, "utf-8");
+    const parsed = JSON.parse(fileContent);
+
+    // Validate with Zod schema
+    const result = schema.safeParse(parsed);
+
+    if (!result.success) {
+      throw new ValidationError({
+        message: "Configuration validation failed",
+        metadata: { errors: result.error.errors, filePath },
+        component: "ConfigLoader",
+        operation: "loadJSON",
+      });
+    }
+
+    return result.data;
+  } catch (error) {
+    if (error instanceof CustomError) throw error;
+
+    throw new InternalServerError({
+      message: `Failed to load configuration from ${filePath}`,
+      error: error as Error,
+      component: "ConfigLoader",
+      operation: "loadJSON",
+    });
+  }
+};
+```
+
+---
+
 ## Summary
 
 | Aspect        | Rule                                    |

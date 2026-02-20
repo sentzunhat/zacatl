@@ -270,9 +270,7 @@ describe("GreetingService", () => {
 
     it("should throw ValidationError when repository fails", async () => {
       // Arrange
-      mockRepository.findAll = vi
-        .fn()
-        .mockRejectedValue(new Error("DB connection failed"));
+      mockRepository.findAll = vi.fn().mockRejectedValue(new Error("DB connection failed"));
 
       // Act & Assert
       await expect(service.getAll()).rejects.toThrow();
@@ -466,9 +464,7 @@ describe("GreetingService.create", () => {
 
   it("should throw BadRequestError when message is empty", async () => {
     // Error case
-    await expect(service.create({ message: "" })).rejects.toThrow(
-      BadRequestError,
-    );
+    await expect(service.create({ message: "" })).rejects.toThrow(BadRequestError);
   });
 
   it("should throw InternalServerError on database failure", async () => {
@@ -500,9 +496,197 @@ expect(result.length > 0).toBe(true);
 
 ---
 
-## Coverage Targets
+## Real-World Test Examples from Codebase
 
-### Coverage Goals
+### Example 1: Testing Custom Errors
+
+```typescript
+// test/unit/error/custom.test.ts
+import { describe, expect, it } from "vitest";
+import { CustomError } from "../../../src/error/custom";
+
+describe("CustomError", () => {
+  class TestError extends CustomError {}
+
+  it("should generate a correlationId if not provided", () => {
+    const error = new TestError({ message: "Something went wrong" });
+
+    expect(error.correlationId).toBeDefined();
+    expect(typeof error.correlationId).toBe("string");
+    expect(error.correlationId.length).toBeGreaterThan(0);
+    expect(error.correlationId).not.toBe(error.id);
+  });
+
+  it("should use the provided correlationId", () => {
+    const customCorrelationId = "req-12345";
+    const error = new TestError({
+      message: "Something went wrong",
+      correlationId: customCorrelationId,
+    });
+
+    expect(error.correlationId).toBe(customCorrelationId);
+    expect(error.correlationId).not.toBe(error.id);
+  });
+
+  it("toJSON() should include correlationId and structured metadata", () => {
+    const metadata = { user: "u1" };
+    const error = new TestError({
+      message: "Test message",
+      code: 400,
+      reason: "Bad Input",
+      metadata,
+    });
+
+    const json = error.toJSON();
+
+    expect(json.message).toBe("Test message");
+    expect(json.name).toBe("TestError");
+    expect(json.code).toBe(400);
+    expect(json.reason).toBe("Bad Input");
+    expect(json.metadata).toEqual(metadata);
+    expect(json.correlationId).toBeDefined();
+  });
+});
+```
+
+### Example 2: Testing Dependency Injection
+
+```typescript
+// test/unit/dependency-injection/container.test.ts
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { clearContainer, registerDependency, registerSingleton, resolveDependency } from "../../../src/dependency-injection/container";
+
+class TestService {
+  public id = Math.random();
+
+  public getMessage(): string {
+    return "Hello from TestService";
+  }
+}
+
+describe("Dependency Injection Container", () => {
+  beforeEach(() => {
+    clearContainer();
+  });
+
+  afterEach(() => {
+    clearContainer();
+  });
+
+  it("should register and resolve a dependency", () => {
+    registerDependency("TestService", TestService);
+
+    const service = resolveDependency<TestService>("TestService");
+
+    expect(service).toBeInstanceOf(TestService);
+    expect(service.getMessage()).toBe("Hello from TestService");
+  });
+
+  it("should register and resolve a singleton (shared instance)", () => {
+    registerSingleton("TestService", TestService);
+
+    const instance1 = resolveDependency<TestService>("TestService");
+    const instance2 = resolveDependency<TestService>("TestService");
+
+    expect(instance1).toBe(instance2); // Same instance
+    expect(instance1.id).toBe(instance2.id);
+  });
+
+  it("should create new instances for non-singleton registrations", () => {
+    registerDependency("TestService", TestService);
+
+    const instance1 = resolveDependency<TestService>("TestService");
+    const instance2 = resolveDependency<TestService>("TestService");
+
+    expect(instance1).toBeInstanceOf(TestService);
+    expect(instance2).toBeInstanceOf(TestService);
+    expect(instance1.id).not.toBe(instance2.id); // Different instances
+  });
+});
+```
+
+### Example 3: Testing with Mocks
+
+```typescript
+// Example pattern for testing services with mocked repositories
+import { describe, it, expect, vi, beforeEach } from "vitest";
+
+describe("GreetingService", () => {
+  let service: GreetingService;
+  let mockRepository: any;
+
+  beforeEach(() => {
+    mockRepository = {
+      findAll: vi.fn(),
+      findById: vi.fn(),
+      save: vi.fn(),
+      delete: vi.fn(),
+    };
+
+    service = new GreetingService(mockRepository);
+  });
+
+  it("should return all greetings", async () => {
+    const mockGreetings = [
+      { id: "1", message: "Hello" },
+      { id: "2", message: "Hi" },
+    ];
+    mockRepository.findAll.mockResolvedValue(mockGreetings);
+
+    const result = await service.getAll();
+
+    expect(result).toEqual(mockGreetings);
+    expect(mockRepository.findAll).toHaveBeenCalledOnce();
+  });
+
+  it("should throw NotFoundError when greeting not found", async () => {
+    mockRepository.findById.mockResolvedValue(null);
+
+    await expect(service.getById("999")).rejects.toThrow(NotFoundError);
+    expect(mockRepository.findById).toHaveBeenCalledWith("999");
+  });
+});
+```
+
+### Example 4: Testing Async Operations
+
+```typescript
+describe("Configuration Loading", () => {
+  it("should load and validate JSON configuration", async () => {
+    const schema = z.object({
+      port: z.number(),
+      host: z.string(),
+    });
+
+    const config = loadJSON("./test/fixtures/config.json", schema);
+
+    expect(config.port).toBe(3000);
+    expect(config.host).toBe("localhost");
+  });
+
+  it("should throw ValidationError on invalid schema", () => {
+    const schema = z.object({
+      port: z.number().min(1).max(65535),
+    });
+
+    expect(() => {
+      loadJSON("./test/fixtures/invalid-config.json", schema);
+    }).toThrow(ValidationError);
+  });
+
+  it("should throw BadResourceError when file not found", () => {
+    const schema = z.object({});
+
+    expect(() => {
+      loadJSON("./nonexistent.json", schema);
+    }).toThrow(BadResourceError);
+  });
+});
+```
+
+---
+
+## Coverage Targets
 
 | Metric     | Target |
 | ---------- | ------ |

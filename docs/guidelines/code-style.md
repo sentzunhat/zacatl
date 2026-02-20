@@ -618,6 +618,270 @@ Add `.prettierrc.json` or `prettier` key in `package.json`:
 
 ---
 
+## Build Process
+
+### TypeScript Compilation Pipeline
+
+The build process follows three stages:
+
+```bash
+npm run build
+# Executes: tsc → tsc-alias → fix-esm.mjs → clean:src
+```
+
+**Stage 1: TypeScript Compilation**
+
+```bash
+tsc --project tsconfig.json
+```
+
+- Compiles `.ts` → `.js` and generates `.d.ts` declaration files
+- Target: ESNext (no transpilation, modern Node.js features preserved)
+- Output: `build/` directory
+
+**Stage 2: Path Alias Resolution**
+
+```bash
+tsc-alias -p tsconfig.json
+```
+
+- Resolves TypeScript path aliases (`@zacatl/*`) to relative paths
+- Converts imports like `@zacatl/error` to `../../error/index.js`
+- Required because TypeScript doesn't resolve aliases at runtime
+
+**Stage 3: ESM Module Fixing**
+
+```bash
+node scripts/fix-esm.mjs
+```
+
+- Adds `.js` extensions to relative imports (Node.js ESM requirement)
+- Fixes default/namespace imports for CommonJS interop
+- Ensures proper Node.js ESM compatibility
+
+**Stage 4: Cleanup**
+
+```bash
+npm run clean:src
+```
+
+- Removes intermediate build artifacts from `src/`
+- Keeps only final output in `build/`
+
+### Why No Bundler?
+
+This project doesn't use bundlers (Vite, esbuild, Rollup) for the library build:
+
+**Pros:**
+
+- ✅ Cleaner output (1:1 file mapping)
+- ✅ Better debugging (source maps match structure)
+- ✅ Easier to inspect generated code
+- ✅ Faster incremental builds
+- ✅ Tree-shaking friendly for consumers
+
+**Cons:**
+
+- ❌ Requires ESM fixing scripts
+- ❌ Manual path alias resolution needed
+
+> **Note**: Examples and applications can still use bundlers (Vite for React apps, etc.)
+
+---
+
+## Logging Patterns
+
+### Logger Creation
+
+```typescript
+import { createLogger } from "@zacatl/logs";
+
+// Default logger (Pino adapter)
+const logger = createLogger();
+
+// Custom adapter
+import { ConsoleLoggerAdapter } from "@zacatl/logs";
+const cliLogger = createLogger(new ConsoleLoggerAdapter());
+```
+
+### Log Levels
+
+```typescript
+logger.debug("Detailed diagnostic info", { userId: "123" });
+logger.info("General information", { event: "user.login" });
+logger.warn("Warning message", { retries: 3 });
+logger.error("Error occurred", { error: err, correlationId });
+```
+
+### Structured Logging
+
+Always include context as second parameter:
+
+```typescript
+// ✅ Good — structured data
+logger.info("User created", {
+  userId: user.id,
+  email: user.email,
+  timestamp: new Date(),
+});
+
+// ❌ Avoid — string concatenation
+logger.info(`User ${user.id} created with email ${user.email}`);
+```
+
+### Correlation IDs
+
+Include correlation IDs for request tracing:
+
+```typescript
+class GetUserHandler extends GetRouteHandler<User> {
+  constructor(
+    private service: UserService,
+    private logger: Logger,
+  ) {}
+
+  async execute(request: FastifyRequest): Promise<User> {
+    const correlationId = request.id; // Fastify request ID
+    this.logger.info("Fetching user", { userId: request.params.id, correlationId });
+
+    try {
+      return await this.service.getUser(request.params.id);
+    } catch (error) {
+      this.logger.error("Failed to fetch user", {
+        userId: request.params.id,
+        correlationId,
+        error,
+      });
+      throw error;
+    }
+  }
+}
+```
+
+---
+
+## Configuration Patterns
+
+### Loading Configuration
+
+```typescript
+import { loadJSON, loadYAML } from "@zacatl/configuration";
+import { z } from "@zacatl/third-party/zod";
+
+// Define schema
+const ServerConfigSchema = z.object({
+  port: z.number().min(1).max(65535),
+  host: z.string(),
+  logLevel: z.enum(["debug", "info", "warn", "error"]),
+});
+
+// Load and validate
+const config = loadJSON("./config.json", ServerConfigSchema);
+const yamlConfig = loadYAML("./config.yaml", ServerConfigSchema);
+```
+
+### Environment-Based Configuration
+
+```typescript
+const env = process.env.NODE_ENV || "development";
+const configPath = `./config/${env}.json`;
+
+const config = loadJSON(configPath, ConfigSchema);
+```
+
+### Configuration Validation Errors
+
+```typescript
+import { ValidationError } from "@zacatl/error";
+
+try {
+  const config = loadJSON("./config.json", ServerConfigSchema);
+} catch (error) {
+  if (error instanceof ValidationError) {
+    console.error("Configuration validation failed:", error.metadata);
+    process.exit(1);
+  }
+  throw error;
+}
+```
+
+---
+
+## Common Patterns & Anti-Patterns
+
+### Error Handling
+
+```typescript
+// ✅ Good — Use typed error classes
+import { BadRequestError, NotFoundError } from "@zacatl/error";
+
+if (!user) {
+  throw new NotFoundError({ message: "User not found", metadata: { userId } });
+}
+
+if (!email) {
+  throw new BadRequestError({ message: "Email is required" });
+}
+
+// ❌ Avoid — Generic Error
+throw new Error("User not found");
+throw new Error("400: Bad Request");
+```
+
+### Async/Await
+
+```typescript
+// ✅ Good — Explicit async/await
+async function getUser(id: string): Promise<User> {
+  const user = await repository.findById(id);
+  if (!user) throw new NotFoundError({ message: "User not found" });
+  return user;
+}
+
+// ❌ Avoid — Promise chains for simple cases
+function getUser(id: string): Promise<User> {
+  return repository
+    .findById(id)
+    .then((user) => {
+      if (!user) throw new NotFoundError({ message: "User not found" });
+      return user;
+    })
+    .catch((err) => {
+      throw err;
+    });
+}
+```
+
+### Optional Chaining & Nullish Coalescing
+
+```typescript
+// ✅ Good — Modern operators
+const userName = user?.profile?.name ?? "Anonymous";
+const count = config?.maxItems ?? 10;
+
+// ❌ Avoid — Nested ternaries
+const userName = user ? (user.profile ? user.profile.name : "Anonymous") : "Anonymous";
+```
+
+### Type Narrowing
+
+```typescript
+// ✅ Good — Type guards
+function isCustomError(error: unknown): error is CustomError {
+  return error instanceof CustomError;
+}
+
+if (isCustomError(error)) {
+  logger.error("Custom error occurred", { correlationId: error.correlationId });
+}
+
+// ❌ Avoid — Type assertions
+const customError = error as CustomError;
+logger.error("Custom error occurred", { correlationId: customError.correlationId });
+```
+
+---
+
 ## Summary
 
 | Aspect           | Rule           |

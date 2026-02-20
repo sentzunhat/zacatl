@@ -356,6 +356,161 @@ class UserCreateHandler extends PostRouteHandler<User> {
 
 ---
 
+### Schema Validation Flexibility (v0.0.40+ / v0.1.0)
+
+🎯 **Flexible Validation: Zod, Yup, or None**
+
+**Goal**: Give users choice and control over request/response validation. Keep Zod as the recommended default, add Yup support for migration paths, and allow opt-out for maximum performance.
+
+**Current State (v0.0.39)**:
+
+- ✅ Zod validation built-in and recommended
+- ✅ Strong type safety with TypeScript + Zod schemas
+- ✅ Automatic validation errors with helpful messages
+- ✅ Works seamlessly with Global Error Handler
+
+**Planned Enhancements**:
+
+**1. Yup Support for Express & Fastify**
+
+Enable Yup as an alternative validation library:
+
+```typescript
+// Option A: Zod (default, recommended)
+import { z } from "zod";
+import { PostRouteHandler } from "@sentzunhat/zacatl";
+
+const createUserSchema = z.object({
+  name: z.string().min(3),
+  email: z.string().email(),
+});
+
+class CreateUserHandler extends PostRouteHandler<User, typeof createUserSchema> {
+  schema = createUserSchema;
+
+  async handler(request, reply) {
+    // request.body is validated and typed
+    return await this.userService.create(request.body);
+  }
+}
+
+// Option B: Yup (for existing codebases or preference)
+import * as yup from "yup";
+import { PostRouteHandler } from "@sentzunhat/zacatl";
+
+const createUserSchema = yup.object({
+  name: yup.string().required().min(3),
+  email: yup.string().required().email(),
+});
+
+class CreateUserHandler extends PostRouteHandler<User, typeof createUserSchema> {
+  schema = createUserSchema;
+  validationLibrary = "yup"; // explicit opt-in
+
+  async handler(request, reply) {
+    // request.body is validated with Yup
+    return await this.userService.create(request.body);
+  }
+}
+```
+
+**2. No Schema Validation (Opt-Out)**
+
+For scenarios where validation isn't needed or is handled elsewhere:
+
+```typescript
+import { PostRouteHandler } from "@sentzunhat/zacatl";
+
+// Option C: No validation (manual checks or pre-validated data)
+class CreateUserHandler extends PostRouteHandler<User, CreateUserInput> {
+  // No schema property = no automatic validation
+
+  async handler(request, reply) {
+    // Manual validation if needed
+    if (!request.body?.email) {
+      throw new BadRequestError("Email is required");
+    }
+
+    // Or trust upstream validation (API gateway, middleware, etc.)
+    return await this.userService.create(request.body);
+  }
+}
+```
+
+**3. Validation Adapter Pattern**
+
+Abstract validation behind a common interface:
+
+```typescript
+interface ValidationAdapter<T> {
+  validate(data: unknown): T;
+  validateAsync(data: unknown): Promise<T>;
+}
+
+class ZodAdapter<T> implements ValidationAdapter<T> {
+  constructor(private schema: z.ZodSchema<T>) {}
+  validate(data: unknown): T {
+    return this.schema.parse(data);
+  }
+}
+
+class YupAdapter<T> implements ValidationAdapter<T> {
+  constructor(private schema: yup.Schema<T>) {}
+  async validate(data: unknown): Promise<T> {
+    return await this.schema.validate(data);
+  }
+}
+
+// Framework detects and uses the appropriate adapter
+```
+
+**4. Configuration-Level Defaults**
+
+Set project-wide validation preferences:
+
+```typescript
+// zacatl.config.ts
+export default {
+  validation: {
+    library: "zod", // "zod" | "yup" | "none"
+    strict: true, // throw on validation errors
+    stripUnknown: true, // remove extra properties
+  },
+  // ... other config
+};
+```
+
+**Benefits**:
+
+- **Choice**: Use Zod, Yup, or no validation based on project needs
+- **Performance**: Skip validation overhead when not needed (trusted sources, internal APIs)
+- **Migration**: Adopt Zacatl without rewriting existing Yup schemas
+- **Flexibility**: Mix validation strategies in the same project (per-route control)
+- **Standards**: Validation adapters follow common interface — easy to extend
+- **Type Safety**: TypeScript inference works with all validation libraries
+
+**Implementation Phases**:
+
+- **Phase 1** (v0.0.40+): No-validation opt-out, documentation
+- **Phase 2** (v0.1.0): Yup adapter implementation
+- **Phase 3** (v0.1.0): Configuration-level defaults and validation adapter interface
+- **Phase 4** (Post v0.1.0): Additional libraries (Joi, Ajv, class-validator) as community demand grows
+
+**Use Cases**:
+
+1. **High-throughput APIs**: Skip validation for performance-critical endpoints
+2. **Microservices**: Validation already done by API gateway
+3. **Legacy codebases**: Keep existing Yup schemas during Zacatl migration
+4. **Hybrid projects**: Zod for new code, Yup for legacy, none for internal routes
+5. **Prototyping**: Fast iteration without schema definitions
+
+**Timeline**:
+
+- **v0.0.40+**: Opt-out support and documentation
+- **v0.1.0**: Full Yup support and validation adapter pattern
+
+---
+
 ## Next Major Version (v0.1.0)
 
 ### Goal

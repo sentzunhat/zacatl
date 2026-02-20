@@ -2,9 +2,67 @@
 
 ---
 
-## [0.0.40] - 2026-02-19
+## [0.0.41] - 2026-02-19
 
 **Status**: Current release
+
+### ✨ Improvements
+
+- **User-controlled response shapes** (opt-in envelope): `buildResponse()` returns raw handler data by default. Use `makeWithDefaultResponse()` in your schema if you want to validate the `{ ok, message, data }` envelope at the Fastify level, then override `buildResponse()` to add the wrapper. This gives full control to the user.
+- **`@singleton()` and `@injectable()` both work on route handlers**: the application layer now checks `container.isRegistered()` before registering a handler. Both decorators produce singletons — use whichever reads better.
+- **Framework dependencies exported from `third-party/`**: `ZodTypeProvider` from `fastify-type-provider-zod` is now re-exported via `@sentzunhat/zacatl/third-party/fastify`, along with all other framework dependencies, for consistent type safety.
+
+### 🔧 Fixes
+
+- **Zod v4 schema type compatibility**: `makeWithDefaultResponse` now has explicit return type and accepts `z.ZodTypeAny`, resolving ~70 `TS2379` errors under `exactOptionalPropertyTypes: true`
+- **Removed `makeSchema`**: was a no-op identity wrapper; its type constraint caused schema type errors. Plain `z.object(...)` is all that is needed.
+- **Schema utilities in `common/`**: `makeWithDefaultResponse` lives in `rest/common/schema.ts` and is shared by both Fastify and Express platforms as an optional utility.
+
+### 📚 Usage examples
+
+#### Default — raw response
+
+```typescript
+export class MyHandler extends PostRouteHandler<Input, MyData> {
+  schema = {
+    body: z.object({ name: z.string() }),
+    response: z.object({ id: z.string() }), // just the data shape
+  };
+
+  async handler({ body }): Promise<MyData> {
+    return { id: "1" }; // returns plain data
+  }
+}
+// HTTP response: { id: "1" }
+```
+
+#### With envelope (opt-in)
+
+```typescript
+export const MyResponseSchema = makeWithDefaultResponse(z.object({ id: z.string() }));
+
+export class MyHandler extends PostRouteHandler<Input, MyData> {
+  schema = {
+    body: z.object({ name: z.string() }),
+    response: MyResponseSchema, // validates full envelope
+  };
+
+  async handler({ body }): Promise<MyData> {
+    return { id: "1" };
+  }
+
+  protected buildResponse(data: MyData) {
+    return { ok: true, message: "Success", data };
+  }
+}
+// HTTP response: { ok: true, message: "Success", data: { id: "1" } }
+```
+
+---
+
+## [0.0.40] - 2026-02-19
+
+**Status**: Previous release
 
 ### ✨ Improvements
 
@@ -251,7 +309,7 @@ const server = new Service({
 });
 ```
 
-#**Breaking Changes (with Backward Compatibility)**
+## **Breaking Changes (with Backward Compatibility)**
 
 ### 📦 Release
 
@@ -547,7 +605,7 @@ import { loadConfig } from "@sentzunhat/zacatl/config";
 - Works in both compiled JavaScript and TypeScript environments
 - ORM type stored for runtime checks without instanceof
 
-###Migration Path
+### Migration Path
 No code changes required. Projects already using both ORMs will continue to work. Projects wanting to use a single ORM can now uninstall the unused one.
 
 See migration archive for details.
@@ -619,5 +677,5 @@ All changes are additive. Existing APIs remain unchanged.
 ---
 
 **Status**: ✅ Ready for Release
-**Version**: X.Y.Z
-**Date**: YYYY-MM-DD
+**Version**: 0.0.20
+**Date**: 2026-01-30

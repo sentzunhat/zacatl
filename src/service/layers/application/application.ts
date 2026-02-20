@@ -28,16 +28,25 @@ export class Application {
 
     const { hooks: restHooks, routes: restRoutes } = restEntryPoints;
 
-    // Register handlers - tsyringe auto-injects services from @injectable metadata
+    // Register handlers as singletons.
+    // If a handler is decorated with @singleton() it is already registered on
+    // module load, so we skip re-registration to avoid overwriting the existing
+    // singleton instance. @injectable() handlers are not self-registered, so
+    // the framework registers them here. Both decorators produce singletons —
+    // use whichever reads better in your codebase.
     if (restHooks && restHooks.length > 0) {
       for (const hook of restHooks) {
-        container.registerSingleton(hook, hook);
+        if (!container.isRegistered(hook)) {
+          container.registerSingleton(hook, hook);
+        }
       }
     }
 
     if (restRoutes && restRoutes.length > 0) {
       for (const route of restRoutes) {
-        container.registerSingleton(route, route);
+        if (!container.isRegistered(route)) {
+          container.registerSingleton(route, route);
+        }
       }
     }
 
@@ -45,14 +54,10 @@ export class Application {
     const hooks = restHooks ? resolveDependencies(restHooks) : [];
     const routes = restRoutes ? resolveDependencies(restRoutes) : [];
 
-    if (
-      hooks.length !== (restHooks?.length || 0) ||
-      routes.length !== (restRoutes?.length || 0)
-    ) {
+    if (hooks.length !== (restHooks?.length || 0) || routes.length !== (restRoutes?.length || 0)) {
       throw new InternalServerError({
         message: "Failed to register all REST entry point dependencies",
-        reason:
-          "Not all REST hooks and routes could be resolved from DI container",
+        reason: "Not all REST hooks and routes could be resolved from DI container",
         component: "ApplicationLayer",
         operation: "register",
         metadata: {

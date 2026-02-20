@@ -102,6 +102,31 @@ class NotificationService {
 }
 ```
 
+  ### Manual Registration Helpers (Advanced)
+
+  If you are not using the Service architecture, prefer Zacatl's DI helper functions
+  over calling `container.register(...)` directly.
+
+  ```typescript
+  import {
+    registerDependency,
+    registerSingleton,
+    registerValue,
+    resolveDependency,
+  } from "@sentzunhat/zacatl/dependency-injection";
+
+  registerDependency(UserService, UserService);
+  registerSingleton(NotificationService, NotificationService);
+
+  const userRepository = new UserRepository();
+  registerValue(UserRepository, userRepository);
+
+  const service = resolveDependency<UserService>(UserService);
+  ```
+
+  Use this approach only when you intentionally manage DI outside of the Service
+  layers. For most applications, the Service architecture is simpler and more robust.
+
 ### Real-World Example
 
 From a production authentication service:

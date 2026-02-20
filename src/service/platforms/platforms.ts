@@ -30,14 +30,18 @@ export class Platforms {
     }
   }
 
-  public async registerEntrypoints(
-    entryPoints: ApplicationEntryPoints,
-  ): Promise<void> {
+  public async registerEntrypoints(entryPoints: ApplicationEntryPoints): Promise<void> {
     if (this.server && entryPoints.rest) {
       await this.server.registerEntrypoints(entryPoints.rest);
     }
 
-    // TODO: Add CLI and Desktop entry points registration when implemented
+    if (this.cli && entryPoints.cli) {
+      await this.cli.registerEntrypoints(entryPoints.cli);
+    }
+
+    if (this.desktop && entryPoints.ipc) {
+      await this.desktop.registerEntrypoints(entryPoints.ipc);
+    }
   }
 
   public async start(options?: { port?: number }): Promise<void> {

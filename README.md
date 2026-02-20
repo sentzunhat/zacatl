@@ -17,7 +17,7 @@ Zacatl enforces clean, layered architecture with dependency injection, validatio
 - **🎯 Multi-Context Architecture** - Single codebase for CLI, Desktop, and Server applications
 - **🏗️ Layered/Hexagonal Architecture** - Clean separation with Application, Domain, Infrastructure, and Platform layers
 - **💉 Dependency Injection** - Built-in DI container using `tsyringe`
-- **✅ Type-Safe Validation** - Full Zod schema support for requests/responses
+- **✅ Type-Safe Validation** - Full Zod schema support (with planned Yup and optional validation)
 - **🛡️ Structured Error Handling** - 7 custom error types with correlation IDs
 - **🗄️ Pluggable ORM Adapters** - Sequelize, Mongoose, or build your own
 - **🌐 Multi-Language Support** - Pluggable i18n with filesystem/memory adapters
@@ -314,6 +314,8 @@ const AppConfigSchema = z.object({
 
 const config = loadConfig("./config/app.yaml", "yaml", AppConfigSchema);
 ```
+
+> **Coming Soon**: Yup support and optional validation for maximum flexibility. See [Roadmap: Schema Validation Flexibility](docs/roadmap/index.md#schema-validation-flexibility-v0040--v010).
 
 ## 🛡️ Error Handling
 

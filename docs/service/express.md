@@ -345,6 +345,8 @@ async execute(req: Express.Request, res: Express.Response) {
 4. **Error handling** - Use Express error middleware for centralized handling
 5. **Validation** - Apply Zod schemas in handlers or middleware
 
+> **Note**: Zod is the recommended validation library. Future versions will support Yup and optional validation for flexibility. See [Roadmap: Schema Validation Flexibility](../roadmap/index.md#schema-validation-flexibility-v0040--v010).
+
 ## Migration Guide
 
 To migrate from Fastify to Express:

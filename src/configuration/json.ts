@@ -4,10 +4,7 @@ import { BadRequestError, NotFoundError, ValidationError } from "@zacatl/error";
 import type { ZodType } from "@zacatl/third-party/zod";
 import { isNodeError, isSyntaxError, isZodError } from "@zacatl/utils";
 
-export function loadJSON<T = unknown>(
-  filePath: string,
-  schema?: ZodType<T>,
-): T {
+export const loadJSON = <T = unknown>(filePath: string, schema?: ZodType<T>): T => {
   try {
     const content = readFileSync(filePath, "utf-8");
     // Strip JSONC comments for .jsonc files
@@ -55,4 +52,4 @@ export function loadJSON<T = unknown>(
 
     throw error;
   }
-}
+};

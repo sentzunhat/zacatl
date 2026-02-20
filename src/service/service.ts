@@ -51,8 +51,14 @@ export class Service {
     }
 
     if (run && run.auto) {
-      this.start().catch(() => {
-        throw new Error("Failed to start service automatically");
+      this.start().catch((err) => {
+        throw new InternalServerError({
+          message: "Failed to start service automatically",
+          reason: "Service auto-start encountered an error during initialization",
+          component: "Service",
+          operation: "constructor",
+          error: err instanceof Error ? err : undefined,
+        });
       });
     }
   }
@@ -75,8 +81,7 @@ export class Service {
       case ServiceType.SERVER:
         if (!platforms?.server) {
           throw new InternalServerError({
-            message:
-              "ServiceType.SERVER requires 'platforms.server' configuration",
+            message: "ServiceType.SERVER requires 'platforms.server' configuration",
             reason: "Server platform configuration is missing",
             component: "Service",
             operation: "validateConfig",
@@ -107,8 +112,7 @@ export class Service {
         }
         if (!layers?.application || !layers.application.entryPoints?.cli) {
           throw new InternalServerError({
-            message:
-              "ServiceType.CLI requires 'layers.application.entryPoints.cli' configuration",
+            message: "ServiceType.CLI requires 'layers.application.entryPoints.cli' configuration",
             reason: "CLI entry points configuration is missing",
             component: "Service",
             operation: "validateConfig",
@@ -120,8 +124,7 @@ export class Service {
       case ServiceType.DESKTOP:
         if (!platforms?.desktop) {
           throw new InternalServerError({
-            message:
-              "ServiceType.DESKTOP requires 'platforms.desktop' configuration",
+            message: "ServiceType.DESKTOP requires 'platforms.desktop' configuration",
             reason: "Desktop platform configuration is missing",
             component: "Service",
             operation: "validateConfig",
@@ -144,9 +147,7 @@ export class Service {
 
   public async start(options?: { port?: number }): Promise<void> {
     if (this.config.layers?.application?.entryPoints) {
-      await this.platforms?.registerEntrypoints(
-        this.config.layers?.application?.entryPoints,
-      );
+      await this.platforms?.registerEntrypoints(this.config.layers?.application?.entryPoints);
 
       await this.platforms?.start(options);
     }

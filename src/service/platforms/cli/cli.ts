@@ -1,6 +1,7 @@
 import { InternalServerError } from "@zacatl/error";
 
 import type { ConfigCLI } from "./types";
+import type { CliApplicationEntryPoints } from "../../layers/application/types";
 
 /**
  * CLI platform stub for ServiceType.CLI execution.
@@ -18,6 +19,18 @@ export class CLI {
   constructor(config: ConfigCLI) {
     this.name = config.name;
     this.version = config.version;
+  }
+
+  public async registerEntrypoints(_entryPoints: CliApplicationEntryPoints): Promise<void> {
+    throw new InternalServerError({
+      message: `CLI entrypoint registration for '${this.name}' is not yet implemented`,
+      reason:
+        "ServiceType.CLI command registration and routing are not implemented. " +
+        "This feature is planned for v0.1.0. Use ServiceType.SERVER for HTTP-based services.",
+      component: "CLI",
+      operation: "registerEntrypoints",
+      metadata: { name: this.name, version: this.version },
+    });
   }
 
   public async start(_input?: unknown): Promise<void> {

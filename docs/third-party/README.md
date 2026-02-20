@@ -28,6 +28,7 @@ const UserSchema = z.object({
 });
 ```
 
+> **Roadmap**: Zod is the recommended validation library. Future versions will support **Yup** for migration paths and **optional validation** for performance-critical scenarios. See [Roadmap: Schema Validation Flexibility](../roadmap/index.md#schema-validation-flexibility-v0040--v010) for details.
 
 ## ORM Packages (Subpath Imports Only)
 

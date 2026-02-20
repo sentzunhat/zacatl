@@ -1,6 +1,7 @@
 import { InternalServerError } from "@zacatl/error";
 
 import type { ConfigDesktop } from "./types";
+import type { IpcApplicationEntryPoints } from "../../layers/application/types";
 
 /**
  * Desktop platform stub for ServiceType.DESKTOP execution.
@@ -18,6 +19,21 @@ export class Desktop {
   constructor(config: ConfigDesktop) {
     this.window = config.window;
     this.platform = config.platform;
+  }
+
+  public async registerEntrypoints(_entryPoints: IpcApplicationEntryPoints): Promise<void> {
+    throw new InternalServerError({
+      message: `Desktop IPC entrypoint registration for '${this.window.title}' is not yet implemented`,
+      reason:
+        "ServiceType.DESKTOP IPC handler registration and event routing are not implemented. " +
+        "This feature is planned for v0.1.0. Use ServiceType.SERVER for HTTP-based services.",
+      component: "Desktop",
+      operation: "registerEntrypoints",
+      metadata: {
+        platform: this.platform,
+        window: { title: this.window.title },
+      },
+    });
   }
 
   public async start(_input?: unknown): Promise<void> {
