@@ -82,7 +82,7 @@ The `HandlersType` enum is exported for internal use by adapters:
 ```typescript
 import { HandlersType } from "@sentzunhat/zacatl";
 
-HandlersType.HOOK;  // "HOOK"
+HandlersType.HOOK; // "HOOK"
 HandlersType.ROUTE; // "ROUTE"
 ```
 
@@ -92,4 +92,3 @@ HandlersType.ROUTE; // "ROUTE"
 2. Use `container.registerSingleton` for handlers decorated with `@injectable()`.
 3. Use `container.registerInstance` for manually constructed repositories and services.
 4. Keep the `routes` array in `layers.application.entryPoints.rest` — do not register routes with the HTTP framework directly.
-
