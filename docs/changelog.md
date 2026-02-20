@@ -2,9 +2,19 @@
 
 ---
 
-## [0.0.42] - 2026-02-19
+## [0.0.43] - 2026-02-19
 
 **Status**: Current release
+
+### 🔧 Maintenance
+
+- **Dependency audit refresh**: Updated lockfile dependencies via npm audit fix to reduce vulnerabilities.
+
+---
+
+## [0.0.42] - 2026-02-19
+
+**Status**: Previous release
 
 ### 🔧 Maintenance
 
@@ -616,6 +626,7 @@ import { loadConfig } from "@sentzunhat/zacatl/config";
 - ORM type stored for runtime checks without instanceof
 
 ### Migration Path
+
 No code changes required. Projects already using both ORMs will continue to work. Projects wanting to use a single ORM can now uninstall the unused one.
 
 See migration archive for details.
