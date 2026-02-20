@@ -1,13 +1,13 @@
-
 # ORM & Database Reference
 
 ## Related Documentation
-  - [overview.md](overview.md) - Supported databases and adapters
-  - [orm-import-strategies.md](orm-import-strategies.md) - How to import ORM packages
-  - [architecture.md](architecture.md) - How adapters work internally
-  - [orm-lazy-loading.md](orm-lazy-loading.md) - Load related data on-demand
-  - [multi-orm-setup.md](multi-orm-setup.md) - Use multiple databases in one service
-  - [working-with-databases.md](working-with-databases.md) - Step-by-step tutorial
+
+- [overview.md](overview.md) - Supported databases and adapters
+- [orm-import-strategies.md](orm-import-strategies.md) - How to import ORM packages
+- [architecture.md](architecture.md) - How adapters work internally
+- [orm-lazy-loading.md](orm-lazy-loading.md) - Load related data on-demand
+- [multi-orm-setup.md](multi-orm-setup.md) - Use multiple databases in one service
+- [working-with-databases.md](working-with-databases.md) - Step-by-step tutorial
 
 ## Common Patterns
 
