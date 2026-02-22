@@ -195,6 +195,15 @@ const namingConventionsConfig = {
         format: ["camelCase", "PascalCase", "UPPER_CASE"],
         leadingUnderscore: "allow",
         trailingUnderscore: "allow",
+        filter: {
+          match: false,
+          // Allow pure numeric keys (e.g. 200) and dotted keys consisting of
+          // alphanumeric segments (e.g. "diego.beltran.is.best" or
+          // "device.browser.fingerprint"). This keeps the rule strict for
+          // normal identifiers while permitting status codes and dot-delimited
+          // keys used as literal property names.
+          regex: "(^\\d+$|^[A-Za-z0-9]+(\\.[A-Za-z0-9]+)+$)",
+        },
       },
 
       // Enum members - UPPER_CASE

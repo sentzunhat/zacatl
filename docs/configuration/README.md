@@ -107,6 +107,7 @@ database:
   }
 }
 ```
+
 ## Error Handling
 
 Both loaders throw typed Zacatl errors:

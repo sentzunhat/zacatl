@@ -1,6 +1,6 @@
 # Contributing to Zacatl
 
-Thank you for your interest in contributing! This guide will help you get started with development, testing, and submitting changes.
+I appreciate your interest in contributing! This guide will help you get started with development, testing, and submitting changes.
 
 ## Getting Started
 
@@ -73,17 +73,22 @@ Before committing code:
 
 ## Making Changes
 
-### 1. Create a Feature Branch
+### 1. Open an issue, then create a branch
 
-Follow the branch naming convention from [git-workflow.md](./docs/guidelines/git-workflow.md):
+Always start with an issue — it keeps work traceable and easy to discuss.
+
+1. Open an issue on GitHub describing what you want to change or fix.
+2. Create a branch tied to that issue:
 
 ```bash
-git checkout -b feat/<scope>/<description>
+git checkout -b issue-<number>/<type>/<description>
 # Examples:
-git checkout -b feat/error/add-forbidden-error
-git checkout -b fix/service/handle-null-connections
-git checkout -b docs/api/update-endpoints
+git checkout -b issue-42/feat/add-forbidden-error
+git checkout -b issue-88/fix/handle-null-connections
+git checkout -b issue-5/docs/update-api-readme
 ```
+
+Branch prefixes: `feat`, `fix`, `refactor`, `perf`, `docs`, `test`, `chore`.
 
 ### 2. Make Your Changes
 
@@ -141,7 +146,7 @@ git commit -m "feat(error): add ForbiddenError class
 Introduces 403 Forbidden error for permission-denied scenarios.
 Extends CustomError with code 403 and provides metadata support.
 
-Fixes #42"
+Fixes #42
 
 git commit -m "fix(service): handle null database connections"
 
@@ -157,7 +162,7 @@ git commit -m "refactor(di-container): simplify auto-registration"
 1. **Push your branch:**
 
    ```bash
-   git push origin feat/error/add-forbidden-error
+   git push origin issue-42/feat/add-forbidden-error
    ```
 
 2. **Create PR on GitHub** with:
@@ -169,7 +174,7 @@ git commit -m "refactor(di-container): simplify auto-registration"
    ```markdown
    ## Description
 
-   Brief summary of changes.
+   Summary of changes.
 
    ## Type of Change
 
@@ -205,9 +210,9 @@ git commit -m "refactor(di-container): simplify auto-registration"
 
 ### Adding a New Feature
 
-1. Create branch: `feat/service/<feature-name>`
+1. Create branch: `feat/service/<feature-name>.`
 2. Add to appropriate layer (domain, application, infrastructure)
-3. Add tests covering happy path and error cases
+3. Add tests covering the happy path and error cases
 4. Update JSDoc with `@example` if public API
 5. Update changelog if significant
 
@@ -243,8 +248,8 @@ describe("ForbiddenError", () => {
 ### Fixing a Bug
 
 1. Create branch: `fix/<scope>/<bug-description>`
-2. Add regression test that fails before fix, passes after
-3. Keep fix minimal and focused
+2. Add a regression test that fails before the fix, passes after
+3. Keep fixes minimal and focused
 4. Update changelog with fix entry
 
 ### Updating Documentation
@@ -252,7 +257,7 @@ describe("ForbiddenError", () => {
 1. Create branch: `docs/<area>/<change>`
 2. No code changes needed (usually)
 3. Update affected `.md` files
-4. Check links work and examples are correct
+4. Check links work, and examples are correct
 
 ### Refactoring Code
 
@@ -290,7 +295,7 @@ describe("ForbiddenError", () => {
 # Make changes locally
 git add .
 git commit -m "refactor: address review feedback"
-git push origin feat/<branch-name>
+git push origin issue-<number>/<type>/<branch-name>
 # PR auto-updates; no need to close/reopen
 ```
 
@@ -373,7 +378,7 @@ Maintainers handle releases. For reference, see [git-workflow.md](./docs/guideli
 
 ## Common Issues & Solutions
 
-### "Tests failing after setup"
+### "Tests failing after setup."
 
 ```bash
 # Clean and reinstall
@@ -382,14 +387,14 @@ npm install
 npm test
 ```
 
-### "Lint errors on commit"
+### "Lint errors on commit."
 
 ```bash
 npm run lint:fix  # Auto-fix most issues
 npm run lint      # Check remaining
 ```
 
-### "Type checking fails"
+### "Type checking fails."
 
 ```bash
 npm run type:check  # See errors
@@ -397,7 +402,42 @@ npm run type:check  # See errors
 npm run type:check
 ```
 
-### "Build produces large output"
+### "Build produces large output."
+
+```bash
+npm run clean:build  # remove old artifacts
+npm run build        # fresh build
+```
+
+The published package only includes `build/`. Source files under `src/` stay local.
+
+---
+
+## DevOps & publishing
+
+Keep releases simple and reproducible:
+
+- Open an issue describing the change first. Use that issue number in your branch name: `issue-<number>/<type>/<desc>` (example: `issue-12/chore/publish-cleanup`).
+- Work on the branch, add tests, push, and open a PR referencing the issue.
+
+- Local installs: if you only want to install deps and avoid lifecycle scripts, run:
+
+  ```bash
+  npm install --ignore-scripts
+  ```
+
+- Build & verify before publishing:
+
+  ```bash
+  npm run build        # creates build/ and copies assets
+  npm run prepare-publish  # generates build/package.json
+  npm run publish:dry  # dry-run publish from ./build
+  npm run publish:otp  # publish (npm will ask for OTP)
+  ```
+
+- Note: we publish `./build` as the package root. `prepare-publish` writes a trimmed `package.json` into `build/` so consumers see built files at the package root.
+
+That's it — keep branches tied to issues and publish from `build/` for a lean package.
 
 ```bash
 npm run clean:build  # Remove old artifacts

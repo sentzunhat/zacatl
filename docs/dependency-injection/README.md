@@ -39,13 +39,7 @@ Ensure your `tsconfig.json` has:
 ### Basic Usage
 
 ```typescript
-import {
-  inject,
-  singleton,
-  BadRequestError,
-  ValidationError,
-  InternalServerError,
-} from "@sentzunhat/zacatl";
+import { inject, singleton, BadRequestError, ValidationError, InternalServerError } from "@sentzunhat/zacatl";
 
 // Define a repository
 @singleton()
@@ -102,43 +96,32 @@ class NotificationService {
 }
 ```
 
-  ### Manual Registration Helpers (Advanced)
+### Manual Registration Helpers (Advanced)
 
-  If you are not using the Service architecture, prefer Zacatl's DI helper functions
-  over calling `container.register(...)` directly.
+If you are not using the Service architecture, prefer Zacatl's DI helper functions
+over calling `container.register(...)` directly.
 
-  ```typescript
-  import {
-    registerDependency,
-    registerSingleton,
-    registerValue,
-    resolveDependency,
-  } from "@sentzunhat/zacatl/dependency-injection";
+```typescript
+import { registerDependency, registerSingleton, registerValue, resolveDependency } from "@sentzunhat/zacatl/dependency-injection";
 
-  registerDependency(UserService, UserService);
-  registerSingleton(NotificationService, NotificationService);
+registerDependency(UserService, UserService);
+registerSingleton(NotificationService, NotificationService);
 
-  const userRepository = new UserRepository();
-  registerValue(UserRepository, userRepository);
+const userRepository = new UserRepository();
+registerValue(UserRepository, userRepository);
 
-  const service = resolveDependency<UserService>(UserService);
-  ```
+const service = resolveDependency<UserService>(UserService);
+```
 
-  Use this approach only when you intentionally manage DI outside of the Service
-  layers. For most applications, the Service architecture is simpler and more robust.
+Use this approach only when you intentionally manage DI outside of the Service
+layers. For most applications, the Service architecture is simpler and more robust.
 
 ### Real-World Example
 
 From a production authentication service:
 
 ```typescript
-import {
-  inject,
-  singleton,
-  BadRequestError,
-  ValidationError,
-  InternalServerError,
-} from "@sentzunhat/zacatl";
+import { inject, singleton, BadRequestError, ValidationError, InternalServerError } from "@sentzunhat/zacatl";
 
 @singleton()
 export class AttestOptionsProviderAdapter {

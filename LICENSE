@@ -1,6 +1,8 @@
+SPDX-License-Identifier: MIT
+
 MIT License
 
-Copyright (c) 2025 Zacatl Contributors
+Copyright (c) 2026 Zacatl Contributors
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -19,11 +21,3 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-
----
-
-Note from Zacatl contributors:
-
-We kindly ask that if you find this software useful and make improvements,
-please consider contributing back via a pull request. While not required,
-we appreciate collaboration and open innovation.

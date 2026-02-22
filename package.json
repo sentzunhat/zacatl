@@ -4,7 +4,7 @@
   "main": "build/index.js",
   "module": "build/index.js",
   "types": "build/index.d.ts",
-  "version": "0.0.43",
+  "version": "0.0.44",
   "packageManager": "npm@10.9.0",
   "exports": {
     ".": {
@@ -116,9 +116,9 @@
       "types": "./build/utils/index.d.ts",
       "import": "./build/utils/index.js"
     },
-    "./optionals": {
-      "types": "./build/optionals.d.ts",
-      "import": "./build/optionals.js"
+    "./utils/optionals": {
+      "types": "./build/utils/optionals.d.ts",
+      "import": "./build/utils/optionals.js"
     },
     "./logs": {
       "types": "./build/logs/index.d.ts",
@@ -137,16 +137,22 @@
       "import": "./build/configuration/index.js"
     },
     "./eslint": {
-      "import": "./src/eslint/index.mjs"
+      "import": "./build/eslint/index.mjs"
     },
     "./eslint/base": {
-      "import": "./src/eslint/base.mjs"
+      "import": "./build/eslint/base.mjs"
     },
     "./eslint/naming-conventions": {
-      "import": "./src/eslint/naming-conventions.mjs"
+      "import": "./build/eslint/naming-conventions.mjs"
     },
     "./eslint/imports": {
-      "import": "./src/eslint/imports.mjs"
+      "import": "./build/eslint/imports.mjs"
+    },
+    "./eslint/file-naming": {
+      "import": "./build/eslint/file-naming.mjs"
+    },
+    "./eslint/solid": {
+      "import": "./build/eslint/solid.mjs"
     },
     "./build/*": "./build/*",
     "./package.json": "./package.json"
@@ -168,17 +174,30 @@
   },
   "keywords": [
     "typescript",
+    "javascript",
+    "ecmascript",
+    "esm",
     "microservice",
     "microservices",
     "framework",
+    "node",
     "nodejs",
     "dependency-injection",
+    "ioc",
+    "inversion-of-control",
+    "injectable",
+    "decorator",
     "hexagonal-architecture",
+    "hexagonal",
     "layered-architecture",
     "clean-architecture",
+    "ddd",
+    "domain-driven-design",
+    "repository-pattern",
     "service",
     "fastify",
     "express",
+    "middleware",
     "mongodb",
     "mongoose",
     "sequelize",
@@ -188,6 +207,7 @@
     "vitest",
     "testing",
     "api",
+    "rest",
     "rest-api",
     "http",
     "backend",
@@ -200,11 +220,15 @@
     "enterprise",
     "scalable",
     "modular",
+    "eslint",
+    "eslint-plugin",
+    "eslint-config",
     "tsyringe",
     "pino",
     "logging",
     "i18n",
     "internationalization",
+    "localization",
     "artisan"
   ],
   "author": "Zacatl Contributors",
@@ -230,13 +254,15 @@
     "clean:modules:examples": "rm -rf examples/*/node_modules examples/*/*/node_modules examples/*/*/*/node_modules examples/*/*/*/*/node_modules 2>/dev/null; true",
     "clean:modules:all": "npm run clean:modules",
     "clean:src": "find src -type f \\( -name '*.js' -o -name '*.d.ts' -o -name '*.js.map' -o -name '*.d.ts.map' \\) -delete 2>/dev/null; true",
-    "clean:build": "rm -rf build dist *.tsbuildinfo && npm run clean:src",
+    "clean:build": "rm -rf build dist coverage *.tsbuildinfo && npm run clean:src",
     "clean": "npm run clean:build && npm run clean:modules:all",
     "prepublish:guard": "node scripts/prepublish-guard.mjs",
-    "prepublish": "npm run prepublish:guard && npm run clean:src && npm run test:coverage && npm run type:check && npm run lint && npm run build",
-    "publish:latest": "npm run prepublish && npm publish --access public --tag latest",
-    "publish:otp": "npm run prepublish && npm publish --access public --tag latest --otp",
-    "publish:dry": "npm run prepublish && npm publish --dry-run",
+    "prepublish:only": "npm run prepublish:guard && npm run clean:src && npm run test:coverage && npm run type:check && npm run lint && npm run build",
+    "postbuild": "mkdir -p build/eslint && cp -R src/eslint/* build/eslint/ || true && mkdir -p build/localization/locales && cp -R src/localization/locales/* build/localization/locales/ || true && cp README.md LICENSE build/ || true",
+    "prepare-publish": "node scripts/prepare-publish.mjs",
+    "publish:latest": "npm run prepublish:only && npm run prepare-publish && npm publish ./build --access public --tag latest",
+    "publish:otp": "npm run prepublish:only && npm run prepare-publish && npm publish ./build --access public --tag latest --otp",
+    "publish:dry": "npm run prepublish:only && npm run prepare-publish && npm publish ./build --dry-run",
     "setup:hooks": "bash scripts/setup-git-hooks.sh"
   },
   "devDependencies": {
@@ -263,11 +289,7 @@
   },
   "license": "MIT",
   "files": [
-    "build",
-    "src/eslint",
-    "src/localization/locales",
-    "README.md",
-    "LICENSE"
+    "build"
   ],
   "peerDependencies": {
     "mongoose": "^9.0.0",

@@ -2,9 +2,29 @@
 
 ---
 
-## [0.0.43] - 2026-02-19
+## [0.0.44] - 2026-02-22
 
 **Status**: Current release
+
+### ✨ Improvements
+
+- **ESLint: consolidated `solid` config** — Added `src/eslint/solid.mjs` (a consolidated, ready-to-use Flat config) and exported it via the package `recommended` set so consumers can opt into a single, well-configured ESLint bundle.
+- **ESLint: relaxed naming rules for literal properties** — The `naming-conventions` rules now allow numeric keys (e.g. `200`) and dot-delimited alphanumeric property names (e.g. `device.browser.fingerprint`, `diego.beltran.is.best`), which avoids false positives when using status-code keys or dotted property identifiers in literal objects.
+
+### 📚 Documentation
+
+- **Docs: cleaned examples and imports** — Removed unnecessary imports from code examples and reformatted ORM docs into a list for clarity. ([commit: f961e2c])
+- **Docs: minor formatting fixes** — Corrected formatting inconsistencies and removed an extraneous trailing newline to improve readability. ([commit: 5fa643b])
+
+### 🔧 Maintenance
+
+- **Preparations for publish** — Bumped package version to `0.0.44`.
+
+---
+
+## [0.0.43] - 2026-02-19
+
+**Status**: Previous release
 
 ### 🔧 Maintenance
 

@@ -107,10 +107,21 @@ export const loadCatalog = (input: LoadCatalogInput): I18nCatalogType => {
 export const resolveBuiltInLocalesDir = (): string => {
   const here = path.dirname(fileURLToPath(import.meta.url));
 
+  // Candidate directories to search for built-in locales.
+  // We include multiple layouts to support development (src/), build output
+  // (build/), and installed package consumers.
   const candidates = [
+    // Locales shipped next to this module (src/localization/locales or build/localization/locales)
     path.resolve(here, "locales"),
+    // If running from build output, try the package build-locales path
+    path.resolve(here, "../../build/localization/locales"),
+    // Fallback to source layout relative to package root
     path.resolve(here, "../../src/localization/locales"),
+    // Project workspace source locales (when running from project root)
     path.resolve(process.cwd(), "src/localization/locales"),
+    // Generic localization folders in project root
+    path.resolve(process.cwd(), "localization/locales"),
+    path.resolve(process.cwd(), "locales"),
   ];
 
   const found = findExistingDir(candidates);
@@ -139,17 +150,14 @@ export const mergeCatalogs = (input: MergeCatalogsInput): I18nCatalogType => {
   for (const locale of locales) {
     const baseLocale = base[locale] ?? {};
 
-    const additionsLocale = additions.reduce<Record<string, unknown>>(
-      (acc, addition) => {
-        const addLocale = addition[locale];
-        if (!addLocale) {
-          return acc;
-        }
+    const additionsLocale = additions.reduce<Record<string, unknown>>((acc, addition) => {
+      const addLocale = addition[locale];
+      if (!addLocale) {
+        return acc;
+      }
 
-        return deepMerge(acc, addLocale);
-      },
-      {},
-    );
+      return deepMerge(acc, addLocale);
+    }, {});
 
     out[locale] = overrideBuiltIn
       ? deepMerge(baseLocale, additionsLocale)
@@ -162,9 +170,7 @@ export const mergeCatalogs = (input: MergeCatalogsInput): I18nCatalogType => {
 /**
  * Configure i18n - merges built-in translations with app-specific locales
  */
-export const configureI18nNode = (
-  input: ConfigureI18nInput = {},
-): typeof i18n => {
+export const configureI18nNode = (input: ConfigureI18nInput = {}): typeof i18n => {
   const defaultLocale = input.locales?.default ?? "en";
   const supportedLocales = input.locales?.supported ?? ["en", "es"];
   const objectNotation = input.objectNotation ?? true;

@@ -90,7 +90,7 @@ const server = new Service({
 - **[Utils](./docs/utils/README.md)** - Utility helpers and path aliases
 - **[Examples](./examples/)** - Production-ready example applications
 
-## Ethical Use (Non-binding)
+## 🌱 Ethical Use (Non-binding)
 
 Zacatl is MIT-licensed (permissive). Please don’t use it to harm people.
 
@@ -174,7 +174,7 @@ Zacatl implements **layered (hexagonal) architecture**:
 └─────────────────────────────────────────┘
 ```
 
-Each layer has a single responsibility and strict dependencies flow inward.
+Each layer has a single responsibility, and dependencies flow strictly inward.
 
 ## 💾 Database Adapters
 
@@ -330,14 +330,14 @@ throw new NotFoundError({ message: "User not found", metadata: { userId: 123 } }
 
 ## 🧪 Testing
 
-Zacatl comes with **178 passing tests** and **61.6% coverage**:
+Zacatl comes with **214 tests** and **52.45% coverage**:
 
 ```bash
 npm test                 # Run all tests
 npm run test:coverage   # Coverage report
 ```
 
-## What's Included
+## 📦 What's Included
 
 ```
 src/
@@ -380,13 +380,17 @@ npm run type:check # TypeScript checking
 
 ## 🤝 Contributing
 
-1. Fork the repository
-2. Create a feature branch: `git checkout -b feature/amazing-feature`
-3. Add tests for your changes
-4. Update documentation
-5. Commit: `git commit -m 'Add amazing feature'`
-6. Push: `git push origin feature/amazing-feature`
-7. Open a Pull Request
+1. Open an issue describing the change.
+2. Create a branch tied to it: `git checkout -b issue-<number>/type/description`
+   - Examples: `issue-42/feat/add-forbidden-error`, `issue-5/docs/update-readme`
+3. Add tests for your changes.
+4. Update documentation.
+5. Commit with [Conventional Commits](https://www.conventionalcommits.org/): `git commit -m 'feat(error): add ForbiddenError'`
+6. Push and open a PR referencing the issue.
+
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for the full guide.
+
+> **Local install tip:** use `npm install --ignore-scripts` to skip lifecycle scripts when you only want to install deps.
 
 ## 📞 Support
 
