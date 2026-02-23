@@ -1,7 +1,7 @@
 import proxy from '@fastify/http-proxy';
 import type { FastifyInstance } from 'fastify';
 
-import { ZodTypeProvider } from '@zacatl/third-party/fastify';
+import type { ZodTypeProvider } from '@zacatl/third-party/fastify';
 
 import type { ApiServerPort, ProxyConfig } from './port';
 import type { HookHandler, RouteHandler } from '../../../layers/application';

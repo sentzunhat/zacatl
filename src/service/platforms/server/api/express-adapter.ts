@@ -1,4 +1,4 @@
-import { Express, Request, Response, NextFunction } from 'express';
+import type { Express, Request, Response, NextFunction } from 'express';
 import { createProxyMiddleware } from 'http-proxy-middleware';
 
 import { logger } from '@zacatl/logs';

@@ -49,15 +49,21 @@ export class Service {
         if (dbConfig.vendor === DatabaseVendor.MONGOOSE) {
           // Register using the concrete instance constructor as the runtime
           // token to avoid importing the Mongoose class at bundle time.
-          getContainer().register(dbConfig.instance.constructor as any, {
-            useValue: dbConfig.instance,
-          });
+          getContainer().register(
+            dbConfig.instance.constructor as unknown as new (...args: unknown[]) => unknown,
+            {
+              useValue: dbConfig.instance,
+            },
+          );
         } else if (dbConfig.vendor === DatabaseVendor.SEQUELIZE) {
           // Register using the concrete instance constructor as the runtime
           // token to avoid importing the Sequelize class at bundle time.
-          getContainer().register(dbConfig.instance.constructor as any, {
-            useValue: dbConfig.instance,
-          });
+          getContainer().register(
+            dbConfig.instance.constructor as unknown as new (...args: unknown[]) => unknown,
+            {
+              useValue: dbConfig.instance,
+            },
+          );
         }
       }
     }

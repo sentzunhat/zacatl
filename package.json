@@ -4,7 +4,7 @@
   "main": "build-cjs/index.js",
   "module": "build/index.js",
   "types": "build/index.d.ts",
-  "version": "0.0.45",
+  "version": "0.0.46",
   "packageManager": "npm@10.9.0",
   "bin": {
     "zacatl-fix-esm": "./build/scripts/fix-esm.js",

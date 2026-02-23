@@ -1,8 +1,8 @@
 import { resolveDependencies } from '@zacatl/dependency-injection';
 import { CustomError, InternalServerError } from '@zacatl/error';
 
-import { type ApiServerPort, type ProxyConfig } from './port';
-import { HookHandler, RouteHandler } from '../../../layers/application';
+import type { ApiServerPort, ProxyConfig } from './port';
+import type { HookHandler, RouteHandler } from '../../../layers/application';
 import type { RestApplicationEntryPoints } from '../../../layers/application/types';
 import { ApiServerType, type HttpServerConfig } from '../types/server-config';
 

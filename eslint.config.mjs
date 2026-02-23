@@ -28,7 +28,7 @@ try {
 function normalizeEntry(item) {
   if (!item || typeof item !== 'object') return [item];
   const keys = Object.keys(item);
-  const numericKeys = keys.filter((k) => /^\d+$/.test(k)).sort((a,b)=>Number(a)-Number(b));
+  const numericKeys = keys.filter((k) => /^\d+$/.test(k)).sort((a, b) => Number(a) - Number(b));
   if (numericKeys.length === 0) return [item];
   const extracted = numericKeys.map((k) => item[k]);
   const rest = {};
@@ -41,8 +41,27 @@ function normalizeEntry(item) {
   return result;
 }
 
+// Top-level ignores for example/build artifacts — these are not part of the
+// library's TypeScript project and cause parserOptions.project errors.
+const topIgnore = {
+  ignores: [
+    'examples/**',
+    'build/**',
+    'build-cjs/**',
+    'coverage/**',
+    'publish/**',
+    'node_modules/**',
+  ],
+};
+
 // Compose and normalize
-const composed = [...compat.config({}), ...srcDefault, ...testDefault, ...scriptsDefault];
+const composed = [
+  topIgnore,
+  ...compat.config({}),
+  ...srcDefault,
+  ...testDefault,
+  ...scriptsDefault,
+];
 const normalized = [];
 for (const entry of composed) {
   if (Array.isArray(entry)) {

@@ -1,4 +1,4 @@
-import { FastifyReply, FastifySchema } from '@zacatl/third-party/fastify';
+import type { FastifyReply, FastifySchema } from '@zacatl/third-party/fastify';
 
 import type { HTTPMethod } from '../../common/http-methods';
 import type { Request } from '../../common/request';

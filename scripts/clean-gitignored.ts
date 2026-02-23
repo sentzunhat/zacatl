@@ -16,11 +16,13 @@ function getIgnoredFiles(): string[] {
   const git = spawnSync('git', ['ls-files', '--others', '-i', '--exclude-from=.gitignore', '-z'], {
     encoding: 'utf8',
   });
-    if (git.error || git.status !== 0) {
-      console.warn('Warning: git unavailable or not a git repository; skipping clean-gitignored step.');
-      if (git.stderr) console.warn(String(git.stderr));
-      if (git.error) console.warn(String(git.error));
-      return [];
+  if (git.error || git.status !== 0) {
+    console.warn(
+      'Warning: git unavailable or not a git repository; skipping clean-gitignored step.',
+    );
+    if (git.stderr) console.warn(String(git.stderr));
+    if (git.error) console.warn(String(git.error));
+    return [];
   }
   const out = git.stdout || '';
   return out.split('\0').filter(Boolean);

@@ -1,6 +1,6 @@
-import { IncomingMessage } from 'http';
+import type { IncomingMessage } from 'http';
 
-import { FastifySchema, FastifyRequest, RawServerBase } from '@zacatl/third-party/fastify';
+import type { FastifySchema, FastifyRequest, RawServerBase } from '@zacatl/third-party/fastify';
 
 export type Request<
   TBody = void,

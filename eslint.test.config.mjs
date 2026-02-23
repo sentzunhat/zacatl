@@ -1,10 +1,17 @@
-import { recommended as zacatlRecommended } from './src/eslint/index.mjs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Test-area overrides (Vitest)
 const vitestOverrides = {
-  ...zacatlRecommended,
   files: ['test/**/*.ts', 'test/**/*.tsx'],
   languageOptions: {
+    parserOptions: {
+      project: ['./test/tsconfig.json'],
+      tsconfigRootDir: __dirname,
+    },
     globals: {
       describe: 'readonly',
       it: 'readonly',

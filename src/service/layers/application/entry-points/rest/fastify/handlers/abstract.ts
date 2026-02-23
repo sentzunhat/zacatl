@@ -1,7 +1,7 @@
-import { FastifyReply, FastifySchema } from '@zacatl/third-party/fastify';
-import { z } from '@zacatl/third-party/zod';
+import type { FastifyReply, FastifySchema } from '@zacatl/third-party/fastify';
+import type { z } from '@zacatl/third-party/zod';
 
-import { RouteHandler } from './route-handler';
+import type { RouteHandler } from './route-handler';
 import type { HTTPMethod } from '../../common/http-methods';
 import type { Request } from '../../common/request';
 

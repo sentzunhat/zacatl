@@ -1,6 +1,6 @@
 import { InternalServerError } from '@zacatl/error';
 
-import {
+import type {
   BaseRepositoryConfig,
   RepositoryPort,
   MongooseBaseRepositoryConfig,

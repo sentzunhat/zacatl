@@ -1,4 +1,4 @@
-import { CustomError, CustomErrorsArgs } from './custom';
+import { CustomError, type CustomErrorsArgs } from './custom';
 
 export interface ValidationErrorArgs extends CustomErrorsArgs {}
 

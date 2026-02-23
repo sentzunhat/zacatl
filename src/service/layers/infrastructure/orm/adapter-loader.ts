@@ -62,10 +62,14 @@ export const createSequelizeAdapter = <D extends object, I, O>(
     public toLean(input: unknown): O | null {
       if (input == null) return null;
 
+      // If the Sequelize instance shape is present, prefer its `get` method
+      interface WithGet {
+        get?: (opts?: { plain?: boolean }) => unknown;
+      }
+      const maybeWithGet = input as unknown as WithGet | Record<string, unknown>;
       const plain =
-        // If the Sequelize instance shape is present, prefer its `get` method
-        typeof (input as any)?.get === 'function'
-          ? (input as any).get({ plain: true })
+        typeof maybeWithGet.get === 'function'
+          ? maybeWithGet.get({ plain: true })
           : (input as Record<string, unknown>);
 
       const idValue =

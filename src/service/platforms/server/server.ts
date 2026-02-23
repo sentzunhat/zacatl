@@ -1,5 +1,5 @@
-import { Express } from 'express';
-import { FastifyInstance } from 'fastify';
+import type { Express } from 'express';
+import type { FastifyInstance } from 'fastify';
 
 import { CustomError, InternalServerError } from '@zacatl/error';
 

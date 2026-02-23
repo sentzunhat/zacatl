@@ -1,4 +1,4 @@
-import { FastifySchema } from '@zacatl/third-party/fastify';
+import type { FastifySchema } from '@zacatl/third-party/fastify';
 
 import { AbstractRouteHandler } from './abstract';
 

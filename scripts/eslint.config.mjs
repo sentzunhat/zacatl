@@ -1,18 +1,14 @@
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-import { recommended as zacatlRecommended } from './src/eslint/index.mjs';
-
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Scripts-specific linting: use scripts/tsconfig.json, allow console and dev deps
 export default [
-  ...zacatlRecommended,
   {
     files: ['scripts/**/*.ts'],
     languageOptions: {
-      parser: '@typescript-eslint/parser',
       parserOptions: {
         project: ['./tsconfig.json'],
         tsconfigRootDir: __dirname,

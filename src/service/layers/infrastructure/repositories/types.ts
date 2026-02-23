@@ -1,5 +1,5 @@
-import type { MongooseBaseRepositoryConfig } from './mongoose/types';
-import type { SequelizeBaseRepositoryConfig } from './sequelize/types';
+import type { MongooseBaseRepositoryConfig, MongooseRepositoryModel } from './mongoose/types';
+import type { SequelizeBaseRepositoryConfig, SequelizeRepositoryModel } from './sequelize/types';
 
 export type BaseRepositoryConfig<D extends object = object> =
   | MongooseBaseRepositoryConfig<D>
@@ -47,7 +47,7 @@ export type {
 
 /** Union of all supported model types */
 export type RepositoryModel<D extends object = object> =
-  | import('./mongoose/types').MongooseRepositoryModel<D>
-  | import('./sequelize/types').SequelizeRepositoryModel<D>;
+  | MongooseRepositoryModel<D>
+  | SequelizeRepositoryModel<D>;
 
 export { ORMType } from './mongoose/types';
