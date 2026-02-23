@@ -1,6 +1,6 @@
-import { describe, it, expect, vi } from 'vitest';
 import type { FastifyRequest } from 'fastify';
 import { container } from 'tsyringe';
+import { describe, it, expect, vi } from 'vitest';
 
 import { Application } from '../../../../../src/service/layers/application';
 import type {
@@ -8,8 +8,8 @@ import type {
   HookHandler,
   HookHandlerName,
 } from '../../../../../src/service/layers/application';
-import { AbstractRouteHandler } from '../../../../../src/service/layers/application/entry-points/rest/fastify/handlers/abstract';
 import type { Request } from '../../../../../src/service/layers/application/entry-points/rest/common/request';
+import { AbstractRouteHandler } from '../../../../../src/service/layers/application/entry-points/rest/fastify/handlers/abstract';
 
 class DummyHookHandler implements HookHandler {
   public name: HookHandlerName = 'onRequest';

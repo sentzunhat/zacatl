@@ -1,4 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
+
 import { SequelizeAdapter } from '../../../../../../../src/service/layers/infrastructure/orm/sequelize-adapter';
 
 interface Plain {

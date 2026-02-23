@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+
 import { ORMType } from '../../../../../../../src/service/layers/infrastructure/repositories/types';
 
 // Mock Sequelize before partial import
@@ -17,6 +18,7 @@ vi.mock('sequelize', () => {
 });
 
 import { Model } from 'sequelize';
+
 import { SequelizeAdapter } from '../../../../../../../src/service/layers/infrastructure/orm/sequelize-adapter';
 
 // Mock Sequelize Model

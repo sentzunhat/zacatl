@@ -1,8 +1,9 @@
 import { describe, it, expect } from 'vitest';
 
+import type {
+  Request} from '../../../../../../../../src/service/layers/application/entry-points/rest/fastify/handlers/post-route-handler';
 import {
-  PostRouteHandler,
-  Request,
+  PostRouteHandler
 } from '../../../../../../../../src/service/layers/application/entry-points/rest/fastify/handlers/post-route-handler';
 import {
   createFakeFastifyReply,

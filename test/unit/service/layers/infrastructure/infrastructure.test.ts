@@ -1,10 +1,12 @@
 import { container } from 'tsyringe';
+
+import type {
+  ConfigInfrastructure} from '../../../../../src/service/layers/infrastructure';
 import {
-  ConfigInfrastructure,
   Infrastructure,
 } from '../../../../../src/service/layers/infrastructure';
-import type { RepositoryPort } from '../../../../../src/service/layers/infrastructure/types';
 import type { RepositoryModel } from '../../../../../src/service/layers/infrastructure/repositories/types';
+import type { RepositoryPort } from '../../../../../src/service/layers/infrastructure/types';
 
 class DummyRepository implements RepositoryPort<object> {
   public model = {} as RepositoryModel<object>;

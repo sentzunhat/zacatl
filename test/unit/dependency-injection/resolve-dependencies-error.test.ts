@@ -84,7 +84,7 @@ describe('resolveDependencies — descriptive error on missing registration', ()
     const results = resolveDependencies([RegisteredService]);
     expect(results).toHaveLength(1);
 
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+     
     const service = results[0]!;
     expect(service).toBeInstanceOf(RegisteredService);
     expect(service.doWork()).toBe('registered');

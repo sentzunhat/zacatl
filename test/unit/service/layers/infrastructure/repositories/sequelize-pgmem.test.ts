@@ -1,6 +1,6 @@
-import { describe, it, expect, beforeAll } from 'vitest';
 import { newDb } from 'pg-mem';
 import { Sequelize, DataTypes } from 'sequelize';
+import { describe, it, expect, beforeAll } from 'vitest';
 
 describe('SequelizeRepository (pg-mem)', () => {
   let sequelize: Sequelize;

@@ -1,6 +1,6 @@
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-import mongoose, { Schema } from 'mongoose';
 import { MongoMemoryServer } from 'mongodb-memory-server';
+import mongoose, { Schema } from 'mongoose';
+import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 
 describe('MongooseRepository (mongodb-memory-server)', () => {
   let mongoServer: MongoMemoryServer;

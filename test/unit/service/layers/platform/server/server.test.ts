@@ -1,5 +1,6 @@
+import type {
+  ConfigServer} from '../../../../../../src/service/platforms/server';
 import {
-  ConfigServer,
   DatabaseVendor,
   Server,
 } from '../../../../../../src/service/platforms/server';

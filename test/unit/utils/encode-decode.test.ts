@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest';
+
 import { encode, decode } from '../../../src/utils/encode-decode';
 
 describe('Encode-Decode Utilities', () => {

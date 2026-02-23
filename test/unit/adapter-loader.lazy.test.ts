@@ -1,4 +1,5 @@
 import { readFileSync } from 'fs';
+
 import { describe, it, expect } from 'vitest';
 
 describe('adapter-loader lazy behavior', () => {

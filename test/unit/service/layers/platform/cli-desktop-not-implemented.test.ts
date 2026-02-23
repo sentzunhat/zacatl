@@ -6,9 +6,9 @@
 
 import { describe, it, expect } from 'vitest';
 
+import { InternalServerError } from '../../../../../src/error';
 import { CLI } from '../../../../../src/service/platforms/cli/cli';
 import { Desktop } from '../../../../../src/service/platforms/desktop/desktop';
-import { InternalServerError } from '../../../../../src/error';
 
 describe('CLI.start() — not implemented', () => {
   it('throws an InternalServerError with a clear message', async () => {

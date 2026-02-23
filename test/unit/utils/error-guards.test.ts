@@ -1,4 +1,7 @@
 import { describe, it, expect } from 'vitest';
+
+import { CustomError } from '../../../src/error/custom';
+import { z } from '../../../src/third-party/zod';
 import {
   isError,
   isZodError,
@@ -6,8 +9,6 @@ import {
   isNodeError,
   isSyntaxError,
 } from '../../../src/utils/error-guards';
-import { CustomError } from '../../../src/error/custom';
-import { z } from '../../../src/third-party/zod';
 
 describe('Error Guard Utilities', () => {
   describe('isError()', () => {

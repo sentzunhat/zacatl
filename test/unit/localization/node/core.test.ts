@@ -1,9 +1,9 @@
-import { describe, it, expect } from 'vitest';
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
 
 import { loadStaticCatalog, mergeStaticCatalogs } from '@zacatl/localization/node/core';
+import { describe, it, expect } from 'vitest';
 
 describe('i18n-node core', () => {
   it('loadStaticCatalog reads available locale files', () => {

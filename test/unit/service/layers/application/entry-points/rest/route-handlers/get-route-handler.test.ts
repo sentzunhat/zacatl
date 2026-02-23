@@ -1,11 +1,11 @@
 import { describe, it, expect } from 'vitest';
 
+import type { Request } from '../../../../../../../../src/service/layers/application';
 import { GetRouteHandler } from '../../../../../../../../src/service/layers/application/entry-points/rest/fastify/handlers/get-route-handler';
 import {
   createFakeFastifyReply,
   createFakeFastifyRequest,
 } from '../../../../../../helpers/common/common';
-import { Request } from '../../../../../../../../src/service/layers/application';
 
 class TestGetRouteHandler extends GetRouteHandler<unknown, string, unknown> {
   async handler(_: unknown): Promise<string> {

@@ -1,5 +1,6 @@
 import { MongoMemoryServer } from 'mongodb-memory-server';
-import { connect, Connection, Mongoose } from 'mongoose';
+import type { Connection} from 'mongoose';
+import { connect, Mongoose } from 'mongoose';
 import { container } from 'tsyringe';
 
 const dbName = 'sentzunhat-zacatl';

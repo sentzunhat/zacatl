@@ -1,6 +1,6 @@
-import { beforeEach, afterEach, describe, expect, it } from 'vitest';
 import { newDb } from 'pg-mem';
 import { Sequelize, DataTypes } from 'sequelize';
+import { beforeEach, afterEach, describe, expect, it } from 'vitest';
 
 describe('Sequelize + pg-mem extended operations', () => {
   let db: any;

@@ -5,14 +5,14 @@
  * can auto-register dependencies without needing Service orchestration.
  */
 
-import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { container } from 'tsyringe';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 
 import { clearContainer, resolveDependency } from '../../src/dependency-injection';
 import { Domain } from '../../src/service/layers/domain/domain';
 import { Infrastructure } from '../../src/service/layers/infrastructure/infrastructure';
-import type { RepositoryPort } from '../../src/service/layers/infrastructure/types';
 import type { RepositoryModel } from '../../src/service/layers/infrastructure/repositories/types';
+import type { RepositoryPort } from '../../src/service/layers/infrastructure/types';
 
 describe('Auto-Registration Without Service', () => {
   beforeEach(() => {

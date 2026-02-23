@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest';
+
 import { generateHmac } from '../../../src/utils/hmac';
 
 describe('HMAC Utilities', () => {

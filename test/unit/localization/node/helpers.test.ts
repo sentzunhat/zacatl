@@ -1,15 +1,16 @@
-import { describe, it, expect } from 'vitest';
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
 
-import { BadRequestError } from '@zacatl/error';
 import {
   isPlainObject,
   deepMerge,
   readJsonFile,
   findExistingDir,
 } from '@zacatl/localization/node/helpers';
+import { describe, it, expect } from 'vitest';
+
+import { BadRequestError } from '@zacatl/error';
 
 describe('i18n-node helpers', () => {
   it('isPlainObject detects plain objects correctly', () => {

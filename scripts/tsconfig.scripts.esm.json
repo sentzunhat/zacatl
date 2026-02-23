@@ -3,7 +3,7 @@
     "target": "ES2020",
     "module": "ES2022",
     "moduleResolution": "Node",
-    "outDir": "../build",
+    "outDir": "../build/scripts",
     "rootDir": ".",
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,

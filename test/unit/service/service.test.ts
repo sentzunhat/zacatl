@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-import { Service, ServiceType } from '../../../src/service';
 import { InternalServerError } from '../../../src/error';
+import { Service, ServiceType } from '../../../src/service';
 
 describe('Service (unit)', () => {
   it('throws when config.type is missing', () => {

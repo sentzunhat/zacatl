@@ -1,12 +1,14 @@
 import 'reflect-metadata';
 
+import { execSync } from 'child_process';
+
+import { globSync } from 'glob';
+
+import { logger } from '../helpers/common/logger';
 import {
   mongoTeardown,
   startMongoServerAndSetEnvConnectionString,
 } from '../helpers/database/mongo';
-import { logger } from '../helpers/common/logger';
-import { execSync } from 'child_process';
-import { globSync } from 'glob';
 
 /**
  * @remarks
