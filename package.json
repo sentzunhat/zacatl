@@ -96,7 +96,7 @@
     "build:watch": "npx tsc --project tsconfig.json --watch",
     "test": "NODE_ENV=test ENV=test vitest run",
     "test:watch": "NODE_ENV=test ENV=test vitest",
-    "test:coverage": "NODE_ENV=test ENV=test vitest run --coverage --reporter json > test-results.json 2>&1 && npm run update:readme-coverage",
+    "test:coverage": "NODE_ENV=test ENV=test bash -lc \"npx vitest run --coverage --reporter json | tee test-results.json; exit ${PIPESTATUS[0]}\" && npm run update:readme-coverage",
     "type:check": "npm run type:check:src && npm run type:check:test",
     "type:check:src": "tsc --noEmit -p ./tsconfig.json",
     "type:check:test": "tsc --noEmit -p ./test/tsconfig.json",

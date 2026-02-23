@@ -9,8 +9,8 @@ import type {
   SequelizeRepositoryModel,
   RepositoryModel,
   ORMPort,
-  ORMType,
 } from './types';
+import { ORMType } from './types';
 import { createMongooseAdapter, createSequelizeAdapter } from '../orm/adapter-loader';
 
 export * from './types';

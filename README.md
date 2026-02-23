@@ -7,7 +7,7 @@
 [![Node.js 24+](https://img.shields.io/badge/Node.js-24%2B-brightgreen.svg)](https://nodejs.org/)
 [![Build](https://github.com/sentzunhat/zacatl/actions/workflows/publish-dry.yml/badge.svg)](https://github.com/sentzunhat/zacatl/actions/workflows/publish-dry.yml)
 [![Tests: 309](https://img.shields.io/badge/Tests-309-blue.svg)](#testing)
-[![Coverage: 69.22%](https://img.shields.io/badge/Coverage-69.22%25-orange.svg)](#testing)
+[![Coverage: 69.30%](https://img.shields.io/badge/Coverage-69.30%25-orange.svg)](#testing)
 
 **Universal TypeScript framework for building CLI tools, desktop apps, APIs, and distributed systems.**
 
