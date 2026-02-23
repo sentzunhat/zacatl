@@ -261,7 +261,7 @@ const service = new Service({
     server: {
       name: "my-api",
       server: {
-        type: ApiServerType.SERVER,
+        type: ServerType.SERVER,
         vendor: ServerVendor.FASTIFY,
         instance: fastifyInstance,
       },

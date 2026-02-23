@@ -300,7 +300,7 @@ Simple REST API server with Fastify.
 
 ```typescript
 import Fastify from "fastify";
-import { Service, ServerVendor, ApiServerType } from "@sentzunhat/zacatl";
+import { Service, ServerVendor, ServerType } from "@sentzunhat/zacatl";
 
 const fastify = Fastify();
 ServerType } from "@sentzunhat/zacatl";
@@ -344,7 +344,7 @@ Fastify server with Sequelize + SQLite.
 ```typescript
 import Fastify from 'fastify';
 import { Sequelize } from 'sequelize';
-import { Service, ServerVendor, ApiServerType, DatabaseVendor } from '@sentzunhat/zacatl';
+import { Service, ServerVendor, ServerType, DatabaseVendor } from '@sentzunhat/zacatl';
 
 const fastify = Fastify();
 const sequelize = new Sequelize('sqlite:database.sqlite');
@@ -356,7 +356,7 @@ const service = new Service({
       name: 'fastify-sqlite',
       port: 3001,
       server: {
-        type: ApiServerType.SERVER,
+        type: ServerType.SERVER,
         vendor: ServerVendor.FASTIFY,
         instance: fastify,
       },
@@ -407,7 +407,7 @@ Simple Express REST API server.
 
 ```typescript
 import express from 'express';
-import { Service, ServerVendor, ApiServerType } from '@sentzunhat/zacatl';
+import { Service, ServerVendor, ServerType } from '@sentzunhat/zacatl';
 
 const app = express();
 
@@ -418,7 +418,7 @@ const service = new Service({
       name: 'express-api',
       port: 8083,
       server: {
-        type: ApiServerType.SERVER,
+        type: ServerType.SERVER,
         vendor: ServerVendor.EXPRESS,
         instance: app,
       },
@@ -451,7 +451,7 @@ Fastify server with React SPA + API + Database.
 ```typescript
 import Fastify from 'fastify';
 import { Sequelize } from 'sequelize';
-import { Service, ServerVendor, ApiServerType, DatabaseVendor } from '@sentzunhat/zacatl';
+import { Service, ServerVendor, ServerType, DatabaseVendor } from '@sentzunhat/zacatl';
 
 const fastify = Fastify();
 const sequelize = new Sequelize('sqlite:database.sqlite');
@@ -463,7 +463,7 @@ const service = new Service({
       name: 'full-stack-app',
       port: 8081,
       server: {
-        type: ApiServerType.SERVER,
+        type: ServerType.SERVER,
         vendor: ServerVendor.FASTIFY,
         instance: fastify,
       },
@@ -519,7 +519,7 @@ Fastify gateway server that proxies requests to multiple backend services.
 
 ```typescript
 import Fastify from 'fastify';
-import { Service, ServerVendor, ApiServerType } from '@sentzunhat/zacatl';
+import { Service, ServerVendor, ServerType } from '@sentzunhat/zacatl';
 
 const fastify = Fastify();
 
@@ -530,7 +530,7 @@ const service = new Service({
       name: 'api-gateway',
       port: 9000,
       server: {
-        type: ApiServerType.GATEWAY,
+        type: ServerType.GATEWAY,
         vendor: ServerVendor.FASTIFY,
         instance: fastify,
         gateway: {
@@ -572,7 +572,7 @@ Server with both MongoDB (Mongoose) and PostgreSQL (Sequelize).
 import Fastify from 'fastify';
 import mongoose from 'mongoose';
 import { Sequelize } from 'sequelize';
-import { Service, ServerVendor, ApiServerType, DatabaseVendor } from '@sentzunhat/zacatl';
+import { Service, ServerVendor, ServerType, DatabaseVendor } from '@sentzunhat/zacatl';
 
 const fastify = Fastify();
 const sequelize = new Sequelize('postgres://localhost:5432/mydb');
@@ -584,7 +584,7 @@ const service = new Service({
       name: 'multi-db-api',
       port: 4000,
       server: {
-        type: ApiServerType.SERVER,
+        type: ServerType.SERVER,
         vendor: ServerVendor.FASTIFY,
         instance: fastify,
       },

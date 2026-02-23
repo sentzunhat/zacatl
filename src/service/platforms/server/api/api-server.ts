@@ -4,7 +4,7 @@ import { CustomError, InternalServerError } from '@zacatl/error';
 import type { ApiServerPort, ProxyConfig } from './port';
 import type { HookHandler, RouteHandler } from '../../../layers/application';
 import type { RestApplicationEntryPoints } from '../../../layers/application/types';
-import { ApiServerType, type HttpServerConfig } from '../types/server-config';
+import { ServerType, type HttpServerConfig } from '../types/server-config';
 
 export enum HandlersType {
   HOOK = 'hook',
@@ -40,7 +40,7 @@ export class ApiServer {
     await this.registerAllRestHandlers(entryPoints);
 
     // Configure gateway proxies if needed
-    if (this.config.type === ApiServerType.GATEWAY && this.config.gateway?.proxies != null) {
+    if (this.config.type === ServerType.GATEWAY && this.config.gateway?.proxies != null) {
       for (const proxyConf of this.config.gateway.proxies) {
         this.registerProxy({
           upstream: proxyConf.upstream,

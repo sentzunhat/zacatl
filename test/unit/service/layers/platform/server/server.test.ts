@@ -1,12 +1,8 @@
-import type {
-  ConfigServer} from '../../../../../../src/service/platforms/server';
-import {
-  DatabaseVendor,
-  Server,
-} from '../../../../../../src/service/platforms/server';
+import type { ConfigServer } from '../../../../../../src/service/platforms/server';
+import { DatabaseVendor, Server } from '../../../../../../src/service/platforms/server';
 import {
   ServerVendor,
-  ApiServerType as ServerType,
+  ServerType as ServerType,
 } from '../../../../../../src/service/platforms/server/types/server-config';
 
 class FakeFastifyInstance {

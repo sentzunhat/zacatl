@@ -4,7 +4,7 @@ export enum ServerVendor {
 }
 
 export interface HttpServerConfig {
-  type: ApiServerType;
+  type: ServerType;
   vendor: ServerVendor;
   instance: unknown;
   gateway?: GatewayService;
@@ -21,15 +21,10 @@ export interface PageServerConfig {
   apiPrefix?: string | undefined;
 }
 
-export enum ApiServerType {
+export enum ServerType {
   SERVER = 'SERVER',
   GATEWAY = 'GATEWAY',
 }
-/**
- * Type alias for ApiServerType - represents the type of server (API or Gateway)
- */
-// eslint-disable-next-line @typescript-eslint/naming-convention
-export const ServerType = ApiServerType;
 
 interface ProxyGateway {
   upstream: string;
