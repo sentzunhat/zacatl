@@ -1,8 +1,8 @@
 ---
-name: "changelog-from-selection"
-description: "Convert selected notes or diffs into a Zacatl changelog section"
-argument-hint: "version=<x.y.z> status=<release status>"
-agent: "ask"
+name: 'changelog-from-selection'
+description: 'Convert selected notes or diffs into a Zacatl changelog section'
+argument-hint: 'version=<x.y.z> status=<release status>'
+agent: 'ask'
 ---
 
 Convert the selected content into a release-note section that matches Zacatl conventions.

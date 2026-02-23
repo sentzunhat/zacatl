@@ -13,11 +13,11 @@ Type utilities for values that may or may not be present.
 ## Example
 
 ```typescript
-import type { Optional, Nullable, Maybe } from "@sentzunhat/zacatl";
+import type { Optional, Nullable, Maybe } from '@sentzunhat/zacatl';
 
 // Optional: undefined is allowed
 function greet(name?: Optional<string>) {
-  console.log(name ?? "Guest");
+  console.log(name ?? 'Guest');
 }
 
 // Nullable: null is allowed (e.g., form inputs)

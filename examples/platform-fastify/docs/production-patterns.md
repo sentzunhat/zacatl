@@ -19,8 +19,8 @@ All examples implement clean architecture with:
 
 ```typescript
 export const CreateGreetingBodySchema = z.object({
-  message: z.string().min(1, "Message is required"),
-  language: z.string().min(2, "Language code must be at least 2 characters"),
+  message: z.string().min(1, 'Message is required'),
+  language: z.string().min(2, 'Language code must be at least 2 characters'),
 });
 
 export type CreateGreetingBody = z.infer<typeof CreateGreetingBodySchema>;
@@ -63,7 +63,11 @@ export const toGreetingResponse = (greeting: Greeting): GreetingResponse => ({
 
 ```typescript
 @singleton()
-export class CreateGreetingHandler extends AbstractRouteHandler<CreateGreetingBody, void, GreetingResponse> {
+export class CreateGreetingHandler extends AbstractRouteHandler<
+  CreateGreetingBody,
+  void,
+  GreetingResponse
+> {
   async handler(request, reply): Promise<GreetingResponse> {
     const { message, language } = request.body;
     const greeting = await this.greetingService.createGreeting({
@@ -95,7 +99,7 @@ fastify.setErrorHandler(async (error, request, reply) => {
 
   await reply.status(statusCode).send({
     error: {
-      message: error.message || "Internal Server Error",
+      message: error.message || 'Internal Server Error',
       statusCode,
     },
   });
@@ -128,7 +132,10 @@ export interface GreetingRepositoryPort {
 
 ```typescript
 @singleton()
-export class GreetingRepositoryAdapter extends BaseRepository<GreetingModel, CreateGreetingInput, Greeting> implements GreetingRepositoryPort {
+export class GreetingRepositoryAdapter
+  extends BaseRepository<GreetingModel, CreateGreetingInput, Greeting>
+  implements GreetingRepositoryPort
+{
   constructor() {
     super({ type: ORMType.Sequelize, model: GreetingModel });
   }
@@ -136,7 +143,9 @@ export class GreetingRepositoryAdapter extends BaseRepository<GreetingModel, Cre
   async findAll(filter?: { language?: string }): Promise<Greeting[]> {
     const where = filter?.language ? { language: filter.language } : {};
     const models = await (this.model as any).findAll({ where });
-    return models.map((model) => this.toLean(model)).filter((item): item is Greeting => item !== null);
+    return models
+      .map((model) => this.toLean(model))
+      .filter((item): item is Greeting => item !== null);
   }
 }
 ```

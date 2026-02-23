@@ -13,10 +13,10 @@ npm install express @sentzunhat/zacatl
 ### Basic Setup
 
 ```typescript
-import express from "express";
-import { Service, ServiceType, ServerVendor, ServerType } from "@sentzunhat/zacatl";
-import { singleton, inject } from "tsyringe";
-import { GetGreetingsHandler } from "./application/handlers/get-greetings";
+import express from 'express';
+import { Service, ServiceType, ServerVendor, ServerType } from '@sentzunhat/zacatl';
+import { singleton, inject } from 'tsyringe';
+import { GetGreetingsHandler } from './application/handlers/get-greetings';
 
 const app = express();
 app.use(express.json());
@@ -37,7 +37,7 @@ const service = new Service({
   },
   platforms: {
     server: {
-      name: "greetings-service",
+      name: 'greetings-service',
       port: 3000,
       databases: [],
       server: {
@@ -57,8 +57,8 @@ await service.start({ port: 3000 });
 Express and Fastify handlers use **the same base class**: `AbstractRouteHandler` (from `@sentzunhat/zacatl`). The `ExpressApiAdapter` wraps the Express response in a `FastifyReply`-compatible interface so handlers are portable.
 
 ```typescript
-import { AbstractRouteHandler } from "@sentzunhat/zacatl";
-import { singleton, inject } from "tsyringe";
+import { AbstractRouteHandler } from '@sentzunhat/zacatl';
+import { singleton, inject } from 'tsyringe';
 
 @singleton()
 export class CreateGreetingHandler extends AbstractRouteHandler<
@@ -68,8 +68,8 @@ export class CreateGreetingHandler extends AbstractRouteHandler<
 > {
   constructor(@inject(GreetingService) private readonly service: GreetingService) {
     super({
-      url: "/greetings",
-      method: "POST",
+      url: '/greetings',
+      method: 'POST',
       schema: { body: createGreetingSchema },
     });
   }
@@ -147,18 +147,18 @@ server: { type: ServerType.SERVER, vendor: ServerVendor.EXPRESS, instance: expre
 Because handlers extend `AbstractRouteHandler` and use the reply adapter interface, unit tests are the same as Fastify:
 
 ```typescript
-import { vi, describe, it, expect } from "vitest";
-import { CreateGreetingHandler } from "./create-handler";
+import { vi, describe, it, expect } from 'vitest';
+import { CreateGreetingHandler } from './create-handler';
 
-describe("CreateGreetingHandler", () => {
-  it("should call service and reply with 201", async () => {
+describe('CreateGreetingHandler', () => {
+  it('should call service and reply with 201', async () => {
     const mockService = {
-      createGreeting: vi.fn().mockResolvedValue({ id: 1, text: "Hello" }),
+      createGreeting: vi.fn().mockResolvedValue({ id: 1, text: 'Hello' }),
     };
 
     const handler = new CreateGreetingHandler(mockService as any);
 
-    const req = { body: { text: "Hello" } } as any;
+    const req = { body: { text: 'Hello' } } as any;
     const reply = {
       sent: false,
       codeCalled: 0,
@@ -175,7 +175,7 @@ describe("CreateGreetingHandler", () => {
 
     await handler.execute(req, reply as any);
 
-    expect(mockService.createGreeting).toHaveBeenCalledWith({ text: "Hello" });
+    expect(mockService.createGreeting).toHaveBeenCalledWith({ text: 'Hello' });
     expect(reply.code).toHaveBeenCalledWith(201);
     expect(reply.send).toHaveBeenCalled();
   });
@@ -202,16 +202,20 @@ npm install express @sentzunhat/zacatl
 ### Basic Setup
 
 ```typescript
-import express from "express";
-import { AbstractExpressRouteHandler, ExpressApiServerAdapter } from "@sentzunhat/zacatl/service";
-import { singleton, inject } from "tsyringe";
+import express from 'express';
+import { AbstractExpressRouteHandler, ExpressApiServerAdapter } from '@sentzunhat/zacatl/service';
+import { singleton, inject } from 'tsyringe';
 
 // 1. Create a handler
 @singleton()
-export class GetGreetingsHandler extends AbstractExpressRouteHandler<void, void, GreetingResponse[]> {
+export class GetGreetingsHandler extends AbstractExpressRouteHandler<
+  void,
+  void,
+  GreetingResponse[]
+> {
   config = {
-    url: "/greetings",
-    method: "GET" as const,
+    url: '/greetings',
+    method: 'GET' as const,
   };
 
   constructor(
@@ -232,9 +236,12 @@ export class GetGreetingsHandler extends AbstractExpressRouteHandler<void, void,
 const app = express();
 const adapter = new ExpressApiServerAdapter(app);
 
-adapter.registerRoutes([new GetGreetingsHandler(greetingService), new CreateGreetingHandler(greetingService)]);
+adapter.registerRoutes([
+  new GetGreetingsHandler(greetingService),
+  new CreateGreetingHandler(greetingService),
+]);
 
-app.listen(3000, () => console.log("Server running on port 3000"));
+app.listen(3000, () => console.log('Server running on port 3000'));
 ```
 
 ## Handler Structure
@@ -249,8 +256,8 @@ export class CreateGreetingHandler extends AbstractExpressRouteHandler<
   GreetingResponse // Response type
 > {
   config = {
-    url: "/greetings",
-    method: "POST" as const,
+    url: '/greetings',
+    method: 'POST' as const,
   };
 
   constructor(
@@ -260,7 +267,10 @@ export class CreateGreetingHandler extends AbstractExpressRouteHandler<
     super();
   }
 
-  async execute(req: Express.Request<void, GreetingResponse, CreateGreetingBody>, res: Express.Response<GreetingResponse>): Promise<GreetingResponse> {
+  async execute(
+    req: Express.Request<void, GreetingResponse, CreateGreetingBody>,
+    res: Express.Response<GreetingResponse>,
+  ): Promise<GreetingResponse> {
     const greeting = await this.greetingService.createGreeting(req.body);
     res.status(201).json(greeting);
     return greeting;
@@ -366,19 +376,19 @@ That's it! Your business logic remains portable across frameworks.
 When testing Express handlers, mock `Express.Request` and `Express.Response`:
 
 ```typescript
-import { vi, describe, it, expect } from "vitest";
-import { CreateGreetingHandler } from "./create-handler";
+import { vi, describe, it, expect } from 'vitest';
+import { CreateGreetingHandler } from './create-handler';
 
-describe("CreateGreetingHandler", () => {
-  it("should call service and send JSON response", async () => {
+describe('CreateGreetingHandler', () => {
+  it('should call service and send JSON response', async () => {
     const mockService = {
-      createGreeting: vi.fn().mockResolvedValue({ id: 1, text: "Hello" }),
+      createGreeting: vi.fn().mockResolvedValue({ id: 1, text: 'Hello' }),
     };
 
     const handler = new CreateGreetingHandler(mockService);
 
     const req = {
-      body: { text: "Hello" },
+      body: { text: 'Hello' },
     } as any;
 
     const res = {
@@ -388,10 +398,10 @@ describe("CreateGreetingHandler", () => {
 
     const result = await handler.execute(req, res);
 
-    expect(mockService.createGreeting).toHaveBeenCalledWith({ text: "Hello" });
+    expect(mockService.createGreeting).toHaveBeenCalledWith({ text: 'Hello' });
     expect(res.status).toHaveBeenCalledWith(201);
-    expect(res.json).toHaveBeenCalledWith({ id: 1, text: "Hello" });
-    expect(result).toEqual({ id: 1, text: "Hello" });
+    expect(res.json).toHaveBeenCalledWith({ id: 1, text: 'Hello' });
+    expect(result).toEqual({ id: 1, text: 'Hello' });
   });
 });
 ```
@@ -408,11 +418,11 @@ describe("CreateGreetingHandler", () => {
 For integration tests, use `supertest`:
 
 ```typescript
-import request from "supertest";
-import express from "express";
-import { ExpressApiServerAdapter } from "@sentzunhat/zacatl/service";
+import request from 'supertest';
+import express from 'express';
+import { ExpressApiServerAdapter } from '@sentzunhat/zacatl/service';
 
-describe("GET /greetings", () => {
+describe('GET /greetings', () => {
   let app: Express.Application;
 
   beforeEach(() => {
@@ -423,13 +433,13 @@ describe("GET /greetings", () => {
     adapter.registerRoutes([new GetAllGreetingsHandler(greetingService)]);
   });
 
-  it("should return all greetings", async () => {
-    const response = await request(app).get("/greetings");
+  it('should return all greetings', async () => {
+    const response = await request(app).get('/greetings');
 
     expect(response.status).toBe(200);
     expect(response.body).toEqual([
-      { id: 1, text: "Hello" },
-      { id: 2, text: "Hi" },
+      { id: 1, text: 'Hello' },
+      { id: 2, text: 'Hi' },
     ]);
   });
 });

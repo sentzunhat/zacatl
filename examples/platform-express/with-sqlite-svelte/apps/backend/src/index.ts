@@ -3,15 +3,15 @@
  * Entry Point
  */
 
-import "@sentzunhat/zacatl/third-party/reflect-metadata";
-import { express } from "@sentzunhat/zacatl/third-party/express";
-import { Sequelize } from "@sentzunhat/zacatl/third-party/sequelize";
-import { Service } from "@sentzunhat/zacatl/service";
-import { config, createServiceConfig } from "./config";
+import '@sentzunhat/zacatl/third-party/reflect-metadata';
+import { express } from '@sentzunhat/zacatl/third-party/express';
+import { Sequelize } from '@sentzunhat/zacatl/third-party/sequelize';
+import { Service } from '@sentzunhat/zacatl/service';
+import { config, createServiceConfig } from './config';
 
 async function main() {
-  console.log("🚀 Starting Express + SQLite (Sequelize) Example");
-  console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+  console.log('🚀 Starting Express + SQLite (Sequelize) Example');
+  console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
 
   try {
     // Initialize Express
@@ -22,9 +22,9 @@ async function main() {
 
     // Initialize Sequelize
     const sequelize = new Sequelize({
-      dialect: "sqlite",
+      dialect: 'sqlite',
       logging: false,
-      storage: config.databaseUrl.replace("sqlite:", ""),
+      storage: config.databaseUrl.replace('sqlite:', ''),
     });
 
     // Create and start service - DI registration happens automatically via layers
@@ -49,7 +49,7 @@ async function main() {
         // Send clean error response
         res.status(statusCode).json({
           error: {
-            message: err.message || "Internal Server Error",
+            message: err.message || 'Internal Server Error',
             statusCode,
           },
         });
@@ -57,30 +57,28 @@ async function main() {
     );
 
     console.log(`✓ Server running on http://localhost:${config.port}`);
-    console.log("\n📚 Available endpoints:");
-    console.log("  GET    /greetings              - Get all greetings");
-    console.log("  GET    /greetings/:id          - Get greeting by ID");
-    console.log(
-      "  GET    /greetings/random/:lang - Get random greeting by language",
-    );
-    console.log("  POST   /greetings              - Create new greeting");
-    console.log("  DELETE /greetings/:id          - Delete greeting");
+    console.log('\n📚 Available endpoints:');
+    console.log('  GET    /greetings              - Get all greetings');
+    console.log('  GET    /greetings/:id          - Get greeting by ID');
+    console.log('  GET    /greetings/random/:lang - Get random greeting by language');
+    console.log('  POST   /greetings              - Create new greeting');
+    console.log('  DELETE /greetings/:id          - Delete greeting');
     console.log(`\n💡 Try: curl http://localhost:${config.port}/greetings`);
-    console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n");
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
   } catch (error) {
-    console.error("❌ Failed to start service:", error);
+    console.error('❌ Failed to start service:', error);
     process.exit(1);
   }
 }
 
 // Handle graceful shutdown
-process.on("SIGINT", () => {
-  console.log("\n👋 Shutting down gracefully...");
+process.on('SIGINT', () => {
+  console.log('\n👋 Shutting down gracefully...');
   process.exit(0);
 });
 
-process.on("SIGTERM", () => {
-  console.log("\n👋 Shutting down gracefully...");
+process.on('SIGTERM', () => {
+  console.log('\n👋 Shutting down gracefully...');
   process.exit(0);
 });
 

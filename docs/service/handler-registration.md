@@ -17,9 +17,9 @@ You do not need to call any registration methods manually when using the `Servic
 Declare handlers in the `Service` configuration. The framework handles the rest:
 
 ```typescript
-import Fastify from "fastify";
-import { Service, ServiceType, ServerType, ServerVendor } from "@sentzunhat/zacatl";
-import { container } from "@sentzunhat/zacatl/third-party";
+import Fastify from 'fastify';
+import { Service, ServiceType, ServerType, ServerVendor } from '@sentzunhat/zacatl';
+import { container } from '@sentzunhat/zacatl/third-party';
 
 // Register repositories and services before constructing Service
 const repo = new UserRepository();
@@ -47,7 +47,7 @@ const service = new Service({
   },
   platforms: {
     server: {
-      name: "user-service",
+      name: 'user-service',
       port: 3000,
       server: { type: ServerType.SERVER, vendor: ServerVendor.FASTIFY, instance: fastify },
       databases: [],
@@ -80,7 +80,7 @@ container.registerSingleton(MyHandler, MyHandler);
 The `HandlersType` enum is exported for internal use by adapters:
 
 ```typescript
-import { HandlersType } from "@sentzunhat/zacatl";
+import { HandlersType } from '@sentzunhat/zacatl';
 
 HandlersType.HOOK; // "HOOK"
 HandlersType.ROUTE; // "ROUTE"

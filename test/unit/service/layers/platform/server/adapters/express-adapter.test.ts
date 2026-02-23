@@ -1,16 +1,16 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { ExpressApiAdapter } from "../../../../../../../src/service/platforms/server/api/adapters";
-import { RouteHandler } from "../../../../../../../src/service/layers/application";
-import { z } from "zod";
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { ExpressApiAdapter } from '../../../../../../../src/service/platforms/server/api/adapters';
+import { RouteHandler } from '../../../../../../../src/service/layers/application';
+import { z } from 'zod';
 
 // Mock http-proxy-middleware
-vi.mock("http-proxy-middleware", () => ({
-  createProxyMiddleware: vi.fn().mockReturnValue("proxy-middleware"),
+vi.mock('http-proxy-middleware', () => ({
+  createProxyMiddleware: vi.fn().mockReturnValue('proxy-middleware'),
 }));
 
-import { createProxyMiddleware } from "http-proxy-middleware";
+import { createProxyMiddleware } from 'http-proxy-middleware';
 
-describe("ExpressApiAdapter", () => {
+describe('ExpressApiAdapter', () => {
   let adapter: ExpressApiAdapter;
   let mockServer: any;
 
@@ -28,26 +28,23 @@ describe("ExpressApiAdapter", () => {
     adapter = new ExpressApiAdapter(mockServer);
   });
 
-  describe("registerRoute", () => {
-    it("should register a route with the correct method and url", () => {
+  describe('registerRoute', () => {
+    it('should register a route with the correct method and url', () => {
       const handler: RouteHandler = {
-        method: "GET",
-        url: "/test",
+        method: 'GET',
+        url: '/test',
         handler: vi.fn(),
       } as any;
 
       adapter.registerRoute(handler);
 
-      expect(mockServer.get).toHaveBeenCalledWith(
-        "/test",
-        expect.any(Function),
-      );
+      expect(mockServer.get).toHaveBeenCalledWith('/test', expect.any(Function));
     });
 
-    it("should handle request validation and call handler", async () => {
+    it('should handle request validation and call handler', async () => {
       const handler: RouteHandler = {
-        method: "POST",
-        url: "/validate",
+        method: 'POST',
+        url: '/validate',
         schema: {
           body: z.object({ name: z.string() }),
         },
@@ -64,7 +61,7 @@ describe("ExpressApiAdapter", () => {
       const callback = mockServer.post.mock.calls[0][1];
 
       const req = {
-        body: { name: "Valid" },
+        body: { name: 'Valid' },
         query: {},
         params: {},
       };
@@ -84,10 +81,10 @@ describe("ExpressApiAdapter", () => {
       expect(res.json).toHaveBeenCalledWith({ success: true });
     });
 
-    it("should handle validation errors", async () => {
+    it('should handle validation errors', async () => {
       const handler: RouteHandler = {
-        method: "POST",
-        url: "/validate",
+        method: 'POST',
+        url: '/validate',
         schema: {
           body: z.object({ name: z.string() }),
         },
@@ -118,10 +115,10 @@ describe("ExpressApiAdapter", () => {
     });
   });
 
-  describe("registerHook", () => {
-    it("should register middleware for hooks", () => {
+  describe('registerHook', () => {
+    it('should register middleware for hooks', () => {
       const handler: any = {
-        name: "onRequest",
+        name: 'onRequest',
         execute: vi.fn(),
       };
       adapter.registerHook(handler);
@@ -129,22 +126,22 @@ describe("ExpressApiAdapter", () => {
     });
   });
 
-  describe("registerProxy", () => {
-    it("should apply proxy middleware", () => {
+  describe('registerProxy', () => {
+    it('should apply proxy middleware', () => {
       const config = {
-        upstream: "http://upstream",
-        prefix: "/api",
-        rewritePrefix: "/remote",
+        upstream: 'http://upstream',
+        prefix: '/api',
+        rewritePrefix: '/remote',
       };
 
       adapter.registerProxy(config);
 
       expect(createProxyMiddleware).toHaveBeenCalledWith({
-        target: "http://upstream",
+        target: 'http://upstream',
         changeOrigin: true,
         pathRewrite: expect.any(Object),
       });
-      expect(mockServer.use).toHaveBeenCalledWith("/api", "proxy-middleware");
+      expect(mockServer.use).toHaveBeenCalledWith('/api', 'proxy-middleware');
     });
   });
 });

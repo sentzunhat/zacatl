@@ -1,4 +1,4 @@
-import type { LoggerPort, LoggerInput } from "../types";
+import type { LoggerPort, LoggerInput } from '../types';
 
 /**
  * Lightweight console-based logger adapter for CLI, desktop apps,
@@ -14,7 +14,7 @@ export class ConsoleLoggerAdapter implements LoggerPort {
   }
 
   private formatMessage(level: string, message: string, input?: LoggerInput): string {
-    const timestamp = this.enableTimestamps ? `[${new Date().toISOString()}]` : "";
+    const timestamp = this.enableTimestamps ? `[${new Date().toISOString()}]` : '';
     const levelTag = `[${level.toUpperCase()}]`;
 
     let output = `${timestamp} ${levelTag} ${message}`;
@@ -23,11 +23,11 @@ export class ConsoleLoggerAdapter implements LoggerPort {
       const structured: Record<string, unknown> = {};
 
       if (input.data !== undefined) {
-        structured["data"] = input.data;
+        structured['data'] = input.data;
       }
 
       if (input.details !== undefined) {
-        structured["details"] = input.details;
+        structured['details'] = input.details;
       }
 
       if (Object.keys(structured).length > 0) {
@@ -42,15 +42,15 @@ export class ConsoleLoggerAdapter implements LoggerPort {
     if (!this.enableColors) return text;
 
     const colors: Record<string, string> = {
-      reset: "\x1b[0m",
-      red: "\x1b[31m",
-      yellow: "\x1b[33m",
-      blue: "\x1b[34m",
-      gray: "\x1b[90m",
-      magenta: "\x1b[35m",
+      reset: '\x1b[0m',
+      red: '\x1b[31m',
+      yellow: '\x1b[33m',
+      blue: '\x1b[34m',
+      gray: '\x1b[90m',
+      magenta: '\x1b[35m',
     };
 
-    return `${colors[color] ?? ""}${text}${colors["reset"]}`;
+    return `${colors[color] ?? ''}${text}${colors['reset']}`;
   }
 
   log(message: string, input?: LoggerInput): void {
@@ -58,31 +58,31 @@ export class ConsoleLoggerAdapter implements LoggerPort {
   }
 
   info(message: string, input?: LoggerInput): void {
-    const formatted = this.formatMessage("info", message, input);
+    const formatted = this.formatMessage('info', message, input);
     /* eslint-disable no-console */
-    console.log(this.colorize(formatted, "blue"));
+    console.log(this.colorize(formatted, 'blue'));
     /* eslint-enable no-console */
   }
 
   trace(message: string, input?: LoggerInput): void {
-    const formatted = this.formatMessage("trace", message, input);
+    const formatted = this.formatMessage('trace', message, input);
     /* eslint-disable no-console */
-    console.log(this.colorize(formatted, "gray"));
+    console.log(this.colorize(formatted, 'gray'));
     /* eslint-enable no-console */
   }
 
   warn(message: string, input?: LoggerInput): void {
-    const formatted = this.formatMessage("warn", message, input);
-    console.warn(this.colorize(formatted, "yellow"));
+    const formatted = this.formatMessage('warn', message, input);
+    console.warn(this.colorize(formatted, 'yellow'));
   }
 
   error(message: string, input?: LoggerInput): void {
-    const formatted = this.formatMessage("error", message, input);
-    console.error(this.colorize(formatted, "red"));
+    const formatted = this.formatMessage('error', message, input);
+    console.error(this.colorize(formatted, 'red'));
   }
 
   fatal(message: string, input?: LoggerInput): void {
-    const formatted = this.formatMessage("fatal", message, input);
-    console.error(this.colorize(formatted, "magenta"));
+    const formatted = this.formatMessage('fatal', message, input);
+    console.error(this.colorize(formatted, 'magenta'));
   }
 }

@@ -15,12 +15,8 @@
     "paths": {
       "@sentzunhat/zacatl": ["../../../../../src/index.ts"],
       "@sentzunhat/zacatl/service": ["../../../../../src/service/index.ts"],
-      "@sentzunhat/zacatl/third-party/fastify": [
-        "../../../../../src/third-party/fastify.ts"
-      ],
-      "@sentzunhat/zacatl/third-party/mongoose": [
-        "../../../../../src/third-party/mongoose.ts"
-      ]
+      "@sentzunhat/zacatl/third-party/fastify": ["../../../../../src/third-party/fastify.ts"],
+      "@sentzunhat/zacatl/third-party/mongoose": ["../../../../../src/third-party/mongoose.ts"]
     }
   },
   "include": ["apps/*/src/**/*"],

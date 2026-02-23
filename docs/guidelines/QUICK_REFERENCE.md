@@ -115,9 +115,9 @@ docs/readme/add-examples
 3. Relative imports (`./`, `../`)
 
 ```typescript
-import { FastifyRequest } from "fastify";
-import { Service } from "@zacatl/service";
-import { handleRequest } from "./utils";
+import { FastifyRequest } from 'fastify';
+import { Service } from '@zacatl/service';
+import { handleRequest } from './utils';
 ```
 
 ---
@@ -126,9 +126,9 @@ import { handleRequest } from "./utils";
 
 ```typescript
 // ✅ Correct
-import { z } from "@zacatl/third-party/zod";
-import { v4 as uuidv4 } from "@zacatl/third-party/uuid";
-import { container } from "@zacatl/third-party/tsyringe";
+import { z } from '@zacatl/third-party/zod';
+import { v4 as uuidv4 } from '@zacatl/third-party/uuid';
+import { container } from '@zacatl/third-party/tsyringe';
 
 // ❌ Don't export from root
 ```
@@ -162,7 +162,7 @@ export function myFunction(arg1: string, arg2?: string): string {
 ## Test Template (AAA Pattern)
 
 ```typescript
-it("should [expected behavior] when [condition]", () => {
+it('should [expected behavior] when [condition]', () => {
   // Arrange: setup
   const input = {
     /* ... */

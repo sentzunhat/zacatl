@@ -1,16 +1,12 @@
-import type { MongooseBaseRepositoryConfig } from "./mongoose/types";
-import type { SequelizeBaseRepositoryConfig } from "./sequelize/types";
+import type { MongooseBaseRepositoryConfig } from './mongoose/types';
+import type { SequelizeBaseRepositoryConfig } from './sequelize/types';
 
 export type BaseRepositoryConfig<D extends object = object> =
   | MongooseBaseRepositoryConfig<D>
   | SequelizeBaseRepositoryConfig<D>;
 
 /** ORM adapter interface - implemented by Mongoose and Sequelize adapters */
-export interface ORMPort<
-  ModelType = unknown,
-  InputType = unknown,
-  OutputType = unknown,
-> {
+export interface ORMPort<ModelType = unknown, InputType = unknown, OutputType = unknown> {
   readonly model: ModelType;
   toLean(input: unknown): OutputType | null;
   findById(id: string): Promise<OutputType | null>;
@@ -25,11 +21,7 @@ export interface ORMPort<
  * Repository contract - public interface for consumers
  * Implemented by BaseRepository with ORM adapters
  */
-export interface RepositoryPort<
-  ModelType = unknown,
-  InputType = unknown,
-  OutputType = unknown,
-> {
+export interface RepositoryPort<ModelType = unknown, InputType = unknown, OutputType = unknown> {
   readonly model?: ModelType;
   toLean(input: unknown): OutputType | null;
   findById(id: string): Promise<OutputType | null>;
@@ -46,16 +38,16 @@ export type {
   MongooseRepositoryConfig,
   MongooseRepositoryModel,
   LeanWithMeta,
-} from "./mongoose/types";
+} from './mongoose/types';
 export type {
   SequelizeBaseRepositoryConfig,
   SequelizeRepositoryConfig,
   SequelizeRepositoryModel,
-} from "./sequelize/types";
+} from './sequelize/types';
 
 /** Union of all supported model types */
 export type RepositoryModel<D extends object = object> =
-  | import("./mongoose/types").MongooseRepositoryModel<D>
-  | import("./sequelize/types").SequelizeRepositoryModel<D>;
+  | import('./mongoose/types').MongooseRepositoryModel<D>
+  | import('./sequelize/types').SequelizeRepositoryModel<D>;
 
-export { ORMType } from "./mongoose/types";
+export { ORMType } from './mongoose/types';

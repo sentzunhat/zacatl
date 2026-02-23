@@ -1,13 +1,10 @@
-import { SequelizeRepository } from "@sentzunhat/zacatl";
-import type { ModelStatic } from "@sentzunhat/zacatl/third-party/sequelize";
-import { singleton } from "@sentzunhat/zacatl/third-party/tsyringe";
+import { SequelizeRepository } from '@sentzunhat/zacatl';
+import type { ModelStatic } from '@sentzunhat/zacatl/third-party/sequelize';
+import { singleton } from '@sentzunhat/zacatl/third-party/tsyringe';
 
-import type {
-  CreateGreetingInput,
-  Greeting,
-} from "../../../../domain/models/greeting";
-import { GreetingModel } from "../../models/greeting.model";
-import type { GreetingRepositoryPort } from "./port";
+import type { CreateGreetingInput, Greeting } from '../../../../domain/models/greeting';
+import { GreetingModel } from '../../models/greeting.model';
+import type { GreetingRepositoryPort } from './port';
 
 @singleton()
 export class GreetingRepositoryAdapter
@@ -24,7 +21,7 @@ export class GreetingRepositoryAdapter
     const where = filter?.language ? { language: filter.language } : {};
     const models = await (this.model as ModelStatic<GreetingModel>).findAll({
       where,
-      order: [["createdAt", "DESC"]],
+      order: [['createdAt', 'DESC']],
     });
 
     return models

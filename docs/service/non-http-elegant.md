@@ -1,7 +1,6 @@
 # Zacatl for Non-HTTP Services
 
-> **Elegant dependency injection for CLI tools, workers, and scripts**
-> **Version:** 0.0.22+
+> **Elegant dependency injection for CLI tools, workers, and scripts** > **Version:** 0.0.22+
 
 ---
 
@@ -29,7 +28,7 @@ Service        → DI Engine (wires everything)
 ## 1. Providers (Business Logic)
 
 ```typescript
-import { singleton } from "tsyringe";
+import { singleton } from 'tsyringe';
 
 @singleton()
 class EmailService {
@@ -59,8 +58,8 @@ class NotificationService {
 ## 2. Repositories (Data Access)
 
 ```typescript
-import { singleton, BaseRepository, ORMType } from "@sentzunhat/zacatl";
-import { Schema } from "mongoose";
+import { singleton, BaseRepository, ORMType } from '@sentzunhat/zacatl';
+import { Schema } from 'mongoose';
 
 const UserSchema = new Schema({
   name: String,
@@ -72,7 +71,7 @@ class UserRepository extends BaseRepository<any, any, any> {
   constructor() {
     super({
       type: ORMType.Mongoose,
-      name: "User",
+      name: 'User',
       schema: UserSchema,
     });
   }
@@ -90,8 +89,8 @@ class UserRepository extends BaseRepository<any, any, any> {
 ## 3. Service (DI Engine)
 
 ```typescript
-import { Service, resolveDependency, ServiceType, DatabaseVendor } from "@sentzunhat/zacatl";
-import mongoose from "mongoose";
+import { Service, resolveDependency, ServiceType, DatabaseVendor } from '@sentzunhat/zacatl';
+import mongoose from 'mongoose';
 
 const service = new Service({
   type: ServiceType.SERVER,
@@ -105,11 +104,11 @@ const service = new Service({
   },
   platforms: {
     server: {
-      name: "my-app",
+      name: 'my-app',
       databases: [
         {
           vendor: DatabaseVendor.MONGOOSE,
-          instance: mongoose.connect("mongodb://localhost/db"),
+          instance: mongoose.connect('mongodb://localhost/db'),
         },
       ],
     },
@@ -119,8 +118,8 @@ const service = new Service({
 await service.start(); // ← Must call before resolving
 
 // Now use anywhere
-const notify = resolveDependency<NotificationService>("NotificationService");
-notify.notify("user@example.com", "Hello!");
+const notify = resolveDependency<NotificationService>('NotificationService');
+notify.notify('user@example.com', 'Hello!');
 ```
 
 **Rules:**
@@ -136,8 +135,8 @@ notify.notify("user@example.com", "Hello!");
 ### Pattern A: Simple CLI (No Database)
 
 ```typescript
-import { Service, resolveDependency } from "@sentzunhat/zacatl";
-import { singleton } from "tsyringe";
+import { Service, resolveDependency } from '@sentzunhat/zacatl';
+import { singleton } from 'tsyringe';
 
 @singleton()
 class Calculator {
@@ -155,18 +154,18 @@ const service = new Service({
 
 await service.start();
 
-const calc = resolveDependency<Calculator>("Calculator");
+const calc = resolveDependency<Calculator>('Calculator');
 console.log(calc.add(2, 3)); // 5
 ```
 
 ### Pattern B: Worker with Database
 
 ```typescript
-import { Service, resolveDependency } from "@sentzunhat/zacatl";
-import { BaseRepository, ORMType } from "@sentzunhat/zacatl/infrastructure";
-import { Schema } from "mongoose";
-import mongoose from "mongoose";
-import { singleton } from "tsyringe";
+import { Service, resolveDependency } from '@sentzunhat/zacatl';
+import { BaseRepository, ORMType } from '@sentzunhat/zacatl/infrastructure';
+import { Schema } from 'mongoose';
+import mongoose from 'mongoose';
+import { singleton } from 'tsyringe';
 
 // Repository
 const TaskSchema = new Schema({ name: String, done: Boolean });
@@ -174,7 +173,7 @@ const TaskSchema = new Schema({ name: String, done: Boolean });
 @singleton()
 class TaskRepository extends BaseRepository<any, any, any> {
   constructor() {
-    super({ type: ORMType.Mongoose, name: "Task", schema: TaskSchema });
+    super({ type: ORMType.Mongoose, name: 'Task', schema: TaskSchema });
   }
 }
 
@@ -184,8 +183,8 @@ class TaskWorker {
   constructor(private tasks: TaskRepository) {}
 
   async process() {
-    const task = await this.tasks.create({ name: "Work", done: false });
-    console.log("Created:", task);
+    const task = await this.tasks.create({ name: 'Work', done: false });
+    console.log('Created:', task);
   }
 }
 
@@ -198,11 +197,11 @@ const service = new Service({
   },
   platforms: {
     server: {
-      name: "worker",
+      name: 'worker',
       databases: [
         {
           vendor: DatabaseVendor.MONGOOSE,
-          instance: mongoose.connect("mongodb://localhost/tasks"),
+          instance: mongoose.connect('mongodb://localhost/tasks'),
         },
       ],
     },
@@ -211,7 +210,7 @@ const service = new Service({
 
 await service.start();
 
-const worker = resolveDependency<TaskWorker>("TaskWorker");
+const worker = resolveDependency<TaskWorker>('TaskWorker');
 await worker.process();
 ```
 
@@ -237,10 +236,7 @@ class Database {
 
 @singleton()
 class UserService {
-  constructor(
-    private db: Database,
-    private logger: Logger,
-  ) {}
+  constructor(private db: Database, private logger: Logger) {}
 
   async getUser(id: string) {
     this.logger.log(`Getting user ${id}`);
@@ -258,8 +254,8 @@ const service = new Service({
 
 await service.start();
 
-const users = resolveDependency<UserService>("UserService");
-await users.getUser("123");
+const users = resolveDependency<UserService>('UserService');
+await users.getUser('123');
 ```
 
 **Auto-wires:** Logger → Database → UserService
@@ -269,15 +265,15 @@ await users.getUser("123");
 ## Configuration
 
 ```typescript
-import { loadConfig } from "@sentzunhat/zacatl/config";
-import { z } from "zod";
+import { loadConfig } from '@sentzunhat/zacatl/config';
+import { z } from 'zod';
 
 const ConfigSchema = z.object({
   db: z.string(),
   apiKey: z.string(),
 });
 
-const config = loadConfig("./config.yaml", "yaml", ConfigSchema);
+const config = loadConfig('./config.yaml', 'yaml', ConfigSchema);
 
 const service = new Service({
   type: ServiceType.SERVER,
@@ -286,7 +282,7 @@ const service = new Service({
   },
   platforms: {
     server: {
-      name: "app",
+      name: 'app',
       databases: [
         {
           vendor: DatabaseVendor.MONGOOSE,
@@ -303,17 +299,17 @@ const service = new Service({
 ## Error Handling
 
 ```typescript
-import { NotFoundError, ValidationError } from "@sentzunhat/zacatl/error";
+import { NotFoundError, ValidationError } from '@sentzunhat/zacatl/error';
 
 @singleton()
 class UserService {
   constructor(private repo: UserRepository) {}
 
   async getUser(id: string) {
-    if (!id) throw new ValidationError({ message: "ID required" });
+    if (!id) throw new ValidationError({ message: 'ID required' });
 
     const user = await this.userRepo.findById(id);
-    if (!user) throw new NotFoundError({ message: "User not found", metadata: { id } });
+    if (!user) throw new NotFoundError({ message: 'User not found', metadata: { id } });
 
     return user;
   }
@@ -325,13 +321,13 @@ class UserService {
 ## Logging
 
 ```typescript
-import { logger } from "@sentzunhat/zacatl";
+import { logger } from '@sentzunhat/zacatl';
 
 @singleton()
 class Worker {
   async run() {
-    logger.info("Worker started");
-    logger.error("Something failed", { details: "..." });
+    logger.info('Worker started');
+    logger.error('Something failed', { details: '...' });
   }
 }
 ```
@@ -356,13 +352,13 @@ class Worker {
 
 ```typescript
 #!/usr/bin/env node
-import { Service, resolveDependency } from "@sentzunhat/zacatl";
-import { singleton } from "tsyringe";
+import { Service, resolveDependency } from '@sentzunhat/zacatl';
+import { singleton } from 'tsyringe';
 
 @singleton()
 class CLI {
   run(args: string[]) {
-    console.log("Args:", args);
+    console.log('Args:', args);
   }
 }
 
@@ -372,19 +368,19 @@ const service = new Service({
 });
 
 await service.start();
-resolveDependency<CLI>("CLI").run(process.argv.slice(2));
+resolveDependency<CLI>('CLI').run(process.argv.slice(2));
 ```
 
 ### Template: Background Job
 
 ```typescript
-import { Service, resolveDependency } from "@sentzunhat/zacatl";
-import { singleton } from "tsyringe";
+import { Service, resolveDependency } from '@sentzunhat/zacatl';
+import { singleton } from 'tsyringe';
 
 @singleton()
 class Job {
   async process() {
-    setInterval(() => console.log("Job running..."), 5000);
+    setInterval(() => console.log('Job running...'), 5000);
   }
 }
 
@@ -394,16 +390,16 @@ const service = new Service({
 });
 
 await service.start();
-await resolveDependency<Job>("Job").process();
+await resolveDependency<Job>('Job').process();
 ```
 
 ### Template: Data Migration
 
 ```typescript
-import { Service, resolveDependency } from "@sentzunhat/zacatl";
-import { BaseRepository, ORMType } from "@sentzunhat/zacatl/infrastructure";
-import mongoose from "mongoose";
-import { singleton } from "tsyringe";
+import { Service, resolveDependency } from '@sentzunhat/zacatl';
+import { BaseRepository, ORMType } from '@sentzunhat/zacatl/infrastructure';
+import mongoose from 'mongoose';
+import { singleton } from 'tsyringe';
 
 @singleton()
 class Migration {
@@ -424,14 +420,14 @@ const service = new Service({
   },
   platforms: {
     server: {
-      name: "migration",
+      name: 'migration',
       databases: [{ vendor: DatabaseVendor.MONGOOSE, instance: mongoose.connect(uri) }],
     },
   },
 });
 
 await service.start();
-await resolveDependency<Migration>("Migration").run();
+await resolveDependency<Migration>('Migration').run();
 ```
 
 ---
@@ -450,28 +446,28 @@ await resolveDependency<Migration>("Migration").run();
 
 ```typescript
 // Core
-import { Service, resolveDependency } from "@sentzunhat/zacatl";
+import { Service, resolveDependency } from '@sentzunhat/zacatl';
 
 // DI (singleton decorator)
-import { singleton } from "@sentzunhat/zacatl";
+import { singleton } from '@sentzunhat/zacatl';
 // Or import directly from tsyringe (same thing)
 // import { singleton } from "tsyringe";
 
 // Repositories
-import { BaseRepository, ORMType } from "@sentzunhat/zacatl/infrastructure";
+import { BaseRepository, ORMType } from '@sentzunhat/zacatl/infrastructure';
 
 // Config
-import { loadConfig } from "@sentzunhat/zacatl/config";
+import { loadConfig } from '@sentzunhat/zacatl/config';
 
 // Errors
-import { NotFoundError, ValidationError } from "@sentzunhat/zacatl/error";
+import { NotFoundError, ValidationError } from '@sentzunhat/zacatl/error';
 
 // Logging
-import { logger } from "@sentzunhat/zacatl";
+import { logger } from '@sentzunhat/zacatl';
 
 // Database
-import mongoose from "mongoose";
-import { Schema } from "mongoose";
+import mongoose from 'mongoose';
+import { Schema } from 'mongoose';
 ```
 
 ---

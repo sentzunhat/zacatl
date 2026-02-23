@@ -1,18 +1,18 @@
-import { describe, it, expect, vi } from "vitest";
-import { FastifyRequest } from "fastify";
-import { container } from "tsyringe";
+import { describe, it, expect, vi } from 'vitest';
+import { FastifyRequest } from 'fastify';
+import { container } from 'tsyringe';
 
 import {
   Application,
   ConfigApplication,
   HookHandler,
   HookHandlerName,
-} from "../../../../../src/service/layers/application";
-import { AbstractRouteHandler } from "../../../../../src/service/layers/application/entry-points/rest/fastify/handlers/abstract";
-import type { Request } from "../../../../../src/service/layers/application/entry-points/rest/common/request";
+} from '../../../../../src/service/layers/application';
+import { AbstractRouteHandler } from '../../../../../src/service/layers/application/entry-points/rest/fastify/handlers/abstract';
+import type { Request } from '../../../../../src/service/layers/application/entry-points/rest/common/request';
 
 class DummyHookHandler implements HookHandler {
-  public name: HookHandlerName = "onRequest";
+  public name: HookHandlerName = 'onRequest';
 
   async execute(_: FastifyRequest): Promise<void> {}
 }
@@ -20,9 +20,9 @@ class DummyHookHandler implements HookHandler {
 class DummyRouteHandler extends AbstractRouteHandler {
   constructor() {
     super({
-      url: "/",
+      url: '/',
       schema: {},
-      method: "GET",
+      method: 'GET',
     });
   }
 
@@ -40,9 +40,9 @@ const fakeConfig: ConfigApplication = {
   },
 };
 
-describe("Application", () => {
-  it("should register hook and route handlers on construction (new pattern)", () => {
-    const registerSpy = vi.spyOn(container, "register");
+describe('Application', () => {
+  it('should register hook and route handlers on construction (new pattern)', () => {
+    const registerSpy = vi.spyOn(container, 'register');
 
     new Application(fakeConfig);
 

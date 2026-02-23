@@ -64,7 +64,7 @@ protected handleError(error: Error): { error: string; message: string; statusCod
 class UserGetHandler extends GetRouteHandler<User> {
   async execute(request, reply) {
     const user = await this.repository.findById(request.params.id);
-    if (!user) throw new NotFoundError("User not found");
+    if (!user) throw new NotFoundError('User not found');
     return user;
   }
   // Automatic: response() wraps in { ok: true, data }
@@ -95,7 +95,7 @@ class UserCreateHandler extends PostRouteHandler<User, CreateUserInput, User> {
     if (error instanceof BadRequestError) {
       return {
         success: false,
-        error: "INVALID_INPUT",
+        error: 'INVALID_INPUT',
         message: error.message,
         statusCode: 400, // Bad Request
       };
@@ -103,14 +103,14 @@ class UserCreateHandler extends PostRouteHandler<User, CreateUserInput, User> {
     if (error instanceof ValidationError) {
       return {
         success: false,
-        error: "VALIDATION_FAILED",
+        error: 'VALIDATION_FAILED',
         message: error.message,
         statusCode: 422, // Unprocessable Entity
       };
     }
     return {
       success: false,
-      error: "SERVER_ERROR",
+      error: 'SERVER_ERROR',
       statusCode: 500,
     };
   }
@@ -159,11 +159,11 @@ Handlers simply **throw errors**. A global error handler catches everything and 
 **Fastify Setup** (real-world example):
 
 ```typescript
-import { CustomError, BadRequestError, NotFoundError } from "@sentzunhat/zacatl";
-import { FastifyInstance, FastifyError, FastifyRequest, FastifyReply } from "fastify";
-import cors from "@fastify/cors";
-import helmet from "@fastify/helmet";
-import { ZodError } from "zod";
+import { CustomError, BadRequestError, NotFoundError } from '@sentzunhat/zacatl';
+import { FastifyInstance, FastifyError, FastifyRequest, FastifyReply } from 'fastify';
+import cors from '@fastify/cors';
+import helmet from '@fastify/helmet';
+import { ZodError } from 'zod';
 
 function isZodError(error: unknown): error is ZodError {
   return error instanceof ZodError;
@@ -175,67 +175,69 @@ function isCustomError(error: unknown): error is CustomError {
 
 export async function setupServer(server: FastifyInstance): Promise<void> {
   // Register middleware/plugins
-  await server.register(cors, { origin: "*" });
+  await server.register(cors, { origin: '*' });
   await server.register(helmet, {
     contentSecurityPolicy: false,
-    frameguard: { action: "deny" },
+    frameguard: { action: 'deny' },
   });
 
   // Global error handler — catches ALL errors
-  server.setErrorHandler(async (error: FastifyError, request: FastifyRequest, reply: FastifyReply) => {
-    // Log the error
-    server.log.error({
-      method: request.method,
-      url: request.url,
-      error: error.message,
-      stack: error.stack,
-    });
-
-    // Handle Zod validation errors
-    if (isZodError(error)) {
-      return reply.code(400).send({
-        ok: false,
-        error: "VALIDATION_ERROR",
-        message: "Request validation failed",
-        statusCode: 400,
-        details: {
-          issues: error.issues,
-        },
+  server.setErrorHandler(
+    async (error: FastifyError, request: FastifyRequest, reply: FastifyReply) => {
+      // Log the error
+      server.log.error({
+        method: request.method,
+        url: request.url,
+        error: error.message,
+        stack: error.stack,
       });
-    }
 
-    // Handle custom errors (with statusCode from error.statusCode property)
-    if (isCustomError(error)) {
+      // Handle Zod validation errors
+      if (isZodError(error)) {
+        return reply.code(400).send({
+          ok: false,
+          error: 'VALIDATION_ERROR',
+          message: 'Request validation failed',
+          statusCode: 400,
+          details: {
+            issues: error.issues,
+          },
+        });
+      }
+
+      // Handle custom errors (with statusCode from error.statusCode property)
+      if (isCustomError(error)) {
+        const statusCode = error.statusCode || 500;
+        return reply.code(statusCode).send({
+          ok: false,
+          error: error.code || 'ERROR',
+          message: error.message,
+          statusCode,
+          reason: error.reason,
+        });
+      }
+
+      // Handle FastifyError (validation, serialization, etc.)
+      if (error.validation) {
+        return reply.code(400).send({
+          ok: false,
+          error: 'VALIDATION_ERROR',
+          message: 'Request validation failed',
+          statusCode: 400,
+          details: { issues: error.validation },
+        });
+      }
+
+      // Fallback: generic error
       const statusCode = error.statusCode || 500;
       return reply.code(statusCode).send({
         ok: false,
-        error: error.code || "ERROR",
-        message: error.message,
+        error: 'INTERNAL_ERROR',
+        message: process.env.NODE_ENV === 'production' ? 'Something went wrong' : error.message,
         statusCode,
-        reason: error.reason,
       });
-    }
-
-    // Handle FastifyError (validation, serialization, etc.)
-    if (error.validation) {
-      return reply.code(400).send({
-        ok: false,
-        error: "VALIDATION_ERROR",
-        message: "Request validation failed",
-        statusCode: 400,
-        details: { issues: error.validation },
-      });
-    }
-
-    // Fallback: generic error
-    const statusCode = error.statusCode || 500;
-    return reply.code(statusCode).send({
-      ok: false,
-      error: "INTERNAL_ERROR",
-      message: process.env.NODE_ENV === "production" ? "Something went wrong" : error.message,
-      statusCode,
-    });
-  });
+    },
+  );
 }
 ```
 
@@ -248,7 +250,7 @@ export class UserGetHandler extends GetRouteHandler<User> {
 
     // Just throw — global error handler will catch
     const user = await this.repository.findOne(userId);
-    if (!user) throw new NotFoundError("User not found");
+    if (!user) throw new NotFoundError('User not found');
 
     return user;
   }
@@ -268,12 +270,12 @@ export class UserGetHandler extends GetRouteHandler<User> {
 **Express Setup** (similar pattern):
 
 ```typescript
-import express, { Express, Request, Response, NextFunction } from "express";
-import cors from "cors";
-import helmet from "helmet";
+import express, { Express, Request, Response, NextFunction } from 'express';
+import cors from 'cors';
+import helmet from 'helmet';
 
 export function setupExpressServer(app: Express): void {
-  app.use(cors({ origin: "*" }));
+  app.use(cors({ origin: '*' }));
   app.use(helmet());
 
   // Global error handler — placed at the end
@@ -286,7 +288,7 @@ export function setupExpressServer(app: Express): void {
       const statusCode = error.statusCode || 500;
       return res.status(statusCode).json({
         ok: false,
-        error: error.code || "ERROR",
+        error: error.code || 'ERROR',
         message: error.message,
         statusCode,
       });
@@ -296,8 +298,8 @@ export function setupExpressServer(app: Express): void {
     if (isZodError(error)) {
       return res.status(400).json({
         ok: false,
-        error: "VALIDATION_ERROR",
-        message: "Request validation failed",
+        error: 'VALIDATION_ERROR',
+        message: 'Request validation failed',
         statusCode: 400,
         details: { issues: error.issues },
       });
@@ -306,8 +308,8 @@ export function setupExpressServer(app: Express): void {
     // Fallback
     res.status(500).json({
       ok: false,
-      error: "INTERNAL_ERROR",
-      message: "Something went wrong",
+      error: 'INTERNAL_ERROR',
+      message: 'Something went wrong',
       statusCode: 500,
     });
   });
@@ -330,7 +332,7 @@ export function setupExpressServer(app: Express): void {
 class UserCreateHandler extends PostRouteHandler<User> {
   async handler(request, reply) {
     if (!request.body.email) {
-      throw new BadRequestError("Email is required"); // statusCode 400 from CustomError
+      throw new BadRequestError('Email is required'); // statusCode 400 from CustomError
     }
     const user = await this.repository.create(request.body);
     return user; // Global or handler response() wraps it
@@ -377,8 +379,8 @@ Enable Yup as an alternative validation library:
 
 ```typescript
 // Option A: Zod (default, recommended)
-import { z } from "zod";
-import { PostRouteHandler } from "@sentzunhat/zacatl";
+import { z } from 'zod';
+import { PostRouteHandler } from '@sentzunhat/zacatl';
 
 const createUserSchema = z.object({
   name: z.string().min(3),
@@ -395,8 +397,8 @@ class CreateUserHandler extends PostRouteHandler<User, typeof createUserSchema> 
 }
 
 // Option B: Yup (for existing codebases or preference)
-import * as yup from "yup";
-import { PostRouteHandler } from "@sentzunhat/zacatl";
+import * as yup from 'yup';
+import { PostRouteHandler } from '@sentzunhat/zacatl';
 
 const createUserSchema = yup.object({
   name: yup.string().required().min(3),
@@ -405,7 +407,7 @@ const createUserSchema = yup.object({
 
 class CreateUserHandler extends PostRouteHandler<User, typeof createUserSchema> {
   schema = createUserSchema;
-  validationLibrary = "yup"; // explicit opt-in
+  validationLibrary = 'yup'; // explicit opt-in
 
   async handler(request, reply) {
     // request.body is validated with Yup
@@ -419,7 +421,7 @@ class CreateUserHandler extends PostRouteHandler<User, typeof createUserSchema> 
 For scenarios where validation isn't needed or is handled elsewhere:
 
 ```typescript
-import { PostRouteHandler } from "@sentzunhat/zacatl";
+import { PostRouteHandler } from '@sentzunhat/zacatl';
 
 // Option C: No validation (manual checks or pre-validated data)
 class CreateUserHandler extends PostRouteHandler<User, CreateUserInput> {
@@ -428,7 +430,7 @@ class CreateUserHandler extends PostRouteHandler<User, CreateUserInput> {
   async handler(request, reply) {
     // Manual validation if needed
     if (!request.body?.email) {
-      throw new BadRequestError("Email is required");
+      throw new BadRequestError('Email is required');
     }
 
     // Or trust upstream validation (API gateway, middleware, etc.)
@@ -472,7 +474,7 @@ Set project-wide validation preferences:
 // zacatl.config.ts
 export default {
   validation: {
-    library: "zod", // "zod" | "yup" | "none"
+    library: 'zod', // "zod" | "yup" | "none"
     strict: true, // throw on validation errors
     stripUnknown: true, // remove extra properties
   },

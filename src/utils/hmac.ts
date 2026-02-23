@@ -1,7 +1,7 @@
-import { createHmac } from "crypto";
+import { createHmac } from 'crypto';
 
-export type HmacAlgorithm = "sha256" | "sha512" | "sha1" | "md5";
-export type HmacEncoding = "hex" | "base64" | "base64url";
+export type HmacAlgorithm = 'sha256' | 'sha512' | 'sha1' | 'md5';
+export type HmacEncoding = 'hex' | 'base64' | 'base64url';
 
 export interface GenerateHmacOptions {
   message: string;
@@ -32,8 +32,8 @@ export interface GenerateHmacOptions {
 export const generateHmac = ({
   message,
   secretKey,
-  algorithm = "sha256",
-  encoding = "hex",
+  algorithm = 'sha256',
+  encoding = 'hex',
 }: GenerateHmacOptions): string => {
   const hmac = createHmac(algorithm, secretKey);
 

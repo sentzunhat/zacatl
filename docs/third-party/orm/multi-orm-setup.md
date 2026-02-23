@@ -5,19 +5,19 @@ This guide shows how to configure MongoDB (Mongoose) and PostgreSQL/MySQL/SQLite
 ## Quick Example: Multi-Database Service
 
 ```typescript
-import { Service, DatabaseVendor, ServerVendor, ServerType } from "@sentzunhat/zacatl";
-import { ORMType } from "@sentzunhat/zacatl/service/layers/infrastructure";
-import mongoose from "mongoose";
-import { Sequelize } from "sequelize";
-import fastify from "fastify";
+import { Service, DatabaseVendor, ServerVendor, ServerType } from '@sentzunhat/zacatl';
+import { ORMType } from '@sentzunhat/zacatl/service/layers/infrastructure';
+import mongoose from 'mongoose';
+import { Sequelize } from 'sequelize';
+import fastify from 'fastify';
 
 // 1. Create your ORM instances
 const mongooseInstance = new mongoose.Mongoose();
-const sequelizeInstance = new Sequelize("postgres://user:pass@localhost:5432/mydb");
+const sequelizeInstance = new Sequelize('postgres://user:pass@localhost:5432/mydb');
 
 // 2. Create your repositories
-import { UserRepository } from "./repositories/user.repository"; // Uses Mongoose
-import { ProductRepository } from "./repositories/product.repository"; // Uses Sequelize
+import { UserRepository } from './repositories/user.repository'; // Uses Mongoose
+import { ProductRepository } from './repositories/product.repository'; // Uses Sequelize
 
 // 3. Configure service with BOTH ORMs
 const service = new Service({
@@ -35,7 +35,7 @@ const service = new Service({
   },
   platforms: {
     server: {
-      name: "my-multi-db-service",
+      name: 'my-multi-db-service',
       server: {
         type: ServerType.SERVER,
         vendor: ServerVendor.FASTIFY,
@@ -46,18 +46,18 @@ const service = new Service({
         {
           vendor: DatabaseVendor.MONGOOSE,
           instance: mongooseInstance,
-          connectionString: "mongodb://localhost:27017",
+          connectionString: 'mongodb://localhost:27017',
           onDatabaseConnected: async (db) => {
-            console.log("✅ MongoDB connected");
+            console.log('✅ MongoDB connected');
           },
         },
         // PostgreSQL configuration
         {
           vendor: DatabaseVendor.SEQUELIZE,
           instance: sequelizeInstance,
-          connectionString: "postgres://user:pass@localhost:5432/mydb",
+          connectionString: 'postgres://user:pass@localhost:5432/mydb',
           onDatabaseConnected: async (db) => {
-            console.log("✅ PostgreSQL connected");
+            console.log('✅ PostgreSQL connected');
             await (db as Sequelize).sync({ alter: true });
           },
         },
@@ -89,8 +89,8 @@ npm install sequelize sqlite3       # SQLite
 
 ```typescript
 // repositories/user.repository.ts
-import { BaseRepository, ORMType } from "@sentzunhat/zacatl/service/layers/infrastructure";
-import { Schema } from "mongoose";
+import { BaseRepository, ORMType } from '@sentzunhat/zacatl/service/layers/infrastructure';
+import { Schema } from 'mongoose';
 
 interface UserDb {
   username: string;
@@ -125,14 +125,16 @@ export class UserRepository extends BaseRepository<UserDb, UserInput, UserOutput
   constructor() {
     super({
       type: ORMType.Mongoose, // ✅ Use enum
-      name: "User",
+      name: 'User',
       schema: UserSchema,
     });
   }
 
   // Custom method using Mongoose
   async findByEmail(email: string): Promise<UserOutput | null> {
-    const user = await (this.model as MongooseModel<User>).findOne({ email }).lean({ virtuals: true });
+    const user = await (this.model as MongooseModel<User>)
+      .findOne({ email })
+      .lean({ virtuals: true });
     return this.toLean(user);
   }
 }
@@ -142,8 +144,8 @@ export class UserRepository extends BaseRepository<UserDb, UserInput, UserOutput
 
 ```typescript
 // repositories/product.repository.ts
-import { BaseRepository, ORMType } from "@sentzunhat/zacatl/service/layers/infrastructure";
-import { DataTypes, Model, Sequelize } from "sequelize";
+import { BaseRepository, ORMType } from '@sentzunhat/zacatl/service/layers/infrastructure';
+import { DataTypes, Model, Sequelize } from 'sequelize';
 
 interface ProductDb {
   id: number;
@@ -179,7 +181,7 @@ export function initProductModel(sequelize: Sequelize) {
       price: { type: DataTypes.FLOAT, allowNull: false },
       stock: { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0 },
     },
-    { sequelize, modelName: "Product", timestamps: true },
+    { sequelize, modelName: 'Product', timestamps: true },
   );
 }
 
@@ -205,21 +207,21 @@ export class ProductRepository extends BaseRepository<ProductModel, ProductInput
 
 ```typescript
 // index.ts
-import { Service, DatabaseVendor, ServerVendor, ServerType } from "@sentzunhat/zacatl";
-import mongoose from "mongoose";
-import { Sequelize } from "sequelize";
-import fastify from "fastify";
-import { UserRepository } from "./repositories/user.repository";
-import { ProductRepository, initProductModel } from "./repositories/product.repository";
+import { Service, DatabaseVendor, ServerVendor, ServerType } from '@sentzunhat/zacatl';
+import mongoose from 'mongoose';
+import { Sequelize } from 'sequelize';
+import fastify from 'fastify';
+import { UserRepository } from './repositories/user.repository';
+import { ProductRepository, initProductModel } from './repositories/product.repository';
 
 // Create ORM instances
 const mongooseInstance = new mongoose.Mongoose();
 const sequelizeInstance = new Sequelize({
-  dialect: "postgres",
-  host: "localhost",
-  database: "myapp",
-  username: "user",
-  password: "password",
+  dialect: 'postgres',
+  host: 'localhost',
+  database: 'myapp',
+  username: 'user',
+  password: 'password',
 });
 
 const service = new Service({
@@ -237,7 +239,7 @@ const service = new Service({
   },
   platforms: {
     server: {
-      name: "my-service",
+      name: 'my-service',
       server: {
         type: ServerType.SERVER,
         vendor: ServerVendor.FASTIFY,
@@ -247,18 +249,18 @@ const service = new Service({
         {
           vendor: DatabaseVendor.MONGOOSE,
           instance: mongooseInstance,
-          connectionString: process.env.MONGODB_URI || "mongodb://localhost:27017",
+          connectionString: process.env.MONGODB_URI || 'mongodb://localhost:27017',
           onDatabaseConnected: async (db) => {
-            console.log("✅ MongoDB connected");
+            console.log('✅ MongoDB connected');
             // Optional: Run migrations, seeders, etc.
           },
         },
         {
           vendor: DatabaseVendor.SEQUELIZE,
           instance: sequelizeInstance,
-          connectionString: process.env.DATABASE_URL || "postgres://localhost:5432/myapp",
+          connectionString: process.env.DATABASE_URL || 'postgres://localhost:5432/myapp',
           onDatabaseConnected: async (db) => {
-            console.log("✅ PostgreSQL connected");
+            console.log('✅ PostgreSQL connected');
             const seq = db as Sequelize;
 
             // Initialize models
@@ -322,10 +324,10 @@ const service = new Service({
 ### Pattern 2: Multiple SQLite Databases (Dev/Testing)
 
 ```typescript
-const userDb = new Sequelize({ dialect: "sqlite", storage: "./users.db" });
+const userDb = new Sequelize({ dialect: 'sqlite', storage: './users.db' });
 const productDb = new Sequelize({
-  dialect: "sqlite",
-  storage: "./products.db",
+  dialect: 'sqlite',
+  storage: './products.db',
 });
 
 const service = new Service({
@@ -336,12 +338,12 @@ const service = new Service({
         {
           vendor: DatabaseVendor.SEQUELIZE,
           instance: userDb,
-          connectionString: "",
+          connectionString: '',
         },
         {
           vendor: DatabaseVendor.SEQUELIZE,
           instance: productDb,
-          connectionString: "",
+          connectionString: '',
         },
       ],
     },
@@ -365,7 +367,7 @@ const service = new Service({
         {
           vendor: DatabaseVendor.MONGOOSE,
           instance: new mongoose.Mongoose(),
-          connectionString: "mongodb://localhost:27017",
+          connectionString: 'mongodb://localhost:27017',
         },
       ],
     },
@@ -388,8 +390,8 @@ const service = new Service({
       databases: [
         {
           vendor: DatabaseVendor.SEQUELIZE,
-          instance: new Sequelize("postgres://localhost:5432/myapp"),
-          connectionString: "postgres://localhost:5432/myapp",
+          instance: new Sequelize('postgres://localhost:5432/myapp'),
+          connectionString: 'postgres://localhost:5432/myapp',
         },
       ],
     },
@@ -401,13 +403,13 @@ const service = new Service({
 
 ```typescript
 // config.ts
-import mongoose from "mongoose";
-import { Sequelize } from "sequelize";
+import mongoose from 'mongoose';
+import { Sequelize } from 'sequelize';
 
 export const getDatabaseConfig = () => {
-  const env = process.env.NODE_ENV || "development";
+  const env = process.env.NODE_ENV || 'development';
 
-  if (env === "production") {
+  if (env === 'production') {
     return {
       databases: [
         {
@@ -429,8 +431,8 @@ export const getDatabaseConfig = () => {
     databases: [
       {
         vendor: DatabaseVendor.SEQUELIZE,
-        instance: new Sequelize({ dialect: "sqlite", storage: ":memory:" }),
-        connectionString: "",
+        instance: new Sequelize({ dialect: 'sqlite', storage: ':memory:' }),
+        connectionString: '',
       },
     ],
   };
@@ -440,7 +442,7 @@ export const getDatabaseConfig = () => {
 ## Available ORM Types (Enum)
 
 ```typescript
-import { ORMType } from "@sentzunhat/zacatl/service/layers/infrastructure";
+import { ORMType } from '@sentzunhat/zacatl/service/layers/infrastructure';
 
 // Use enum for type safety
 ORMType.Mongoose; // For MongoDB
@@ -450,7 +452,7 @@ ORMType.Sequelize; // For PostgreSQL, MySQL, SQLite, MSSQL
 ## Database Vendors (Enum)
 
 ```typescript
-import { DatabaseVendor } from "@sentzunhat/zacatl";
+import { DatabaseVendor } from '@sentzunhat/zacatl';
 
 DatabaseVendor.MONGOOSE; // MongoDB
 DatabaseVendor.SEQUELIZE; // SQL databases

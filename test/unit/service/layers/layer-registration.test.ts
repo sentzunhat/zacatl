@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect, beforeEach } from 'vitest';
 import {
   clearContainer,
   resolveDependency,
@@ -6,18 +6,18 @@ import {
   resolveDependencies,
   registerAndResolve,
   registerDependency,
-} from "../../../../src/dependency-injection";
+} from '../../../../src/dependency-injection';
 
-describe("Layer Registration Pattern", () => {
+describe('Layer Registration Pattern', () => {
   beforeEach(() => {
     clearContainer();
   });
 
-  it("should register and resolve dependencies in correct order", () => {
+  it('should register and resolve dependencies in correct order', () => {
     // Infrastructure layer
     class UserRepository {
       getData() {
-        return "user-data";
+        return 'user-data';
       }
     }
 
@@ -42,13 +42,13 @@ describe("Layer Registration Pattern", () => {
     const userService = new UserService(userRepo);
 
     expect(userService).toBeInstanceOf(UserService);
-    expect(userService.getUser()).toBe("user-data");
+    expect(userService.getUser()).toBe('user-data');
   });
 
-  it("should support registerAndResolve convenience function", () => {
+  it('should support registerAndResolve convenience function', () => {
     class SimpleService {
       getValue() {
-        return "simple";
+        return 'simple';
       }
     }
 
@@ -56,30 +56,30 @@ describe("Layer Registration Pattern", () => {
     const service = services[0];
 
     expect(service).toBeInstanceOf(SimpleService);
-    expect(service!.getValue()).toBe("simple");
+    expect(service!.getValue()).toBe('simple');
   });
 
-  it("should handle multiple dependencies in single call", () => {
+  it('should handle multiple dependencies in single call', () => {
     class ServiceA {
-      name = "A";
+      name = 'A';
     }
     class ServiceB {
-      name = "B";
+      name = 'B';
     }
     class ServiceC {
-      name = "C";
+      name = 'C';
     }
 
     registerDependencies([ServiceA, ServiceB, ServiceC]);
     const services = resolveDependencies([ServiceA, ServiceB, ServiceC]);
 
     expect(services).toHaveLength(3);
-    expect(services[0]?.name).toBe("A");
-    expect(services[1]?.name).toBe("B");
-    expect(services[2]?.name).toBe("C");
+    expect(services[0]?.name).toBe('A');
+    expect(services[1]?.name).toBe('B');
+    expect(services[2]?.name).toBe('C');
   });
 
-  it("should maintain instance order", () => {
+  it('should maintain instance order', () => {
     class First {
       order = 1;
     }

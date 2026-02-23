@@ -1,7 +1,7 @@
-import { FastifyRequest } from "fastify";
+import { FastifyRequest } from 'fastify';
 
 export const createFakeFastifyRequest = (): Partial<FastifyRequest> => ({
-  id: "req-1",
+  id: 'req-1',
   params: {},
   // raw: {},
   query: {},

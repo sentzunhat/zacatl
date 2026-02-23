@@ -9,12 +9,5 @@
     "emitDeclarationOnly": false
   },
   "include": ["src/**/*.ts", "src/**/*.js"],
-  "exclude": [
-    "node_modules",
-    "build",
-    "build-cjs",
-    "coverage",
-    "test",
-    "examples"
-  ]
+  "exclude": ["node_modules", "build", "build-cjs", "coverage", "test", "examples"]
 }

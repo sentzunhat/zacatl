@@ -77,14 +77,10 @@
       "@zacatl/third-party/zod": ["./src/third-party/zod.ts"],
       "@zacatl/third-party/mongoose": ["./src/third-party/mongoose.ts"],
       "@zacatl/third-party/sequelize": ["./src/third-party/sequelize.ts"],
-      "@zacatl/third-party/reflect-metadata": [
-        "./src/third-party/reflect-metadata.ts"
-      ],
+      "@zacatl/third-party/reflect-metadata": ["./src/third-party/reflect-metadata.ts"],
       "@zacatl/third-party/eslint": ["./src/third-party/eslint.ts"],
       "@zacatl/optionals": ["src/utils/optionals.ts"],
-      "@zacatl/infrastructure": [
-        "./src/service/layers/infrastructure/index.ts"
-      ],
+      "@zacatl/infrastructure": ["./src/service/layers/infrastructure/index.ts"],
       "@zacatl/domain": ["./src/service/layers/domain/index.ts"],
       "@zacatl/application": ["./src/service/layers/application/index.ts"],
       "@zacatl/platform": ["./src/service/platforms/index.ts"]

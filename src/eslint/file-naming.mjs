@@ -20,7 +20,7 @@
  * Custom rule implementation for ESLint
  */
 const fileNamingRules = {
-  files: ["src/**/*.ts", "!src/**/*.d.ts"],
+  files: ['src/**/*.ts', '!src/**/*.d.ts'],
   rules: {
     /**
      * Enforce: Files containing Port interface/type must end with -port.ts
@@ -33,9 +33,9 @@ const fileNamingRules = {
      * NOTE: This rule requires a custom ESLint rule plugin.
      * If your project uses eslint-plugin-filenames or similar, configure:
      */
-    "filenames/match-regex": [
-      "off", // Disabled by default - requires external plugin
-      "^[a-z]([a-z0-9-]*[a-z0-9])?(\\.port|\\.adapter)?\\.ts$",
+    'filenames/match-regex': [
+      'off', // Disabled by default - requires external plugin
+      '^[a-z]([a-z0-9-]*[a-z0-9])?(\\.port|\\.adapter)?\\.ts$',
       true,
     ],
   },

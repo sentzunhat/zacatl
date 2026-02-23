@@ -1,10 +1,10 @@
-import proxy from "@fastify/http-proxy";
-import type { FastifyInstance } from "fastify";
+import proxy from '@fastify/http-proxy';
+import type { FastifyInstance } from 'fastify';
 
-import { ZodTypeProvider } from "@zacatl/third-party/fastify";
+import { ZodTypeProvider } from '@zacatl/third-party/fastify';
 
-import type { ApiServerPort, ProxyConfig } from "./port";
-import type { HookHandler, RouteHandler } from "../../../layers/application";
+import type { ApiServerPort, ProxyConfig } from './port';
+import type { HookHandler, RouteHandler } from '../../../layers/application';
 
 /**
  * FastifyApiAdapter - Implements ApiServerPort for Fastify framework
@@ -35,7 +35,7 @@ export class FastifyApiAdapter implements ApiServerPort {
   }
 
   async listen(port: number): Promise<void> {
-    await this.server.listen({ port, host: "0.0.0.0" });
+    await this.server.listen({ port, host: '0.0.0.0' });
   }
 
   getRawServer(): unknown {

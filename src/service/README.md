@@ -11,7 +11,7 @@ Service, Layers, Platforms, ServiceType, DatabaseVendor, ServerVendor, ServerTyp
 ## Quick use
 
 ```typescript
-import { Service } from "@sentzunhat/zacatl/service";
+import { Service } from '@sentzunhat/zacatl/service';
 const svc = new Service(config);
 await svc.start();
 ```

@@ -1,7 +1,7 @@
-import { FastifySchema } from "@zacatl/third-party/fastify";
+import { FastifySchema } from '@zacatl/third-party/fastify';
 
-import { AbstractRouteHandler } from "./abstract";
-export type { Request } from "./abstract";
+import { AbstractRouteHandler } from './abstract';
+export type { Request } from './abstract';
 
 export interface PostRouteHandlerConstructor {
   url: string;
@@ -14,17 +14,11 @@ export abstract class PostRouteHandler<
   TResponse = void,
   TParams = void,
   THeaders = void,
-> extends AbstractRouteHandler<
-  TBody,
-  TQuerystring,
-  TResponse,
-  TParams,
-  THeaders
-> {
+> extends AbstractRouteHandler<TBody, TQuerystring, TResponse, TParams, THeaders> {
   constructor(args: PostRouteHandlerConstructor) {
     super({
       url: args.url,
-      method: "POST",
+      method: 'POST',
       schema: args.schema,
     });
   }

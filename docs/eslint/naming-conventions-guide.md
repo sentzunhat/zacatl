@@ -226,27 +226,27 @@ export interface Service<DataType, InputData, ReturnType> { ... }  // Too verbos
 ```typescript
 // ✅ DO: UPPER_CASE enum members
 export enum ORMType {
-  Mongoose = "mongoose",
-  Sequelize = "sequelize",
+  Mongoose = 'mongoose',
+  Sequelize = 'sequelize',
 }
 
 export enum ServiceType {
-  CLI = "cli",
-  DESKTOP = "desktop",
-  SERVER = "server",
+  CLI = 'cli',
+  DESKTOP = 'desktop',
+  SERVER = 'server',
 }
 
 export enum LogLevel {
-  TRACE = "trace",
-  INFO = "info",
-  WARN = "warn",
-  ERROR = "error",
+  TRACE = 'trace',
+  INFO = 'info',
+  WARN = 'warn',
+  ERROR = 'error',
 }
 
 // ❌ DON'T: camelCase or mixed case
 export enum ORMType {
-  mongoose = "mongoose", // Use Mongoose
-  sequelize = "sequelize", // Use Sequelize
+  mongoose = 'mongoose', // Use Mongoose
+  sequelize = 'sequelize', // Use Sequelize
 }
 ```
 
@@ -323,10 +323,10 @@ export class NotFound { ... }                   // Use NotFoundError
 
 ```javascript
 // eslint.config.mjs
-import { FlatCompat } from "@eslint/eslintrc";
-import js from "@eslint/js";
-import tseslint from "typescript-eslint";
-import namingConventionsConfig from "./eslint.naming-conventions.mjs";
+import { FlatCompat } from '@eslint/eslintrc';
+import js from '@eslint/js';
+import tseslint from 'typescript-eslint';
+import namingConventionsConfig from './eslint.naming-conventions.mjs';
 
 const compat = new FlatCompat({
   baseDirectory: import.meta.dirname,
@@ -335,7 +335,7 @@ const compat = new FlatCompat({
 
 export default [
   {
-    ignores: ["build/**/*", "dist/**/*", "node_modules/**/*", "coverage/**/*"],
+    ignores: ['build/**/*', 'dist/**/*', 'node_modules/**/*', 'coverage/**/*'],
   },
   namingConventionsConfig,
   js.configs.recommended,

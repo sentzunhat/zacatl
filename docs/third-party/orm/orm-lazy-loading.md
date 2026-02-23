@@ -12,13 +12,13 @@ When importing from the main zacatl package, mongoose and sequelize were being l
 
 ```typescript
 // This caused: SyntaxError: The requested module 'mongoose' does not provide an export named 'connection'
-import { Service } from "@sentzunhat/zacatl";
+import { Service } from '@sentzunhat/zacatl';
 ```
 
 **Root Cause:** Main index.ts was re-exporting ORMs through barrel exports:
 
 ```typescript
-export * from "./orm-exports"; // ❌ Eagerly loads mongoose + sequelize
+export * from './orm-exports'; // ❌ Eagerly loads mongoose + sequelize
 ```
 
 ---
@@ -44,11 +44,11 @@ export * from "./orm-exports"; // ❌ Eagerly loads mongoose + sequelize
 
 ```typescript
 // No ORM loading
-import { Service, BaseRepository } from "@sentzunhat/zacatl";
+import { Service, BaseRepository } from '@sentzunhat/zacatl';
 
 // Explicit opt-in
-import { mongoose, Schema } from "@sentzunhat/zacatl/third-party/mongoose";
-import { Sequelize, DataTypes } from "@sentzunhat/zacatl/third-party/sequelize";
+import { mongoose, Schema } from '@sentzunhat/zacatl/third-party/mongoose';
+import { Sequelize, DataTypes } from '@sentzunhat/zacatl/third-party/sequelize';
 ```
 
 **Pros:**
@@ -71,18 +71,18 @@ import { Sequelize, DataTypes } from "@sentzunhat/zacatl/third-party/sequelize";
 
 ```typescript
 // ❌ This loads mongoose at runtime (even if only types needed)
-import { Model } from "mongoose";
+import { Model } from 'mongoose';
 
 // ✅ This only loads types at compile time
-import type { Model } from "mongoose";
+import type { Model } from 'mongoose';
 ```
 
 **Implementation:**
 
 ```typescript
 // src/service/layers/infrastructure/repositories/types.ts
-import type { Model, Schema } from "mongoose"; // Type-only
-import type { Sequelize, DataTypes } from "sequelize"; // Type-only
+import type { Model, Schema } from 'mongoose'; // Type-only
+import type { Sequelize, DataTypes } from 'sequelize'; // Type-only
 ```
 
 **Why This Works:**
@@ -99,14 +99,16 @@ import type { Sequelize, DataTypes } from "sequelize"; // Type-only
 
 ```typescript
 // src/service/layers/infrastructure/orm/adapter-loader.ts
-export async function loadMongooseAdapter<D, I, O>(config: MongooseRepositoryConfig<D>): Promise<ORMAdapter<D, I, O>> {
+export async function loadMongooseAdapter<D, I, O>(
+  config: MongooseRepositoryConfig<D>,
+): Promise<ORMAdapter<D, I, O>> {
   try {
     // Dynamic import - only loads when Mongoose is actually used
-    const adapters = await import("./adapters/mongoose-adapter");
+    const adapters = await import('./adapters/mongoose-adapter');
     return new adapters.MongooseAdapter<D, I, O>(config);
   } catch (error: any) {
-    if (error.code === "ERR_MODULE_NOT_FOUND") {
-      throw new Error("Mongoose not installed. Run: npm install mongoose");
+    if (error.code === 'ERR_MODULE_NOT_FOUND') {
+      throw new Error('Mongoose not installed. Run: npm install mongoose');
     }
     throw error;
   }
@@ -205,7 +207,7 @@ export const mongoose = new Proxy(
   {},
   {
     get(target, prop) {
-      const actual = require("mongoose");
+      const actual = require('mongoose');
       return actual[prop];
     },
   },
@@ -238,7 +240,7 @@ export const mongoose = new Proxy(
 
 ```typescript
 // src/index.ts
-export * from "./orm-exports"; // ❌ Eager loading
+export * from './orm-exports'; // ❌ Eager loading
 ```
 
 **After:**
@@ -259,9 +261,17 @@ src/third-party/
 
 ```typescript
 // src/third-party/mongoose.ts
-export { default as mongoose, Mongoose, Schema, Model, Document, connect, connection } from "mongoose";
+export {
+  default as mongoose,
+  Mongoose,
+  Schema,
+  Model,
+  Document,
+  connect,
+  connection,
+} from 'mongoose';
 
-export type { Model as MongooseModel } from "mongoose";
+export type { Model as MongooseModel } from 'mongoose';
 ```
 
 #### 3. **Updated package.json Exports**
@@ -289,8 +299,8 @@ export type { Model as MongooseModel } from "mongoose";
 
 ```typescript
 // src/service/layers/infrastructure/repositories/types.ts
-import type { Model, Schema } from "mongoose"; // Was: import { ... }
-import type { Sequelize, DataTypes } from "sequelize"; // Was: import { ... }
+import type { Model, Schema } from 'mongoose'; // Was: import { ... }
+import type { Sequelize, DataTypes } from 'sequelize'; // Was: import { ... }
 ```
 
 #### 5. **Removed ORM Re-exports from Infrastructure**
@@ -299,8 +309,8 @@ import type { Sequelize, DataTypes } from "sequelize"; // Was: import { ... }
 
 ```typescript
 // src/service/layers/infrastructure/index.ts
-export { Schema, Model } from "mongoose"; // ❌
-export { Sequelize, DataTypes } from "sequelize"; // ❌
+export { Schema, Model } from 'mongoose'; // ❌
+export { Sequelize, DataTypes } from 'sequelize'; // ❌
 ```
 
 **After:**
@@ -319,18 +329,18 @@ export { Sequelize, DataTypes } from "sequelize"; // ❌
 
 ```typescript
 // ORM exports available from main package
-import { Service, Schema, mongoose } from "@sentzunhat/zacatl";
+import { Service, Schema, mongoose } from '@sentzunhat/zacatl';
 ```
 
 ### v0.0.23+ (NEW)
 
 ```typescript
 // Main package - NO ORMs
-import { Service, BaseRepository } from "@sentzunhat/zacatl";
+import { Service, BaseRepository } from '@sentzunhat/zacatl';
 
 // ORM imports - opt-in from dedicated paths
-import { mongoose, Schema } from "@sentzunhat/zacatl/third-party/mongoose";
-import { Sequelize, DataTypes } from "@sentzunhat/zacatl/third-party/sequelize";
+import { mongoose, Schema } from '@sentzunhat/zacatl/third-party/mongoose';
+import { Sequelize, DataTypes } from '@sentzunhat/zacatl/third-party/sequelize';
 ```
 
 ### Non-Breaking for Most Users
@@ -339,8 +349,8 @@ If you weren't importing ORMs from zacatl (best practice), no changes needed:
 
 ```typescript
 // Still works fine ✅
-import { Service } from "@sentzunhat/zacatl";
-import { Schema } from "mongoose"; // Direct import
+import { Service } from '@sentzunhat/zacatl';
+import { Schema } from 'mongoose'; // Direct import
 ```
 
 ---
@@ -350,8 +360,8 @@ import { Schema } from "mongoose"; // Direct import
 Added comprehensive test suite ([test/unit/conditional-exports.test.ts](test/unit/conditional-exports.test.ts)):
 
 ```typescript
-it("should import from main package without loading ORMs", async () => {
-  const mainExports = await import("../../src/index.js");
+it('should import from main package without loading ORMs', async () => {
+  const mainExports = await import('../../src/index.js');
 
   expect(mainExports.Service).toBeDefined();
   expect(mainExports.resolveDependency).toBeDefined();
@@ -361,8 +371,8 @@ it("should import from main package without loading ORMs", async () => {
   expect(mainExports.Sequelize).toBeUndefined();
 });
 
-it("should import Mongoose from dedicated entry point", async () => {
-  const mongooseExports = await import("../../src/third-party/mongoose.js");
+it('should import Mongoose from dedicated entry point', async () => {
+  const mongooseExports = await import('../../src/third-party/mongoose.js');
 
   // ✅ Available from dedicated path
   expect(mongooseExports.mongoose).toBeDefined();
@@ -384,7 +394,7 @@ it("should import Mongoose from dedicated entry point", async () => {
 ### 1. **No Eager Loading**
 
 ```typescript
-import { Service } from "@sentzunhat/zacatl"; // ✅ No mongoose/sequelize loaded
+import { Service } from '@sentzunhat/zacatl'; // ✅ No mongoose/sequelize loaded
 ```
 
 ### 2. **Smaller Bundle Size**

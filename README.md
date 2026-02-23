@@ -127,8 +127,8 @@ npm run check:peers
 ### Hello World HTTP Service
 
 ```typescript
-import Fastify from "fastify";
-import { Service } from "@sentzunhat/zacatl";
+import Fastify from 'fastify';
+import { Service } from '@sentzunhat/zacatl';
 
 const fastify = Fastify();
 
@@ -143,7 +143,7 @@ const service = new Service({
   },
   platforms: {
     server: {
-      name: "hello-service",
+      name: 'hello-service',
       server: {
         type: ServerType.SERVER,
         vendor: ServerVendor.FASTIFY,
@@ -159,10 +159,10 @@ await service.start({ port: 3000 });
 ### CLI / Desktop Application
 
 ```typescript
-import { Service, resolveDependency } from "@sentzunhat/zacatl";
+import { Service, resolveDependency } from '@sentzunhat/zacatl';
 
 class MyService {
-  doSomething = async () => console.log("Hello from CLI!");
+  doSomething = async () => console.log('Hello from CLI!');
 }
 
 const service = new Service({
@@ -171,12 +171,12 @@ const service = new Service({
     domain: { services: [MyService] },
   },
   platforms: {
-    cli: { name: "my-cli", version: "1.0.0" },
+    cli: { name: 'my-cli', version: '1.0.0' },
   },
 });
 
 await service.start();
-const myService = resolveDependency<MyService>("MyService");
+const myService = resolveDependency<MyService>('MyService');
 await myService.doSomething();
 ```
 
@@ -203,10 +203,10 @@ Each layer has a single responsibility, and dependencies flow strictly inward.
 ### Sequelize
 
 ```typescript
-import { Sequelize } from "sequelize";
-import { Service } from "@sentzunhat/zacatl";
+import { Sequelize } from 'sequelize';
+import { Service } from '@sentzunhat/zacatl';
 
-const sequelize = new Sequelize("postgresql://user:pass@localhost/db");
+const sequelize = new Sequelize('postgresql://user:pass@localhost/db');
 
 const service = new Service({
   type: ServiceType.SERVER,
@@ -217,7 +217,7 @@ const service = new Service({
   },
   platforms: {
     server: {
-      name: "my-service",
+      name: 'my-service',
       server: {
         type: ServerType.SERVER,
         vendor: ServerVendor.FASTIFY,
@@ -237,8 +237,8 @@ const service = new Service({
 ### MongoDB (Mongoose)
 
 ```typescript
-import mongoose from "mongoose";
-import { Service } from "@sentzunhat/zacatl";
+import mongoose from 'mongoose';
+import { Service } from '@sentzunhat/zacatl';
 
 const service = new Service({
   type: ServiceType.SERVER,
@@ -249,7 +249,7 @@ const service = new Service({
   },
   platforms: {
     server: {
-      name: "my-service",
+      name: 'my-service',
       server: {
         type: ServerType.SERVER,
         vendor: ServerVendor.FASTIFY,
@@ -259,7 +259,7 @@ const service = new Service({
         {
           vendor: DatabaseVendor.MONGOOSE,
           instance: mongoose,
-          connectionString: "mongodb://localhost/mydb",
+          connectionString: 'mongodb://localhost/mydb',
         },
       ],
     },
@@ -272,7 +272,7 @@ const service = new Service({
 Implement `IRepository<T>` for any database:
 
 ```typescript
-import { IRepository } from "@sentzunhat/zacatl";
+import { IRepository } from '@sentzunhat/zacatl';
 
 class MyRepository<T> implements IRepository<T> {
   findById = async (id: string): Promise<T | null> => {
@@ -299,13 +299,13 @@ class MyRepository<T> implements IRepository<T> {
 ## 🌐 Internationalization
 
 ```typescript
-import { createI18n, FilesystemAdapter } from "@sentzunhat/zacatl";
+import { createI18n, FilesystemAdapter } from '@sentzunhat/zacatl';
 
 const i18n = createI18n();
-const greeting = i18n.t("greeting"); // Loads from src/localization/locales/
+const greeting = i18n.t('greeting'); // Loads from src/localization/locales/
 
-await i18n.setLanguage("es");
-const saludo = i18n.t("greeting"); // Translations loaded automatically
+await i18n.setLanguage('es');
+const saludo = i18n.t('greeting'); // Translations loaded automatically
 ```
 
 Place translation files in `src/localization/locales/`:
@@ -323,18 +323,18 @@ Place translation files in `src/localization/locales/`:
 ## ✅ Validation with Zod
 
 ```typescript
-import { z } from "zod";
-import { loadConfig } from "@sentzunhat/zacatl";
+import { z } from 'zod';
+import { loadConfig } from '@sentzunhat/zacatl';
 
 const AppConfigSchema = z.object({
   server: z.object({
     port: z.number().min(1).max(65535),
     host: z.string(),
   }),
-  logLevel: z.enum(["debug", "info", "warn", "error"]).default("info"),
+  logLevel: z.enum(['debug', 'info', 'warn', 'error']).default('info'),
 });
 
-const config = loadConfig("./config/app.yaml", "yaml", AppConfigSchema);
+const config = loadConfig('./config/app.yaml', 'yaml', AppConfigSchema);
 ```
 
 > **Coming Soon**: Yup support and optional validation for maximum flexibility. See [Roadmap: Schema Validation Flexibility](docs/roadmap/index.md#schema-validation-flexibility-v0040--v010).
@@ -344,10 +344,18 @@ const config = loadConfig("./config/app.yaml", "yaml", AppConfigSchema);
 Zacatl includes 7 custom error types with built-in correlation IDs:
 
 ```typescript
-import { BadRequestError, NotFoundError, UnauthorizedError, ForbiddenError, ValidationError, InternalServerError, BadResourceError } from "@sentzunhat/zacatl";
+import {
+  BadRequestError,
+  NotFoundError,
+  UnauthorizedError,
+  ForbiddenError,
+  ValidationError,
+  InternalServerError,
+  BadResourceError,
+} from '@sentzunhat/zacatl';
 
-throw new ValidationError({ message: "Email is required" });
-throw new NotFoundError({ message: "User not found", metadata: { userId: 123 } });
+throw new ValidationError({ message: 'Email is required' });
+throw new NotFoundError({ message: 'User not found', metadata: { userId: 123 } });
 ```
 
 ## 🧪 Testing

@@ -1,21 +1,21 @@
 #!/usr/bin/env node
-import fs from "fs";
-import path from "path";
-import { fileURLToPath } from "url";
-import { dirname } from "path";
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const rootDir = path.resolve(__dirname, "..");
+const rootDir = path.resolve(__dirname, '..');
 
-const targetDir = process.argv[2] || "build";
+const targetDir = process.argv[2] || 'build';
 let distDir: string;
 
 if (path.isAbsolute(targetDir)) {
   distDir = targetDir;
 } else {
   distDir = path.resolve(process.cwd(), targetDir);
-  if (!fs.existsSync(distDir) && targetDir === "build") {
-    const rootBuild = path.join(rootDir, "build");
+  if (!fs.existsSync(distDir) && targetDir === 'build') {
+    const rootBuild = path.join(rootDir, 'build');
     if (fs.existsSync(rootBuild)) distDir = rootBuild;
   }
 }
@@ -29,16 +29,16 @@ function walkDir(dir: string): string[] {
   const files: string[] = [];
   const items = fs.readdirSync(dir, { withFileTypes: true });
   for (const item of items) {
-    if (item.name.startsWith(".")) continue;
+    if (item.name.startsWith('.')) continue;
     const fullPath = path.join(dir, item.name);
     if (item.isDirectory()) files.push(...walkDir(fullPath));
-    else if (item.isFile() && item.name.endsWith(".js")) files.push(fullPath);
+    else if (item.isFile() && item.name.endsWith('.js')) files.push(fullPath);
   }
   return files;
 }
 
 function fixFile(filePath: string) {
-  let content = fs.readFileSync(filePath, "utf-8");
+  let content = fs.readFileSync(filePath, 'utf-8');
   const original = content;
   const fileDir = path.dirname(filePath);
 
@@ -50,7 +50,7 @@ function fixFile(filePath: string) {
 
   patterns.forEach((pattern) => {
     content = content.replace(pattern, (match, importPath: string) => {
-      if (importPath.endsWith(".json")) return match;
+      if (importPath.endsWith('.json')) return match;
       const resolvedPath = path.resolve(fileDir, importPath);
       if (fs.existsSync(resolvedPath) && fs.statSync(resolvedPath).isDirectory()) {
         return match
@@ -65,7 +65,7 @@ function fixFile(filePath: string) {
   });
 
   if (content !== original) {
-    fs.writeFileSync(filePath, content, "utf-8");
+    fs.writeFileSync(filePath, content, 'utf-8');
     return true;
   }
   return false;

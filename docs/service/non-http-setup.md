@@ -16,12 +16,12 @@
 ## Quick Start Template
 
 ```typescript
-import { Service, resolveDependency } from "@sentzunhat/zacatl";
+import { Service, resolveDependency } from '@sentzunhat/zacatl';
 
 // 1. Define your providers (domain services)
 class MyBusinessService {
   async doWork() {
-    console.log("Business logic here");
+    console.log('Business logic here');
   }
 }
 
@@ -37,7 +37,7 @@ await service.start();
 
 // 3. Resolve and use
 // Note: prefer class token (MyBusinessService) over string token for type safety
-const businessService = resolveDependency<MyBusinessService>("MyBusinessService");
+const businessService = resolveDependency<MyBusinessService>('MyBusinessService');
 await businessService.doWork();
 ```
 
@@ -46,10 +46,10 @@ await businessService.doWork();
 ## With Database Repository
 
 ```typescript
-import { Service, resolveDependency, BaseRepository, ORMType } from "@sentzunhat/zacatl";
-import { Schema } from "mongoose";
-import mongoose from "mongoose";
-import { singleton } from "tsyringe";
+import { Service, resolveDependency, BaseRepository, ORMType } from '@sentzunhat/zacatl';
+import { Schema } from 'mongoose';
+import mongoose from 'mongoose';
+import { singleton } from 'tsyringe';
 
 // 1. Define your data model
 interface User {
@@ -74,7 +74,7 @@ class UserRepository extends BaseRepository<User, User, UserOutput> {
   constructor() {
     super({
       type: ORMType.Mongoose,
-      name: "User",
+      name: 'User',
       schema: UserSchema,
     });
   }
@@ -95,7 +95,7 @@ class UserService {
 }
 
 // 4. Setup service with database
-const mongoUri = "mongodb://localhost:27017/mydb";
+const mongoUri = 'mongodb://localhost:27017/mydb';
 
 const service = new Service({
   type: ServiceType.SERVER,
@@ -105,7 +105,7 @@ const service = new Service({
   },
   platforms: {
     server: {
-      name: "my-cli-tool",
+      name: 'my-cli-tool',
       databases: [
         {
           vendor: DatabaseVendor.MONGOOSE,
@@ -120,9 +120,9 @@ await service.start();
 
 // 5. Use your services
 // Note: prefer class token (UserService) over string token for type safety
-const userService = resolveDependency<UserService>("UserService");
-const user = await userService.createUser("Alice", "alice@example.com");
-console.log("Created user:", user);
+const userService = resolveDependency<UserService>('UserService');
+const user = await userService.createUser('Alice', 'alice@example.com');
+console.log('Created user:', user);
 ```
 
 ---
@@ -132,7 +132,7 @@ console.log("Created user:", user);
 ### Pattern 1: Constructor Injection (Recommended)
 
 ```typescript
-import { singleton } from "tsyringe";
+import { singleton } from 'tsyringe';
 
 @singleton()
 class EmailService {
@@ -144,10 +144,7 @@ class EmailService {
 @singleton()
 class NotificationService {
   // Dependencies injected via constructor
-  constructor(
-    private emailService: EmailService,
-    private userRepo: UserRepository,
-  ) {}
+  constructor(private emailService: EmailService, private userRepo: UserRepository) {}
 
   async notifyUser(userId: string, message: string) {
     const user = await this.userRepo.findById(userId);
@@ -170,11 +167,11 @@ const service = new Service({
 ### Pattern 2: Manual Resolution
 
 ```typescript
-import { resolveDependency } from "@sentzunhat/zacatl";
+import { resolveDependency } from '@sentzunhat/zacatl';
 
 // After service.start()
-const emailService = resolveDependency<EmailService>("EmailService");
-await emailService.sendEmail("test@example.com", "Hello");
+const emailService = resolveDependency<EmailService>('EmailService');
+await emailService.sendEmail('test@example.com', 'Hello');
 ```
 
 ---
@@ -182,7 +179,7 @@ await emailService.sendEmail("test@example.com", "Hello");
 ## Multiple Repositories
 
 ```typescript
-import { Schema } from "mongoose";
+import { Schema } from 'mongoose';
 
 // Product repository
 const ProductSchema = new Schema({
@@ -193,7 +190,7 @@ const ProductSchema = new Schema({
 @singleton()
 class ProductRepository extends BaseRepository<any, any, any> {
   constructor() {
-    super({ type: ORMType.Mongoose, name: "Product", schema: ProductSchema });
+    super({ type: ORMType.Mongoose, name: 'Product', schema: ProductSchema });
   }
 }
 
@@ -207,7 +204,7 @@ const OrderSchema = new Schema({
 @singleton()
 class OrderRepository extends BaseRepository<any, any, any> {
   constructor() {
-    super({ type: ORMType.Mongoose, name: "Order", schema: OrderSchema });
+    super({ type: ORMType.Mongoose, name: 'Order', schema: OrderSchema });
   }
 }
 
@@ -225,7 +222,7 @@ class OrderService {
     const product = await this.productRepo.findById(productId);
 
     if (!user || !product) {
-      throw new Error("User or product not found");
+      throw new Error('User or product not found');
     }
 
     return this.orderRepo.create({ userId, productId, quantity });
@@ -243,7 +240,7 @@ const service = new Service({
   },
   platforms: {
     server: {
-      name: "order-processor",
+      name: 'order-processor',
       databases: [
         {
           vendor: DatabaseVendor.MONGOOSE,
@@ -260,8 +257,8 @@ const service = new Service({
 ## Configuration Loading
 
 ```typescript
-import { loadConfig } from "@sentzunhat/zacatl/config";
-import { z } from "zod";
+import { loadConfig } from '@sentzunhat/zacatl/config';
+import { z } from 'zod';
 
 // Define config schema
 const ConfigSchema = z.object({
@@ -276,7 +273,7 @@ const ConfigSchema = z.object({
 });
 
 // Load and validate
-const config = loadConfig("./config/app.yaml", "yaml", ConfigSchema);
+const config = loadConfig('./config/app.yaml', 'yaml', ConfigSchema);
 
 // Use in service
 const service = new Service({
@@ -303,7 +300,7 @@ const service = new Service({
 ## Error Handling
 
 ```typescript
-import { NotFoundError, ValidationError, InternalServerError } from "@sentzunhat/zacatl/errors";
+import { NotFoundError, ValidationError, InternalServerError } from '@sentzunhat/zacatl/errors';
 
 @singleton()
 class UserService {
@@ -311,12 +308,12 @@ class UserService {
 
   async getUser(id: string) {
     if (!id) {
-      throw new ValidationError({ message: "User ID is required" });
+      throw new ValidationError({ message: 'User ID is required' });
     }
 
     const user = await this.userRepo.findById(id);
     if (!user) {
-      throw new NotFoundError({ message: "User not found", metadata: { userId: id } });
+      throw new NotFoundError({ message: 'User not found', metadata: { userId: id } });
     }
 
     return user;
@@ -329,10 +326,10 @@ class UserService {
       return user;
     } catch (error) {
       if (error instanceof NotFoundError) {
-        console.error("User does not exist:", error.metadata);
+        console.error('User does not exist:', error.metadata);
         return null;
       }
-      throw new InternalServerError("Failed to process user", {
+      throw new InternalServerError('Failed to process user', {
         originalError: error,
       });
     }
@@ -345,18 +342,18 @@ class UserService {
 ## Logging
 
 ```typescript
-import { logger } from "@sentzunhat/zacatl";
+import { logger } from '@sentzunhat/zacatl';
 
 @singleton()
 class BackgroundWorker {
   async processJobs() {
-    logger.info("Starting job processing");
+    logger.info('Starting job processing');
 
     try {
       // Do work
-      logger.info("Job completed successfully");
+      logger.info('Job completed successfully');
     } catch (error) {
-      logger.error("Job failed", { error });
+      logger.error('Job failed', { error });
     }
   }
 }
@@ -368,21 +365,21 @@ class BackgroundWorker {
 
 ```typescript
 #!/usr/bin/env node
-import { Service, resolveDependency } from "@sentzunhat/zacatl";
-import { BaseRepository, ORMType } from "@sentzunhat/zacatl/infrastructure";
-import { loadConfig } from "@sentzunhat/zacatl/config";
-import { logger } from "@sentzunhat/zacatl";
-import { Schema } from "mongoose";
-import mongoose from "mongoose";
-import { singleton } from "tsyringe";
-import { z } from "zod";
+import { Service, resolveDependency } from '@sentzunhat/zacatl';
+import { BaseRepository, ORMType } from '@sentzunhat/zacatl/infrastructure';
+import { loadConfig } from '@sentzunhat/zacatl/config';
+import { logger } from '@sentzunhat/zacatl';
+import { Schema } from 'mongoose';
+import mongoose from 'mongoose';
+import { singleton } from 'tsyringe';
+import { z } from 'zod';
 
 // Config
 const ConfigSchema = z.object({
   mongodb: z.string(),
 });
 
-const config = loadConfig("./config.yaml", "yaml", ConfigSchema);
+const config = loadConfig('./config.yaml', 'yaml', ConfigSchema);
 
 // Repository
 const TaskSchema = new Schema({
@@ -393,7 +390,7 @@ const TaskSchema = new Schema({
 @singleton()
 class TaskRepository extends BaseRepository<any, any, any> {
   constructor() {
-    super({ type: ORMType.Mongoose, name: "Task", schema: TaskSchema });
+    super({ type: ORMType.Mongoose, name: 'Task', schema: TaskSchema });
   }
 }
 
@@ -427,7 +424,7 @@ async function main() {
     },
     platforms: {
       server: {
-        name: "task-cli",
+        name: 'task-cli',
         databases: [
           {
             vendor: DatabaseVendor.MONGOOSE,
@@ -440,30 +437,30 @@ async function main() {
 
   await service.start();
 
-  const taskService = resolveDependency<TaskService>("TaskService");
+  const taskService = resolveDependency<TaskService>('TaskService');
 
   const command = process.argv[2];
 
   switch (command) {
-    case "add":
+    case 'add':
       const title = process.argv[3];
       const task = await taskService.addTask(title);
-      logger.info("Task added", { task });
+      logger.info('Task added', { task });
       break;
 
-    case "list":
+    case 'list':
       const tasks = await taskService.listTasks();
-      console.log("Tasks:", tasks);
+      console.log('Tasks:', tasks);
       break;
 
-    case "complete":
+    case 'complete':
       const id = process.argv[3];
       await taskService.completeTask(id);
-      logger.info("Task completed", { id });
+      logger.info('Task completed', { id });
       break;
 
     default:
-      console.log("Usage: task-cli [add|list|complete] [args]");
+      console.log('Usage: task-cli [add|list|complete] [args]');
   }
 
   await mongoose.disconnect();
@@ -471,7 +468,7 @@ async function main() {
 }
 
 main().catch((error) => {
-  logger.error("CLI failed", { error });
+  logger.error('CLI failed', { error });
   process.exit(1);
 });
 ```
@@ -519,7 +516,7 @@ const service = new Service({
 
 await service.start();
 
-const worker = resolveDependency<EmailWorker>("EmailWorker");
+const worker = resolveDependency<EmailWorker>('EmailWorker');
 await worker.processQueue();
 ```
 
@@ -528,10 +525,7 @@ await worker.processQueue();
 ```typescript
 @singleton()
 class MigrationService {
-  constructor(
-    private oldRepo: OldDataRepository,
-    private newRepo: NewDataRepository,
-  ) {}
+  constructor(private oldRepo: OldDataRepository, private newRepo: NewDataRepository) {}
 
   async migrate() {
     const oldModel = this.oldRepo.model as MongooseModel<OldData>;
@@ -555,14 +549,14 @@ const service = new Service({
   },
   platforms: {
     server: {
-      name: "migration",
+      name: 'migration',
       databases: [{ vendor: DatabaseVendor.MONGOOSE, instance: mongoose.connect(uri) }],
     },
   },
 });
 
 await service.start();
-const migration = resolveDependency<MigrationService>("MigrationService");
+const migration = resolveDependency<MigrationService>('MigrationService');
 await migration.migrate();
 ```
 

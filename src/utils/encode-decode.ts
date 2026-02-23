@@ -1,24 +1,24 @@
-import { Buffer } from "buffer";
+import { Buffer } from 'buffer';
 
 export type BufferEncodingInput =
-  | "utf8"
-  | "utf-8"
-  | "base64"
-  | "base64url"
-  | "hex"
-  | "ascii"
-  | "binary"
-  | "latin1";
+  | 'utf8'
+  | 'utf-8'
+  | 'base64'
+  | 'base64url'
+  | 'hex'
+  | 'ascii'
+  | 'binary'
+  | 'latin1';
 
 export type BufferEncodingOutput =
-  | "utf8"
-  | "utf-8"
-  | "base64"
-  | "base64url"
-  | "hex"
-  | "ascii"
-  | "binary"
-  | "latin1";
+  | 'utf8'
+  | 'utf-8'
+  | 'base64'
+  | 'base64url'
+  | 'hex'
+  | 'ascii'
+  | 'binary'
+  | 'latin1';
 
 export interface EncodeOptions {
   input: string;
@@ -65,8 +65,7 @@ export interface DecodeOptions {
  * ```
  */
 export const encode = ({ input, encoding = {} }: EncodeOptions): string => {
-  const { input: inputEncoding = "utf-8", output: outputEncoding = "base64" } =
-    encoding;
+  const { input: inputEncoding = 'utf-8', output: outputEncoding = 'base64' } = encoding;
   return Buffer.from(input, inputEncoding).toString(outputEncoding);
 };
 
@@ -99,7 +98,6 @@ export const encode = ({ input, encoding = {} }: EncodeOptions): string => {
  * ```
  */
 export const decode = ({ input, encoding = {} }: DecodeOptions): string => {
-  const { input: inputEncoding = "base64", output: outputEncoding = "utf-8" } =
-    encoding;
+  const { input: inputEncoding = 'base64', output: outputEncoding = 'utf-8' } = encoding;
   return Buffer.from(input, inputEncoding).toString(outputEncoding);
 };

@@ -1,18 +1,18 @@
-import { Express } from "express";
-import { FastifyInstance } from "fastify";
+import { Express } from 'express';
+import { FastifyInstance } from 'fastify';
 
-import { CustomError, InternalServerError } from "@zacatl/error";
+import { CustomError, InternalServerError } from '@zacatl/error';
 
-import { ExpressApiAdapter, FastifyApiAdapter } from "./api/adapters";
-import { ApiServer } from "./api/api-server";
-import type { ApiServerPort } from "./api/port";
-import { DatabaseServer } from "./database/database-server";
-import type { DatabaseConfig } from "./database/port";
-import { ExpressPageAdapter, FastifyPageAdapter } from "./page/adapters";
-import { PageServer } from "./page/page-server";
-import type { PageServerPort } from "./page/port";
-import { ServerVendor, type HttpServerConfig } from "./types/server-config";
-import type { RestApplicationEntryPoints } from "../../layers/application/types";
+import { ExpressApiAdapter, FastifyApiAdapter } from './api/adapters';
+import { ApiServer } from './api/api-server';
+import type { ApiServerPort } from './api/port';
+import { DatabaseServer } from './database/database-server';
+import type { DatabaseConfig } from './database/port';
+import { ExpressPageAdapter, FastifyPageAdapter } from './page/adapters';
+import { PageServer } from './page/page-server';
+import type { PageServerPort } from './page/port';
+import { ServerVendor, type HttpServerConfig } from './types/server-config';
+import type { RestApplicationEntryPoints } from '../../layers/application/types';
 
 interface ServerPageConfig {
   devServerUrl?: string;
@@ -82,9 +82,9 @@ export class Server {
     } else {
       throw new InternalServerError({
         message: `Unsupported server vendor: ${config.vendor}`,
-        reason: "Server vendor must be Fastify or Express",
-        component: "Server",
-        operation: "createAdapters",
+        reason: 'Server vendor must be Fastify or Express',
+        component: 'Server',
+        operation: 'createAdapters',
         metadata: { vendor: config.vendor },
       });
     }
@@ -173,10 +173,10 @@ export class Server {
       // 3. Start API server listening
       if (!this.apiServer) {
         throw new InternalServerError({
-          message: "ApiServer not initialized",
-          reason: "ApiServer failed to initialize",
-          component: "Server",
-          operation: "start",
+          message: 'ApiServer not initialized',
+          reason: 'ApiServer failed to initialize',
+          component: 'Server',
+          operation: 'start',
         });
       }
 
@@ -186,7 +186,7 @@ export class Server {
       throw new CustomError({
         message: `failed to start service "${this.config.name}"`,
         code: 500,
-        reason: "service start failed",
+        reason: 'service start failed',
         error: error as Error,
         metadata: {
           service: {

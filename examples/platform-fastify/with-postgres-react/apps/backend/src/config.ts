@@ -3,28 +3,23 @@
  * Simple, centralized configuration for the Fastify + PostgreSQL example
  */
 
-import type { FastifyInstance } from "@sentzunhat/zacatl/third-party/fastify";
-import type { Sequelize } from "sequelize";
-import { fileURLToPath } from "url";
-import { dirname, join } from "path";
-import {
-  ServiceType,
-  ServerType,
-  ServerVendor,
-  DatabaseVendor,
-} from "@sentzunhat/zacatl";
-import { GetAllGreetingsHandler } from "./application/handlers/greetings/get-all/handler";
-import { GetGreetingByIdHandler } from "./application/handlers/greetings/get-by-id/handler";
-import { CreateGreetingHandler } from "./application/handlers/greetings/create/handler";
-import { DeleteGreetingHandler } from "./application/handlers/greetings/delete/handler";
-import { GetRandomGreetingHandler } from "./application/handlers/greetings/get-random/handler";
-import { initGreetingModel } from "./infrastructure/greetings/models/greeting.model";
-import { repositories } from "./infrastructure/greetings/repositories/repositories";
-import { GreetingServiceAdapter } from "./domain/greetings/service";
+import type { FastifyInstance } from '@sentzunhat/zacatl/third-party/fastify';
+import type { Sequelize } from 'sequelize';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
+import { ServiceType, ServerType, ServerVendor, DatabaseVendor } from '@sentzunhat/zacatl';
+import { GetAllGreetingsHandler } from './application/handlers/greetings/get-all/handler';
+import { GetGreetingByIdHandler } from './application/handlers/greetings/get-by-id/handler';
+import { CreateGreetingHandler } from './application/handlers/greetings/create/handler';
+import { DeleteGreetingHandler } from './application/handlers/greetings/delete/handler';
+import { GetRandomGreetingHandler } from './application/handlers/greetings/get-random/handler';
+import { initGreetingModel } from './infrastructure/greetings/models/greeting.model';
+import { repositories } from './infrastructure/greetings/repositories/repositories';
+import { GreetingServiceAdapter } from './domain/greetings/service';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-const rootDir = join(__dirname, "..", "..", "..");
+const rootDir = join(__dirname, '..', '..', '..');
 
 export interface AppConfig {
   port: number;
@@ -32,21 +27,16 @@ export interface AppConfig {
 }
 
 export const config: AppConfig = {
-  port: parseInt(process.env["PORT"] || "8083", 10),
-  databaseUrl:
-    process.env["DATABASE_URL"] ||
-    "postgres://local:local@localhost:5432/appdb",
+  port: parseInt(process.env['PORT'] || '8083', 10),
+  databaseUrl: process.env['DATABASE_URL'] || 'postgres://local:local@localhost:5432/appdb',
 };
 
-export function createServiceConfig(
-  fastify: FastifyInstance,
-  sequelize: Sequelize,
-) {
+export function createServiceConfig(fastify: FastifyInstance, sequelize: Sequelize) {
   return {
     type: ServiceType.SERVER,
     platforms: {
       server: {
-        name: "fastify-sqlite",
+        name: 'fastify-sqlite',
         port: config.port,
         server: {
           type: ServerType.SERVER,
@@ -54,8 +44,8 @@ export function createServiceConfig(
           instance: fastify,
         },
         page: {
-          staticDir: join(rootDir, "apps/frontend/dist"),
-          apiPrefix: "/greetings",
+          staticDir: join(rootDir, 'apps/frontend/dist'),
+          apiPrefix: '/greetings',
         },
         databases: [
           {

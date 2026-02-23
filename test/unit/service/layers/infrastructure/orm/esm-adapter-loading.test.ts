@@ -1,8 +1,8 @@
-import { describe, expect, it, beforeAll } from "vitest";
-import { BaseRepository } from "../../../../../../src/service/layers/infrastructure/repositories/abstract";
-import { ORMType } from "../../../../../../src/service/layers/infrastructure/repositories/types";
-import { Schema } from "mongoose";
-import { connectToMongoServerAndRegisterDependency } from "../../../../helpers/database/mongo";
+import { describe, expect, it, beforeAll } from 'vitest';
+import { BaseRepository } from '../../../../../../src/service/layers/infrastructure/repositories/abstract';
+import { ORMType } from '../../../../../../src/service/layers/infrastructure/repositories/types';
+import { Schema } from 'mongoose';
+import { connectToMongoServerAndRegisterDependency } from '../../../../helpers/database/mongo';
 
 /**
  * ESM Runtime Tests for Synchronous Adapter Loading
@@ -11,14 +11,14 @@ import { connectToMongoServerAndRegisterDependency } from "../../../../helpers/d
  * in ESM environments with synchronous initialization.
  */
 
-describe("ESM Adapter Loading", () => {
+describe('ESM Adapter Loading', () => {
   beforeAll(async () => {
     // Setup DI container with Mongoose for tests
     await connectToMongoServerAndRegisterDependency();
   });
 
-  describe("Synchronous Initialization", () => {
-    it("should create repository and initialize adapter synchronously", () => {
+  describe('Synchronous Initialization', () => {
+    it('should create repository and initialize adapter synchronously', () => {
       class TestRepository extends BaseRepository<any, string, any> {
         constructor() {
           super({
@@ -34,7 +34,7 @@ describe("ESM Adapter Loading", () => {
       expect(repo.model).toBeDefined();
     });
 
-    it("should make model available immediately after construction", () => {
+    it('should make model available immediately after construction', () => {
       class TestRepository extends BaseRepository<any, string, any> {
         constructor() {
           super({
@@ -51,7 +51,7 @@ describe("ESM Adapter Loading", () => {
       expect(repo.model).toBeDefined();
     });
 
-    it("should allow toLean to be called immediately", () => {
+    it('should allow toLean to be called immediately', () => {
       class TestRepository extends BaseRepository<any, string, any> {
         constructor() {
           super({
@@ -69,8 +69,8 @@ describe("ESM Adapter Loading", () => {
     });
   });
 
-  describe("Adapter Error Handling", () => {
-    it("should handle errors during adapter construction", () => {
+  describe('Adapter Error Handling', () => {
+    it('should handle errors during adapter construction', () => {
       class TestRepository extends BaseRepository<any, string, any> {
         constructor() {
           super({
@@ -84,7 +84,7 @@ describe("ESM Adapter Loading", () => {
       expect(() => new TestRepository()).not.toThrow();
     });
 
-    it("should use static imports for adapters", () => {
+    it('should use static imports for adapters', () => {
       // This test verifies that we use static imports not dynamic import()
       // by checking that repository construction is synchronous
 
@@ -108,8 +108,8 @@ describe("ESM Adapter Loading", () => {
     });
   });
 
-  describe("Repository Operations", () => {
-    it("should allow async methods to be called immediately", async () => {
+  describe('Repository Operations', () => {
+    it('should allow async methods to be called immediately', async () => {
       class TestRepository extends BaseRepository<any, string, any> {
         constructor() {
           super({
@@ -121,31 +121,24 @@ describe("ESM Adapter Loading", () => {
 
       const repo = new TestRepository();
 
-      const findByIdPromise = repo.findById("test-id").catch(() => null);
+      const findByIdPromise = repo.findById('test-id').catch(() => null);
       expect(findByIdPromise).toBeInstanceOf(Promise);
 
-      const createPromise = repo.create("test-data").catch(() => null);
+      const createPromise = repo.create('test-data').catch(() => null);
       expect(createPromise).toBeInstanceOf(Promise);
 
-      const updatePromise = repo
-        .update("test-id", "updated-data")
-        .catch(() => null);
+      const updatePromise = repo.update('test-id', 'updated-data').catch(() => null);
       expect(updatePromise).toBeInstanceOf(Promise);
 
-      const deletePromise = repo.delete("test-id").catch(() => null);
+      const deletePromise = repo.delete('test-id').catch(() => null);
       expect(deletePromise).toBeInstanceOf(Promise);
 
-      await Promise.all([
-        findByIdPromise,
-        createPromise,
-        updatePromise,
-        deletePromise,
-      ]);
+      await Promise.all([findByIdPromise, createPromise, updatePromise, deletePromise]);
     });
   });
 
-  describe("Concurrent Operations", () => {
-    it("should handle multiple concurrent calls without initialization races", async () => {
+  describe('Concurrent Operations', () => {
+    it('should handle multiple concurrent calls without initialization races', async () => {
       class TestRepository extends BaseRepository<any, string, any> {
         constructor() {
           super({
@@ -159,9 +152,9 @@ describe("ESM Adapter Loading", () => {
 
       // Multiple concurrent async calls work immediately - no race conditions
       const promises = [
-        repo.findById("1").catch(() => null),
-        repo.findById("2").catch(() => null),
-        repo.findById("3").catch(() => null),
+        repo.findById('1').catch(() => null),
+        repo.findById('2').catch(() => null),
+        repo.findById('3').catch(() => null),
       ];
 
       // Await all promises

@@ -1,7 +1,7 @@
-import type { Optional } from "../../../utils/optionals";
-import type { ConfigCLI } from "../cli/types";
-import type { ConfigDesktop } from "../desktop/types";
-import type { ConfigServer } from "../server/server";
+import type { Optional } from '../../../utils/optionals';
+import type { ConfigCLI } from '../cli/types';
+import type { ConfigDesktop } from '../desktop/types';
+import type { ConfigServer } from '../server/server';
 
 export interface ConfigPlatforms {
   /** Server configuration (required for SERVER type) */

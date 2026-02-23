@@ -5,9 +5,9 @@ Zacatl provides helpers to load **YAML** and **JSON** configuration files with o
 ## Import
 
 ```typescript
-import { loadJSON, loadYML } from "@sentzunhat/zacatl";
+import { loadJSON, loadYML } from '@sentzunhat/zacatl';
 // or via subpath:
-import { loadJSON, loadYML } from "@sentzunhat/zacatl/configuration";
+import { loadJSON, loadYML } from '@sentzunhat/zacatl/configuration';
 ```
 
 ## API
@@ -17,20 +17,20 @@ import { loadJSON, loadYML } from "@sentzunhat/zacatl/configuration";
 Load and parse a JSON (or JSONC) file. Optionally validate with a Zod schema.
 
 ```typescript
-import { loadJSON } from "@sentzunhat/zacatl";
-import { z } from "zod";
+import { loadJSON } from '@sentzunhat/zacatl';
+import { z } from 'zod';
 
 const schema = z.object({ port: z.number(), host: z.string() });
 
-const config = loadJSON("./config/server.json", schema);
+const config = loadJSON('./config/server.json', schema);
 console.log(config.port); // 3000
 ```
 
 ## Validate with Zod
 
 ```typescript
-import { loadJSON } from "@sentzunhat/zacatl";
-import { z } from "zod";
+import { loadJSON } from '@sentzunhat/zacatl';
+import { z } from 'zod';
 
 const schema = z.object({
   server: z.object({
@@ -42,14 +42,14 @@ const schema = z.object({
   }),
 });
 
-const config = loadJSON("./config/default.json", schema);
+const config = loadJSON('./config/default.json', schema);
 // config is fully typed as z.infer<typeof schema>
 ```
 
 ## Environment-Specific Files
 
 ```typescript
-const env = process.env.NODE_ENV ?? "development";
+const env = process.env.NODE_ENV ?? 'development';
 const config = loadJSON(`./config/${env}.json`);
 ```
 
@@ -58,9 +58,9 @@ const config = loadJSON(`./config/${env}.json`);
 Load and parse a YAML file. Optionally validate with a Zod schema. Also exported as `loadYAML`.
 
 ```typescript
-import { loadYML } from "@sentzunhat/zacatl";
+import { loadYML } from '@sentzunhat/zacatl';
 
-const config = loadYML("./config/app.yaml");
+const config = loadYML('./config/app.yaml');
 console.log(config.service.name);
 ```
 
@@ -75,11 +75,11 @@ console.log(config.service.name);
 
 ```yaml
 service:
-  name: "user-service"
+  name: 'user-service'
   port: 3000
 
 database:
-  host: "localhost"
+  host: 'localhost'
   maxConnections: 10
 ```
 

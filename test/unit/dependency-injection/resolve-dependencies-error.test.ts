@@ -3,30 +3,30 @@
  * is not registered in the DI container, rather than silently auto-registering it.
  */
 
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import "reflect-metadata";
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import 'reflect-metadata';
 
 import {
   clearContainer,
   registerSingleton,
   resolveDependencies,
-} from "../../../src/dependency-injection/container";
+} from '../../../src/dependency-injection/container';
 
 // A class that is intentionally NOT decorated with @injectable
 class UnregisteredService {
   doWork() {
-    return "work";
+    return 'work';
   }
 }
 
 // A class that IS decorated and will be manually registered
 class RegisteredService {
   doWork() {
-    return "registered";
+    return 'registered';
   }
 }
 
-describe("resolveDependencies — descriptive error on missing registration", () => {
+describe('resolveDependencies — descriptive error on missing registration', () => {
   beforeEach(() => {
     clearContainer();
   });
@@ -35,11 +35,11 @@ describe("resolveDependencies — descriptive error on missing registration", ()
     clearContainer();
   });
 
-  it("throws an Error (not a silent default) when class is not registered", () => {
+  it('throws an Error (not a silent default) when class is not registered', () => {
     expect(() => resolveDependencies([UnregisteredService])).toThrow();
   });
 
-  it("error message names the missing class", () => {
+  it('error message names the missing class', () => {
     let thrown: Error | null = null;
     try {
       resolveDependencies([UnregisteredService]);
@@ -51,7 +51,7 @@ describe("resolveDependencies — descriptive error on missing registration", ()
     expect(thrown!.message).toMatch(/UnregisteredService/);
   });
 
-  it("error message hints at @injectable decorator", () => {
+  it('error message hints at @injectable decorator', () => {
     let thrown: Error | null = null;
     try {
       resolveDependencies([UnregisteredService]);
@@ -65,7 +65,7 @@ describe("resolveDependencies — descriptive error on missing registration", ()
     expect(errorWithReason.reason).toMatch(/@injectable/);
   });
 
-  it("error message mentions layers config paths", () => {
+  it('error message mentions layers config paths', () => {
     let thrown: Error | null = null;
     try {
       resolveDependencies([UnregisteredService]);
@@ -79,7 +79,7 @@ describe("resolveDependencies — descriptive error on missing registration", ()
     expect(errorWithReason.reason).toMatch(/layers\./);
   });
 
-  it("resolves successfully when the class is properly registered", () => {
+  it('resolves successfully when the class is properly registered', () => {
     registerSingleton(RegisteredService, RegisteredService);
     const results = resolveDependencies([RegisteredService]);
     expect(results).toHaveLength(1);
@@ -87,10 +87,10 @@ describe("resolveDependencies — descriptive error on missing registration", ()
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const service = results[0]!;
     expect(service).toBeInstanceOf(RegisteredService);
-    expect(service.doWork()).toBe("registered");
+    expect(service.doWork()).toBe('registered');
   });
 
-  it("stops at first failure — does not partially resolve a batch", () => {
+  it('stops at first failure — does not partially resolve a batch', () => {
     registerSingleton(RegisteredService, RegisteredService);
 
     // Mix of registered + unregistered in one call

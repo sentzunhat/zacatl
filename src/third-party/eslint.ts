@@ -21,8 +21,8 @@
 export const tsEslintParser: unknown = (() => {
   try {
     // runtime import resolution may vary between environments
-    const mod = require("@typescript-eslint/parser");
-    const candidate = mod != null ? (mod.default ?? mod) : undefined;
+    const mod = require('@typescript-eslint/parser');
+    const candidate = mod != null ? mod.default ?? mod : undefined;
     return candidate as unknown;
   } catch {
     return undefined;
@@ -32,7 +32,7 @@ export const tsEslintParser: unknown = (() => {
 export const tseslint: unknown = (() => {
   try {
     // runtime import resolution may vary between environments
-    return require("typescript-eslint") as unknown;
+    return require('typescript-eslint') as unknown;
   } catch {
     return undefined;
   }
@@ -42,8 +42,8 @@ export const tseslint: unknown = (() => {
 export const tsEslintPlugin: unknown = (() => {
   try {
     // runtime import resolution may vary between environments
-    const mod = require("@typescript-eslint/eslint-plugin");
-    const candidate = mod != null ? (mod.default ?? mod) : undefined;
+    const mod = require('@typescript-eslint/eslint-plugin');
+    const candidate = mod != null ? mod.default ?? mod : undefined;
     return candidate as unknown;
   } catch {
     return undefined;
@@ -53,7 +53,7 @@ export const tsEslintPlugin: unknown = (() => {
 export const importPlugin: unknown = (() => {
   try {
     // runtime import resolution may vary between environments
-    return require("eslint-plugin-import") as unknown;
+    return require('eslint-plugin-import') as unknown;
   } catch {
     return undefined;
   }

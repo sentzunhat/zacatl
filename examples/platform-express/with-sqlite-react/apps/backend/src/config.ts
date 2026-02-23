@@ -3,36 +3,31 @@
  * Simple, centralized configuration for the Express + SQLite example
  */
 
-import type { Application } from "@sentzunhat/zacatl/third-party/express";
-import type { Sequelize } from "sequelize";
-import { fileURLToPath } from "url";
-import { dirname, join } from "path";
-import {
-  ServiceType,
-  ServerType,
-  ServerVendor,
-  DatabaseVendor,
-} from "@sentzunhat/zacatl";
-import type { ApplicationRestRoutes } from "@sentzunhat/zacatl/service";
-import { GetAllGreetingsHandler } from "./application/handlers/greetings/get-all/handler";
-import { GetGreetingByIdHandler } from "./application/handlers/greetings/get-by-id/handler";
-import { CreateGreetingHandler } from "./application/handlers/greetings/create/handler";
-import { DeleteGreetingHandler } from "./application/handlers/greetings/delete/handler";
-import { GetRandomGreetingHandler } from "./application/handlers/greetings/get-random/handler";
-import { initGreetingModel } from "./infrastructure/greetings/models/greeting.model";
-import { repositories } from "./infrastructure/greetings/repositories/repositories";
-import { GreetingServiceAdapter } from "./domain/greetings/service/index";
+import type { Application } from '@sentzunhat/zacatl/third-party/express';
+import type { Sequelize } from 'sequelize';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
+import { ServiceType, ServerType, ServerVendor, DatabaseVendor } from '@sentzunhat/zacatl';
+import type { ApplicationRestRoutes } from '@sentzunhat/zacatl/service';
+import { GetAllGreetingsHandler } from './application/handlers/greetings/get-all/handler';
+import { GetGreetingByIdHandler } from './application/handlers/greetings/get-by-id/handler';
+import { CreateGreetingHandler } from './application/handlers/greetings/create/handler';
+import { DeleteGreetingHandler } from './application/handlers/greetings/delete/handler';
+import { GetRandomGreetingHandler } from './application/handlers/greetings/get-random/handler';
+import { initGreetingModel } from './infrastructure/greetings/models/greeting.model';
+import { repositories } from './infrastructure/greetings/repositories/repositories';
+import { GreetingServiceAdapter } from './domain/greetings/service/index';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-const rootDir = join(__dirname, "..", "..", "..");
+const rootDir = join(__dirname, '..', '..', '..');
 export interface AppConfig {
   port: number;
   databaseUrl: string;
 }
 
 export const config: AppConfig = {
-  port: parseInt(process.env["PORT"] || "8181", 10),
-  databaseUrl: process.env["DATABASE_URL"] || "sqlite:database.sqlite",
+  port: parseInt(process.env['PORT'] || '8181', 10),
+  databaseUrl: process.env['DATABASE_URL'] || 'sqlite:database.sqlite',
 };
 
 export function createServiceConfig(app: Application, sequelize: Sequelize) {
@@ -40,7 +35,7 @@ export function createServiceConfig(app: Application, sequelize: Sequelize) {
     type: ServiceType.SERVER,
     platforms: {
       server: {
-        name: "express-sqlite",
+        name: 'express-sqlite',
         port: config.port,
         server: {
           type: ServerType.SERVER,
@@ -48,8 +43,8 @@ export function createServiceConfig(app: Application, sequelize: Sequelize) {
           instance: app,
         },
         page: {
-          staticDir: join(rootDir, "apps/frontend/dist"),
-          apiPrefix: "/greetings",
+          staticDir: join(rootDir, 'apps/frontend/dist'),
+          apiPrefix: '/greetings',
         },
         databases: [
           {

@@ -10,20 +10,20 @@ import {
   loadCatalog,
   mergeCatalogs,
   resolveBuiltInLocalesDir,
-} from "@sentzunhat/zacatl";
+} from '@sentzunhat/zacatl';
 
 import type {
   ConfigureI18nInput,
   I18nCatalogType,
   LoadCatalogInput,
   MergeCatalogsInput,
-} from "@sentzunhat/zacatl";
+} from '@sentzunhat/zacatl';
 ```
 
 ## Filesystem Adapter
 
 ```typescript
-const i18n = createI18n(new FilesystemAdapter("./src/localization/locales"));
+const i18n = createI18n(new FilesystemAdapter('./src/localization/locales'));
 ```
 
 **Expected structure:** `localesDir/language.json`
@@ -33,12 +33,12 @@ const i18n = createI18n(new FilesystemAdapter("./src/localization/locales"));
 In-memory translations (useful for testing).
 
 ```typescript
-import { MemoryAdapter, createI18n } from "@sentzunhat/zacatl";
+import { MemoryAdapter, createI18n } from '@sentzunhat/zacatl';
 
 const i18n = createI18n(
   new MemoryAdapter({
-    en: { translation: { greeting: "Hello" } },
-    es: { translation: { greeting: "Hola" } },
+    en: { translation: { greeting: 'Hello' } },
+    es: { translation: { greeting: 'Hola' } },
   }),
 );
 ```
@@ -48,7 +48,7 @@ const i18n = createI18n(
 Implement the `I18nPort` interface:
 
 ```typescript
-import type { I18nPort } from "@sentzunhat/zacatl";
+import type { I18nPort } from '@sentzunhat/zacatl';
 
 class MyAdapter implements I18nPort {
   async init?() {
@@ -57,14 +57,10 @@ class MyAdapter implements I18nPort {
 
   loadResources(language: string, namespace: string) {
     // Load and return translations
-    return { greeting: "Hello" };
+    return { greeting: 'Hello' };
   }
 
-  saveResources?(
-    language: string,
-    namespace: string,
-    resources: Record<string, unknown>,
-  ) {
+  saveResources?(language: string, namespace: string, resources: Record<string, unknown>) {
     // Optional: Save translations
   }
 }
@@ -75,17 +71,17 @@ class MyAdapter implements I18nPort {
 ### Basic Translation
 
 ```typescript
-i18n.t("welcome"); // "Welcome"
+i18n.t('welcome'); // "Welcome"
 
-await i18n.setLanguage("es");
-i18n.t("welcome"); // "Bienvenido"
+await i18n.setLanguage('es');
+i18n.t('welcome'); // "Bienvenido"
 ```
 
 ### With Variables (Interpolation)
 
 ```typescript
 // en.json: { "greeting": "Hello, {{name}}!" }
-i18n.t("greeting", { name: "John" }); // "Hello, John!"
+i18n.t('greeting', { name: 'John' }); // "Hello, John!"
 ```
 
 ### Nested Keys (Object Notation)

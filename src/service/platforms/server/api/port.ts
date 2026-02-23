@@ -1,4 +1,4 @@
-import type { HookHandler, RouteHandler } from "../../../layers/application";
+import type { HookHandler, RouteHandler } from '../../../layers/application';
 
 export interface ProxyConfig {
   upstream: string;

@@ -8,11 +8,11 @@ export {
   loadCatalog,
   resolveBuiltInLocalesDir,
   mergeCatalogs,
-} from "./i18n-node";
+} from './i18n-node';
 
 export type {
   I18nCatalogType,
   ConfigureI18nInput,
   LoadCatalogInput,
   MergeCatalogsInput,
-} from "./i18n-node";
+} from './i18n-node';

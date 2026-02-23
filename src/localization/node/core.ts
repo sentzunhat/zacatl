@@ -3,16 +3,16 @@
  * @module localization/i18n-node/core
  */
 
-import fs from "fs";
-import path from "path";
+import fs from 'fs';
+import path from 'path';
 
-import { readJsonFile, deepMerge, findExistingDir } from "./helpers";
+import { readJsonFile, deepMerge, findExistingDir } from './helpers';
 import type {
   I18nStaticCatalogType,
   LoadStaticCatalogInput,
   MergeStaticCatalogsInput,
-} from "./types";
-import { NotFoundError } from "../../error/index";
+} from './types';
+import { NotFoundError } from '../../error/index';
 
 /**
  * Load a static catalog from JSON files in a locales directory.
@@ -52,11 +52,11 @@ export const loadStaticCatalog = (input: LoadStaticCatalogInput): I18nStaticCata
  * @throws {Error} If the locales directory cannot be found
  */
 const getHere = (): string => {
-  if (typeof __dirname !== "undefined") return __dirname;
+  if (typeof __dirname !== 'undefined') return __dirname;
   if (
-    typeof process !== "undefined" &&
+    typeof process !== 'undefined' &&
     Array.isArray(process.argv) &&
-    typeof process.argv[1] === "string" &&
+    typeof process.argv[1] === 'string' &&
     process.argv[1].length > 0
   ) {
     return path.dirname(process.argv[1]);
@@ -68,18 +68,20 @@ export const resolveBuiltInLocalesDir = (): string => {
   const here = getHere();
 
   const candidates = [
-    path.resolve(here, "../locales"),
-    path.resolve(here, "../../../src/localization/locales"),
-    path.resolve(process.cwd(), "src/localization/locales"),
+    path.resolve(here, '../locales'),
+    path.resolve(here, '../../../src/localization/locales'),
+    path.resolve(process.cwd(), 'src/localization/locales'),
   ];
 
   const found = findExistingDir(candidates);
   if (found == null) {
     throw new NotFoundError({
-      message: `Unable to locate Zacatl built-in locales directory. Tried: ${candidates.join(", ")}`,
-      reason: "Built-in locales directory not found in expected paths",
-      component: "I18nNode",
-      operation: "getBuiltInLocalesDir",
+      message: `Unable to locate Zacatl built-in locales directory. Tried: ${candidates.join(
+        ', ',
+      )}`,
+      reason: 'Built-in locales directory not found in expected paths',
+      component: 'I18nNode',
+      operation: 'getBuiltInLocalesDir',
       metadata: { candidates },
     });
   }

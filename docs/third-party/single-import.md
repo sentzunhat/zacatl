@@ -10,11 +10,11 @@ With v0.0.20, you can import **everything** from `@sentzunhat/zacatl`. No need t
 
 ```typescript
 // ❌ OLD WAY - Multiple imports from different packages
-import { Service } from "@sentzunhat/zacatl";
-import { Schema, Model, Types } from "mongoose";
-import { DataTypes, Sequelize, Model as SequelizeModel } from "sequelize";
-import { container } from "tsyringe";
-import { z } from "zod";
+import { Service } from '@sentzunhat/zacatl';
+import { Schema, Model, Types } from 'mongoose';
+import { DataTypes, Sequelize, Model as SequelizeModel } from 'sequelize';
+import { container } from 'tsyringe';
+import { z } from 'zod';
 ```
 
 ## After (Single Package)
@@ -33,7 +33,7 @@ import {
   z,
   ORMType,
   BaseRepository,
-} from "@sentzunhat/zacatl";
+} from '@sentzunhat/zacatl';
 ```
 
 ---
@@ -79,7 +79,7 @@ import {
   z,
   ZodType,
   ZodError,
-} from "@sentzunhat/zacatl";
+} from '@sentzunhat/zacatl';
 ```
 
 ### Mongoose (MongoDB)
@@ -107,7 +107,7 @@ import {
   PopulateOptions,
   HydratedDocument,
   InferSchemaType,
-} from "@sentzunhat/zacatl";
+} from '@sentzunhat/zacatl';
 ```
 
 ### Sequelize (SQL Databases)
@@ -133,7 +133,7 @@ import {
   WhereOptions,
   Order,
   Includeable,
-} from "@sentzunhat/zacatl";
+} from '@sentzunhat/zacatl';
 ```
 
 ---
@@ -143,12 +143,7 @@ import {
 ### Example 1: Mongoose Repository (Single Import)
 
 ```typescript
-import {
-  BaseRepository,
-  ORMType,
-  Schema,
-  InferSchemaType,
-} from "@sentzunhat/zacatl";
+import { BaseRepository, ORMType, Schema, InferSchemaType } from '@sentzunhat/zacatl';
 
 // Define schema
 const UserSchema = new Schema(
@@ -162,7 +157,7 @@ const UserSchema = new Schema(
 
 // Infer types
 type UserDb = InferSchemaType<typeof UserSchema>;
-interface UserInput extends Omit<UserDb, "timestamps"> {}
+interface UserInput extends Omit<UserDb, 'timestamps'> {}
 interface UserOutput extends UserDb {
   id: string;
   createdAt: Date;
@@ -170,15 +165,11 @@ interface UserOutput extends UserDb {
 }
 
 // Create repository
-export class UserRepository extends BaseRepository<
-  UserDb,
-  UserInput,
-  UserOutput
-> {
+export class UserRepository extends BaseRepository<UserDb, UserInput, UserOutput> {
   constructor() {
     super({
       type: ORMType.Mongoose,
-      name: "User",
+      name: 'User',
       schema: UserSchema,
     });
   }
@@ -195,13 +186,13 @@ import {
   Sequelize,
   SequelizeModelClass,
   ModelAttributes,
-} from "@sentzunhat/zacatl";
+} from '@sentzunhat/zacatl';
 
 // Define Sequelize instance
 const sequelize = new Sequelize({
-  dialect: "postgres",
-  host: "localhost",
-  database: "myapp",
+  dialect: 'postgres',
+  host: 'localhost',
+  database: 'myapp',
 });
 
 // Define model
@@ -214,7 +205,7 @@ const attributes: ModelAttributes = {
   stock: { type: DataTypes.INTEGER, defaultValue: 0 },
 };
 
-ProductModel.init(attributes, { sequelize, modelName: "Product" });
+ProductModel.init(attributes, { sequelize, modelName: 'Product' });
 
 // Define types
 interface ProductInput {
@@ -233,11 +224,7 @@ interface ProductOutput {
 }
 
 // Create repository
-export class ProductRepository extends BaseRepository<
-  ProductModel,
-  ProductInput,
-  ProductOutput
-> {
+export class ProductRepository extends BaseRepository<ProductModel, ProductInput, ProductOutput> {
   constructor() {
     super({
       type: ORMType.Sequelize,
@@ -258,17 +245,17 @@ import {
   Schema,
   Sequelize,
   container,
-} from "@sentzunhat/zacatl";
-import fastify from "fastify"; // Only external package you need!
+} from '@sentzunhat/zacatl';
+import fastify from 'fastify'; // Only external package you need!
 
-import { UserRepository } from "./repositories/user.repository";
-import { ProductRepository } from "./repositories/product.repository";
+import { UserRepository } from './repositories/user.repository';
+import { ProductRepository } from './repositories/product.repository';
 
 // Create ORM instances (also from single import!)
-import { connect, Sequelize as SequelizeClass } from "@sentzunhat/zacatl";
+import { connect, Sequelize as SequelizeClass } from '@sentzunhat/zacatl';
 
-const mongooseInstance = await connect("mongodb://localhost:27017/myapp");
-const sequelizeInstance = new SequelizeClass("postgres://localhost:5432/myapp");
+const mongooseInstance = await connect('mongodb://localhost:27017/myapp');
+const sequelizeInstance = new SequelizeClass('postgres://localhost:5432/myapp');
 
 // Create service
 const service = new Service({
@@ -283,7 +270,7 @@ const service = new Service({
   },
   platforms: {
     server: {
-      name: "my-service",
+      name: 'my-service',
       server: {
         type: ServerType.SERVER,
         vendor: ServerVendor.FASTIFY,
@@ -293,12 +280,12 @@ const service = new Service({
         {
           vendor: DatabaseVendor.MONGOOSE,
           instance: mongooseInstance,
-          connectionString: "mongodb://localhost:27017/myapp",
+          connectionString: 'mongodb://localhost:27017/myapp',
         },
         {
           vendor: DatabaseVendor.SEQUELIZE,
           instance: sequelizeInstance,
-          connectionString: "postgres://localhost:5432/myapp",
+          connectionString: 'postgres://localhost:5432/myapp',
         },
       ],
     },
@@ -311,7 +298,7 @@ await service.start({ port: 3000 });
 ### Example 4: Validation with Zod (Single Import)
 
 ```typescript
-import { z, BaseRepository, ORMType, Schema } from "@sentzunhat/zacatl";
+import { z, BaseRepository, ORMType, Schema } from '@sentzunhat/zacatl';
 
 // Create Zod schema for validation
 const CreateUserSchema = z.object({
@@ -337,7 +324,7 @@ export class UserRepository extends BaseRepository<any, any, any> {
   constructor() {
     super({
       type: ORMType.Mongoose,
-      name: "User",
+      name: 'User',
       schema: UserSchema,
     });
   }
@@ -364,9 +351,9 @@ export class UserRepository extends BaseRepository<any, any, any> {
 ### Example 5: Dependency Injection (Single Import)
 
 ```typescript
-import { container, Service, BaseRepository } from "@sentzunhat/zacatl";
+import { container, Service, BaseRepository } from '@sentzunhat/zacatl';
 
-import { UserRepository } from "./repositories/user.repository";
+import { UserRepository } from './repositories/user.repository';
 
 // Start service (auto-registers repositories)
 const service = new Service({
@@ -378,7 +365,7 @@ const service = new Service({
     domain: { services: [] },
   },
   platforms: {
-    server: { name: "my-service" },
+    server: { name: 'my-service' },
   },
 });
 
@@ -388,9 +375,9 @@ await service.start();
 const userRepo = container.resolve(UserRepository);
 
 const user = await userRepo.create({
-  username: "john",
-  email: "john@example.com",
-  passwordHash: "hashed",
+  username: 'john',
+  email: 'john@example.com',
+  passwordHash: 'hashed',
 });
 ```
 
@@ -503,13 +490,7 @@ const user = await userRepo.create({
 ### Type-Safe Generic Repository
 
 ```typescript
-import {
-  BaseRepository,
-  ORMType,
-  Schema,
-  InferSchemaType,
-  z,
-} from "@sentzunhat/zacatl";
+import { BaseRepository, ORMType, Schema, InferSchemaType, z } from '@sentzunhat/zacatl';
 
 // Everything from one import!
 const UserSchema = new Schema(
@@ -531,7 +512,7 @@ export class UserRepository extends BaseRepository<UserDb, any, any> {
   constructor() {
     super({
       type: ORMType.Mongoose,
-      name: "User",
+      name: 'User',
       schema: UserSchema,
     });
   }
@@ -568,7 +549,7 @@ import {
   // Utilities
   container,
   z,
-} from "@sentzunhat/zacatl";
+} from '@sentzunhat/zacatl';
 ```
 
 **No more:**

@@ -1,5 +1,5 @@
-import type { Constructor } from "../../types";
-import type { HookHandler, RouteHandler } from "../entry-points/rest";
+import type { Constructor } from '../../types';
+import type { HookHandler, RouteHandler } from '../entry-points/rest';
 
 export type ApplicationRestHooks = Array<Constructor<HookHandler>>;
 export type ApplicationRestRoutes = Array<

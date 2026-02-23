@@ -1,5 +1,5 @@
 ---
-applyTo: "docs/changelog.md,package.json"
+applyTo: 'docs/changelog.md,package.json'
 ---
 
 # Changelog and Version Update Instructions

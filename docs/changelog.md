@@ -2,6 +2,26 @@
 
 ---
 
+## [0.0.46] - 2026-02-22
+
+**Status**: Current patch
+
+### ✨ Improvements
+
+- **Lazy-load DB adapters** — Prevented top-level imports from pulling in heavy ORM runtime deps (notably `sequelize`/`pg` and `pg-hstore`) by:
+
+  - Making the Sequelize adapter a lazy wrapper that dynamically imports the runtime implementation when first used.
+  - Converting internal Sequelize runtime imports to type-only where appropriate.
+  - Registering concrete DB instances by their runtime constructor to avoid importing adapter classes at module load.
+
+  This fixes bundler failures (e.g. `bun build`) where consumers that only use Mongoose were required to install Postgres packages.
+
+### 🔧 Fixes
+
+- **Bundling**: Importing the library root no longer causes bundlers to traverse `sequelize` at bundle time unless explicitly used.
+
+---
+
 ## [0.0.45] - 2026-02-22
 
 **Status**: Current release
@@ -81,7 +101,7 @@ export class MyHandler extends PostRouteHandler<Input, MyData> {
   };
 
   async handler({ body }): Promise<MyData> {
-    return { id: "1" }; // returns plain data
+    return { id: '1' }; // returns plain data
   }
 }
 // HTTP response: { id: "1" }
@@ -99,11 +119,11 @@ export class MyHandler extends PostRouteHandler<Input, MyData> {
   };
 
   async handler({ body }): Promise<MyData> {
-    return { id: "1" };
+    return { id: '1' };
   }
 
   protected buildResponse(data: MyData) {
-    return { ok: true, message: "Success", data };
+    return { ok: true, message: 'Success', data };
   }
 }
 // HTTP response: { ok: true, message: "Success", data: { id: "1" } }
@@ -179,11 +199,13 @@ export class MyHandler extends PostRouteHandler<Input, MyData> {
 Three Express examples targeting parity with existing Fastify examples:
 
 - `04-with-sqlite` (Express + SQLite via Sequelize)
+
   - Backend API with full CRUD greetings endpoint
   - React frontend loading from Express API
   - E2E verified: API call → handler → service → repository → SQLite → response
 
 - `05-with-mongodb` (Express + MongoDB via Mongoose)
+
   - Backend API with full CRUD greetings endpoint
   - React frontend loading from Express API
   - E2E verified: API call → handler → service → repository → MongoDB → response
@@ -465,15 +487,15 @@ const server = new Service({
 **Option 1 - Main Package (Convenience):**
 
 ```typescript
-import { Service, mongoose, Schema, Sequelize } from "@sentzunhat/zacatl";
+import { Service, mongoose, Schema, Sequelize } from '@sentzunhat/zacatl';
 ```
 
 **Option 2 - Subpath Imports (Minimal Bundle):**
 
 ```typescript
-import { Service } from "@sentzunhat/zacatl";
-import { mongoose, Schema } from "@sentzunhat/zacatl/third-party/mongoose";
-import { Sequelize, DataTypes } from "@sentzunhat/zacatl/third-party/sequelize";
+import { Service } from '@sentzunhat/zacatl';
+import { mongoose, Schema } from '@sentzunhat/zacatl/third-party/mongoose';
+import { Sequelize, DataTypes } from '@sentzunhat/zacatl/third-party/sequelize';
 ```
 
 #### Why Both Options?
@@ -527,7 +549,7 @@ import { Sequelize, DataTypes } from "@sentzunhat/zacatl/third-party/sequelize";
 ```typescript
 // v0.0.21 - BROKEN in ESM
 export function loadMongooseAdapter(config) {
-  const adapters = require("./adapters/mongoose-adapter"); // ❌
+  const adapters = require('./adapters/mongoose-adapter'); // ❌
   return new adapters.MongooseAdapter(config);
 }
 ```
@@ -537,7 +559,7 @@ export function loadMongooseAdapter(config) {
 ```typescript
 // v0.0.22 - Works in ALL environments
 export async function loadMongooseAdapter(config) {
-  const adapters = await import("./adapters/mongoose-adapter"); // ✅
+  const adapters = await import('./adapters/mongoose-adapter'); // ✅
   return new adapters.MongooseAdapter(config);
 }
 ```
@@ -592,13 +614,13 @@ npm install @sentzunhat/zacatl mongoose
 **Before:**
 
 ```typescript
-import { connection } from "mongoose"; // ❌ Breaks in v9
+import { connection } from 'mongoose'; // ❌ Breaks in v9
 ```
 
 **After:**
 
 ```typescript
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 mongoose.connection; // ✅ Works in v9
 ```
 
@@ -617,9 +639,9 @@ mongoose.connection; // ✅ Works in v9
 **New Import Shortcuts:**
 
 ```typescript
-import { BaseRepository, ORMType } from "@sentzunhat/zacatl/infrastructure";
-import { CustomError } from "@sentzunhat/zacatl/errors";
-import { loadConfig } from "@sentzunhat/zacatl/config";
+import { BaseRepository, ORMType } from '@sentzunhat/zacatl/infrastructure';
+import { CustomError } from '@sentzunhat/zacatl/errors';
+import { loadConfig } from '@sentzunhat/zacatl/config';
 ```
 
 #### 🔧 Peer Dependencies

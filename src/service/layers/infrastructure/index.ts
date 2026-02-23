@@ -1,8 +1,8 @@
-export * from "./repositories";
-export * from "./infrastructure";
+export * from './repositories';
+export * from './infrastructure';
 export type {
   InfrastructureUnknownRepository,
   InfrastructureRepository,
   InfrastructureRepositories,
   ConfigInfrastructure,
-} from "./types";
+} from './types';

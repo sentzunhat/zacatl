@@ -1,11 +1,11 @@
-import { FastifyReply, FastifySchema } from "@zacatl/third-party/fastify";
-import { z } from "@zacatl/third-party/zod";
+import { FastifyReply, FastifySchema } from '@zacatl/third-party/fastify';
+import { z } from '@zacatl/third-party/zod';
 
-import { RouteHandler } from "./route-handler";
-import type { HTTPMethod } from "../../common/http-methods";
-import type { Request } from "../../common/request";
+import { RouteHandler } from './route-handler';
+import type { HTTPMethod } from '../../common/http-methods';
+import type { Request } from '../../common/request';
 
-export type { Request } from "../../common/request";
+export type { Request } from '../../common/request';
 
 export interface RouteSchema<
   TBody = void,
@@ -35,7 +35,8 @@ export abstract class AbstractRouteHandler<
   TResponse = void,
   TParams = void,
   THeaders = void,
-> implements RouteHandler<TBody, TQuerystring, TResponse, TParams, THeaders> {
+> implements RouteHandler<TBody, TQuerystring, TResponse, TParams, THeaders>
+{
   public url: string;
   public method: HTTPMethod;
   public schema: RouteSchema | FastifySchema | Record<string, unknown>;

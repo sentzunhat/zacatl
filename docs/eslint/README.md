@@ -32,17 +32,11 @@ Create an `eslint.config.mjs` file in your project root:
 
 ```javascript
 // eslint.config.mjs
-import { recommended } from "@sentzunhat/zacatl/eslint";
+import { recommended } from '@sentzunhat/zacatl/eslint';
 
 export default [
   {
-    ignores: [
-      "build/**",
-      "node_modules/**",
-      "coverage/**",
-      "*.config.js",
-      "*.config.mjs",
-    ],
+    ignores: ['build/**', 'node_modules/**', 'coverage/**', '*.config.js', '*.config.mjs'],
   },
   ...recommended,
 ];
@@ -74,7 +68,7 @@ Zacatl provides four modular ESLint configurations:
 The easiest way to get started with all Zacatl ESLint rules.
 
 ```javascript
-import { recommended } from "@sentzunhat/zacatl/eslint";
+import { recommended } from '@sentzunhat/zacatl/eslint';
 
 export default [...recommended];
 ```
@@ -84,7 +78,7 @@ export default [...recommended];
 Fundamental TypeScript linting rules.
 
 ```javascript
-import { baseConfig } from "@sentzunhat/zacatl/eslint";
+import { baseConfig } from '@sentzunhat/zacatl/eslint';
 
 export default [baseConfig];
 ```
@@ -102,7 +96,7 @@ export default [baseConfig];
 Enforces Port-Adapter naming conventions.
 
 ```javascript
-import { namingConventions } from "@sentzunhat/zacatl/eslint";
+import { namingConventions } from '@sentzunhat/zacatl/eslint';
 
 export default [namingConventions];
 ```
@@ -120,7 +114,7 @@ export default [namingConventions];
 Automatically organizes and sorts imports.
 
 ```javascript
-import { importsConfig } from "@sentzunhat/zacatl/eslint";
+import { importsConfig } from '@sentzunhat/zacatl/eslint';
 
 export default [importsConfig];
 ```
@@ -137,15 +131,15 @@ export default [importsConfig];
 ### Override Specific Rules
 
 ```javascript
-import { recommended } from "@sentzunhat/zacatl/eslint";
+import { recommended } from '@sentzunhat/zacatl/eslint';
 
 export default [
   ...recommended,
   {
-    files: ["src/**/*.ts"],
+    files: ['src/**/*.ts'],
     rules: {
-      "@typescript-eslint/explicit-function-return-type": "off",
-      "@typescript-eslint/naming-convention": "warn", // Change to warning
+      '@typescript-eslint/explicit-function-return-type': 'off',
+      '@typescript-eslint/naming-convention': 'warn', // Change to warning
     },
   },
 ];
@@ -154,15 +148,15 @@ export default [
 ### Project-Specific Rules for Test Files
 
 ```javascript
-import { recommended } from "@sentzunhat/zacatl/eslint";
+import { recommended } from '@sentzunhat/zacatl/eslint';
 
 export default [
   ...recommended,
   {
-    files: ["test/**/*.ts", "**/*.test.ts", "**/*.spec.ts"],
+    files: ['test/**/*.ts', '**/*.test.ts', '**/*.spec.ts'],
     rules: {
-      "@typescript-eslint/explicit-function-return-type": "off",
-      "@typescript-eslint/no-explicit-any": "off",
+      '@typescript-eslint/explicit-function-return-type': 'off',
+      '@typescript-eslint/no-explicit-any': 'off',
     },
   },
 ];
@@ -171,14 +165,14 @@ export default [
 ### Mix and Match Configs
 
 ```javascript
-import { baseConfig, importsConfig } from "@sentzunhat/zacatl/eslint";
+import { baseConfig, importsConfig } from '@sentzunhat/zacatl/eslint';
 
 export default [
   baseConfig,
   importsConfig,
   // Skip naming conventions if not using Hexagonal Architecture
   {
-    files: ["src/**/*.ts"],
+    files: ['src/**/*.ts'],
     rules: {
       // Your custom rules
     },
@@ -189,23 +183,23 @@ export default [
 ### Add Path Aliases Support
 
 ```javascript
-import { recommended } from "@sentzunhat/zacatl/eslint";
+import { recommended } from '@sentzunhat/zacatl/eslint';
 
 export default [
   ...recommended,
   {
     rules: {
-      "import/order": [
-        "error",
+      'import/order': [
+        'error',
         {
-          groups: ["builtin", "external", "internal", ["parent", "sibling"]],
+          groups: ['builtin', 'external', 'internal', ['parent', 'sibling']],
           pathGroups: [
-            { pattern: "@app/**", group: "internal" },
-            { pattern: "@shared/**", group: "internal" },
+            { pattern: '@app/**', group: 'internal' },
+            { pattern: '@shared/**', group: 'internal' },
           ],
-          pathGroupsExcludedImportTypes: ["builtin"],
-          "newlines-between": "always",
-          alphabetize: { order: "asc", caseInsensitive: true },
+          pathGroupsExcludedImportTypes: ['builtin'],
+          'newlines-between': 'always',
+          alphabetize: { order: 'asc', caseInsensitive: true },
         },
       ],
     },
@@ -274,14 +268,14 @@ type DatabaseConfig = {
 class ValidationError extends Error {
   constructor(message: string) {
     super(message);
-    this.name = "ValidationError";
+    this.name = 'ValidationError';
   }
 }
 
 class NotFoundError extends Error {
   constructor(resource: string) {
     super(`${resource} not found`);
-    this.name = "NotFoundError";
+    this.name = 'NotFoundError';
   }
 }
 
@@ -347,21 +341,21 @@ When you use `importsConfig`, your imports will be automatically organized:
 
 ```typescript
 // Before (unorganized)
-import { UserRepositoryPort } from "./repositories/user";
-import express from "express";
-import { config } from "../config";
-import fs from "fs";
-import { LoggerServicePort } from "@/services/logger";
+import { UserRepositoryPort } from './repositories/user';
+import express from 'express';
+import { config } from '../config';
+import fs from 'fs';
+import { LoggerServicePort } from '@/services/logger';
 
 // After (organized by ESLint)
-import fs from "fs";
+import fs from 'fs';
 
-import express from "express";
+import express from 'express';
 
-import { LoggerServicePort } from "@/services/logger";
+import { LoggerServicePort } from '@/services/logger';
 
-import { config } from "../config";
-import { UserRepositoryPort } from "./repositories/user";
+import { config } from '../config';
+import { UserRepositoryPort } from './repositories/user';
 ```
 
 ## Integration with VS Code
@@ -410,13 +404,13 @@ Verify your `tsconfig.json` is in the project root or update the parser configur
 You can temporarily change the severity to `warn` while refactoring:
 
 ```javascript
-import { recommended } from "@sentzunhat/zacatl/eslint";
+import { recommended } from '@sentzunhat/zacatl/eslint';
 
 export default [
   ...recommended,
   {
     rules: {
-      "@typescript-eslint/naming-convention": "warn",
+      '@typescript-eslint/naming-convention': 'warn',
     },
   },
 ];

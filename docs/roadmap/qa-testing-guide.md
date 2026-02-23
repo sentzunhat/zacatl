@@ -38,11 +38,11 @@ Lessons and best practices learned from v0.0.39 release cycle.
 **Goal**: Verify handler logic, service calls, and response structure.
 
 ```typescript
-describe("GetAllGreetingsHandler", () => {
-  it("should fetch greetings and return typed response", async () => {
+describe('GetAllGreetingsHandler', () => {
+  it('should fetch greetings and return typed response', async () => {
     // 1. Setup mocks
     const mockService = {
-      getAllGreetings: vi.fn().mockResolvedValue([{ id: 1, text: "Hello" }]),
+      getAllGreetings: vi.fn().mockResolvedValue([{ id: 1, text: 'Hello' }]),
     };
 
     // 2. Create handler with mocked dependencies
@@ -63,10 +63,10 @@ describe("GetAllGreetingsHandler", () => {
 
     // 6. Assert response was sent (Express-specific)
     expect(res.status).toHaveBeenCalledWith(200);
-    expect(res.json).toHaveBeenCalledWith([{ id: 1, text: "Hello" }]);
+    expect(res.json).toHaveBeenCalledWith([{ id: 1, text: 'Hello' }]);
 
     // 7. Assert return value (for future adapter parity)
-    expect(result).toEqual([{ id: 1, text: "Hello" }]);
+    expect(result).toEqual([{ id: 1, text: 'Hello' }]);
   });
 });
 ```
@@ -102,11 +102,11 @@ describe("GetAllGreetingsHandler", () => {
 Use `supertest` for end-to-end handler testing against a fully wired Express instance:
 
 ```typescript
-import request from "supertest";
-import express from "express";
-import { Service, ServiceType, ServerVendor, ServerType } from "@sentzunhat/zacatl";
+import request from 'supertest';
+import express from 'express';
+import { Service, ServiceType, ServerVendor, ServerType } from '@sentzunhat/zacatl';
 
-describe("Integration: /greetings endpoints", () => {
+describe('Integration: /greetings endpoints', () => {
   let service: Service;
 
   beforeEach(async () => {
@@ -129,7 +129,7 @@ describe("Integration: /greetings endpoints", () => {
       },
       platforms: {
         server: {
-          name: "test",
+          name: 'test',
           port: 0,
           databases: [],
           server: {
@@ -143,17 +143,17 @@ describe("Integration: /greetings endpoints", () => {
     await service.start({ port: 0 });
   });
 
-  it("GET /greetings returns 200 with array", async () => {
-    const res = await request(app).get("/greetings");
+  it('GET /greetings returns 200 with array', async () => {
+    const res = await request(app).get('/greetings');
     expect(res.status).toBe(200);
     expect(Array.isArray(res.body)).toBe(true);
   });
 
-  it("POST /greetings with valid body returns 201", async () => {
-    const res = await request(app).post("/greetings").send({ text: "Hello" });
+  it('POST /greetings with valid body returns 201', async () => {
+    const res = await request(app).post('/greetings').send({ text: 'Hello' });
 
     expect(res.status).toBe(201);
-    expect(res.body).toHaveProperty("id");
+    expect(res.body).toHaveProperty('id');
   });
 });
 ```
@@ -229,6 +229,7 @@ grep -r "\[.*\](.*\.md)" docs/ examples/ | head -20
 **To Fix:**
 
 1. **ExpressApiAdapter auto-send return values**
+
    - Capture handler return value and auto-send via `res.json()` if not already sent
    - Provides parity with Fastify's implicit response handling
    - Test: `express-adapter.test.ts` will then pass
@@ -298,6 +299,7 @@ grep -rh "\[.*\](.*\.md)" docs/ examples/ | sort | uniq
 If adding a **third framework** (e.g., Hono, Elysia, etc.):
 
 1. **Adapter Pattern**: Implement `ApiServerPort` interface with:
+
    - `registerRoute(handler)` - Register single handler
    - `registerHook(handler)` - Register middleware/interceptor
    - `registerProxy(config)` - Register proxy routes
@@ -314,6 +316,7 @@ If adding a **third framework** (e.g., Hono, Elysia, etc.):
    ```
 
 3. **Response Semantics**:
+
    - If framework auto-sends return values (like Fastify): Implement that
    - If framework requires explicit response calls (like Express): Document it
 

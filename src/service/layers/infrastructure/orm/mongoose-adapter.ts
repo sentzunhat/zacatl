@@ -1,12 +1,12 @@
-import { InternalServerError } from "../../../../error";
-import { uuidv4, container } from "../../../../third-party";
-import { Mongoose } from "../../../../third-party/mongoose";
+import { InternalServerError } from '../../../../error';
+import { uuidv4, container } from '../../../../third-party';
+import { Mongoose } from '../../../../third-party/mongoose';
 import type {
   MongooseRepositoryConfig,
   MongooseRepositoryModel,
   ORMPort,
   LeanWithMeta,
-} from "../repositories/types";
+} from '../repositories/types';
 
 /**
  * Mongoose ORM adapter - handles Mongoose-specific database operations
@@ -59,9 +59,9 @@ export class MongooseAdapter<D, I, O> implements ORMPort<MongooseRepositoryModel
 
     if (
       input != null &&
-      typeof input === "object" &&
-      "toObject" in input &&
-      typeof (input as unknown as Record<string, unknown>)["toObject"] === "function"
+      typeof input === 'object' &&
+      'toObject' in input &&
+      typeof (input as unknown as Record<string, unknown>)['toObject'] === 'function'
     ) {
       base = (
         input as unknown as {
@@ -77,11 +77,10 @@ export class MongooseAdapter<D, I, O> implements ORMPort<MongooseRepositoryModel
     const baseRec = base as unknown as Record<string, unknown>;
 
     const idVal = (() => {
-      if (typeof baseRec["id"] === "string") return baseRec["id"] as string;
-      if (typeof baseRec["_id"] === "string") return baseRec["_id"] as string;
-      if (baseRec["_id"] !== undefined && baseRec["_id"] !== null)
-        return String(baseRec["_id"]);
-      return "";
+      if (typeof baseRec['id'] === 'string') return baseRec['id'] as string;
+      if (typeof baseRec['_id'] === 'string') return baseRec['_id'] as string;
+      if (baseRec['_id'] !== undefined && baseRec['_id'] !== null) return String(baseRec['_id']);
+      return '';
     })();
 
     const result: O = {
@@ -91,14 +90,14 @@ export class MongooseAdapter<D, I, O> implements ORMPort<MongooseRepositoryModel
         base.createdAt instanceof Date
           ? base.createdAt
           : base.createdAt != null
-            ? new Date(base.createdAt as string | number)
-            : new Date(),
+          ? new Date(base.createdAt as string | number)
+          : new Date(),
       updatedAt:
         base.updatedAt instanceof Date
           ? base.updatedAt
           : base.updatedAt != null
-            ? new Date(base.updatedAt as string | number)
-            : new Date(),
+          ? new Date(base.updatedAt as string | number)
+          : new Date(),
     } as O;
 
     return result;
@@ -133,10 +132,10 @@ export class MongooseAdapter<D, I, O> implements ORMPort<MongooseRepositoryModel
 
     if (leanDocument == null) {
       throw new InternalServerError({
-        message: "Failed to create document",
-        reason: "Document was created but toLean returned null",
-        component: "MongooseAdapter",
-        operation: "create",
+        message: 'Failed to create document',
+        reason: 'Document was created but toLean returned null',
+        component: 'MongooseAdapter',
+        operation: 'create',
       });
     }
 

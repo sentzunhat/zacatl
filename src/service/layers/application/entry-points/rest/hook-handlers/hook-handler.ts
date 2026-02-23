@@ -1,10 +1,6 @@
-import { FastifyReply, FastifyRequest } from "@zacatl/third-party/fastify";
+import { FastifyReply, FastifyRequest } from '@zacatl/third-party/fastify';
 
-export type HookHandlerName =
-  | "onRequest"
-  | "preHandler"
-  | "preValidation"
-  | "preSerialization";
+export type HookHandlerName = 'onRequest' | 'preHandler' | 'preValidation' | 'preSerialization';
 
 export interface HookHandler {
   name: HookHandlerName;

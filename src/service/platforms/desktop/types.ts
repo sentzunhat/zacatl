@@ -24,5 +24,5 @@ export interface ConfigDesktop {
   };
 
   /** Desktop platform/runtime */
-  platform: "neutralino" | "electron";
+  platform: 'neutralino' | 'electron';
 }

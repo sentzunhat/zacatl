@@ -7,5 +7,5 @@
  * @module third-party/js-yaml
  */
 
-export { load, dump } from "js-yaml";
-export * from "js-yaml";
+export { load, dump } from 'js-yaml';
+export * from 'js-yaml';

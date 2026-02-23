@@ -237,11 +237,11 @@ volumes:
 **MongoDB Init Script (mongo-init.js):**
 
 ```javascript
-db = db.getSiblingDB("appdb");
+db = db.getSiblingDB('appdb');
 db.createUser({
-  user: "local",
-  pwd: "local",
-  roles: [{ role: "readWrite", db: "appdb" }],
+  user: 'local',
+  pwd: 'local',
+  roles: [{ role: 'readWrite', db: 'appdb' }],
 });
 ```
 
@@ -374,6 +374,7 @@ RUN npm rebuild sqlite3
 **Solutions**:
 
 1. **Check hostname in connection string:**
+
    - Docker Compose: Use container name (`mongodb`, `postgres`)
    - Local dev-env: Use `localhost`
 

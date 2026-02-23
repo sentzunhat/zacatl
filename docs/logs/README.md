@@ -5,9 +5,9 @@ Structured, high-performance logging with Pino adapter.
 ## Import
 
 ```typescript
-import { createLogger, logger } from "@sentzunhat/zacatl/logs";
-import { PinoLoggerAdapter, ConsoleLoggerAdapter } from "@sentzunhat/zacatl/logs";
-import { createPinoConfig } from "@sentzunhat/zacatl/logs";
+import { createLogger, logger } from '@sentzunhat/zacatl/logs';
+import { PinoLoggerAdapter, ConsoleLoggerAdapter } from '@sentzunhat/zacatl/logs';
+import { createPinoConfig } from '@sentzunhat/zacatl/logs';
 ```
 
 ## Quick Start
@@ -15,15 +15,15 @@ import { createPinoConfig } from "@sentzunhat/zacatl/logs";
 ### Use Default Logger
 
 ```typescript
-import { logger } from "@sentzunhat/zacatl/logs";
+import { logger } from '@sentzunhat/zacatl/logs';
 
-logger.info("Server started", { data: { port: 3000 } });
+logger.info('Server started', { data: { port: 3000 } });
 ```
 
 ### Create Custom Logger
 
 ```typescript
-import { createLogger, PinoLoggerAdapter } from "@sentzunhat/zacatl/logs";
+import { createLogger, PinoLoggerAdapter } from '@sentzunhat/zacatl/logs';
 
 const logger = createLogger(new PinoLoggerAdapter());
 ```
@@ -31,11 +31,11 @@ const logger = createLogger(new PinoLoggerAdapter());
 ## Log Levels
 
 ```typescript
-logger.info("Informational message", { data: { userId: "123" } });
-logger.trace("Detailed trace info", { data: { query: "SELECT *" } });
-logger.warn("Warning message", { data: { deprecation: true } });
-logger.error("Error occurred", { data: { error: err.message } });
-logger.fatal("Fatal error", { data: { code: "SYSTEM_FAILURE" } });
+logger.info('Informational message', { data: { userId: '123' } });
+logger.trace('Detailed trace info', { data: { query: 'SELECT *' } });
+logger.warn('Warning message', { data: { deprecation: true } });
+logger.error('Error occurred', { data: { error: err.message } });
+logger.fatal('Fatal error', { data: { code: 'SYSTEM_FAILURE' } });
 ```
 
 ## Structured Logging
@@ -43,7 +43,7 @@ logger.fatal("Fatal error", { data: { code: "SYSTEM_FAILURE" } });
 All log methods accept a message and optional structured data:
 
 ```typescript
-logger.info("User created", {
+logger.info('User created', {
   data: {
     userId: user.id,
     email: user.email,
@@ -62,7 +62,7 @@ logger.info("User created", {
 High-performance JSON logging for microservices:
 
 ```typescript
-import { createLogger, PinoLoggerAdapter } from "@sentzunhat/zacatl/logs";
+import { createLogger, PinoLoggerAdapter } from '@sentzunhat/zacatl/logs';
 
 const logger = createLogger(new PinoLoggerAdapter());
 // Auto-detects: pretty in dev, JSON in production
@@ -73,7 +73,7 @@ const logger = createLogger(new PinoLoggerAdapter());
 Simple console output for CLI tools and desktop apps:
 
 ```typescript
-import { createLogger, ConsoleLoggerAdapter } from "@sentzunhat/zacatl/logs";
+import { createLogger, ConsoleLoggerAdapter } from '@sentzunhat/zacatl/logs';
 
 const logger = createLogger(new ConsoleLoggerAdapter());
 ```
@@ -83,13 +83,13 @@ const logger = createLogger(new ConsoleLoggerAdapter());
 ### Basic Configuration
 
 ```typescript
-import { createLogger, PinoLoggerAdapter, createPinoConfig } from "@sentzunhat/zacatl/logs";
+import { createLogger, PinoLoggerAdapter, createPinoConfig } from '@sentzunhat/zacatl/logs';
 
 const logger = createLogger(
   new PinoLoggerAdapter(
     createPinoConfig({
-      serviceName: "user-api",
-      appVersion: "1.0.0",
+      serviceName: 'user-api',
+      appVersion: '1.0.0',
     }),
   ),
 );
@@ -98,10 +98,10 @@ const logger = createLogger(
 ### File Logging
 
 ```typescript
-import pino from "pino";
-import { createLogger, PinoLoggerAdapter, createPinoConfig } from "@sentzunhat/zacatl/logs";
+import pino from 'pino';
+import { createLogger, PinoLoggerAdapter, createPinoConfig } from '@sentzunhat/zacatl/logs';
 
-const fileDestination = pino.destination("/var/log/app/app.log");
+const fileDestination = pino.destination('/var/log/app/app.log');
 const logger = createLogger(new PinoLoggerAdapter(createPinoConfig(), fileDestination));
 ```
 
@@ -110,7 +110,7 @@ const logger = createLogger(new PinoLoggerAdapter(createPinoConfig(), fileDestin
 No spread operator needed - use `pinoConfig` option:
 
 ```typescript
-import { createLogger, PinoLoggerAdapter, createPinoConfig } from "@sentzunhat/zacatl/logs";
+import { createLogger, PinoLoggerAdapter, createPinoConfig } from '@sentzunhat/zacatl/logs';
 
 const logger = createLogger(
   new PinoLoggerAdapter(
@@ -118,8 +118,8 @@ const logger = createLogger(
       pinoConfig: {
         transport: {
           targets: [
-            { target: "pino/file", options: { destination: "./app.log" } },
-            { target: "pino-pretty", options: { colorize: true } },
+            { target: 'pino/file', options: { destination: './app.log' } },
+            { target: 'pino-pretty', options: { colorize: true } },
           ],
         },
       },
@@ -131,21 +131,21 @@ const logger = createLogger(
 ### Third-Party Services (Prometheus, Grafana, etc.)
 
 ```typescript
-import { createLogger, PinoLoggerAdapter, createPinoConfig } from "@sentzunhat/zacatl/logs";
+import { createLogger, PinoLoggerAdapter, createPinoConfig } from '@sentzunhat/zacatl/logs';
 
 const logger = createLogger(
   new PinoLoggerAdapter(
     createPinoConfig({
-      serviceName: "my-service",
+      serviceName: 'my-service',
       pinoConfig: {
         transport: {
-          target: "pino/file",
-          options: { destination: "/var/log/metrics.json" },
+          target: 'pino/file',
+          options: { destination: '/var/log/metrics.json' },
         },
         formatters: {
           log: (object) => ({
             ...object,
-            labels: { service: "my-api", env: "production" },
+            labels: { service: 'my-api', env: 'production' },
           }),
         },
       },
@@ -178,12 +178,12 @@ Create a shared logger instance:
 
 ```typescript
 // src/utils/logger.ts
-import { createLogger, PinoLoggerAdapter, createPinoConfig } from "@sentzunhat/zacatl/logs";
+import { createLogger, PinoLoggerAdapter, createPinoConfig } from '@sentzunhat/zacatl/logs';
 
 export const logger = createLogger(
   new PinoLoggerAdapter(
     createPinoConfig({
-      serviceName: "my-service",
+      serviceName: 'my-service',
     }),
   ),
 );
@@ -192,17 +192,17 @@ export const logger = createLogger(
 Use across your application:
 
 ```typescript
-import { logger } from "./utils/logger";
+import { logger } from './utils/logger';
 
-logger.info("Application started");
+logger.info('Application started');
 ```
 
 ### DI Container
 
 ```typescript
-import { container, inject, singleton } from "@sentzunhat/zacatl";
-import type { LoggerInput } from "@sentzunhat/zacatl/logs";
-import { createLogger, PinoLoggerAdapter } from "@sentzunhat/zacatl/logs";
+import { container, inject, singleton } from '@sentzunhat/zacatl';
+import type { LoggerInput } from '@sentzunhat/zacatl/logs';
+import { createLogger, PinoLoggerAdapter } from '@sentzunhat/zacatl/logs';
 
 @singleton()
 class AppLogger {
@@ -220,7 +220,7 @@ class UserService {
   constructor(@inject(AppLogger) private logger: AppLogger) {}
 
   async createUser(data: UserData) {
-    this.logger.info("Creating user", { data });
+    this.logger.info('Creating user', { data });
   }
 }
 ```
@@ -228,11 +228,17 @@ class UserService {
 ## TypeScript Types
 
 ```typescript
-import type { Logger, LoggerPort, LoggerInput, LoggerAdapterType, PinoLoggerConfig } from "@sentzunhat/zacatl/logs";
+import type {
+  Logger,
+  LoggerPort,
+  LoggerInput,
+  LoggerAdapterType,
+  PinoLoggerConfig,
+} from '@sentzunhat/zacatl/logs';
 
 // LoggerInput structure
 const input: LoggerInput = {
-  data: { userId: "123" },
+  data: { userId: '123' },
   details: { timestamp: new Date() },
 };
 

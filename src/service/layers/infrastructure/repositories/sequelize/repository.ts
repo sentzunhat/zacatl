@@ -1,9 +1,6 @@
-import type {
-  SequelizeRepositoryConfig,
-  SequelizeRepositoryModel,
-} from "./types";
-import { createSequelizeAdapter } from "../../orm/adapter-loader";
-import type { RepositoryPort , ORMPort } from "../types";
+import type { SequelizeRepositoryConfig, SequelizeRepositoryModel } from './types';
+import { createSequelizeAdapter } from '../../orm/adapter-loader';
+import type { RepositoryPort, ORMPort } from '../types';
 
 /**
  * Standalone Sequelize Repository - delegates to SequelizeAdapter
@@ -11,11 +8,9 @@ import type { RepositoryPort , ORMPort } from "../types";
  * Provides all repository operations for Sequelize ORM without runtime adapter switching.
  * Internally uses the same SequelizeAdapter as BaseRepository for code reuse.
  */
-export abstract class AbstractSequelizeRepository<
-  D extends object,
-  I,
-  O,
-> implements RepositoryPort<SequelizeRepositoryModel<D>, I, O> {
+export abstract class AbstractSequelizeRepository<D extends object, I, O>
+  implements RepositoryPort<SequelizeRepositoryModel<D>, I, O>
+{
   private readonly adapter: ORMPort<SequelizeRepositoryModel<D>, I, O>;
 
   constructor(config: SequelizeRepositoryConfig<D>) {

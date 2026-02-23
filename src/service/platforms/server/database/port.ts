@@ -1,11 +1,11 @@
-import type { Mongoose } from "mongoose";
-import type { Sequelize } from "sequelize";
+import type { Mongoose } from 'mongoose';
+import type { Sequelize } from 'sequelize';
 
-import type { Optional } from "../../../../utils/optionals";
+import type { Optional } from '../../../../utils/optionals';
 
 export enum DatabaseVendor {
-  MONGOOSE = "MONGOOSE",
-  SEQUELIZE = "SEQUELIZE",
+  MONGOOSE = 'MONGOOSE',
+  SEQUELIZE = 'SEQUELIZE',
 }
 
 export type DatabaseInstance = Mongoose | Sequelize;

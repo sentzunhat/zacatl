@@ -1,17 +1,17 @@
-import type { ConfigLayers } from "../layers/types";
-import type { ConfigPlatforms } from "../platforms/types";
+import type { ConfigLayers } from '../layers/types';
+import type { ConfigPlatforms } from '../platforms/types';
 
 /**
  * Configuration for the CLI platform (re-export).
  * See src/platforms/cli/types for details.
  */
-export type { ConfigCLI } from "../platforms/cli/types";
+export type { ConfigCLI } from '../platforms/cli/types';
 
 /**
  * Configuration for the Desktop platform (re-export).
  * See src/platforms/desktop/types for details.
  */
-export type { ConfigDesktop } from "../platforms/desktop/types";
+export type { ConfigDesktop } from '../platforms/desktop/types';
 
 /**
  * Service execution context.
@@ -21,9 +21,9 @@ export type { ConfigDesktop } from "../platforms/desktop/types";
  * - `SERVER` — server (HTTP) execution.
  */
 export enum ServiceType {
-  CLI = "CLI",
-  DESKTOP = "DESKTOP",
-  SERVER = "SERVER",
+  CLI = 'CLI',
+  DESKTOP = 'DESKTOP',
+  SERVER = 'SERVER',
 }
 
 /**

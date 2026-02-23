@@ -3,7 +3,7 @@ services:
     image: postgres:16
     container_name: express-postgres-db
     ports:
-      - "5432:5432"
+      - '5432:5432'
     environment:
       - POSTGRES_USER=local
       - POSTGRES_PASSWORD=local
@@ -11,7 +11,7 @@ services:
     volumes:
       - postgres-data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U local -d appdb"]
+      test: ['CMD-SHELL', 'pg_isready -U local -d appdb']
       interval: 10s
       timeout: 5s
       retries: 3
@@ -25,7 +25,7 @@ services:
     image: zacatl-express-postgres
     container_name: express-postgres-backend
     ports:
-      - "8183:8183"
+      - '8183:8183'
     environment:
       - NODE_ENV=production
       - PORT=8183
@@ -36,9 +36,9 @@ services:
     healthcheck:
       test:
         [
-          "CMD",
-          "node",
-          "-e",
+          'CMD',
+          'node',
+          '-e',
           "fetch('http://localhost:8183/greetings').catch(() => process.exit(1))",
         ]
       interval: 10s

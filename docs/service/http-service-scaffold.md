@@ -61,7 +61,7 @@ src/
 ### 1. Entry Point (`src/server.ts`)
 
 ```typescript
-import { buildService } from "./service.js";
+import { buildService } from './service.js';
 
 async function start() {
   const service = await buildService();
@@ -69,7 +69,7 @@ async function start() {
 }
 
 start().catch((error) => {
-  console.error("Failed to start service:", error);
+  console.error('Failed to start service:', error);
   process.exit(1);
 });
 ```
@@ -77,10 +77,10 @@ start().catch((error) => {
 ### 2. Service Configuration (`src/service.ts`)
 
 ```typescript
-import { Service } from "@sentzunhat/zacatl";
-import { taskRoutes } from "./tasks/application/route-handlers/routes.js";
-import { taskProviders } from "./tasks/domain/providers/providers.js";
-import { taskRepositories } from "./tasks/infrastructure/repositories/repositories.js";
+import { Service } from '@sentzunhat/zacatl';
+import { taskRoutes } from './tasks/application/route-handlers/routes.js';
+import { taskProviders } from './tasks/domain/providers/providers.js';
+import { taskRepositories } from './tasks/infrastructure/repositories/repositories.js';
 
 export async function buildService() {
   const service = new Service({
@@ -126,10 +126,10 @@ export interface TaskOutput extends Task {
 ### 4. Repository (`src/tasks/infrastructure/repositories/task.repository.ts`)
 
 ```typescript
-import { singleton } from "tsyringe";
-import { BaseRepository, ORMType } from "@sentzunhat/zacatl";
-import { Schema } from "mongoose";
-import type { Task, TaskOutput } from "../../domain/entities/task.entity.js";
+import { singleton } from 'tsyringe';
+import { BaseRepository, ORMType } from '@sentzunhat/zacatl';
+import { Schema } from 'mongoose';
+import type { Task, TaskOutput } from '../../domain/entities/task.entity.js';
 
 const TaskSchema = new Schema<Task>({
   title: { type: String, required: true },
@@ -142,7 +142,7 @@ export class TaskRepository extends BaseRepository<Task, Task, TaskOutput> {
   constructor() {
     super({
       type: ORMType.Mongoose,
-      name: "Task",
+      name: 'Task',
       schema: TaskSchema,
     });
   }
@@ -152,7 +152,7 @@ export class TaskRepository extends BaseRepository<Task, Task, TaskOutput> {
 **DI Registration** (`src/tasks/infrastructure/repositories/repositories.ts`):
 
 ```typescript
-import { TaskRepository } from "./task.repository.js";
+import { TaskRepository } from './task.repository.js';
 
 export const taskRepositories = [TaskRepository];
 ```
@@ -160,9 +160,9 @@ export const taskRepositories = [TaskRepository];
 ### 5. Domain Service (`src/tasks/domain/providers/task.service.ts`)
 
 ```typescript
-import { singleton } from "tsyringe";
-import { TaskRepository } from "../../infrastructure/repositories/task.repository.js";
-import type { Task } from "../entities/task.entity.js";
+import { singleton } from 'tsyringe';
+import { TaskRepository } from '../../infrastructure/repositories/task.repository.js';
+import type { Task } from '../entities/task.entity.js';
 
 @singleton()
 export class TaskService {
@@ -193,7 +193,7 @@ export class TaskService {
 **DI Registration** (`src/tasks/domain/providers/providers.ts`):
 
 ```typescript
-import { TaskService } from "./task.service.js";
+import { TaskService } from './task.service.js';
 
 export const taskProviders = [TaskService];
 ```
@@ -203,7 +203,7 @@ export const taskProviders = [TaskService];
 **Schema** (`src/tasks/application/route-handlers/create-task/schema.ts`):
 
 ```typescript
-import { Type } from "@sinclair/typebox";
+import { Type } from '@sinclair/typebox';
 
 export const CreateTaskSchema = {
   body: Type.Object({
@@ -217,9 +217,9 @@ export const CreateTaskSchema = {
 **Handler** (`src/tasks/application/route-handlers/create-task/handler.ts`):
 
 ```typescript
-import type { FastifyRequest, FastifyReply } from "fastify";
-import { resolveDependency } from "@sentzunhat/zacatl";
-import { TaskService } from "../../../domain/providers/task.service.js";
+import type { FastifyRequest, FastifyReply } from 'fastify';
+import { resolveDependency } from '@sentzunhat/zacatl';
+import { TaskService } from '../../../domain/providers/task.service.js';
 
 interface CreateTaskBody {
   title: string;
@@ -227,8 +227,11 @@ interface CreateTaskBody {
   completed?: boolean;
 }
 
-export async function createTaskHandler(request: FastifyRequest<{ Body: CreateTaskBody }>, reply: FastifyReply) {
-  const taskService = resolveDependency<TaskService>("TaskService");
+export async function createTaskHandler(
+  request: FastifyRequest<{ Body: CreateTaskBody }>,
+  reply: FastifyReply,
+) {
+  const taskService = resolveDependency<TaskService>('TaskService');
 
   const task = await taskService.createTask({
     title: request.body.title,
@@ -243,12 +246,12 @@ export async function createTaskHandler(request: FastifyRequest<{ Body: CreateTa
 **List Handler** (`src/tasks/application/route-handlers/list-tasks/handler.ts`):
 
 ```typescript
-import type { FastifyRequest, FastifyReply } from "fastify";
-import { resolveDependency } from "@sentzunhat/zacatl";
-import { TaskService } from "../../../domain/providers/task.service.js";
+import type { FastifyRequest, FastifyReply } from 'fastify';
+import { resolveDependency } from '@sentzunhat/zacatl';
+import { TaskService } from '../../../domain/providers/task.service.js';
 
 export async function listTasksHandler(request: FastifyRequest, reply: FastifyReply) {
-  const taskService = resolveDependency<TaskService>("TaskService");
+  const taskService = resolveDependency<TaskService>('TaskService');
   const tasks = await taskService.getAllTasks();
   return reply.send(tasks);
 }
@@ -257,14 +260,14 @@ export async function listTasksHandler(request: FastifyRequest, reply: FastifyRe
 ### 7. Routes Aggregation (`src/tasks/application/route-handlers/routes.ts`)
 
 ```typescript
-import type { FastifyInstance, FastifyPluginOptions } from "fastify";
-import { createTaskHandler } from "./create-task/handler.js";
-import { CreateTaskSchema } from "./create-task/schema.js";
-import { listTasksHandler } from "./list-tasks/handler.js";
+import type { FastifyInstance, FastifyPluginOptions } from 'fastify';
+import { createTaskHandler } from './create-task/handler.js';
+import { CreateTaskSchema } from './create-task/schema.js';
+import { listTasksHandler } from './list-tasks/handler.js';
 
 export async function taskRoutes(app: FastifyInstance, opts: FastifyPluginOptions) {
-  app.post("/tasks", { schema: CreateTaskSchema }, createTaskHandler);
-  app.get("/tasks", listTasksHandler);
+  app.post('/tasks', { schema: CreateTaskSchema }, createTaskHandler);
+  app.get('/tasks', listTasksHandler);
 }
 ```
 
@@ -439,25 +442,25 @@ src/
 ### Service.ts for Multi-Area
 
 ```typescript
-import { Service } from "@sentzunhat/zacatl";
+import { Service } from '@sentzunhat/zacatl';
 
 // Catalyst area
-import { catalystRoutes } from "./areas/catalyst/application/route-handlers/routes.js";
-import { catalystHooks } from "./areas/catalyst/application/hook-handlers/hooks.js";
-import { catalystProviders } from "./areas/catalyst/domain/providers/providers.js";
-import { catalystRepositories } from "./areas/catalyst/infrastructure/repositories/repositories.js";
-import { catalystJobs } from "./areas/catalyst/infrastructure/jobs/jobs.js";
+import { catalystRoutes } from './areas/catalyst/application/route-handlers/routes.js';
+import { catalystHooks } from './areas/catalyst/application/hook-handlers/hooks.js';
+import { catalystProviders } from './areas/catalyst/domain/providers/providers.js';
+import { catalystRepositories } from './areas/catalyst/infrastructure/repositories/repositories.js';
+import { catalystJobs } from './areas/catalyst/infrastructure/jobs/jobs.js';
 
 // Passport area
-import { passportRoutes } from "./areas/passport/application/route-handlers/routes.js";
-import { authHook } from "./areas/passport/application/hook-handlers/auth.hook.js";
-import { passportProviders } from "./areas/passport/domain/providers/providers.js";
-import { passportRepositories } from "./areas/passport/infrastructure/repositories/repositories.js";
+import { passportRoutes } from './areas/passport/application/route-handlers/routes.js';
+import { authHook } from './areas/passport/application/hook-handlers/auth.hook.js';
+import { passportProviders } from './areas/passport/domain/providers/providers.js';
+import { passportRepositories } from './areas/passport/infrastructure/repositories/repositories.js';
 
 // Tenancy area
-import { tenancyRoutes } from "./areas/tenancy/application/route-handlers/routes.js";
-import { tenancyProviders } from "./areas/tenancy/domain/providers/providers.js";
-import { tenancyRepositories } from "./areas/tenancy/infrastructure/repositories/repositories.js";
+import { tenancyRoutes } from './areas/tenancy/application/route-handlers/routes.js';
+import { tenancyProviders } from './areas/tenancy/domain/providers/providers.js';
+import { tenancyRepositories } from './areas/tenancy/infrastructure/repositories/repositories.js';
 
 export async function buildService() {
   const service = new Service({
@@ -502,11 +505,11 @@ When scaffolding a new project, verify these connections:
 ```typescript
 // routes.ts exports plugin function
 export async function myRoutes(app: FastifyInstance, opts: FastifyPluginOptions) {
-  app.get("/health", healthHandler);
+  app.get('/health', healthHandler);
 }
 
 // service.ts imports and registers
-import { myRoutes } from "./areas/main/application/route-handlers/routes.js";
+import { myRoutes } from './areas/main/application/route-handlers/routes.js';
 // ...
 application: {
   routes: [myRoutes];
@@ -541,7 +544,7 @@ export class UserRepository extends BaseRepository<User, User, UserOutput> {
   constructor() {
     super({
       type: ORMType.Mongoose, // or ORMType.Sequelize
-      name: "User",
+      name: 'User',
       schema: UserSchema,
     });
   }
@@ -551,11 +554,11 @@ export class UserRepository extends BaseRepository<User, User, UserOutput> {
 ### ✅ 4. Handler Uses resolveDependency
 
 ```typescript
-import { resolveDependency } from "@sentzunhat/zacatl";
-import { TaskService } from "../../../domain/providers/task.service.js";
+import { resolveDependency } from '@sentzunhat/zacatl';
+import { TaskService } from '../../../domain/providers/task.service.js';
 
 export async function handler(request: FastifyRequest, reply: FastifyReply) {
-  const service = resolveDependency<TaskService>("TaskService");
+  const service = resolveDependency<TaskService>('TaskService');
   // Use service...
 }
 ```
@@ -570,7 +573,7 @@ export async function handler(request: FastifyRequest, reply: FastifyReply) {
 
 ```typescript
 // server.ts
-import { buildService } from "./service.js";
+import { buildService } from './service.js';
 
 async function start() {
   const service = await buildService();
@@ -578,7 +581,7 @@ async function start() {
 }
 
 start().catch((error) => {
-  console.error("Startup failed:", error);
+  console.error('Startup failed:', error);
   process.exit(1);
 });
 ```
@@ -603,9 +606,9 @@ Each feature (e.g., "create user", "list tasks") gets its own folder with:
 **handler.ts:**
 
 ```typescript
-import type { FastifyRequest, FastifyReply } from "fastify";
-import { resolveDependency } from "@sentzunhat/zacatl";
-import { UserService } from "../../../domain/providers/user.service.js";
+import type { FastifyRequest, FastifyReply } from 'fastify';
+import { resolveDependency } from '@sentzunhat/zacatl';
+import { UserService } from '../../../domain/providers/user.service.js';
 
 interface CreateUserBody {
   email: string;
@@ -613,8 +616,11 @@ interface CreateUserBody {
   name: string;
 }
 
-export async function createUserHandler(request: FastifyRequest<{ Body: CreateUserBody }>, reply: FastifyReply) {
-  const userService = resolveDependency<UserService>("UserService");
+export async function createUserHandler(
+  request: FastifyRequest<{ Body: CreateUserBody }>,
+  reply: FastifyReply,
+) {
+  const userService = resolveDependency<UserService>('UserService');
 
   const user = await userService.createUser(request.body);
 
@@ -629,11 +635,11 @@ export async function createUserHandler(request: FastifyRequest<{ Body: CreateUs
 **schema.ts:**
 
 ```typescript
-import { Type } from "@sinclair/typebox";
+import { Type } from '@sinclair/typebox';
 
 export const CreateUserSchema = {
   body: Type.Object({
-    email: Type.String({ format: "email" }),
+    email: Type.String({ format: 'email' }),
     password: Type.String({ minLength: 8 }),
     name: Type.String({ minLength: 1 }),
   }),
@@ -650,15 +656,15 @@ export const CreateUserSchema = {
 **routes.ts (area aggregator):**
 
 ```typescript
-import type { FastifyInstance, FastifyPluginOptions } from "fastify";
-import { createUserHandler } from "./create-user/handler.js";
-import { CreateUserSchema } from "./create-user/schema.js";
-import { loginHandler } from "./login/handler.js";
-import { LoginSchema } from "./login/schema.js";
+import type { FastifyInstance, FastifyPluginOptions } from 'fastify';
+import { createUserHandler } from './create-user/handler.js';
+import { CreateUserSchema } from './create-user/schema.js';
+import { loginHandler } from './login/handler.js';
+import { LoginSchema } from './login/schema.js';
 
 export async function passportRoutes(app: FastifyInstance, opts: FastifyPluginOptions) {
-  app.post("/auth/register", { schema: CreateUserSchema }, createUserHandler);
-  app.post("/auth/login", { schema: LoginSchema }, loginHandler);
+  app.post('/auth/register', { schema: CreateUserSchema }, createUserHandler);
+  app.post('/auth/login', { schema: LoginSchema }, loginHandler);
 }
 ```
 
@@ -669,20 +675,20 @@ export async function passportRoutes(app: FastifyInstance, opts: FastifyPluginOp
 ### 1. Error Handling
 
 ```typescript
-import { BadRequestError, NotFoundError, UnauthorizedError } from "@sentzunhat/zacatl";
+import { BadRequestError, NotFoundError, UnauthorizedError } from '@sentzunhat/zacatl';
 
 export async function handler(request: FastifyRequest, reply: FastifyReply) {
   const { id } = request.params;
 
   if (!id) {
-    throw new BadRequestError({ message: "ID is required" });
+    throw new BadRequestError({ message: 'ID is required' });
   }
 
-  const service = resolveDependency<TaskService>("TaskService");
+  const service = resolveDependency<TaskService>('TaskService');
   const task = await service.getTaskById(id);
 
   if (!task) {
-    throw new NotFoundError({ message: "Task not found" });
+    throw new NotFoundError({ message: 'Task not found' });
   }
 
   return reply.send(task);
@@ -694,14 +700,14 @@ export async function handler(request: FastifyRequest, reply: FastifyReply) {
 **Auth Hook** (`src/areas/passport/application/hook-handlers/auth.hook.ts`):
 
 ```typescript
-import type { FastifyInstance, FastifyPluginOptions } from "fastify";
+import type { FastifyInstance, FastifyPluginOptions } from 'fastify';
 
 export async function authHook(app: FastifyInstance, opts: FastifyPluginOptions) {
-  app.addHook("onRequest", async (request, reply) => {
-    const token = request.headers.authorization?.replace("Bearer ", "");
+  app.addHook('onRequest', async (request, reply) => {
+    const token = request.headers.authorization?.replace('Bearer ', '');
 
     if (!token) {
-      return reply.code(401).send({ error: "Unauthorized" });
+      return reply.code(401).send({ error: 'Unauthorized' });
     }
 
     // Validate token, attach user to request
@@ -730,12 +736,12 @@ layers: {
 **Job Definition** (`src/areas/catalyst/infrastructure/jobs/email-notifier.job.ts`):
 
 ```typescript
-import { singleton } from "tsyringe";
+import { singleton } from 'tsyringe';
 
 @singleton()
 export class EmailNotifierJob {
   async execute() {
-    console.log("Sending email notifications...");
+    console.log('Sending email notifications...');
     // Job logic here
   }
 }
@@ -744,7 +750,7 @@ export class EmailNotifierJob {
 **Job Registration** (`src/areas/catalyst/infrastructure/jobs/jobs.ts`):
 
 ```typescript
-import { EmailNotifierJob } from "./email-notifier.job.js";
+import { EmailNotifierJob } from './email-notifier.job.js';
 
 export const catalystJobs = [EmailNotifierJob];
 ```
@@ -762,22 +768,22 @@ infrastructure: {
 ```typescript
 // src/main/infrastructure/migrations/001-create-users-table.ts
 export async function up(db: Db) {
-  await db.createCollection("users");
+  await db.createCollection('users');
 }
 
 export async function down(db: Db) {
-  await db.dropCollection("users");
+  await db.dropCollection('users');
 }
 ```
 
 ### 5. Validation with TypeBox
 
 ```typescript
-import { Type } from "@sinclair/typebox";
+import { Type } from '@sinclair/typebox';
 
 export const UpdateTaskSchema = {
   params: Type.Object({
-    id: Type.String({ format: "uuid" }),
+    id: Type.String({ format: 'uuid' }),
   }),
   body: Type.Object({
     title: Type.Optional(Type.String({ minLength: 1 })),

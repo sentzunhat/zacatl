@@ -1,10 +1,10 @@
-import type { Request as ExpressRequest, Response } from "express";
+import type { Request as ExpressRequest, Response } from 'express';
 
-import { z } from "@zacatl/third-party/zod";
+import { z } from '@zacatl/third-party/zod';
 
-import type { HTTPMethod } from "../../common/http-methods";
+import type { HTTPMethod } from '../../common/http-methods';
 
-export type { Request } from "../../common/request";
+export type { Request } from '../../common/request';
 
 export interface RouteSchema<
   TBody = void,

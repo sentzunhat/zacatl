@@ -13,9 +13,9 @@ npm install sequelize pg pg-hstore
 ### Setup
 
 ```typescript
-import { Sequelize } from "sequelize";
+import { Sequelize } from 'sequelize';
 
-const sequelize = new Sequelize("postgresql://localhost:5432/mydb", {
+const sequelize = new Sequelize('postgresql://localhost:5432/mydb', {
   logging: false,
 });
 
@@ -25,9 +25,9 @@ await sequelize.authenticate();
 ### Define Model
 
 ```typescript
-import { DataTypes } from "sequelize";
+import { DataTypes } from 'sequelize';
 
-const User = sequelize.define("User", {
+const User = sequelize.define('User', {
   id: {
     type: DataTypes.UUID,
     defaultValue: DataTypes.UUIDV4,
@@ -43,7 +43,7 @@ await sequelize.sync();
 ### Create Repository
 
 ```typescript
-import { IRepository } from "@sentzunhat/zacatl";
+import { IRepository } from '@sentzunhat/zacatl';
 
 class UserRepository implements IRepository<User> {
   async findById(id: string) {
@@ -75,13 +75,7 @@ class UserRepository implements IRepository<User> {
 ### Register
 
 ```typescript
-import {
-  Service,
-  ServiceType,
-  ServerType,
-  ServerVendor,
-  DatabaseVendor,
-} from "@sentzunhat/zacatl";
+import { Service, ServiceType, ServerType, ServerVendor, DatabaseVendor } from '@sentzunhat/zacatl';
 
 const service = new Service({
   type: ServiceType.SERVER,
@@ -93,7 +87,7 @@ const service = new Service({
   },
   platforms: {
     server: {
-      name: "my-service",
+      name: 'my-service',
       server: {
         type: ServerType.SERVER,
         vendor: ServerVendor.FASTIFY,
@@ -121,9 +115,9 @@ npm install mongoose
 ### Setup
 
 ```typescript
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
-await mongoose.connect("mongodb://localhost:27017/mydb");
+await mongoose.connect('mongodb://localhost:27017/mydb');
 ```
 
 ### Define Schema
@@ -134,7 +128,7 @@ const userSchema = new mongoose.Schema({
   email: String,
 });
 
-const User = mongoose.model("User", userSchema);
+const User = mongoose.model('User', userSchema);
 ```
 
 ### Create Repository
@@ -170,7 +164,7 @@ class UserRepository implements IRepository<User> {
 ### Register
 
 ```typescript
-import { Service, ServiceType, DatabaseVendor } from "@sentzunhat/zacatl";
+import { Service, ServiceType, DatabaseVendor } from '@sentzunhat/zacatl';
 
 const service = new Service({
   type: ServiceType.SERVER,

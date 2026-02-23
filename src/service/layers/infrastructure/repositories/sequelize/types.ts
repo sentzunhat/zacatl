@@ -1,8 +1,5 @@
-import type {
-  ModelStatic,
-  SequelizeModel as Model,
-} from "../../../../../third-party/sequelize";
-import { ORMType } from "../mongoose/types";
+import type { ModelStatic, SequelizeModel as Model } from '../../../../../third-party/sequelize';
+import { ORMType } from '../mongoose/types';
 
 export type LeanDocument<T> = T & {
   id: string;
@@ -21,6 +18,4 @@ export type SequelizeBaseRepositoryConfig<D extends object = object> =
   };
 
 /** Model types for Sequelize ORM */
-export type SequelizeRepositoryModel<D extends object = object> = ModelStatic<
-  Model<D>
->;
+export type SequelizeRepositoryModel<D extends object = object> = ModelStatic<Model<D>>;

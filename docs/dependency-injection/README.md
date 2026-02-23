@@ -39,14 +39,20 @@ Ensure your `tsconfig.json` has:
 ### Basic Usage
 
 ```typescript
-import { inject, singleton, BadRequestError, ValidationError, InternalServerError } from "@sentzunhat/zacatl";
+import {
+  inject,
+  singleton,
+  BadRequestError,
+  ValidationError,
+  InternalServerError,
+} from '@sentzunhat/zacatl';
 
 // Define a repository
 @singleton()
 class UserRepository {
   async findById(id: string) {
     // Implementation
-    return { id, name: "John Doe" };
+    return { id, name: 'John Doe' };
   }
 }
 
@@ -62,8 +68,8 @@ class UserService {
     const user = await this.userRepo.findById(id);
     if (!user) {
       throw new BadRequestError({
-        message: "User not found",
-        reason: "USER_NOT_FOUND",
+        message: 'User not found',
+        reason: 'USER_NOT_FOUND',
       });
     }
     return user;
@@ -102,7 +108,12 @@ If you are not using the Service architecture, prefer Zacatl's DI helper functio
 over calling `container.register(...)` directly.
 
 ```typescript
-import { registerDependency, registerSingleton, registerValue, resolveDependency } from "@sentzunhat/zacatl/dependency-injection";
+import {
+  registerDependency,
+  registerSingleton,
+  registerValue,
+  resolveDependency,
+} from '@sentzunhat/zacatl/dependency-injection';
 
 registerDependency(UserService, UserService);
 registerSingleton(NotificationService, NotificationService);
@@ -121,7 +132,13 @@ layers. For most applications, the Service architecture is simpler and more robu
 From a production authentication service:
 
 ```typescript
-import { inject, singleton, BadRequestError, ValidationError, InternalServerError } from "@sentzunhat/zacatl";
+import {
+  inject,
+  singleton,
+  BadRequestError,
+  ValidationError,
+  InternalServerError,
+} from '@sentzunhat/zacatl';
 
 @singleton()
 export class AttestOptionsProviderAdapter {
@@ -139,8 +156,8 @@ export class AttestOptionsProviderAdapter {
 
     if (!token) {
       throw new BadRequestError({
-        message: "invalid token",
-        reason: "CLIENT_TOKEN_MISSING",
+        message: 'invalid token',
+        reason: 'CLIENT_TOKEN_MISSING',
       });
     }
 
@@ -219,7 +236,7 @@ Both work identically - choose based on semantic meaning. See [Layer Registratio
 ### Basic Setup
 
 ```typescript
-import { Service, singleton } from "@sentzunhat/zacatl";
+import { Service, singleton } from '@sentzunhat/zacatl';
 
 // Define your classes
 @singleton()
@@ -235,8 +252,8 @@ class UserProvider {
 
   async createUser(email: string) {
     // Create user...
-    await this.emailProvider.send(email, "Welcome!");
-    return { id: "123", email };
+    await this.emailProvider.send(email, 'Welcome!');
+    return { id: '123', email };
   }
 }
 
@@ -264,18 +281,18 @@ See the [Service Adapter Pattern](../service/service-adapter-pattern.md) for ful
 ### Pattern 1: Repository with Service
 
 ```typescript
-import { inject, singleton, NotFoundError } from "@sentzunhat/zacatl";
+import { inject, singleton, NotFoundError } from '@sentzunhat/zacatl';
 
 @singleton()
 class UserRepository {
   async findById(id: string) {
     // DB query
-    return { id, email: "user@example.com" };
+    return { id, email: 'user@example.com' };
   }
 
   async create(data: any) {
     // DB insert
-    return { id: "new-id", ...data };
+    return { id: 'new-id', ...data };
   }
 }
 
@@ -290,8 +307,8 @@ class UserService {
     const user = await this.userRepo.findById(id);
     if (!user) {
       throw new NotFoundError({
-        message: "User not found",
-        reason: "USER_NOT_FOUND",
+        message: 'User not found',
+        reason: 'USER_NOT_FOUND',
       });
     }
     return user;
@@ -330,7 +347,7 @@ class OrderService {
 ### Pattern 3: Abstract-Class DI (Manual Binding)
 
 ```typescript
-import { inject, singleton, container } from "@sentzunhat/zacatl";
+import { inject, singleton, container } from '@sentzunhat/zacatl';
 
 // Define abstract token
 abstract class NotificationService {
@@ -433,18 +450,18 @@ class ConsoleLogger implements ILogger {
 
 class FileLogger implements ILogger {
   log(message: string) {
-    fs.appendFileSync("app.log", message + "\n");
+    fs.appendFileSync('app.log', message + '\n');
   }
 }
 
 // Manual registration with string token (advanced only)
-container.register<ILogger>("ILogger", {
-  useClass: process.env.NODE_ENV === "production" ? FileLogger : ConsoleLogger,
+container.register<ILogger>('ILogger', {
+  useClass: process.env.NODE_ENV === 'production' ? FileLogger : ConsoleLogger,
 });
 
 // Inject using string token
 class MyService {
-  constructor(@inject("ILogger") private logger: ILogger) {}
+  constructor(@inject('ILogger') private logger: ILogger) {}
 }
 ```
 
@@ -509,7 +526,7 @@ class UserOrderCoordinator {
 
 ```typescript
 // Instead of decorators
-import { registerSingletonWithDependencies } from "@sentzunhat/zacatl";
+import { registerSingletonWithDependencies } from '@sentzunhat/zacatl';
 
 registerSingletonWithDependencies(MyRepository);
 registerSingletonWithDependencies(MyService, [MyRepository]);
@@ -552,11 +569,11 @@ registerWithDependencies(MyService, []);
 
 ```typescript
 // String token - requires manual registration, no type safety
-container.registerInstance("MyRepository", new MyRepositoryAdapter());
+container.registerInstance('MyRepository', new MyRepositoryAdapter());
 
 @singleton()
 class MyService {
-  constructor(@inject("MyRepository") private repo: any) {}
+  constructor(@inject('MyRepository') private repo: any) {}
   //                 ^^^^^^^^^^^^^^^^           ^^^ - loses type safety
 }
 ```
@@ -650,7 +667,7 @@ import {
   // Other utilities
   Service,
   BaseRepository,
-} from "@sentzunhat/zacatl";
+} from '@sentzunhat/zacatl';
 ```
 
 This ensures you're using the correct versions bundled with Zacatl. You can also import directly from `tsyringe` if needed, but the Zacatl exports are recommended for consistency.

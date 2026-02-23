@@ -1,9 +1,6 @@
-import type {
-  MongooseRepositoryConfig,
-  MongooseRepositoryModel,
-} from "./types";
-import { createMongooseAdapter } from "../../orm/adapter-loader";
-import type { RepositoryPort , ORMPort } from "../types";
+import type { MongooseRepositoryConfig, MongooseRepositoryModel } from './types';
+import { createMongooseAdapter } from '../../orm/adapter-loader';
+import type { RepositoryPort, ORMPort } from '../types';
 
 /**
  * Standalone Mongoose Repository - delegates to MongooseAdapter
@@ -11,11 +8,9 @@ import type { RepositoryPort , ORMPort } from "../types";
  * Provides all repository operations for Mongoose ORM without runtime adapter switching.
  * Internally uses the same MongooseAdapter as BaseRepository for code reuse.
  */
-export abstract class AbstractMongooseRepository<
-  D,
-  I,
-  O,
-> implements RepositoryPort<MongooseRepositoryModel<D>, I, O> {
+export abstract class AbstractMongooseRepository<D, I, O>
+  implements RepositoryPort<MongooseRepositoryModel<D>, I, O>
+{
   private readonly adapter: ORMPort<MongooseRepositoryModel<D>, I, O>;
 
   constructor(config: MongooseRepositoryConfig<D>) {

@@ -62,17 +62,17 @@ This document outlines a strategic approach to improving test coverage by focusi
 **Example:**
 
 ```typescript
-describe("BadRequestError", () => {
-  it("should include metadata with error chain", () => {
-    const cause = new Error("Schema validation failed");
+describe('BadRequestError', () => {
+  it('should include metadata with error chain', () => {
+    const cause = new Error('Schema validation failed');
     const error = new BadRequestError({
-      message: "Invalid input",
-      reason: "Email is required",
-      metadata: { field: "email", schema: "User" },
+      message: 'Invalid input',
+      reason: 'Email is required',
+      metadata: { field: 'email', schema: 'User' },
       error: cause,
     });
     expect(error.cause).toBe(cause);
-    expect(error.metadata).toContainEqual({ field: "email" });
+    expect(error.metadata).toContainEqual({ field: 'email' });
   });
 });
 ```
@@ -100,21 +100,21 @@ Critical path: Service → Port → Repository
 **Example:**
 
 ```typescript
-describe("GreetingService", () => {
-  describe("create", () => {
-    it("should validate message is not empty", async () => {
-      await expect(service.create({ message: "" })).rejects.toThrow(BadRequestError);
+describe('GreetingService', () => {
+  describe('create', () => {
+    it('should validate message is not empty', async () => {
+      await expect(service.create({ message: '' })).rejects.toThrow(BadRequestError);
     });
 
-    it("should include timestamp and ID on creation", async () => {
-      const result = await service.create({ message: "Hello" });
+    it('should include timestamp and ID on creation', async () => {
+      const result = await service.create({ message: 'Hello' });
       expect(result.id).toBeDefined();
       expect(result.createdAt).toBeInstanceOf(Date);
     });
 
-    it("should throw if repository fails", async () => {
-      mockRepo.save.mockRejectedValue(new Error("DB error"));
-      await expect(service.create({ message: "Test" })).rejects.toThrow();
+    it('should throw if repository fails', async () => {
+      mockRepo.save.mockRejectedValue(new Error('DB error'));
+      await expect(service.create({ message: 'Test' })).rejects.toThrow();
     });
   });
 });
@@ -144,17 +144,17 @@ describe("GreetingService", () => {
 **Example:**
 
 ```typescript
-describe("Auto-Registration", () => {
+describe('Auto-Registration', () => {
   beforeEach(() => clearContainer());
 
-  it("should register and resolve transient instances", () => {
+  it('should register and resolve transient instances', () => {
     new Infrastructure({ repositories: [UserRepository] });
     const inst1 = resolveDependency(UserRepository);
     const inst2 = resolveDependency(UserRepository);
     expect(inst1).not.toBe(inst2); // Different instances
   });
 
-  it("should detect and report circular dependencies", () => {
+  it('should detect and report circular dependencies', () => {
     expect(() => {
       new Infrastructure({ repositories: [circularA, circularB] });
     }).toThrow(/circular|cycle/i);
@@ -237,20 +237,20 @@ Pick the most-used ORM (e.g., Sequelize) and test it thoroughly once. Then mark 
 **Example:**
 
 ```typescript
-describe("SequelizeGreetingRepository", () => {
-  it("should find all greetings", async () => {
+describe('SequelizeGreetingRepository', () => {
+  it('should find all greetings', async () => {
     const results = await repo.findAll();
     expect(Array.isArray(results)).toBe(true);
   });
 
   it("should throw NotFoundError when ID doesn't exist", async () => {
-    await expect(repo.findById("nonexistent-id")).rejects.toThrow(NotFoundError);
+    await expect(repo.findById('nonexistent-id')).rejects.toThrow(NotFoundError);
   });
 
-  it("should save and return with generated ID", async () => {
-    const result = await repo.save({ message: "Test" });
+  it('should save and return with generated ID', async () => {
+    const result = await repo.save({ message: 'Test' });
     expect(result.id).toBeDefined();
-    expect(result.message).toBe("Test");
+    expect(result.message).toBe('Test');
   });
 });
 ```
@@ -278,14 +278,14 @@ describe("SequelizeGreetingRepository", () => {
 **Example:**
 
 ```typescript
-describe("loadJSON", () => {
-  it("should load and validate schema", async () => {
-    const config = loadJSON("./test.json", serverSchema);
+describe('loadJSON', () => {
+  it('should load and validate schema', async () => {
+    const config = loadJSON('./test.json', serverSchema);
     expect(config.port).toBe(3000);
   });
 
-  it("should throw ValidationError on invalid schema", () => {
-    expect(() => loadJSON("./invalid.json", serverSchema)).toThrow(ValidationError);
+  it('should throw ValidationError on invalid schema', () => {
+    expect(() => loadJSON('./invalid.json', serverSchema)).toThrow(ValidationError);
   });
 });
 ```

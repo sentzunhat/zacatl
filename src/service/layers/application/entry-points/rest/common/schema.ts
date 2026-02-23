@@ -1,4 +1,4 @@
-import { z } from "@zacatl/third-party/zod";
+import { z } from '@zacatl/third-party/zod';
 
 /**
  * Builds the standard API response envelope schema:

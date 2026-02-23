@@ -7,20 +7,20 @@ Zacatl re-exports commonly used third-party packages for convenience and provide
 ### tsyringe (Dependency Injection)
 
 ```typescript
-import { container, injectable, inject } from "@sentzunhat/zacatl/third-party";
+import { container, injectable, inject } from '@sentzunhat/zacatl/third-party';
 
 @injectable()
 class UserService {
   constructor(private userRepo: UserRepository) {}
 }
 
-container.register("UserService", { useClass: UserService });
+container.register('UserService', { useClass: UserService });
 ```
 
 ### Zod (Validation)
 
 ```typescript
-import { z } from "@sentzunhat/zacatl/third-party";
+import { z } from '@sentzunhat/zacatl/third-party';
 
 const UserSchema = z.object({
   name: z.string(),
@@ -42,10 +42,10 @@ See [../third-party/orm/overview.md](../third-party/orm/overview.md) for full us
 
 ```typescript
 // ✅ This only bundles Mongoose
-import { mongoose } from "@sentzunhat/zacatl/third-party/mongoose";
+import { mongoose } from '@sentzunhat/zacatl/third-party/mongoose';
 
 // ❌ This would bundle ALL ORMs (if they were in main exports)
-import { mongoose, Sequelize } from "@sentzunhat/zacatl";
+import { mongoose, Sequelize } from '@sentzunhat/zacatl';
 ```
 
 **Bundle Size**:
@@ -80,16 +80,16 @@ Zacatl uses these third-party versions:
 
 ```typescript
 // From main package - always available
-import { container, injectable } from "@sentzunhat/zacatl/third-party";
-import { z } from "@sentzunhat/zacatl/third-party";
+import { container, injectable } from '@sentzunhat/zacatl/third-party';
+import { z } from '@sentzunhat/zacatl/third-party';
 ```
 
 ### Subpath Imports
 
 ```typescript
 // From subpath - install peer dependency first
-import { mongoose } from "@sentzunhat/zacatl/third-party/mongoose";
-import { Sequelize } from "@sentzunhat/zacatl/third-party/sequelize";
+import { mongoose } from '@sentzunhat/zacatl/third-party/mongoose';
+import { Sequelize } from '@sentzunhat/zacatl/third-party/sequelize';
 ```
 
 ## Installing Peer Dependencies

@@ -1,7 +1,7 @@
-export * from "./server";
-export * from "./api";
-export * from "./page";
-export * from "./database";
+export * from './server';
+export * from './api';
+export * from './page';
+export * from './database';
 export {
   ServerVendor,
   DatabaseVendor,
@@ -12,4 +12,4 @@ export {
   type StaticConfig,
   type DatabaseServerPort,
   type DatabaseConfig,
-} from "./types";
+} from './types';

@@ -1,14 +1,14 @@
-import { resolveDependencies } from "@zacatl/dependency-injection";
-import { CustomError, InternalServerError } from "@zacatl/error";
+import { resolveDependencies } from '@zacatl/dependency-injection';
+import { CustomError, InternalServerError } from '@zacatl/error';
 
-import { type ApiServerPort, type ProxyConfig } from "./port";
-import { HookHandler, RouteHandler } from "../../../layers/application";
-import type { RestApplicationEntryPoints } from "../../../layers/application/types";
-import { ApiServerType, type HttpServerConfig } from "../types/server-config";
+import { type ApiServerPort, type ProxyConfig } from './port';
+import { HookHandler, RouteHandler } from '../../../layers/application';
+import type { RestApplicationEntryPoints } from '../../../layers/application/types';
+import { ApiServerType, type HttpServerConfig } from '../types/server-config';
 
 export enum HandlersType {
-  HOOK = "hook",
-  ROUTE = "route",
+  HOOK = 'hook',
+  ROUTE = 'route',
 }
 
 type Handlers = RouteHandler | HookHandler;
@@ -44,7 +44,7 @@ export class ApiServer {
       for (const proxyConf of this.config.gateway.proxies) {
         this.registerProxy({
           upstream: proxyConf.upstream,
-          prefix: proxyConf.prefix ?? "/",
+          prefix: proxyConf.prefix ?? '/',
           http2: false,
         });
       }
@@ -64,9 +64,9 @@ export class ApiServer {
           } else {
             throw new InternalServerError({
               message: `Handler type ${handlersType} is not supported`,
-              reason: "Handler type must be ROUTE or HOOK",
-              component: "ApiServer",
-              operation: "registerHandlers",
+              reason: 'Handler type must be ROUTE or HOOK',
+              component: 'ApiServer',
+              operation: 'registerHandlers',
               metadata: { handlersType },
             });
           }
@@ -74,7 +74,7 @@ export class ApiServer {
           throw new CustomError({
             message: `failed to register ${handlersType}: ${handler.constructor.name}`,
             code: 500,
-            reason: "handler registration failed",
+            reason: 'handler registration failed',
             error: error as Error,
             metadata: { handler: handler.constructor.name },
           });

@@ -1,23 +1,23 @@
-import { container } from "tsyringe";
+import { container } from 'tsyringe';
 
 import {
   registerDependencies,
   registerAndResolve,
-} from "../../../../src/dependency-injection/container";
+} from '../../../../src/dependency-injection/container';
 
 class DummyDependency {
-  public value = "dummy";
+  public value = 'dummy';
 }
 
 class AnotherDependency {
-  public name = "another";
-  public value = "test-value";
+  public name = 'another';
+  public value = 'test-value';
 }
 
-describe("Layer Composition Utilities", () => {
-  describe("registerDependencies", () => {
-    it("should register each dependency with the container", () => {
-      const spyFunction = vi.spyOn(container, "register");
+describe('Layer Composition Utilities', () => {
+  describe('registerDependencies', () => {
+    it('should register each dependency with the container', () => {
+      const spyFunction = vi.spyOn(container, 'register');
 
       registerDependencies([DummyDependency, AnotherDependency]);
 
@@ -29,8 +29,8 @@ describe("Layer Composition Utilities", () => {
       });
     });
 
-    it("should handle empty array", () => {
-      const spyFunction = vi.spyOn(container, "register");
+    it('should handle empty array', () => {
+      const spyFunction = vi.spyOn(container, 'register');
       const initialCallCount = spyFunction.mock.calls.length;
 
       registerDependencies([]);
@@ -39,10 +39,10 @@ describe("Layer Composition Utilities", () => {
     });
   });
 
-  describe("registerAndResolve", () => {
-    it("should register dependencies and return resolved instances", () => {
-      const registerSpy = vi.spyOn(container, "register");
-      const resolveSpy = vi.spyOn(container, "resolve");
+  describe('registerAndResolve', () => {
+    it('should register dependencies and return resolved instances', () => {
+      const registerSpy = vi.spyOn(container, 'register');
+      const resolveSpy = vi.spyOn(container, 'resolve');
 
       const instances = registerAndResolve([DummyDependency]);
 
@@ -53,18 +53,15 @@ describe("Layer Composition Utilities", () => {
       expect(instances).toHaveLength(1);
     });
 
-    it("should return array of resolved instances in order", () => {
-      const instances = registerAndResolve([
-        DummyDependency,
-        AnotherDependency,
-      ]);
+    it('should return array of resolved instances in order', () => {
+      const instances = registerAndResolve([DummyDependency, AnotherDependency]);
 
       expect(instances).toHaveLength(2);
       expect(instances[0]).toBeInstanceOf(DummyDependency);
       expect(instances[1]).toBeInstanceOf(AnotherDependency);
     });
 
-    it("should return empty array for empty input", () => {
+    it('should return empty array for empty input', () => {
       const instances = registerAndResolve([]);
 
       expect(instances).toEqual([]);

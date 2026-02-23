@@ -22,8 +22,8 @@ graph TD
 ## Mongoose Example
 
 ```typescript
-import { BaseRepository } from "@sentzunhat/zacatl";
-import { Schema } from "mongoose";
+import { BaseRepository } from '@sentzunhat/zacatl';
+import { Schema } from 'mongoose';
 
 const userSchema = new Schema(
   {
@@ -35,7 +35,7 @@ const userSchema = new Schema(
 
 class UserRepository extends BaseRepository<User, CreateUser, UserDTO> {
   constructor() {
-    super({ type: "mongoose", name: "User", schema: userSchema });
+    super({ type: 'mongoose', name: 'User', schema: userSchema });
   }
 
   async findByEmail(email: string) {
@@ -48,21 +48,17 @@ class UserRepository extends BaseRepository<User, CreateUser, UserDTO> {
 ## Sequelize Example
 
 ```typescript
-import { BaseRepository } from "@sentzunhat/zacatl";
-import { Model } from "sequelize";
+import { BaseRepository } from '@sentzunhat/zacatl';
+import { Model } from 'sequelize';
 
 class ProductModel extends Model {
   declare id: string;
   declare name: string;
 }
 
-class ProductRepository extends BaseRepository<
-  ProductModel,
-  CreateProduct,
-  ProductDTO
-> {
+class ProductRepository extends BaseRepository<ProductModel, CreateProduct, ProductDTO> {
   constructor() {
-    super({ type: "sequelize", model: ProductModel });
+    super({ type: 'sequelize', model: ProductModel });
   }
 }
 ```
@@ -70,7 +66,7 @@ class ProductRepository extends BaseRepository<
 ## Custom Adapter
 
 ```typescript
-import type { ORMAdapter } from "@sentzunhat/zacatl";
+import type { ORMAdapter } from '@sentzunhat/zacatl';
 
 class MyAdapter<D, I, O> implements ORMAdapter<D, I, O> {
   readonly model: any;

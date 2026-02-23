@@ -1,5 +1,5 @@
-export * from "./repository";
-export * from "./types";
+export * from './repository';
+export * from './types';
 
 // Backward compatibility alias
-export { AbstractMongooseRepository as MongooseRepository } from "./repository";
+export { AbstractMongooseRepository as MongooseRepository } from './repository';

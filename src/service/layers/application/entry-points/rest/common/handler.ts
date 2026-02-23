@@ -1,4 +1,4 @@
-import { Request } from "./request";
+import { Request } from './request';
 
 export type Handler<
   TBody = void,

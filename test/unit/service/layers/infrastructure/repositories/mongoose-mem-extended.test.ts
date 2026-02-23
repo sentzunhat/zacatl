@@ -1,8 +1,8 @@
-import { beforeEach, afterEach, describe, expect, it } from "vitest";
-import mongoose from "mongoose";
-import { MongoMemoryServer } from "mongodb-memory-server";
+import { beforeEach, afterEach, describe, expect, it } from 'vitest';
+import mongoose from 'mongoose';
+import { MongoMemoryServer } from 'mongodb-memory-server';
 
-describe("Mongoose + mongodb-memory-server extended operations", () => {
+describe('Mongoose + mongodb-memory-server extended operations', () => {
   let mongod: MongoMemoryServer;
 
   beforeEach(async () => {
@@ -18,13 +18,13 @@ describe("Mongoose + mongodb-memory-server extended operations", () => {
 
     const PostSchema = new mongoose.Schema({
       title: String,
-      author: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+      author: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     });
 
-    mongoose.model("User", UserSchema);
-    mongoose.model("Post", PostSchema);
+    mongoose.model('User', UserSchema);
+    mongoose.model('Post', PostSchema);
     // Ensure indexes are created before tests that rely on unique constraints
-    await mongoose.model("User").createIndexes();
+    await mongoose.model('User').createIndexes();
   });
 
   afterEach(async () => {
@@ -34,12 +34,12 @@ describe("Mongoose + mongodb-memory-server extended operations", () => {
     Object.keys(models).forEach((k) => delete mongoose.models[k]);
   });
 
-  it("supports unique index violations and validation", async () => {
-    const User = mongoose.model("User") as mongoose.Model<any>;
-    await User.create({ email: "u1@example.com", name: "U1" });
+  it('supports unique index violations and validation', async () => {
+    const User = mongoose.model('User') as mongoose.Model<any>;
+    await User.create({ email: 'u1@example.com', name: 'U1' });
     let threw = false;
     try {
-      await User.create({ email: "u1@example.com", name: "U2" });
+      await User.create({ email: 'u1@example.com', name: 'U2' });
     } catch (err: any) {
       threw = true;
       expect(err).toBeTruthy();
@@ -47,23 +47,23 @@ describe("Mongoose + mongodb-memory-server extended operations", () => {
     expect(threw).toBe(true);
   });
 
-  it("supports populate, updateMany, aggregate and countDocuments", async () => {
-    const User = mongoose.model("User") as mongoose.Model<any>;
-    const Post = mongoose.model("Post") as mongoose.Model<any>;
+  it('supports populate, updateMany, aggregate and countDocuments', async () => {
+    const User = mongoose.model('User') as mongoose.Model<any>;
+    const Post = mongoose.model('Post') as mongoose.Model<any>;
 
-    const u = await User.create({ email: "pop@example.com", name: "P", meta: { age: 30 } });
-    await Post.create({ title: "one", author: u._id });
-    await Post.create({ title: "two", author: u._id });
+    const u = await User.create({ email: 'pop@example.com', name: 'P', meta: { age: 30 } });
+    await Post.create({ title: 'one', author: u._id });
+    await Post.create({ title: 'two', author: u._id });
 
-    const posts = await Post.find({}).populate("author");
+    const posts = await Post.find({}).populate('author');
     expect(posts.length).toBe(2);
-    expect(posts[0].author.email).toBe("pop@example.com");
+    expect(posts[0].author.email).toBe('pop@example.com');
 
-    await User.updateMany({ "meta.age": { $gte: 30 } }, { $set: { "meta.age": 31 } });
-    const updated = await User.findOne({ email: "pop@example.com" });
+    await User.updateMany({ 'meta.age': { $gte: 30 } }, { $set: { 'meta.age': 31 } });
+    const updated = await User.findOne({ email: 'pop@example.com' });
     expect(updated.meta.age).toBe(31);
 
-    const agg = await Post.aggregate([{ $group: { _id: "$author", count: { $sum: 1 } } }]);
+    const agg = await Post.aggregate([{ $group: { _id: '$author', count: { $sum: 1 } } }]);
     expect(agg[0].count).toBe(2);
 
     const c = await Post.countDocuments();

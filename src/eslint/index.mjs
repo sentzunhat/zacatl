@@ -7,11 +7,11 @@
  * import { recommended } from "@sentzunhat/zacatl/eslint";
  */
 
-import baseConfig from "./base.mjs";
-import importsConfig from "./imports.mjs";
-import namingConventions from "./naming-conventions.mjs";
-import fileNamingRules from "./file-naming.mjs";
-import solidConfig from "./solid.mjs";
+import baseConfig from './base.mjs';
+import importsConfig from './imports.mjs';
+import namingConventions from './naming-conventions.mjs';
+import fileNamingRules from './file-naming.mjs';
+import solidConfig from './solid.mjs';
 
 /**
  * Recommended ESLint configuration combining all Zacatl configs

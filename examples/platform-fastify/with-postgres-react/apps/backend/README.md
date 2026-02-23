@@ -100,8 +100,8 @@ export class CreateGreetingHandler extends AbstractRouteHandler<
     private readonly greetingService: GreetingServiceAdapter,
   ) {
     super({
-      url: "/greetings",
-      method: "POST",
+      url: '/greetings',
+      method: 'POST',
       schema: { body: CreateGreetingBodySchema },
     });
   }

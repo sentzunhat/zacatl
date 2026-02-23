@@ -2,10 +2,10 @@
  * Sequelize Model for Greeting Entity
  */
 
-import { DataTypes, Model, type Sequelize } from "sequelize";
-import type { Greeting } from "../../../domain/models/greeting";
+import { DataTypes, Model, type Sequelize } from 'sequelize';
+import type { Greeting } from '../../../domain/models/greeting';
 
-export class GreetingModel extends Model implements Omit<Greeting, "id"> {
+export class GreetingModel extends Model implements Omit<Greeting, 'id'> {
   declare id: string;
   declare message: string;
   declare language: string;
@@ -32,7 +32,7 @@ export function initGreetingModel(sequelize: Sequelize): typeof GreetingModel {
     },
     {
       sequelize,
-      tableName: "greetings",
+      tableName: 'greetings',
       timestamps: true,
     },
   );

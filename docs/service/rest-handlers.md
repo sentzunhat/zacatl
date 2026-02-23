@@ -7,14 +7,7 @@ Zacatl provides framework-agnostic REST API handler patterns that work consisten
 All handlers use a unified `HTTPMethod` type defined in `src/service/layers/application/entry-points/rest/common/http-methods.ts`:
 
 ```typescript
-export type HTTPMethod =
-  | "GET"
-  | "POST"
-  | "PUT"
-  | "PATCH"
-  | "DELETE"
-  | "HEAD"
-  | "OPTIONS";
+export type HTTPMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE' | 'HEAD' | 'OPTIONS';
 ```
 
 This ensures consistent HTTP method naming across Fastify and Express implementations.
@@ -33,12 +26,12 @@ Located in `src/service/layers/application/entry-points/rest/fastify/handlers/`
 **Example:**
 
 ```typescript
-import { GetRouteHandler } from "@sentzunhat/zacatl/service";
+import { GetRouteHandler } from '@sentzunhat/zacatl/service';
 
 export class FetchGreetingsHandler extends GetRouteHandler {
   constructor() {
     super({
-      url: "/greetings",
+      url: '/greetings',
       schema: {
         response: z.object({ message: z.string() }),
       },
@@ -46,7 +39,7 @@ export class FetchGreetingsHandler extends GetRouteHandler {
   }
 
   async handler(request, reply) {
-    return { message: "Hello from Fastify!" };
+    return { message: 'Hello from Fastify!' };
   }
 }
 ```
@@ -68,12 +61,12 @@ Located in `src/service/layers/application/entry-points/rest/express/handlers/`
 **Example:**
 
 ```typescript
-import { GetExpressRouteHandler } from "@sentzunhat/zacatl/service";
+import { GetExpressRouteHandler } from '@sentzunhat/zacatl/service';
 
 export class FetchGreetingsHandler extends GetExpressRouteHandler {
   constructor() {
     super({
-      url: "/greetings",
+      url: '/greetings',
       schema: {
         response: z.object({ message: z.string() }),
       },
@@ -81,7 +74,7 @@ export class FetchGreetingsHandler extends GetExpressRouteHandler {
   }
 
   async handler(req, res) {
-    return { message: "Hello from Express!" };
+    return { message: 'Hello from Express!' };
   }
 }
 ```

@@ -18,40 +18,53 @@
  * ];
  */
 
-import importPlugin from "eslint-plugin-import";
+import importPlugin from 'eslint-plugin-import';
 
 const importsConfig = {
   ...importPlugin.flatConfigs.recommended,
   rules: {
-    "import/order": [
-      "error",
+    'import/order': [
+      'error',
       {
         groups: [
-          "builtin", // Node.js built-in modules
-          "external", // npm packages
-          "internal", // Aliased imports
-          ["parent", "sibling", "index"], // Relative imports
+          'builtin', // Node.js built-in modules
+          'external', // npm packages
+          'internal', // Aliased imports
+          ['parent', 'sibling', 'index'], // Relative imports
         ],
         pathGroups: [
           {
-            pattern: "src/**",
-            group: "internal",
+            pattern: 'src/**',
+            group: 'internal',
           },
         ],
-        pathGroupsExcludedImportTypes: ["builtin", "external"],
-        "newlines-between": "always",
+        pathGroupsExcludedImportTypes: ['builtin', 'external'],
+        'newlines-between': 'always',
         alphabetize: {
-          order: "asc",
+          order: 'asc',
           caseInsensitive: true,
         },
       },
     ],
     // Disable rules that may conflict with TypeScript
-    "import/no-unresolved": "off",
-    "import/named": "off",
-    "import/namespace": "off",
-    "import/default": "off",
-    "import/no-named-as-default-member": "off",
+    'import/no-unresolved': 'off',
+    'import/named': 'off',
+    'import/namespace': 'off',
+    'import/default': 'off',
+    'import/no-named-as-default-member': 'off',
+    // Discourage importing the library root; prefer explicit subpath imports
+    'no-restricted-imports': [
+      'warn',
+      {
+        paths: [
+          {
+            name: '@zacatl',
+            message:
+              "Import explicit subpaths instead (e.g. '@zacatl/third-party/mongoose' or '@zacatl/service') to avoid pulling runtime implementations unintentionally.",
+          },
+        ],
+      },
+    ],
   },
 };
 

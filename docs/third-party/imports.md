@@ -24,7 +24,7 @@ import {
   tseslint, // typescript-eslint
   tsEslintPlugin, // @typescript-eslint/eslint-plugin
   importPlugin, // eslint-plugin-import
-} from "@sentzunhat/zacatl/third-party/eslint";
+} from '@sentzunhat/zacatl/third-party/eslint';
 ```
 
 **Use case:** ESLint config files that need direct access to ESLint plugins and parsers.
@@ -32,16 +32,16 @@ import {
 **Example (eslint.config.mjs):**
 
 ```javascript
-import { tsEslintParser, tseslint } from "@sentzunhat/zacatl/third-party/eslint";
+import { tsEslintParser, tseslint } from '@sentzunhat/zacatl/third-party/eslint';
 
 export default [
   {
-    files: ["src/**/*.ts"],
+    files: ['src/**/*.ts'],
     languageOptions: {
       parser: tsEslintParser,
-      parserOptions: { project: "./tsconfig.json" },
+      parserOptions: { project: './tsconfig.json' },
     },
-    plugins: { "@typescript-eslint": tseslint.plugin },
+    plugins: { '@typescript-eslint': tseslint.plugin },
   },
 ];
 ```
@@ -51,8 +51,8 @@ export default [
 For lazy-loaded Mongoose types and utilities:
 
 ```typescript
-import type { Mongoose } from "@sentzunhat/zacatl/third-party/mongoose";
-import { MongooseAdapter } from "@sentzunhat/zacatl/third-party/mongoose";
+import type { Mongoose } from '@sentzunhat/zacatl/third-party/mongoose';
+import { MongooseAdapter } from '@sentzunhat/zacatl/third-party/mongoose';
 ```
 
 **Use case:** Repositories and database adapters that need to support Mongoose without bundling it.
@@ -60,15 +60,15 @@ import { MongooseAdapter } from "@sentzunhat/zacatl/third-party/mongoose";
 **Example:**
 
 ```typescript
-import type { Mongoose } from "@sentzunhat/zacatl/third-party/mongoose";
-import { BaseRepository } from "@sentzunhat/zacatl/infrastructure";
+import type { Mongoose } from '@sentzunhat/zacatl/third-party/mongoose';
+import { BaseRepository } from '@sentzunhat/zacatl/infrastructure';
 
 class UserRepository extends BaseRepository<User, Mongoose> {
   constructor(mongoose: Mongoose) {
     super({
-      type: "mongoose",
+      type: 'mongoose',
       instance: mongoose,
-      name: "User",
+      name: 'User',
       schema: userSchema,
     });
   }
@@ -80,8 +80,8 @@ class UserRepository extends BaseRepository<User, Mongoose> {
 For lazy-loaded Sequelize types and utilities:
 
 ```typescript
-import type { Sequelize } from "@sentzunhat/zacatl/third-party/sequelize";
-import { SequelizeAdapter } from "@sentzunhat/zacatl/third-party/sequelize";
+import type { Sequelize } from '@sentzunhat/zacatl/third-party/sequelize';
+import { SequelizeAdapter } from '@sentzunhat/zacatl/third-party/sequelize';
 ```
 
 **Use case:** Repositories and database adapters that need to support Sequelize without bundling it.
@@ -89,13 +89,13 @@ import { SequelizeAdapter } from "@sentzunhat/zacatl/third-party/sequelize";
 **Example:**
 
 ```typescript
-import type { Sequelize } from "@sentzunhat/zacatl/third-party/sequelize";
-import { BaseRepository } from "@sentzunhat/zacatl/infrastructure";
+import type { Sequelize } from '@sentzunhat/zacatl/third-party/sequelize';
+import { BaseRepository } from '@sentzunhat/zacatl/infrastructure';
 
 class UserRepository extends BaseRepository<User, Sequelize> {
   constructor(sequelize: Sequelize) {
     super({
-      type: "sequelize",
+      type: 'sequelize',
       instance: sequelize,
       model: UserModel,
     });
@@ -113,11 +113,11 @@ Use direct package imports in **source files that execute at build/runtime**:
 
 ```typescript
 // ✅ In application code (src/*)
-import mongoose from "mongoose";
-import { Sequelize } from "sequelize";
+import mongoose from 'mongoose';
+import { Sequelize } from 'sequelize';
 
 // ✅ In dev-only files
-import tseslint from "typescript-eslint"; // in eslint.config.mjs
+import tseslint from 'typescript-eslint'; // in eslint.config.mjs
 ```
 
 ### Third-Party Subpath Imports (Runtime Only)
@@ -126,13 +126,13 @@ Use `@sentzunhat/zacatl/third-party/*` for **code that handles external dependen
 
 ```typescript
 // ✅ For exported database adapters
-export { MongooseAdapter } from "@sentzunhat/zacatl/third-party/mongoose";
+export { MongooseAdapter } from '@sentzunhat/zacatl/third-party/mongoose';
 
 // ✅ For optional ORM support in repos
-import type { Mongoose } from "@sentzunhat/zacatl/third-party/mongoose";
+import type { Mongoose } from '@sentzunhat/zacatl/third-party/mongoose';
 
 // ✅ For lazy-loaded infrastructure
-const adapter = await import("@sentzunhat/zacatl/third-party/mongoose");
+const adapter = await import('@sentzunhat/zacatl/third-party/mongoose');
 ```
 
 ---
@@ -145,9 +145,9 @@ const adapter = await import("@sentzunhat/zacatl/third-party/mongoose");
 
 ```javascript
 // ✅ CORRECT - Development time, direct imports
-import tseslint from "typescript-eslint";
-import tsEslintParser from "@typescript-eslint/parser";
-import importPlugin from "eslint-plugin-import";
+import tseslint from 'typescript-eslint';
+import tsEslintParser from '@typescript-eslint/parser';
+import importPlugin from 'eslint-plugin-import';
 
 export default [
   /* config */
@@ -156,7 +156,7 @@ export default [
 
 ```javascript
 // ❌ INCORRECT - Will fail because built package not available during dev
-import { tseslint, tsEslintParser } from "@sentzunhat/zacatl/third-party/eslint";
+import { tseslint, tsEslintParser } from '@sentzunhat/zacatl/third-party/eslint';
 ```
 
 ### TypeScript Service Code (src/\*_/_.ts)
@@ -165,7 +165,7 @@ import { tseslint, tsEslintParser } from "@sentzunhat/zacatl/third-party/eslint"
 
 ```typescript
 // ✅ CORRECT - Isolated type import, no bundle bloat
-import type { Mongoose } from "@sentzunhat/zacatl/third-party/mongoose";
+import type { Mongoose } from '@sentzunhat/zacatl/third-party/mongoose';
 
 class UserRepository {
   constructor(mongoose: Mongoose) {
@@ -176,7 +176,7 @@ class UserRepository {
 
 ```typescript
 // ❌ LESS OPTIMAL - Bundles mongoose into main package
-import type { Mongoose } from "mongoose";
+import type { Mongoose } from 'mongoose';
 ```
 
 ### Runtime Values (src/\*_/_.ts)
@@ -185,10 +185,10 @@ import type { Mongoose } from "mongoose";
 
 ```typescript
 // ✅ CORRECT - Core functionality
-import { BaseRepository, Service } from "@sentzunhat/zacatl";
+import { BaseRepository, Service } from '@sentzunhat/zacatl';
 
 // ✅ CORRECT - Actual mongoose usage (in code path that needs it)
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 await mongoose.connect(url);
 ```
 
@@ -197,16 +197,16 @@ await mongoose.connect(url);
 ## Real-World Example: Multi-Adapter Repository
 
 ```typescript
-import type { Mongoose } from "@sentzunhat/zacatl/third-party/mongoose";
-import type { Sequelize } from "@sentzunhat/zacatl/third-party/sequelize";
-import { BaseRepository, ORMType } from "@sentzunhat/zacatl/infrastructure";
+import type { Mongoose } from '@sentzunhat/zacatl/third-party/mongoose';
+import type { Sequelize } from '@sentzunhat/zacatl/third-party/sequelize';
+import { BaseRepository, ORMType } from '@sentzunhat/zacatl/infrastructure';
 
 type DatabaseInstance = Mongoose | Sequelize;
 
 export class UserRepository extends BaseRepository<User, DatabaseInstance> {
   constructor(private db: DatabaseInstance) {
     const isMongoose = (db: DatabaseInstance): db is Mongoose => {
-      return "connect" in db;
+      return 'connect' in db;
     };
 
     const config = isMongoose(db)
@@ -214,7 +214,7 @@ export class UserRepository extends BaseRepository<User, DatabaseInstance> {
           type: ORMType.Mongoose,
           instance: db,
           schema: userSchema,
-          name: "User",
+          name: 'User',
         }
       : {
           type: ORMType.Sequelize,
@@ -242,37 +242,37 @@ This approach:
 
 ```typescript
 // ✅ Always available
-import { Service, BaseRepository, singleton, logger } from "@sentzunhat/zacatl";
+import { Service, BaseRepository, singleton, logger } from '@sentzunhat/zacatl';
 ```
 
 ### Subpath: `/eslint`
 
 ```typescript
 // ✅ ESLint configurations (for config files)
-import { recommended, baseConfig } from "@sentzunhat/zacatl/eslint";
+import { recommended, baseConfig } from '@sentzunhat/zacatl/eslint';
 ```
 
 ### Subpath: `/third-party/eslint`
 
 ```typescript
 // ✅ ESLint internals (re-exports)
-import { tseslint, tsEslintParser } from "@sentzunhat/zacatl/third-party/eslint";
+import { tseslint, tsEslintParser } from '@sentzunhat/zacatl/third-party/eslint';
 ```
 
 ### Subpath: `/third-party/mongoose`
 
 ```typescript
 // ✅ Mongoose types and adapters
-import type { Mongoose } from "@sentzunhat/zacatl/third-party/mongoose";
-import { MongooseAdapter } from "@sentzunhat/zacatl/third-party/mongoose";
+import type { Mongoose } from '@sentzunhat/zacatl/third-party/mongoose';
+import { MongooseAdapter } from '@sentzunhat/zacatl/third-party/mongoose';
 ```
 
 ### Subpath: `/third-party/sequelize`
 
 ```typescript
 // ✅ Sequelize types and adapters
-import type { Sequelize } from "@sentzunhat/zacatl/third-party/sequelize";
-import { SequelizeAdapter } from "@sentzunhat/zacatl/third-party/sequelize";
+import type { Sequelize } from '@sentzunhat/zacatl/third-party/sequelize';
+import { SequelizeAdapter } from '@sentzunhat/zacatl/third-party/sequelize';
 ```
 
 ---
@@ -283,7 +283,7 @@ When you import only what you need:
 
 ```typescript
 // ✅ This import...
-import type { Mongoose } from "@sentzunhat/zacatl/third-party/mongoose";
+import type { Mongoose } from '@sentzunhat/zacatl/third-party/mongoose';
 
 // ...is tree-shaken away if mongoose is never actually used
 // Final bundle = Zero mongoose overhead
@@ -293,7 +293,7 @@ vs.
 
 ```typescript
 // ❌ This import...
-import { BaseRepository, mongooseSupport } from "@sentzunhat/zacatl";
+import { BaseRepository, mongooseSupport } from '@sentzunhat/zacatl';
 
 // ...bundles ALL ORMs by default
 // Final bundle = mongoose + sequelize + better-sqlite3 + types

@@ -1,4 +1,4 @@
-import { CustomError, CustomErrorsArgs } from "./custom";
+import { CustomError, CustomErrorsArgs } from './custom';
 
 export interface BadRequestErrorArgs extends CustomErrorsArgs {}
 

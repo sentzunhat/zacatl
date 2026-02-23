@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, afterEach } from "vitest";
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import {
   registerDependencies,
   resolveDependencies,
@@ -7,7 +7,7 @@ import {
   getContainer,
   registerDependency,
   registerSingleton,
-} from "../../../src/dependency-injection/container";
+} from '../../../src/dependency-injection/container';
 
 /**
  * DI Integration Tests - Active Functions Only
@@ -15,7 +15,7 @@ import {
  * Tests verifying the currently supported DI container functions work correctly.
  */
 
-describe("DI Container Integration Tests", () => {
+describe('DI Container Integration Tests', () => {
   beforeEach(() => {
     clearContainer();
   });
@@ -24,8 +24,8 @@ describe("DI Container Integration Tests", () => {
     clearContainer();
   });
 
-  describe("Basic Registration and Resolution", () => {
-    it("should register and resolve a single dependency", () => {
+  describe('Basic Registration and Resolution', () => {
+    it('should register and resolve a single dependency', () => {
       class UserService {}
 
       registerDependency(UserService, UserService);
@@ -35,7 +35,7 @@ describe("DI Container Integration Tests", () => {
       expect(service).toBeInstanceOf(UserService);
     });
 
-    it("should register singleton", () => {
+    it('should register singleton', () => {
       class Logger {}
 
       registerSingleton(Logger, Logger);
@@ -46,7 +46,7 @@ describe("DI Container Integration Tests", () => {
       expect(logger1).toBe(logger2);
     });
 
-    it("should register multiple dependencies", () => {
+    it('should register multiple dependencies', () => {
       class Repo {}
       class Service {}
 
@@ -57,7 +57,7 @@ describe("DI Container Integration Tests", () => {
       expect(resolved[1]).toBeInstanceOf(Service);
     });
 
-    it("should register and resolve dependencies in one call", () => {
+    it('should register and resolve dependencies in one call', () => {
       class Config {}
       class Database {}
 
@@ -69,8 +69,8 @@ describe("DI Container Integration Tests", () => {
     });
   });
 
-  describe("Container Management", () => {
-    it("should clear all registrations", () => {
+  describe('Container Management', () => {
+    it('should clear all registrations', () => {
       class UserRepository {}
 
       registerDependency(UserRepository, UserRepository);
@@ -86,7 +86,7 @@ describe("DI Container Integration Tests", () => {
       expect(repo2).toBeInstanceOf(UserRepository);
     });
 
-    it("should allow re-registration after clear", () => {
+    it('should allow re-registration after clear', () => {
       class Service {}
 
       registerDependency(Service, Service);

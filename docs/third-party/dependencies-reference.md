@@ -22,7 +22,7 @@ import {
   resolveDependency, // ✅ Zacatl DI
   logger, // ✅ Pino logger
   z, // ✅ Zod validation (re-exported)
-} from "@sentzunhat/zacatl";
+} from '@sentzunhat/zacatl';
 ```
 
 ### Errors
@@ -37,19 +37,19 @@ import {
   UnauthorizedError,
   InternalServerError,
   BadResourceError,
-} from "@sentzunhat/zacatl/errors";
+} from '@sentzunhat/zacatl/errors';
 ```
 
 ### Configuration
 
 ```typescript
-import { loadConfig } from "@sentzunhat/zacatl/config";
+import { loadConfig } from '@sentzunhat/zacatl/config';
 ```
 
 ### Infrastructure
 
 ```typescript
-import { BaseRepository, ORMType } from "@sentzunhat/zacatl/infrastructure";
+import { BaseRepository, ORMType } from '@sentzunhat/zacatl/infrastructure';
 ```
 
 ---
@@ -63,11 +63,11 @@ npm install mongoose
 ```
 
 ```typescript
-import mongoose from "mongoose";
-import { Schema } from "mongoose";
+import mongoose from 'mongoose';
+import { Schema } from 'mongoose';
 
 const UserSchema = new Schema({ name: String });
-mongoose.connect("mongodb://localhost/db");
+mongoose.connect('mongodb://localhost/db');
 ```
 
 **When to install:** Using `ORMType.Mongoose` in repositories
@@ -86,9 +86,9 @@ npm install tedious           # MSSQL
 ```
 
 ```typescript
-import { Sequelize } from "sequelize";
+import { Sequelize } from 'sequelize';
 
-const sequelize = new Sequelize("postgresql://localhost/db");
+const sequelize = new Sequelize('postgresql://localhost/db');
 ```
 
 **When to install:** Using `ORMType.Sequelize` in repositories
@@ -108,12 +108,12 @@ npm install @sentzunhat/zacatl
 **Use:**
 
 ```typescript
-import { Service, singleton, resolveDependency } from "@sentzunhat/zacatl";
+import { Service, singleton, resolveDependency } from '@sentzunhat/zacatl';
 
 @singleton()
 class MyService {
   doWork() {
-    console.log("Working...");
+    console.log('Working...');
   }
 }
 
@@ -140,20 +140,15 @@ npm install @sentzunhat/zacatl mongoose
 **Use:**
 
 ```typescript
-import {
-  Service,
-  singleton,
-  BaseRepository,
-  ORMType,
-} from "@sentzunhat/zacatl";
-import mongoose, { Schema } from "mongoose";
+import { Service, singleton, BaseRepository, ORMType } from '@sentzunhat/zacatl';
+import mongoose, { Schema } from 'mongoose';
 
 const UserSchema = new Schema({ name: String });
 
 @singleton()
 class UserRepository extends BaseRepository<any, any, any> {
   constructor() {
-    super({ type: ORMType.Mongoose, name: "User", schema: UserSchema });
+    super({ type: ORMType.Mongoose, name: 'User', schema: UserSchema });
   }
 }
 
@@ -164,11 +159,11 @@ const service = new Service({
   },
   platforms: {
     server: {
-      name: "app",
+      name: 'app',
       databases: [
         {
           vendor: DatabaseVendor.MONGOOSE,
-          instance: mongoose.connect("mongodb://localhost/db"),
+          instance: mongoose.connect('mongodb://localhost/db'),
         },
       ],
     },
@@ -189,17 +184,12 @@ npm install @sentzunhat/zacatl sequelize pg pg-hstore
 **Use:**
 
 ```typescript
-import {
-  Service,
-  singleton,
-  BaseRepository,
-  ORMType,
-} from "@sentzunhat/zacatl";
-import { Sequelize, DataTypes } from "sequelize";
+import { Service, singleton, BaseRepository, ORMType } from '@sentzunhat/zacatl';
+import { Sequelize, DataTypes } from 'sequelize';
 
-const sequelize = new Sequelize("postgresql://localhost/db");
+const sequelize = new Sequelize('postgresql://localhost/db');
 
-const UserModel = sequelize.define("User", {
+const UserModel = sequelize.define('User', {
   name: DataTypes.STRING,
 });
 
@@ -217,7 +207,7 @@ const service = new Service({
   },
   platforms: {
     server: {
-      name: "app",
+      name: 'app',
       databases: [
         {
           vendor: DatabaseVendor.SEQUELIZE,
@@ -252,12 +242,7 @@ const service = new Service({
 All TypeScript types are included automatically:
 
 ```typescript
-import type {
-  DependencyContainer,
-  ZodType,
-  ZodError,
-  ConfigServer,
-} from "@sentzunhat/zacatl";
+import type { DependencyContainer, ZodType, ZodError, ConfigServer } from '@sentzunhat/zacatl';
 ```
 
 **No `@types/*` packages needed for Zacatl core!** ✅
@@ -284,7 +269,7 @@ Do you need database access?
 
 ```typescript
 // Everything you need for a basic service (no database)
-import { Service, singleton, resolveDependency } from "@sentzunhat/zacatl";
+import { Service, singleton, resolveDependency } from '@sentzunhat/zacatl';
 
 // That's it! No other imports needed. ✅
 ```

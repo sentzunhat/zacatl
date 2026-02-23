@@ -1,7 +1,7 @@
-import { CustomError } from "@zacatl/error";
+import { CustomError } from '@zacatl/error';
 
-import { createDatabaseAdapter } from "./adapters";
-import type { DatabaseConfig, DatabaseServerPort } from "./port";
+import { createDatabaseAdapter } from './adapters';
+import type { DatabaseConfig, DatabaseServerPort } from './port';
 
 /**
  * DatabaseServer - Encapsulates database connection logic
@@ -29,9 +29,9 @@ export class DatabaseServer {
     for (const database of this.databases) {
       if (database.connectionString == null || database.connectionString.length === 0) {
         throw new CustomError({
-          message: "database connection string is not provided",
+          message: 'database connection string is not provided',
           code: 500,
-          reason: "database connection string not provided",
+          reason: 'database connection string not provided',
         });
       }
 
@@ -45,7 +45,7 @@ export class DatabaseServer {
         throw new CustomError({
           message: `failed to configure database for service "${this.serviceName}"`,
           code: 500,
-          reason: "database configuration failed",
+          reason: 'database configuration failed',
           error: error as Error,
           metadata: {
             database: {

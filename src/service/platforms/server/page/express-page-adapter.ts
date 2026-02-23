@@ -1,12 +1,12 @@
-import express, { Express } from "express";
+import express, { Express } from 'express';
 
-import type { PageServerPort, StaticConfig } from "./port";
+import type { PageServerPort, StaticConfig } from './port';
 
 export class ExpressPageAdapter implements PageServerPort {
   constructor(private readonly server: Express) {}
 
   registerStaticFiles(config: StaticConfig): void {
-    this.server.use(config.prefix ?? "/", express.static(config.root));
+    this.server.use(config.prefix ?? '/', express.static(config.root));
   }
 
   registerSpaFallback(apiPrefix: string, staticDir: string): void {
@@ -14,11 +14,11 @@ export class ExpressPageAdapter implements PageServerPort {
       if (req.path.startsWith(apiPrefix)) {
         res.status(404).json({
           code: 404,
-          error: "Not Found",
+          error: 'Not Found',
           message: `Route ${req.method}:${req.path} not found`,
         });
       } else {
-        res.sendFile("index.html", { root: staticDir });
+        res.sendFile('index.html', { root: staticDir });
       }
     });
   }

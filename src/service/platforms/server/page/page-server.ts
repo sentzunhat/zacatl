@@ -1,7 +1,7 @@
-import { CustomError } from "@zacatl/error";
+import { CustomError } from '@zacatl/error';
 
-import type { ConfigServer } from "../server";
-import { type PageServerPort, type StaticConfig } from "./port";
+import type { ConfigServer } from '../server';
+import { type PageServerPort, type StaticConfig } from './port';
 
 /**
  * PageServer - Encapsulates frontend/page rendering logic
@@ -26,9 +26,9 @@ export class PageServer {
       this.adapter.registerStaticFiles(config);
     } catch (error: unknown) {
       throw new CustomError({
-        message: "failed to register static files",
+        message: 'failed to register static files',
         code: 500,
-        reason: "static file registration failed",
+        reason: 'static file registration failed',
         error: error as Error,
         metadata: { config },
       });
@@ -44,9 +44,9 @@ export class PageServer {
       this.adapter.registerSpaFallback(apiPrefix, staticDir);
     } catch (error: unknown) {
       throw new CustomError({
-        message: "failed to register SPA fallback",
+        message: 'failed to register SPA fallback',
         code: 500,
-        reason: "SPA fallback registration failed",
+        reason: 'SPA fallback registration failed',
         error: error as Error,
         metadata: { apiPrefix, staticDir },
       });
@@ -61,9 +61,9 @@ export class PageServer {
       await this.adapter.register(server);
     } catch (error: unknown) {
       throw new CustomError({
-        message: "failed to register page module",
+        message: 'failed to register page module',
         code: 500,
-        reason: "page module registration failed",
+        reason: 'page module registration failed',
         error: error as Error,
       });
     }

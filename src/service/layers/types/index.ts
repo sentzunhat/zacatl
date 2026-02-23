@@ -1,7 +1,7 @@
-import type { Optional } from "../../../utils/optionals";
-import type { ConfigApplication } from "../application";
-import type { ConfigDomain, ProviderPort } from "../domain";
-import type { ConfigInfrastructure } from "../infrastructure";
+import type { Optional } from '../../../utils/optionals';
+import type { ConfigApplication } from '../application';
+import type { ConfigDomain, ProviderPort } from '../domain';
+import type { ConfigInfrastructure } from '../infrastructure';
 
 export interface ConfigLayers {
   /** Application layer: Entry points for different contexts */

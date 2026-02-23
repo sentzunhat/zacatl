@@ -95,8 +95,8 @@ export class CreateGreetingHandler extends AbstractRouteHandler<
     private readonly greetingService: GreetingServiceAdapter,
   ) {
     super({
-      url: "/greetings",
-      method: "POST",
+      url: '/greetings',
+      method: 'POST',
       schema: { body: CreateGreetingBodySchema },
     });
   }
@@ -175,7 +175,7 @@ export class GreetingServiceAdapter implements GreetingServicePort {
   async createGreeting(input: CreateGreetingInput): Promise<Greeting> {
     // Business logic: validate, normalize, etc.
     if (!input.message?.trim()) {
-      throw new Error("Message cannot be empty");
+      throw new Error('Message cannot be empty');
     }
 
     const normalized: CreateGreetingInput = {
@@ -303,7 +303,7 @@ export class PostServiceAdapter implements PostServicePort {
 
 ```typescript
 // infrastructure/posts/models/post.model.ts
-export class PostModel extends Model implements Omit<Post, "id"> {
+export class PostModel extends Model implements Omit<Post, 'id'> {
   declare title: string;
   declare content: string;
   declare authorId: string;
@@ -313,7 +313,7 @@ PostModel.init(
   {
     /* ... */
   },
-  { sequelize, tableName: "posts" },
+  { sequelize, tableName: 'posts' },
 );
 ```
 
@@ -342,26 +342,19 @@ export class PostRepositoryAdapter
 ```typescript
 // application/handlers/posts/create-post/handler.ts
 @singleton()
-export class CreatePostHandler extends AbstractRouteHandler<
-  CreatePostInput,
-  void,
-  PostResponse
-> {
+export class CreatePostHandler extends AbstractRouteHandler<CreatePostInput, void, PostResponse> {
   constructor(
     @inject(PostServiceAdapter)
     private readonly postService: PostServiceAdapter,
   ) {
     super({
-      url: "/posts",
-      method: "POST",
+      url: '/posts',
+      method: 'POST',
       schema: { body: CreatePostBodySchema },
     });
   }
 
-  async handler(
-    request: Request<CreatePostInput>,
-    reply: FastifyReply,
-  ): Promise<PostResponse> {
+  async handler(request: Request<CreatePostInput>, reply: FastifyReply): Promise<PostResponse> {
     const post = await this.postService.createPost(request.body);
     return toPostResponse(post);
   }
@@ -372,9 +365,9 @@ export class CreatePostHandler extends AbstractRouteHandler<
 
 ```typescript
 // di.ts
-import { PostServiceAdapter } from "./domain/posts/post.service";
-import { PostRepositoryAdapter } from "./infrastructure/posts/repositories/post/adapter";
-import { CreatePostHandler } from "./application/handlers/posts/create-post/handler";
+import { PostServiceAdapter } from './domain/posts/post.service';
+import { PostRepositoryAdapter } from './infrastructure/posts/repositories/post/adapter';
+import { CreatePostHandler } from './application/handlers/posts/create-post/handler';
 
 // These are auto-registered via @singleton() decorators
 ```
@@ -406,18 +399,23 @@ The domain never imports from application or infrastructure. Application imports
 ## Common Mistakes to Avoid
 
 1. ❌ Importing infrastructure models into handlers
+
    - ✅ Use domain models instead
 
 2. ❌ Business logic in handlers
+
    - ✅ Move to domain services
 
 3. ❌ Multiple responsibilities per layer
+
    - ✅ Keep layers focused
 
 4. ❌ Mixing ports and adapters
+
    - ✅ Keep interfaces (`.port.ts`) separate from implementations
 
 5. ❌ Deep nesting (more than 3-4 levels)
+
    - ✅ Flatten within features
 
 6. ❌ Circular dependencies

@@ -181,7 +181,7 @@ export class GreetingService {
 
   async create(input: CreateGreetingInput): Promise<Greeting> {
     if (!input.message?.trim()) {
-      throw new InvalidGreetingError("Message cannot be empty");
+      throw new InvalidGreetingError('Message cannot be empty');
     }
     return this.repo.save(input);
   }
@@ -303,13 +303,13 @@ Every meaningful folder has an `index.ts` that re-exports public APIs:
 
 ```typescript
 // src/error/index.ts
-export * from "./bad-request";
-export * from "./unauthorized";
-export * from "./custom";
-export type { CustomErrorsArgs } from "./custom";
+export * from './bad-request';
+export * from './unauthorized';
+export * from './custom';
+export type { CustomErrorsArgs } from './custom';
 
 // Usage
-import { BadRequestError, UnauthorizedError } from "@zacatl/error";
+import { BadRequestError, UnauthorizedError } from '@zacatl/error';
 ```
 
 **Benefits:**
@@ -342,13 +342,13 @@ Use a DI container to manage dependencies (e.g., `tsyringe`):
 
 ```typescript
 // Register dependencies
-import { container } from "tsyringe";
+import { container } from 'tsyringe';
 
 container.register(GreetingService, {
   useClass: GreetingService,
 });
 
-container.register("GreetingRepository", {
+container.register('GreetingRepository', {
   useClass: GreetingRepository,
 });
 
@@ -380,10 +380,7 @@ Always inject dependencies through the constructor:
 ```typescript
 // ✅ Good
 export class GreetingService {
-  constructor(
-    private repo: GreetingRepository,
-    private logger: Logger,
-  ) {}
+  constructor(private repo: GreetingRepository, private logger: Logger) {}
 }
 
 class GetGreetingsHandler extends GetRouteHandler {
@@ -478,9 +475,9 @@ Configure short import paths for better readability:
       "@zacatl/configuration": ["src/configuration/index.ts"],
       "@zacatl/error": ["src/error/index.ts"],
       "@zacatl/service": ["src/service/index.ts"],
-      "@zacatl/*": ["src/*"],
-    },
-  },
+      "@zacatl/*": ["src/*"]
+    }
+  }
 }
 ```
 
@@ -494,16 +491,16 @@ Order imports as:
 
 ```typescript
 // ✅ Good
-import { FastifyRequest, FastifyReply } from "fastify";
-import { Service } from "@zacatl/service";
-import { logger } from "@zacatl/logs";
-import { GreetingService } from "../domain";
-import type { RouteConfig } from "./types";
+import { FastifyRequest, FastifyReply } from 'fastify';
+import { Service } from '@zacatl/service';
+import { logger } from '@zacatl/logs';
+import { GreetingService } from '../domain';
+import type { RouteConfig } from './types';
 
 // ❌ Avoid (mixed order)
-import { GreetingService } from "../domain";
-import { FastifyRequest } from "fastify";
-import { logger } from "@zacatl/logs";
+import { GreetingService } from '../domain';
+import { FastifyRequest } from 'fastify';
+import { logger } from '@zacatl/logs';
 ```
 
 ### Subpath Exports for Libraries
@@ -531,11 +528,11 @@ import { logger } from "@zacatl/logs";
 
 ```typescript
 // ✅ Framework-specific import only where needed
-import { FastifyInstance } from "@zacatl/third-party/fastify";
+import { FastifyInstance } from '@zacatl/third-party/fastify';
 
 // ✅ Core library imports
-import { Service } from "@zacatl/zacatl";
-import { BadRequestError } from "@zacatl/error";
+import { Service } from '@zacatl/zacatl';
+import { BadRequestError } from '@zacatl/error';
 ```
 
 ---
@@ -593,7 +590,7 @@ container.register(
 
 ```typescript
 // src/service/layers/domain/greeting-service.ts
-import { FastifyRequest } from "fastify"; // Framework in domain!
+import { FastifyRequest } from 'fastify'; // Framework in domain!
 
 export class GreetingService {
   async create(req: FastifyRequest) {
@@ -610,7 +607,7 @@ export class GreetingService {
   async create(input: CreateGreetingInput) {
     // Framework-agnostic
     if (!input.message?.trim()) {
-      throw new BadRequestError({ message: "Message is required" });
+      throw new BadRequestError({ message: 'Message is required' });
     }
     return this.repository.save(input);
   }
@@ -634,14 +631,14 @@ export class CreateGreetingHandler extends PostRouteHandler {
 
 ```typescript
 // user-service.ts
-import { OrderService } from "./order-service";
+import { OrderService } from './order-service';
 
 export class UserService {
   constructor(private orderService: OrderService) {}
 }
 
 // order-service.ts
-import { UserService } from "./user-service"; // Circular!
+import { UserService } from './user-service'; // Circular!
 
 export class OrderService {
   constructor(private userService: UserService) {}
@@ -657,14 +654,14 @@ export class UserService {
 
   async createUser(input: CreateUserInput) {
     const user = await this.repository.save(input);
-    this.eventBus.emit("user.created", { userId: user.id });
+    this.eventBus.emit('user.created', { userId: user.id });
     return user;
   }
 }
 
 export class OrderService {
   constructor(private eventBus: EventBus) {
-    this.eventBus.on("user.created", this.handleUserCreated);
+    this.eventBus.on('user.created', this.handleUserCreated);
   }
 
   private handleUserCreated(event: UserCreatedEvent) {
@@ -726,10 +723,7 @@ export class GreetingService {
 
 ```typescript
 export class GreetingService {
-  constructor(
-    private repository: GreetingRepository,
-    private logger: Logger,
-  ) {} // Injected dependencies
+  constructor(private repository: GreetingRepository, private logger: Logger) {} // Injected dependencies
 }
 ```
 
@@ -848,7 +842,10 @@ export class CustomError extends Error {
 
 ```typescript
 // src/dependency-injection/container.ts
-export const registerDependencies = <T extends object>(dependencies: Constructor<T>[], lifecycle: Lifecycle = Lifecycle.SINGLETON): void => {
+export const registerDependencies = <T extends object>(
+  dependencies: Constructor<T>[],
+  lifecycle: Lifecycle = Lifecycle.SINGLETON,
+): void => {
   dependencies.forEach((dep) => {
     const token = dep.name || dep;
     registerSingleton(token, dep);
@@ -872,12 +869,12 @@ export const loadJSON = <T>(filePath: string, schema: ZodSchema<T>): T => {
     if (!existsSync(filePath)) {
       throw new BadResourceError({
         message: `Configuration file not found: ${filePath}`,
-        component: "ConfigLoader",
-        operation: "loadJSON",
+        component: 'ConfigLoader',
+        operation: 'loadJSON',
       });
     }
 
-    const fileContent = readFileSync(filePath, "utf-8");
+    const fileContent = readFileSync(filePath, 'utf-8');
     const parsed = JSON.parse(fileContent);
 
     // Validate with Zod schema
@@ -885,10 +882,10 @@ export const loadJSON = <T>(filePath: string, schema: ZodSchema<T>): T => {
 
     if (!result.success) {
       throw new ValidationError({
-        message: "Configuration validation failed",
+        message: 'Configuration validation failed',
         metadata: { errors: result.error.errors, filePath },
-        component: "ConfigLoader",
-        operation: "loadJSON",
+        component: 'ConfigLoader',
+        operation: 'loadJSON',
       });
     }
 
@@ -899,8 +896,8 @@ export const loadJSON = <T>(filePath: string, schema: ZodSchema<T>): T => {
     throw new InternalServerError({
       message: `Failed to load configuration from ${filePath}`,
       error: error as Error,
-      component: "ConfigLoader",
-      operation: "loadJSON",
+      component: 'ConfigLoader',
+      operation: 'loadJSON',
     });
   }
 };

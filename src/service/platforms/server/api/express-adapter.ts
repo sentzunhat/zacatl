@@ -1,11 +1,11 @@
-import { Express, Request, Response, NextFunction } from "express";
-import { createProxyMiddleware } from "http-proxy-middleware";
+import { Express, Request, Response, NextFunction } from 'express';
+import { createProxyMiddleware } from 'http-proxy-middleware';
 
-import { logger } from "@zacatl/logs";
+import { logger } from '@zacatl/logs';
 
-import type { ApiServerPort, ProxyConfig } from "./port";
-import { applyZodSchema } from "./schema-helper";
-import type { HookHandler, RouteHandler } from "../../../layers/application";
+import type { ApiServerPort, ProxyConfig } from './port';
+import { applyZodSchema } from './schema-helper';
+import type { HookHandler, RouteHandler } from '../../../layers/application';
 
 /**
  * ExpressApiAdapter - Implements ApiServerPort for Express framework
@@ -27,7 +27,7 @@ export class ExpressApiAdapter implements ApiServerPort {
       >
     )[method];
 
-    if (typeof register !== "function") {
+    if (typeof register !== 'function') {
       logger.warn(
         `ExpressApiAdapter: HTTP method '${handler.method}' is not supported by Express. ` +
           `Handler '${handler.constructor.name}' for '${url}' was not registered.`,
@@ -70,7 +70,7 @@ export class ExpressApiAdapter implements ApiServerPort {
   }
 
   registerHook(handler: HookHandler): void {
-    if (handler.name === "onRequest" || handler.name === "preHandler") {
+    if (handler.name === 'onRequest' || handler.name === 'preHandler') {
       this.server.use(async (req: Request, res: Response, next: NextFunction) => {
         try {
           const execute = handler.execute as unknown as (
@@ -107,10 +107,10 @@ export class ExpressApiAdapter implements ApiServerPort {
   async listen(port: number): Promise<void> {
     return new Promise((resolve, reject) => {
       this.server
-        .listen(port, "0.0.0.0", () => {
+        .listen(port, '0.0.0.0', () => {
           resolve();
         })
-        .on("error", reject);
+        .on('error', reject);
     });
   }
 

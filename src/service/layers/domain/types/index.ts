@@ -1,5 +1,5 @@
-import type { Constructor } from "../../types";
-import type { ProviderPort, ServicePort } from "../ports";
+import type { Constructor } from '../../types';
+import type { ProviderPort, ServicePort } from '../ports';
 
 /**
  * Domain providers that implement business logic and domain services.

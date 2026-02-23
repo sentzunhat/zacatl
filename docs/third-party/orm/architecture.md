@@ -70,8 +70,8 @@ MongoDB | PostgreSQL | Your Database
 ## Option 1: Mongoose
 
 ```typescript
-import { BaseRepository } from "@sentzunhat/zacatl";
-import { Schema } from "mongoose";
+import { BaseRepository } from '@sentzunhat/zacatl';
+import { Schema } from 'mongoose';
 
 const userSchema = new Schema(
   {
@@ -84,8 +84,8 @@ const userSchema = new Schema(
 class UserRepository extends BaseRepository<User, CreateUser, UserDTO> {
   constructor() {
     super({
-      type: "mongoose",
-      name: "User",
+      type: 'mongoose',
+      name: 'User',
       schema: userSchema,
     });
   }
@@ -101,8 +101,8 @@ class UserRepository extends BaseRepository<User, CreateUser, UserDTO> {
 ## Option 2: Sequelize
 
 ```typescript
-import { BaseRepository } from "@sentzunhat/zacatl";
-import { Model } from "sequelize";
+import { BaseRepository } from '@sentzunhat/zacatl';
+import { Model } from 'sequelize';
 
 class ProductModel extends Model {
   declare id: string;
@@ -112,7 +112,7 @@ class ProductModel extends Model {
 class ProductRepository extends BaseRepository<ProductModel, CreateProduct, ProductDTO> {
   constructor() {
     super({
-      type: "sequelize",
+      type: 'sequelize',
       model: ProductModel,
     });
   }
@@ -122,8 +122,8 @@ class ProductRepository extends BaseRepository<ProductModel, CreateProduct, Prod
 ### Using Sequelize
 
 ```typescript
-import { BaseRepository } from "@sentzunhat/zacatl";
-import { Model, DataTypes } from "sequelize";
+import { BaseRepository } from '@sentzunhat/zacatl';
+import { Model, DataTypes } from 'sequelize';
 
 // Define Sequelize model
 class ProductModel extends Model {
@@ -139,14 +139,14 @@ ProductModel.init(
     name: { type: DataTypes.STRING, allowNull: false },
     price: { type: DataTypes.DECIMAL, allowNull: false },
   },
-  { sequelize, tableName: "products" },
+  { sequelize, tableName: 'products' },
 );
 
 // Create repository
 class ProductRepository extends BaseRepository<ProductModel, CreateProduct, ProductDTO> {
   constructor() {
     super({
-      type: "sequelize",
+      type: 'sequelize',
       model: ProductModel,
     });
   }
@@ -169,8 +169,8 @@ class ProductRepository extends BaseRepository<ProductModel, CreateProduct, Prod
 
 ```typescript
 // src/adapters/prisma-adapter.ts
-import type { PrismaClient } from "@prisma/client";
-import type { ORMAdapter } from "@sentzunhat/zacatl";
+import type { PrismaClient } from '@prisma/client';
+import type { ORMAdapter } from '@sentzunhat/zacatl';
 
 export class PrismaAdapter<D, I, O> implements ORMAdapter<D, I, O> {
   public readonly model: any;
@@ -187,7 +187,7 @@ export class PrismaAdapter<D, I, O> implements ORMAdapter<D, I, O> {
     if (!input) return null;
     return {
       ...(input as O),
-      id: String((input as any).id || ""),
+      id: String((input as any).id || ''),
       createdAt: new Date((input as any).createdAt || Date.now()),
       updatedAt: new Date((input as any).updatedAt || Date.now()),
     } as O;
@@ -229,9 +229,9 @@ export class PrismaAdapter<D, I, O> implements ORMAdapter<D, I, O> {
 ### Step 2: Use Your Custom Adapter
 
 ```typescript
-import { BaseRepository } from "@sentzunhat/zacatl";
-import { PrismaClient } from "@prisma/client";
-import { PrismaAdapter } from "./adapters/prisma-adapter";
+import { BaseRepository } from '@sentzunhat/zacatl';
+import { PrismaClient } from '@prisma/client';
+import { PrismaAdapter } from './adapters/prisma-adapter';
 
 const prisma = new PrismaClient();
 
@@ -243,7 +243,7 @@ class UserRepository extends BaseRepository<User, CreateUser, UserDTO> {
     // @ts-ignore - Set custom adapter
     this.adapter = new PrismaAdapter({
       prisma,
-      modelName: "user",
+      modelName: 'user',
     });
   }
 
@@ -259,20 +259,20 @@ class UserRepository extends BaseRepository<User, CreateUser, UserDTO> {
 You can use different ORMs in the same application:
 
 ```typescript
-import { BaseRepository } from "@sentzunhat/zacatl";
-import { createClient } from "redis";
+import { BaseRepository } from '@sentzunhat/zacatl';
+import { createClient } from 'redis';
 
 // Users in MongoDB (Mongoose)
 class UserRepository extends BaseRepository<User, CreateUser, UserDTO> {
   constructor() {
-    super({ type: "mongoose", name: "User", schema: userSchema });
+    super({ type: 'mongoose', name: 'User', schema: userSchema });
   }
 }
 
 // Products in PostgreSQL (Sequelize)
 class ProductRepository extends BaseRepository<Product, CreateProduct, ProductDTO> {
   constructor() {
-    super({ type: "sequelize", model: ProductModel });
+    super({ type: 'sequelize', model: ProductModel });
   }
 }
 
@@ -283,7 +283,7 @@ class SessionRepository extends BaseRepository<Session, CreateSession, SessionDT
     // @ts-ignore
     this.adapter = new RedisAdapter({
       client: createClient(),
-      keyPrefix: "session",
+      keyPrefix: 'session',
       ttl: 3600,
     });
   }
@@ -292,10 +292,7 @@ class SessionRepository extends BaseRepository<Session, CreateSession, SessionDT
 // Use them together
 @injectable()
 export class AuthService {
-  constructor(
-    private userRepo: UserRepository,
-    private sessionRepo: SessionRepository,
-  ) {}
+  constructor(private userRepo: UserRepository, private sessionRepo: SessionRepository) {}
 
   async login(email: string, password: string) {
     const user = await this.userRepo.findByEmail(email);
@@ -314,7 +311,7 @@ If you create an adapter you think would benefit others, you can contribute it:
 
 ```typescript
 // src/service/layers/infrastructure/orm/adapters/your-adapter.ts
-import type { ORMAdapter } from "../../repositories/types";
+import type { ORMAdapter } from '../../repositories/types';
 
 export class YourAdapter<D, I, O> implements ORMAdapter<D, I, O> {
   // Implementation
@@ -326,26 +323,29 @@ export class YourAdapter<D, I, O> implements ORMAdapter<D, I, O> {
 ```typescript
 // src/service/layers/infrastructure/repositories/types.ts
 export type YourRepositoryConfig = {
-  type: "your-orm";
+  type: 'your-orm';
   // ... config properties
 };
 
-export type BaseRepositoryConfig<D> = MongooseRepositoryConfig<D> | SequelizeRepositoryConfig<D extends Model ? D : never> | YourRepositoryConfig; // Add here
+export type BaseRepositoryConfig<D> =
+  | MongooseRepositoryConfig<D>
+  | SequelizeRepositoryConfig<D extends Model ? D : never>
+  | YourRepositoryConfig; // Add here
 ```
 
 ### Step 3: Update BaseRepository
 
 ```typescript
 // src/service/layers/infrastructure/repositories/abstract.ts
-import { YourAdapter } from "../orm/adapters/your-adapter";
+import { YourAdapter } from '../orm/adapters/your-adapter';
 
 export abstract class BaseRepository<D, I, O> implements Repository<D, I, O> {
   constructor(config: BaseRepositoryConfig<D>) {
-    if (config.type === "mongoose") {
+    if (config.type === 'mongoose') {
       this.adapter = new MongooseAdapter<D, I, O>(config);
-    } else if (config.type === "sequelize") {
+    } else if (config.type === 'sequelize') {
       this.adapter = new SequelizeAdapter<D extends Model ? D : never, I, O>(config as any);
-    } else if (config.type === "your-orm") {
+    } else if (config.type === 'your-orm') {
       // Add here
       this.adapter = new YourAdapter<D, I, O>(config);
     }
@@ -358,9 +358,9 @@ export abstract class BaseRepository<D, I, O> implements Repository<D, I, O> {
 
 ```typescript
 // src/service/layers/infrastructure/orm/index.ts
-export * from "./adapters/mongoose-adapter";
-export * from "./adapters/sequelize-adapter";
-export * from "./adapters/your-adapter"; // Add here
+export * from './adapters/mongoose-adapter';
+export * from './adapters/sequelize-adapter';
+export * from './adapters/your-adapter'; // Add here
 ```
 
 ## API Reference
@@ -535,8 +535,8 @@ Instead of a factory layer, we keep BaseRepository as the main interface and mak
 ```typescript
 // Same API - user doesn't need to know about adapters
 const userRepo = new BaseRepository({
-  type: "mongoose", // or 'sequelize'
-  name: "User",
+  type: 'mongoose', // or 'sequelize'
+  name: 'User',
   schema: userSchema,
 });
 
@@ -569,10 +569,10 @@ For advanced users who want more control, we can still offer the factory pattern
 
 ```typescript
 const registry = new ORMRegistry();
-registry.register("redis", redisAdapterFactory);
+registry.register('redis', redisAdapterFactory);
 
 const factory = new RepositoryFactory(registry);
-const cache = factory.create("redis", redisConfig);
+const cache = factory.create('redis', redisConfig);
 ```
 
 But for most use cases, the simplified BaseRepository approach is better.

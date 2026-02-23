@@ -1,10 +1,10 @@
-import { container } from "tsyringe";
+import { container } from 'tsyringe';
 import {
   ConfigInfrastructure,
   Infrastructure,
-} from "../../../../../src/service/layers/infrastructure";
-import type { RepositoryPort } from "../../../../../src/service/layers/infrastructure/types";
-import type { RepositoryModel } from "../../../../../src/service/layers/infrastructure/repositories/types";
+} from '../../../../../src/service/layers/infrastructure';
+import type { RepositoryPort } from '../../../../../src/service/layers/infrastructure/types';
+import type { RepositoryModel } from '../../../../../src/service/layers/infrastructure/repositories/types';
 
 class DummyRepository implements RepositoryPort<object> {
   public model = {} as RepositoryModel<object>;
@@ -42,20 +42,20 @@ const config: ConfigInfrastructure = {
   repositories: [DummyRepository],
 };
 
-describe("Infrastructure", () => {
+describe('Infrastructure', () => {
   let infrastructure: Infrastructure;
 
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  it("should store the configuration passed in the constructor", () => {
+  it('should store the configuration passed in the constructor', () => {
     infrastructure = new Infrastructure(config);
-    expect(infrastructure["config"]).toEqual(config);
+    expect(infrastructure['config']).toEqual(config);
   });
 
-  it("should register dependencies on construction (new pattern)", () => {
-    const registerSpy = vi.spyOn(container, "register");
+  it('should register dependencies on construction (new pattern)', () => {
+    const registerSpy = vi.spyOn(container, 'register');
 
     new Infrastructure({
       repositories: [DummyRepository],
@@ -68,7 +68,7 @@ describe("Infrastructure", () => {
     );
   });
 
-  it("start() method exists for interface compatibility", () => {
+  it('start() method exists for interface compatibility', () => {
     infrastructure = new Infrastructure(config);
 
     // start() should exist and not throw

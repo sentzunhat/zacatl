@@ -1,4 +1,4 @@
-import { AbstractRouteHandler } from "./abstract";
+import { AbstractRouteHandler } from './abstract';
 
 export interface PatchRouteHandlerConstructor {
   url: string;
@@ -14,17 +14,11 @@ export abstract class PatchRouteHandler<
   TResponse = void,
   TParams = void,
   THeaders = void,
-> extends AbstractRouteHandler<
-  TBody,
-  TQuerystring,
-  TResponse,
-  TParams,
-  THeaders
-> {
+> extends AbstractRouteHandler<TBody, TQuerystring, TResponse, TParams, THeaders> {
   constructor(args: PatchRouteHandlerConstructor) {
     super({
       url: args.url,
-      method: "PATCH",
+      method: 'PATCH',
       schema: args.schema,
     });
   }

@@ -1,8 +1,8 @@
-import fs from "fs";
-import path from "path";
+import fs from 'fs';
+import path from 'path';
 
-import { NotFoundError, BadRequestError } from "@zacatl/error";
-import i18n from "@zacatl/third-party/i18n";
+import { NotFoundError, BadRequestError } from '@zacatl/error';
+import i18n from '@zacatl/third-party/i18n';
 
 export type I18nCatalogType = Record<string, Record<string, unknown>>;
 
@@ -29,10 +29,10 @@ export interface MergeCatalogsInput {
 
 const isPlainObject = (value: unknown): value is Record<string, unknown> => {
   return (
-    typeof value === "object" &&
+    typeof value === 'object' &&
     value !== null &&
     !Array.isArray(value) &&
-    Object.prototype.toString.call(value) === "[object Object]"
+    Object.prototype.toString.call(value) === '[object Object]'
   );
 };
 
@@ -57,15 +57,15 @@ const deepMerge = (
 };
 
 const readJsonFile = (filePath: string): Record<string, unknown> => {
-  const content = fs.readFileSync(filePath, "utf-8");
+  const content = fs.readFileSync(filePath, 'utf-8');
   const parsed: unknown = JSON.parse(content);
 
   if (!isPlainObject(parsed)) {
     throw new BadRequestError({
       message: `Invalid locale JSON shape in ${filePath}`,
-      reason: "Locale file must contain a plain JSON object",
-      component: "I18nNode",
-      operation: "readJsonFile",
+      reason: 'Locale file must contain a plain JSON object',
+      component: 'I18nNode',
+      operation: 'readJsonFile',
       metadata: { filePath },
     });
   }
@@ -104,12 +104,12 @@ export const loadCatalog = (input: LoadCatalogInput): I18nCatalogType => {
 };
 
 const getHere = (): string => {
-  if (typeof __dirname !== "undefined") return __dirname;
+  if (typeof __dirname !== 'undefined') return __dirname;
   // Be explicit about the shape/value checks to satisfy strict-boolean-expressions
   if (
-    typeof process !== "undefined" &&
+    typeof process !== 'undefined' &&
     Array.isArray(process.argv) &&
-    typeof process.argv[1] === "string" &&
+    typeof process.argv[1] === 'string' &&
     process.argv[1].length > 0
   ) {
     return path.dirname(process.argv[1]);
@@ -125,25 +125,25 @@ export const resolveBuiltInLocalesDir = (): string => {
   // (build/), and installed package consumers.
   const candidates = [
     // Locales shipped next to this module (src/localization/locales or build/localization/locales)
-    path.resolve(here, "locales"),
+    path.resolve(here, 'locales'),
     // If running from build output, try the package build-locales path
-    path.resolve(here, "../../build/localization/locales"),
+    path.resolve(here, '../../build/localization/locales'),
     // Fallback to source layout relative to package root
-    path.resolve(here, "../../src/localization/locales"),
+    path.resolve(here, '../../src/localization/locales'),
     // Project workspace source locales (when running from project root)
-    path.resolve(process.cwd(), "src/localization/locales"),
+    path.resolve(process.cwd(), 'src/localization/locales'),
     // Generic localization folders in project root
-    path.resolve(process.cwd(), "localization/locales"),
-    path.resolve(process.cwd(), "locales"),
+    path.resolve(process.cwd(), 'localization/locales'),
+    path.resolve(process.cwd(), 'locales'),
   ];
 
   const found = findExistingDir(candidates);
   if (found == null) {
     throw new NotFoundError({
-      message: `Unable to locate built-in locales directory. Tried: ${candidates.join(", ")}`,
-      reason: "Built-in locales directory not found in expected paths",
-      component: "I18nNode",
-      operation: "resolveBuiltInLocalesDir",
+      message: `Unable to locate built-in locales directory. Tried: ${candidates.join(', ')}`,
+      reason: 'Built-in locales directory not found in expected paths',
+      component: 'I18nNode',
+      operation: 'resolveBuiltInLocalesDir',
       metadata: { candidates },
     });
   }
@@ -184,8 +184,8 @@ export const mergeCatalogs = (input: MergeCatalogsInput): I18nCatalogType => {
  * Configure i18n - merges built-in translations with app-specific locales
  */
 export const configureI18nNode = (input: ConfigureI18nInput = {}): typeof i18n => {
-  const defaultLocale = input.locales?.default ?? "en";
-  const supportedLocales = input.locales?.supported ?? ["en", "es"];
+  const defaultLocale = input.locales?.default ?? 'en';
+  const supportedLocales = input.locales?.supported ?? ['en', 'es'];
   const objectNotation = input.objectNotation ?? true;
   const overrideBuiltIn = input.overrideBuiltIn ?? true;
 

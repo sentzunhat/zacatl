@@ -1,11 +1,5 @@
-import { FlatCompat } from "@eslint/eslintrc";
-import path from "path";
-import { fileURLToPath } from "url";
-import { recommended as zacatlRecommended } from "./src/eslint/index.mjs";
+import { recommended as zacatlRecommended } from './src/eslint/index.mjs';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-const compat = new FlatCompat({ baseDirectory: __dirname, resolvePluginsRelativeTo: __dirname });
-
-export default [...compat.config({}), ...zacatlRecommended];
+// Source-area config: export the recommended Zacatl rule set for `src`.
+// The root `eslint.config.mjs` is responsible for adding `FlatCompat` once.
+export default [...zacatlRecommended];

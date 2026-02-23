@@ -1,13 +1,13 @@
 #!/usr/bin/env node
-import { execSync } from "node:child_process";
-import { readFileSync } from "node:fs";
-import { resolve } from "node:path";
+import { execSync } from 'node:child_process';
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 
 const root = process.cwd();
-const packagePath = resolve(root, "package.json");
-const changelogPath = resolve(root, "docs/changelog.md");
-const skipGuard = process.env["SKIP_PREPUBLISH_GUARD"] === "1";
-const skipGuardReason = (process.env["SKIP_PREPUBLISH_GUARD_REASON"] || "").trim();
+const packagePath = resolve(root, 'package.json');
+const changelogPath = resolve(root, 'docs/changelog.md');
+const skipGuard = process.env['SKIP_PREPUBLISH_GUARD'] === '1';
+const skipGuardReason = (process.env['SKIP_PREPUBLISH_GUARD_REASON'] || '').trim();
 
 const fail = (message: string) => {
   console.error(`❌ prepublish guard failed: ${message}`);
@@ -25,7 +25,7 @@ const pass = (message: string) => {
 if (skipGuard) {
   if (!skipGuardReason) {
     fail(
-      "SKIP_PREPUBLISH_GUARD=1 requires SKIP_PREPUBLISH_GUARD_REASON with a non-empty emergency reason",
+      'SKIP_PREPUBLISH_GUARD=1 requires SKIP_PREPUBLISH_GUARD_REASON with a non-empty emergency reason',
     );
   }
   warn(`Bypassing prepublish guard due to emergency override. Reason: ${skipGuardReason}`);
@@ -34,34 +34,34 @@ if (skipGuard) {
 
 let packageJson: any;
 try {
-  packageJson = JSON.parse(readFileSync(packagePath, "utf8"));
+  packageJson = JSON.parse(readFileSync(packagePath, 'utf8'));
 } catch {
-  fail("Unable to read package.json");
+  fail('Unable to read package.json');
 }
 
 const packageName = packageJson.name;
 const packageVersion = packageJson.version;
 
-if (!packageName || !packageVersion) fail("package.json must include both name and version");
+if (!packageName || !packageVersion) fail('package.json must include both name and version');
 
-let changelogContent: string = "";
+let changelogContent: string = '';
 try {
-  changelogContent = readFileSync(changelogPath, "utf8");
+  changelogContent = readFileSync(changelogPath, 'utf8');
 } catch {
-  fail("Unable to read docs/changelog.md");
+  fail('Unable to read docs/changelog.md');
 }
 
 const lines = changelogContent.split(/\r?\n/);
-const firstSeparatorIndex = lines.findIndex((line) => line.trim() === "---");
+const firstSeparatorIndex = lines.findIndex((line) => line.trim() === '---');
 if (firstSeparatorIndex === -1) fail("docs/changelog.md is missing the top '---' separator");
 
 const headerRegex = /^## \[([^\]]+)\]/;
 const firstEntryLine = lines.slice(firstSeparatorIndex + 1).find((line) => headerRegex.test(line));
-if (!firstEntryLine) fail("docs/changelog.md has no release entry after the top separator");
+if (!firstEntryLine) fail('docs/changelog.md has no release entry after the top separator');
 
 const match = (firstEntryLine?.match(headerRegex) ?? []) as RegExpMatchArray;
 const topVersion = match[1];
-if (!topVersion) fail("Unable to parse top changelog version entry");
+if (!topVersion) fail('Unable to parse top changelog version entry');
 
 if (topVersion !== packageVersion) {
   fail(
@@ -75,18 +75,18 @@ let publishedVersions: string[] = [];
 try {
   const output = execSync(`npm view ${packageName} versions --json`, {
     cwd: root,
-    stdio: ["ignore", "pipe", "pipe"],
-    encoding: "utf8",
+    stdio: ['ignore', 'pipe', 'pipe'],
+    encoding: 'utf8',
   });
   const parsed = JSON.parse(output);
   publishedVersions = Array.isArray(parsed) ? parsed : parsed ? [parsed] : [];
 } catch (error: any) {
-  const stderr = error?.stderr?.toString?.() ?? "";
-  if (stderr.includes("E404")) {
+  const stderr = error?.stderr?.toString?.() ?? '';
+  if (stderr.includes('E404')) {
     warn(`${packageName} is not yet published on npm (E404). Proceeding.`);
     process.exit(0);
   }
-  fail("Unable to query npm registry for published versions");
+  fail('Unable to query npm registry for published versions');
 }
 
 if (publishedVersions.includes(packageVersion)) {

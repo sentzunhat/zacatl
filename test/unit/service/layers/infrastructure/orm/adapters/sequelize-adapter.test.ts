@@ -1,8 +1,8 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { ORMType } from "../../../../../../../src/service/layers/infrastructure/repositories/types";
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { ORMType } from '../../../../../../../src/service/layers/infrastructure/repositories/types';
 
 // Mock Sequelize before partial import
-vi.mock("sequelize", () => {
+vi.mock('sequelize', () => {
   class Model {
     public static init() {}
     public get(opts: any) {
@@ -16,8 +16,8 @@ vi.mock("sequelize", () => {
   return { Model };
 });
 
-import { Model } from "sequelize";
-import { SequelizeAdapter } from "../../../../../../../src/service/layers/infrastructure/orm/sequelize-adapter";
+import { Model } from 'sequelize';
+import { SequelizeAdapter } from '../../../../../../../src/service/layers/infrastructure/orm/sequelize-adapter';
 
 // Mock Sequelize Model
 class MockModel extends Model {
@@ -43,7 +43,7 @@ interface TestOutput {
   updatedAt: Date;
 }
 
-describe("SequelizeAdapter", () => {
+describe('SequelizeAdapter', () => {
   let adapter: SequelizeAdapter<MockModel, TestInput, TestOutput>;
   const mockConfig = {
     type: ORMType.Sequelize as const,
@@ -55,17 +55,17 @@ describe("SequelizeAdapter", () => {
     adapter = new SequelizeAdapter(mockConfig);
   });
 
-  describe("toLean", () => {
-    it("should return null if input is falsy", () => {
+  describe('toLean', () => {
+    it('should return null if input is falsy', () => {
       expect(adapter.toLean(null)).toBeNull();
       expect(adapter.toLean(undefined)).toBeNull();
     });
 
-    it("should convert Model instance to plain object", () => {
+    it('should convert Model instance to plain object', () => {
       const now = new Date();
       const plainData = {
-        id: "123",
-        name: "Test",
+        id: '123',
+        name: 'Test',
         createdAt: now,
         updatedAt: now,
       };
@@ -78,11 +78,11 @@ describe("SequelizeAdapter", () => {
       expect(mockInstance.get).toHaveBeenCalledWith({ plain: true });
     });
 
-    it("should handle plain object input", () => {
+    it('should handle plain object input', () => {
       const now = new Date();
       const plainData = {
-        id: "123",
-        name: "Test",
+        id: '123',
+        name: 'Test',
         createdAt: now,
         updatedAt: now,
       };
@@ -91,10 +91,10 @@ describe("SequelizeAdapter", () => {
       expect(result).toEqual(plainData);
     });
 
-    it("should handle missing timestamps", () => {
+    it('should handle missing timestamps', () => {
       const plainData = {
-        id: "123",
-        name: "Test",
+        id: '123',
+        name: 'Test',
       };
 
       const result = adapter.toLean(plainData);
@@ -104,12 +104,12 @@ describe("SequelizeAdapter", () => {
     });
   });
 
-  describe("findById", () => {
-    it("should return entity when found", async () => {
+  describe('findById', () => {
+    it('should return entity when found', async () => {
       const now = new Date();
       const plainData = {
-        id: "123",
-        name: "Found",
+        id: '123',
+        name: 'Found',
         createdAt: now,
         updatedAt: now,
       };
@@ -118,26 +118,26 @@ describe("SequelizeAdapter", () => {
       mockInstance.get = vi.fn().mockReturnValue(plainData);
       MockModel.findByPk.mockResolvedValue(mockInstance);
 
-      const result = await adapter.findById("123");
+      const result = await adapter.findById('123');
       expect(result).toEqual(plainData);
-      expect(MockModel.findByPk).toHaveBeenCalledWith("123");
+      expect(MockModel.findByPk).toHaveBeenCalledWith('123');
     });
 
-    it("should return null when not found", async () => {
+    it('should return null when not found', async () => {
       MockModel.findByPk.mockResolvedValue(null);
 
-      const result = await adapter.findById("999");
+      const result = await adapter.findById('999');
       expect(result).toBeNull();
     });
   });
 
-  describe("create", () => {
-    it("should create and return entity", async () => {
-      const input = { name: "New" };
+  describe('create', () => {
+    it('should create and return entity', async () => {
+      const input = { name: 'New' };
       const now = new Date();
       const plainData = {
-        id: "new-id",
-        name: "New",
+        id: 'new-id',
+        name: 'New',
         createdAt: now,
         updatedAt: now,
       };
@@ -152,13 +152,13 @@ describe("SequelizeAdapter", () => {
     });
   });
 
-  describe("update", () => {
-    it("should update and return new entity", async () => {
-      const updateData = { name: "Updated" };
+  describe('update', () => {
+    it('should update and return new entity', async () => {
+      const updateData = { name: 'Updated' };
       const now = new Date();
       const updatedData = {
-        id: "123",
-        name: "Updated",
+        id: '123',
+        name: 'Updated',
         createdAt: now,
         updatedAt: now,
       };
@@ -170,29 +170,29 @@ describe("SequelizeAdapter", () => {
       mockInstance.get = vi.fn().mockReturnValue(updatedData);
       MockModel.findByPk.mockResolvedValue(mockInstance);
 
-      const result = await adapter.update("123", updateData);
+      const result = await adapter.update('123', updateData);
 
       expect(MockModel.update).toHaveBeenCalledWith(updateData, {
-        where: { id: "123" },
+        where: { id: '123' },
       });
       expect(result).toEqual(updatedData);
     });
 
-    it("should return null if no rows affected", async () => {
+    it('should return null if no rows affected', async () => {
       MockModel.update.mockResolvedValue([0]);
 
-      const result = await adapter.update("999", { name: "Ghost" });
+      const result = await adapter.update('999', { name: 'Ghost' });
       expect(result).toBeNull();
       expect(MockModel.findByPk).not.toHaveBeenCalled();
     });
   });
 
-  describe("delete", () => {
-    it("should delete and return the deleted entity", async () => {
+  describe('delete', () => {
+    it('should delete and return the deleted entity', async () => {
       const now = new Date();
       const existingData = {
-        id: "123",
-        name: "To Delete",
+        id: '123',
+        name: 'To Delete',
         createdAt: now,
         updatedAt: now,
       };
@@ -204,16 +204,16 @@ describe("SequelizeAdapter", () => {
 
       MockModel.destroy.mockResolvedValue(1);
 
-      const result = await adapter.delete("123");
+      const result = await adapter.delete('123');
 
       expect(result).toEqual(existingData);
-      expect(MockModel.destroy).toHaveBeenCalledWith({ where: { id: "123" } });
+      expect(MockModel.destroy).toHaveBeenCalledWith({ where: { id: '123' } });
     });
 
-    it("should return null if entity not found before delete", async () => {
+    it('should return null if entity not found before delete', async () => {
       MockModel.findByPk.mockResolvedValue(null);
 
-      const result = await adapter.delete("999");
+      const result = await adapter.delete('999');
       expect(result).toBeNull();
       expect(MockModel.destroy).not.toHaveBeenCalled();
     });

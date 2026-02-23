@@ -7,7 +7,8 @@
   "version": "0.0.45",
   "packageManager": "npm@10.9.0",
   "bin": {
-    "zacatl-fix-esm": "./build/scripts/fix-esm.js"
+    "zacatl-fix-esm": "./build/scripts/fix-esm.js",
+    "zacatl-clean-gitignored": "./build/scripts/clean-gitignored.js"
   },
   "repository": {
     "type": "git",
@@ -108,12 +109,14 @@
     "clean:src": "find src -type f \\( -name '*.js' -o -name '*.d.ts' -o -name '*.js.map' -o -name '*.d.ts.map' \\) -delete 2>/dev/null; true",
     "clean:build": "rm -rf build build-cjs dist coverage publish *.tsbuildinfo *.log && npm run clean:src",
     "clean:examples": "npx tsx scripts/clean-examples.ts",
-    "clean": "npm run clean:examples && npm run clean:build && npm run clean:modules:all",
+    "clean:gitignored": "npx tsx scripts/clean-gitignored.ts",
+    "clean": "npm run clean:examples && npm run clean:gitignored && npm run clean:build && npm run clean:modules:all",
     "prepublish:guard": "npx tsx scripts/prepublish-guard.ts",
     "prepublish:only": "npm run prepublish:guard && npm run clean:src && npm run test:coverage && npm run type:check && npm run lint && npm run build",
     "update:readme-coverage": "npx tsx scripts/update-coverage-readme.ts",
     "postbuild": "mkdir -p build/eslint && cp -R src/eslint/* build/eslint/ || true && mkdir -p build/localization/locales && cp -R src/localization/locales/* build/localization/locales/ || true",
     "prepare-publish": "npx tsx scripts/prepare-publish.ts",
+    "format": "prettier --write .",
     "publish:dry:ci": "npm run prepublish:guard && npm run clean:src && npm run test && npm run type:check && npm run lint && npm run build && npm run prepare-publish && npm publish ./publish --dry-run",
     "publish:latest": "npm run prepublish:only && npm run prepare-publish && npm publish ./publish --access public --tag latest",
     "publish:otp": "npm run prepublish:only && npm run prepare-publish && npm publish ./publish --access public --tag latest --otp",
@@ -152,7 +155,8 @@
     "fastify": "^5.7.4",
     "express": "^5.2.1",
     "better-sqlite3": "^12.6.2",
-    "@types/better-sqlite3": "^7.6.13"
+    "@types/better-sqlite3": "^7.6.13",
+    "prettier": "^2.8.8"
   },
   "license": "MIT",
   "dependencies": {

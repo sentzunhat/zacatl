@@ -1,6 +1,6 @@
 export enum ServerVendor {
-  FASTIFY = "FASTIFY",
-  EXPRESS = "EXPRESS",
+  FASTIFY = 'FASTIFY',
+  EXPRESS = 'EXPRESS',
 }
 
 export interface HttpServerConfig {
@@ -22,8 +22,8 @@ export interface PageServerConfig {
 }
 
 export enum ApiServerType {
-  SERVER = "SERVER",
-  GATEWAY = "GATEWAY",
+  SERVER = 'SERVER',
+  GATEWAY = 'GATEWAY',
 }
 /**
  * Type alias for ApiServerType - represents the type of server (API or Gateway)
@@ -38,4 +38,6 @@ interface ProxyGateway {
 
 type ProxiesGateway = Array<ProxyGateway>;
 
-interface GatewayService { proxies: ProxiesGateway }
+interface GatewayService {
+  proxies: ProxiesGateway;
+}

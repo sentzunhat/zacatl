@@ -19,7 +19,7 @@ This guide shows the **canonical pattern** for building Zacatl services. This is
 
 ```typescript
 // OLD PATTERN - Don't use
-container.register("Repository", { useValue: repo });
+container.register('Repository', { useValue: repo });
 container.register(Service, { useClass: Service });
 ```
 
@@ -41,7 +41,7 @@ container.registerSingleton(GetAllHandler, GetAllHandler);
 ### 1. **DI Registration** (Before Service initialization)
 
 ```typescript
-import { container } from "tsyringe";
+import { container } from 'tsyringe';
 
 // Repositories - use registerInstance with class tokens
 const repository = new MyRepositoryAdapter();
@@ -60,14 +60,14 @@ container.registerSingleton(CreateHandler, CreateHandler);
 ### 2. **Service Configuration**
 
 ```typescript
-import { Service } from "@sentzunhat/zacatl/service";
-import { ServiceType, ServerType, ServerVendor, DatabaseVendor } from "@sentzunhat/zacatl";
+import { Service } from '@sentzunhat/zacatl/service';
+import { ServiceType, ServerType, ServerVendor, DatabaseVendor } from '@sentzunhat/zacatl';
 
 const serviceConfig = {
   type: ServiceType.SERVER,
   platforms: {
     server: {
-      name: "my-service",
+      name: 'my-service',
       server: {
         type: ServerType.SERVER,
         vendor: ServerVendor.EXPRESS, // or FASTIFY
@@ -110,7 +110,7 @@ const serviceConfig = {
 
 ```typescript
 const service = new Service(serviceConfig);
-const port = process.env["PORT"] ? parseInt(process.env["PORT"]!, 10) : 8080;
+const port = process.env['PORT'] ? parseInt(process.env['PORT']!, 10) : 8080;
 await service.start({ port });
 ```
 
@@ -119,10 +119,10 @@ await service.start({ port });
 All handlers **MUST** extend `AbstractRouteHandler`:
 
 ```typescript
-import { injectable, inject } from "tsyringe";
-import { AbstractRouteHandler } from "@sentzunhat/zacatl/service";
-import { HttpMethod } from "@sentzunhat/zacatl";
-import { GreetingService } from "../domain/services/greeting.service";
+import { injectable, inject } from 'tsyringe';
+import { AbstractRouteHandler } from '@sentzunhat/zacatl/service';
+import { HttpMethod } from '@sentzunhat/zacatl';
+import { GreetingService } from '../domain/services/greeting.service';
 
 interface CreateBody {
   message: string;
@@ -130,7 +130,11 @@ interface CreateBody {
 }
 
 @injectable()
-export class CreateGreetingHandler extends AbstractRouteHandler<CreateBody, never, { id: string; message: string }> {
+export class CreateGreetingHandler extends AbstractRouteHandler<
+  CreateBody,
+  never,
+  { id: string; message: string }
+> {
   constructor(
     @inject(GreetingService)
     private readonly greetingService: GreetingService,
@@ -139,7 +143,7 @@ export class CreateGreetingHandler extends AbstractRouteHandler<CreateBody, neve
   }
 
   method = HttpMethod.POST;
-  path = "/greetings";
+  path = '/greetings';
 
   async execute(body: CreateBody): Promise<{ id: string; message: string }> {
     const greeting = await this.greetingService.createGreeting(body);
@@ -189,7 +193,7 @@ domain: {
 ```typescript
 // ❌ WRONG
 container.register(Service, { useClass: Service });
-container.register("Repository", { useValue: repo });
+container.register('Repository', { useValue: repo });
 
 // ✅ CORRECT - Use class tokens for type safety
 container.registerInstance(MyService, new MyService(repo));

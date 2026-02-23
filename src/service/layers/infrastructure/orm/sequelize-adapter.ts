@@ -1,18 +1,15 @@
-import { SequelizeModel as Model } from "../../../../third-party/sequelize";
 import type {
   SequelizeRepositoryConfig,
   SequelizeRepositoryModel,
   ORMPort,
-} from "../repositories/types";
+} from '../repositories/types';
 
 /**
  * Sequelize ORM adapter - handles Sequelize-specific database operations
  */
-export class SequelizeAdapter<D extends object, I, O> implements ORMPort<
-  SequelizeRepositoryModel<D>,
-  I,
-  O
-> {
+export class SequelizeAdapter<D extends object, I, O>
+  implements ORMPort<SequelizeRepositoryModel<D>, I, O>
+{
   public readonly model: SequelizeRepositoryModel<D>;
 
   constructor(config: SequelizeRepositoryConfig<D>) {
@@ -23,18 +20,18 @@ export class SequelizeAdapter<D extends object, I, O> implements ORMPort<
     if (input == null) return null;
 
     const plain =
-      input instanceof Model
-        ? (input.get({ plain: true }) as Record<string, unknown>)
+      typeof (input as any)?.get === 'function'
+        ? (input as any).get({ plain: true })
         : (input as Record<string, unknown>);
 
-    const idValue = plain["id"] ?? plain["_id"];
-    const createdAtValue = plain["createdAt"];
-    const updatedAtValue = plain["updatedAt"];
+    const idValue =
+      (plain as Record<string, unknown>)['id'] ?? (plain as Record<string, unknown>)['_id'];
+    const createdAtValue = (plain as Record<string, unknown>)['createdAt'];
+    const updatedAtValue = (plain as Record<string, unknown>)['updatedAt'];
 
-    // Normalize id, createdAt, updatedAt
     return {
       ...(plain as O),
-      id: idValue !== undefined && idValue !== null ? String(idValue) : "",
+      id: idValue !== undefined && idValue !== null ? String(idValue) : '',
       createdAt:
         createdAtValue != null ? new Date(createdAtValue as string | number | Date) : new Date(),
       updatedAt:

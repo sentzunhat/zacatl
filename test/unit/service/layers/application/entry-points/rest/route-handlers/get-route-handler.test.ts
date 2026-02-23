@@ -1,22 +1,22 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect } from 'vitest';
 
-import { GetRouteHandler } from "../../../../../../../../src/service/layers/application/entry-points/rest/fastify/handlers/get-route-handler";
+import { GetRouteHandler } from '../../../../../../../../src/service/layers/application/entry-points/rest/fastify/handlers/get-route-handler';
 import {
   createFakeFastifyReply,
   createFakeFastifyRequest,
-} from "../../../../../../helpers/common/common";
-import { Request } from "../../../../../../../../src/service/layers/application";
+} from '../../../../../../helpers/common/common';
+import { Request } from '../../../../../../../../src/service/layers/application';
 
 class TestGetRouteHandler extends GetRouteHandler<unknown, string, unknown> {
   async handler(_: unknown): Promise<string> {
-    return "Test GET response";
+    return 'Test GET response';
   }
 }
 
-describe("GetRouteHandler", () => {
-  it("executes GET handler and sends raw response by default", async () => {
+describe('GetRouteHandler', () => {
+  it('executes GET handler and sends raw response by default', async () => {
     const testHandler = new TestGetRouteHandler({
-      url: "/get-test",
+      url: '/get-test',
       schema: {},
     });
 
@@ -27,6 +27,6 @@ describe("GetRouteHandler", () => {
 
     expect(fakeReply.code).toHaveBeenCalledWith(200);
     // Default behavior: raw data sent, no forced envelope
-    expect(fakeReply.send).toHaveBeenCalledWith("Test GET response");
+    expect(fakeReply.send).toHaveBeenCalledWith('Test GET response');
   });
 });

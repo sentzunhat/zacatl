@@ -1,5 +1,5 @@
-import type { Request } from "express";
-import type { ParsedQs } from "qs";
+import type { Request } from 'express';
+import type { ParsedQs } from 'qs';
 
 interface RouteSchema {
   body?: { parseAsync: (input: unknown) => Promise<unknown> };

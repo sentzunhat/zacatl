@@ -1,9 +1,9 @@
 #!/usr/bin/env node
-import fs from "fs";
-import path from "path";
+import fs from 'fs';
+import path from 'path';
 
-const HOOKS_DIR = ".git/hooks";
-const PRE_COMMIT_HOOK = path.join(HOOKS_DIR, "pre-commit");
+const HOOKS_DIR = '.git/hooks';
+const PRE_COMMIT_HOOK = path.join(HOOKS_DIR, 'pre-commit');
 
 const hook = `#!/bin/bash
 
@@ -28,7 +28,7 @@ exit 0
 fs.mkdirSync(HOOKS_DIR, { recursive: true });
 fs.writeFileSync(PRE_COMMIT_HOOK, hook, { mode: 0o755 });
 
-console.log("✅ Git pre-commit hook installed successfully!");
-console.log("   The hook will prevent accidental commits of compiled files from src folder.");
-console.log("");
-console.log("To uninstall, run: rm", PRE_COMMIT_HOOK);
+console.log('✅ Git pre-commit hook installed successfully!');
+console.log('   The hook will prevent accidental commits of compiled files from src folder.');
+console.log('');
+console.log('To uninstall, run: rm', PRE_COMMIT_HOOK);

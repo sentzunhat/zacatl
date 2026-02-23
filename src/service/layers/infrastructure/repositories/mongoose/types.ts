@@ -6,11 +6,11 @@ import type {
   Require_id,
   ObjectId,
   IfAny,
-} from "../../../../../third-party/mongoose";
+} from '../../../../../third-party/mongoose';
 
 export enum ORMType {
-  Mongoose = "mongoose",
-  Sequelize = "sequelize",
+  Mongoose = 'mongoose',
+  Sequelize = 'sequelize',
 }
 
 export type WithMongooseMeta<T> = Default__v<Require_id<T>>;
@@ -51,10 +51,9 @@ export interface MongooseRepositoryConfig<D = unknown> {
   readonly schema: Schema<D>;
 }
 
-export type MongooseBaseRepositoryConfig<D = unknown> =
-  MongooseRepositoryConfig<D> & {
-    readonly type: ORMType.Mongoose;
-  };
+export type MongooseBaseRepositoryConfig<D = unknown> = MongooseRepositoryConfig<D> & {
+  readonly type: ORMType.Mongoose;
+};
 
 /** Model types for Mongoose ORM */
 export type MongooseRepositoryModel<D> = MongooseModel<D>;

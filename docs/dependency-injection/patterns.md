@@ -17,7 +17,7 @@ import {
   registerValue,
   registerDependencies,
   registerAndResolve,
-} from "@sentzunhat/zacatl/dependency-injection";
+} from '@sentzunhat/zacatl/dependency-injection';
 ```
 
 ## Registration Methods
@@ -32,7 +32,7 @@ calling `container.register(...)` directly so registration stays consistent and 
 **Pattern:**
 
 ```typescript
-import { registerDependency } from "@sentzunhat/zacatl/dependency-injection";
+import { registerDependency } from '@sentzunhat/zacatl/dependency-injection';
 
 registerDependency(MyService, MyService);
 ```
@@ -46,7 +46,7 @@ registerDependency(MyService, MyService);
 **Pattern:**
 
 ```typescript
-import { registerValue } from "@sentzunhat/zacatl/dependency-injection";
+import { registerValue } from '@sentzunhat/zacatl/dependency-injection';
 
 const repository = new MyRepository();
 registerValue(MyRepository, repository);
@@ -61,7 +61,7 @@ registerValue(MyRepository, repository);
 **Pattern:**
 
 ```typescript
-import { registerSingleton } from "@sentzunhat/zacatl/dependency-injection";
+import { registerSingleton } from '@sentzunhat/zacatl/dependency-injection';
 
 registerSingleton(GetAllHandler, GetAllHandler);
 registerSingleton(CreateHandler, CreateHandler);
@@ -74,7 +74,7 @@ registerSingleton(CreateHandler, CreateHandler);
 **Use for:** Batch registration/resolution in advanced setup.
 
 ```typescript
-import { registerDependencies, registerAndResolve } from "@sentzunhat/zacatl/dependency-injection";
+import { registerDependencies, registerAndResolve } from '@sentzunhat/zacatl/dependency-injection';
 
 registerDependencies([UserRepository, ProductRepository]);
 const services = registerAndResolve([UserService, ProductService]);
@@ -93,8 +93,8 @@ These are still used internally, but the helper APIs are the supported public su
 
 ```typescript
 // Repositories implement port interfaces
-import { MySequelizeRepository } from "./infrastructure/repositories/my.repository";
-import { MyRepositoryPort } from "./domain/ports/my-repository.port";
+import { MySequelizeRepository } from './infrastructure/repositories/my.repository';
+import { MyRepositoryPort } from './domain/ports/my-repository.port';
 
 const myRepository = new MySequelizeRepository();
 registerValue(MyRepositoryPort, myRepository);
@@ -110,7 +110,7 @@ registerValue(MyRepositoryPort, myRepository);
 
 ```typescript
 // Services depend on repository ports
-import { MyService } from "./domain/services/my.service";
+import { MyService } from './domain/services/my.service';
 
 const myService = new MyService(myRepository);
 registerValue(MyService, myService); // Class token
@@ -125,8 +125,8 @@ registerValue(MyService, myService); // Class token
 
 ```typescript
 // Handlers depend on services via @inject
-import { GetAllHandler } from "./application/handlers/get-all.handler";
-import { CreateHandler } from "./application/handlers/create.handler";
+import { GetAllHandler } from './application/handlers/get-all.handler';
+import { CreateHandler } from './application/handlers/create.handler';
 
 registerSingleton(GetAllHandler, GetAllHandler);
 registerSingleton(CreateHandler, CreateHandler);
@@ -143,13 +143,11 @@ registerSingleton(CreateHandler, CreateHandler);
 ### Constructor Injection
 
 ```typescript
-import { injectable, inject } from "tsyringe";
+import { injectable, inject } from 'tsyringe';
 
 @injectable()
 export class MyService {
-  constructor(
-    @inject(MyRepositoryPort) private readonly myRepository: MyRepositoryPort,
-  ) {}
+  constructor(@inject(MyRepositoryPort) private readonly myRepository: MyRepositoryPort) {}
 }
 
 @injectable()
@@ -257,19 +255,19 @@ registerValue(MyRepositoryPort, repository);
 ## Complete Example
 
 ```typescript
-import "@sentzunhat/zacatl/third-party/reflect-metadata";
-import { container } from "@sentzunhat/zacatl/dependency-injection";
+import '@sentzunhat/zacatl/third-party/reflect-metadata';
+import { container } from '@sentzunhat/zacatl/dependency-injection';
 
 // Infrastructure
-import { SequelizeGreetingRepository } from "./infrastructure/repositories/greeting.repository";
-import { GreetingRepositoryAdapter } from "./domain/ports/greeting.repository";
+import { SequelizeGreetingRepository } from './infrastructure/repositories/greeting.repository';
+import { GreetingRepositoryAdapter } from './domain/ports/greeting.repository';
 
 // Domain
-import { GreetingService } from "./domain/services/greeting.service";
+import { GreetingService } from './domain/services/greeting.service';
 
 // Application
-import { GetAllGreetingsHandler } from "./application/handlers/get-all-greetings.handler";
-import { CreateGreetingHandler } from "./application/handlers/create-greeting.handler";
+import { GetAllGreetingsHandler } from './application/handlers/get-all-greetings.handler';
+import { CreateGreetingHandler } from './application/handlers/create-greeting.handler';
 
 // ═══════════════════════════════════════════════════════════
 // DI REGISTRATION

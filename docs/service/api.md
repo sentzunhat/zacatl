@@ -5,19 +5,14 @@ Main service class for building microservices.
 ## Import
 
 ```typescript
-import { Service } from "@sentzunhat/zacatl";
+import { Service } from '@sentzunhat/zacatl';
 ```
 
 ## Create Service
 
 ```typescript
-import Fastify from "fastify";
-import {
-  Service,
-  ServiceType,
-  ServerType,
-  ServerVendor,
-} from "@sentzunhat/zacatl";
+import Fastify from 'fastify';
+import { Service, ServiceType, ServerType, ServerVendor } from '@sentzunhat/zacatl';
 
 const fastify = Fastify();
 
@@ -41,7 +36,7 @@ const service = new Service({
   },
   platforms: {
     server: {
-      name: "my-service",
+      name: 'my-service',
       port: 3000,
       server: {
         type: ServerType.SERVER,
@@ -67,7 +62,7 @@ The port is specified in the `platforms.server.port` configuration.
 
 ```typescript
 interface ConfigService {
-  type?: "SERVER" | "CLI" | "DESKTOP";
+  type?: 'SERVER' | 'CLI' | 'DESKTOP';
 
   layers?: {
     application?: {

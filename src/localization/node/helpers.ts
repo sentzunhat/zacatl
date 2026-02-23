@@ -3,19 +3,19 @@
  * @module localization/i18n-node/helpers
  */
 
-import fs from "fs";
+import fs from 'fs';
 
-import { BadRequestError } from "../../error/index";
+import { BadRequestError } from '../../error/index';
 
 /**
  * Type guard: check if value is a plain object.
  */
 export const isPlainObject = (value: unknown): value is Record<string, unknown> => {
   return (
-    typeof value === "object" &&
+    typeof value === 'object' &&
     value !== null &&
     !Array.isArray(value) &&
-    Object.prototype.toString.call(value) === "[object Object]"
+    Object.prototype.toString.call(value) === '[object Object]'
   );
 };
 
@@ -48,15 +48,15 @@ export const deepMerge = (
  * Throws if the file content is not a plain object.
  */
 export const readJsonFile = (filePath: string): Record<string, unknown> => {
-  const content = fs.readFileSync(filePath, "utf-8");
+  const content = fs.readFileSync(filePath, 'utf-8');
   const parsed: unknown = JSON.parse(content);
 
   if (!isPlainObject(parsed)) {
     throw new BadRequestError({
       message: `Invalid locale JSON shape in ${filePath}`,
-      reason: "Locale file must contain a plain JSON object",
-      component: "I18nNode",
-      operation: "readJsonFile",
+      reason: 'Locale file must contain a plain JSON object',
+      component: 'I18nNode',
+      operation: 'readJsonFile',
       metadata: { filePath },
     });
   }

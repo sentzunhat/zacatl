@@ -4,16 +4,16 @@
  * this over legacy CommonJS `__dirname` usage.
  */
 
-import path from "path";
-import { fileURLToPath } from "url";
+import path from 'path';
+import { fileURLToPath } from 'url';
 
-import { FlatCompat } from "@eslint/eslintrc";
-import eslint from "@eslint/js";
-import importPlugin from "eslint-plugin-import";
-import tsEslintParser from "@typescript-eslint/parser";
-import tseslint from "typescript-eslint";
+import { FlatCompat } from '@eslint/eslintrc';
+import eslint from '@eslint/js';
+import importPlugin from 'eslint-plugin-import';
+import tsEslintParser from '@typescript-eslint/parser';
+import tseslint from 'typescript-eslint';
 
-import namingConventions from "./naming-conventions.mjs";
+import namingConventions from './naming-conventions.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -28,34 +28,34 @@ const compat = new FlatCompat({
 export default [
   {
     ignores: [
-      "README.md",
-      "*.md",
-      "package-lock.json",
-      "package.json",
-      "tsconfig.json",
-      "bun.lockb",
-      "build/**/*",
-      "report/**/*",
-      "scripts/**/*",
-      "*.config.mjs",
-      "*.config.js",
-      "eslint.config.mjs",
-      "vite.config.mjs",
-      "LICENSE",
-      "Dockerfile",
-      "config/**/*",
-      "doc/**/*",
-      "locales/**/*",
-      "src/**/*.mjs",
+      'README.md',
+      '*.md',
+      'package-lock.json',
+      'package.json',
+      'tsconfig.json',
+      'bun.lockb',
+      'build/**/*',
+      'report/**/*',
+      'scripts/**/*',
+      '*.config.mjs',
+      '*.config.js',
+      'eslint.config.mjs',
+      'vite.config.mjs',
+      'LICENSE',
+      'Dockerfile',
+      'config/**/*',
+      'doc/**/*',
+      'locales/**/*',
+      'src/**/*.mjs',
     ],
   },
 
   // Ensure import plugin can resolve TypeScript `paths` from tsconfig
   {
     settings: {
-      "import/resolver": {
+      'import/resolver': {
         typescript: {
-          project: "./tsconfig.json",
+          project: './tsconfig.json',
         },
       },
     },
@@ -70,45 +70,45 @@ export default [
   { ...importPlugin.flatConfigs.recommended },
 
   {
-    files: ["src/**/*.ts"],
+    files: ['src/**/*.ts'],
     languageOptions: {
       parser: tsEslintParser,
-      parserOptions: { project: "./tsconfig.json" },
-      globals: { __dirname: "readonly", process: "readonly" },
+      parserOptions: { project: './tsconfig.json' },
+      globals: { __dirname: 'readonly', process: 'readonly' },
     },
     rules: {
-      "@typescript-eslint/no-empty-object-type": [
-        "error",
-        { allowInterfaces: "always", allowObjectTypes: "never" },
+      '@typescript-eslint/no-empty-object-type': [
+        'error',
+        { allowInterfaces: 'always', allowObjectTypes: 'never' },
       ],
 
       /* TypeScript strictness and best-practices */
-      "@typescript-eslint/no-explicit-any": "error",
-      "@typescript-eslint/strict-boolean-expressions": "error",
-      "@typescript-eslint/no-floating-promises": "error",
-      "@typescript-eslint/no-misused-promises": "error",
-      "@typescript-eslint/explicit-module-boundary-types": [
-        "warn",
+      '@typescript-eslint/no-explicit-any': 'error',
+      '@typescript-eslint/strict-boolean-expressions': 'error',
+      '@typescript-eslint/no-floating-promises': 'error',
+      '@typescript-eslint/no-misused-promises': 'error',
+      '@typescript-eslint/explicit-module-boundary-types': [
+        'warn',
         { allowTypedFunctionExpressions: true },
       ],
-      "@typescript-eslint/consistent-type-definitions": ["warn", "interface"],
-      "@typescript-eslint/no-unused-vars": [
-        "error",
-        { argsIgnorePattern: "^_", varsIgnorePattern: "^_" },
+      '@typescript-eslint/consistent-type-definitions': ['warn', 'interface'],
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
       ],
-      "@typescript-eslint/prefer-readonly": ["error", { onlyInlineLambdas: false }],
+      '@typescript-eslint/prefer-readonly': ['error', { onlyInlineLambdas: false }],
 
       /* General best-practices */
-      "no-console": ["warn", { allow: ["warn", "error"] }],
-      "prefer-const": "error",
-      "no-throw-literal": "error",
-      "consistent-return": "error",
-      "max-classes-per-file": ["error", 1],
+      'no-console': ['warn', { allow: ['warn', 'error'] }],
+      'prefer-const': 'error',
+      'no-throw-literal': 'error',
+      'consistent-return': 'error',
+      'max-classes-per-file': ['error', 1],
 
       /* import plugin rules to catch module issues */
-      "import/no-default-export": "error",
-      "import/no-extraneous-dependencies": [
-        "error",
+      'import/no-default-export': 'error',
+      'import/no-extraneous-dependencies': [
+        'error',
         {
           devDependencies: false,
           optionalDependencies: false,
@@ -121,18 +121,18 @@ export default [
   // repository-level post-rules (kept light) — repo config can add extra overrides
   {
     rules: {
-      "import/no-cycle": ["error", { maxDepth: Infinity }],
-      "@typescript-eslint/no-explicit-any": "error",
+      'import/no-cycle': ['error', { maxDepth: Infinity }],
+      '@typescript-eslint/no-explicit-any': 'error',
     },
   },
 
   // Allow some relaxations for internal tooling and third-party re-exports
   {
-    files: ["src/third-party/**", "src/eslint/**"],
+    files: ['src/third-party/**', 'src/eslint/**'],
     rules: {
-      "import/no-default-export": "off",
-      "import/no-extraneous-dependencies": [
-        "error",
+      'import/no-default-export': 'off',
+      'import/no-extraneous-dependencies': [
+        'error',
         { devDependencies: true, optionalDependencies: false, peerDependencies: true },
       ],
     },

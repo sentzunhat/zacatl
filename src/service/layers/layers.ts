@@ -1,7 +1,7 @@
-import { Application } from "./application";
-import { Domain } from "./domain";
-import { Infrastructure } from "./infrastructure";
-import { ConfigLayers } from "./types";
+import { Application } from './application';
+import { Domain } from './domain';
+import { Infrastructure } from './infrastructure';
+import { ConfigLayers } from './types';
 
 export class Layers {
   constructor(config: ConfigLayers) {

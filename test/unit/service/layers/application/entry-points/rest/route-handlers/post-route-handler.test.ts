@@ -1,18 +1,18 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect } from 'vitest';
 
 import {
   PostRouteHandler,
   Request,
-} from "../../../../../../../../src/service/layers/application/entry-points/rest/fastify/handlers/post-route-handler";
+} from '../../../../../../../../src/service/layers/application/entry-points/rest/fastify/handlers/post-route-handler';
 import {
   createFakeFastifyReply,
   createFakeFastifyRequest,
-} from "../../../../../../helpers/common/common";
+} from '../../../../../../helpers/common/common';
 
 class TestPostRouteHandler extends PostRouteHandler<{}, {}, { id: number }, {}> {
   constructor() {
     super({
-      url: "/post-test",
+      url: '/post-test',
       schema: {},
     });
   }
@@ -22,8 +22,8 @@ class TestPostRouteHandler extends PostRouteHandler<{}, {}, { id: number }, {}> 
   }
 }
 
-describe("PostRouteHandler", () => {
-  it("executes POST handler and sends raw response by default", async () => {
+describe('PostRouteHandler', () => {
+  it('executes POST handler and sends raw response by default', async () => {
     const testHandler = new TestPostRouteHandler();
 
     const fakeRequest = createFakeFastifyRequest() as Request<{}, {}, {}>;

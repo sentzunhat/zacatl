@@ -1,4 +1,4 @@
-import { InternalServerError } from "@zacatl/error";
+import { InternalServerError } from '@zacatl/error';
 
 import {
   BaseRepositoryConfig,
@@ -10,10 +10,10 @@ import {
   RepositoryModel,
   ORMPort,
   ORMType,
-} from "./types";
-import { createMongooseAdapter, createSequelizeAdapter } from "../orm/adapter-loader";
+} from './types';
+import { createMongooseAdapter, createSequelizeAdapter } from '../orm/adapter-loader';
 
-export * from "./types";
+export * from './types';
 
 const isMongooseConfig = <D extends object>(
   config: BaseRepositoryConfig<D>,
@@ -34,11 +34,9 @@ const isSequelizeConfig = <D extends object>(
  * 1. Direct method calls: `await repo.findById()` - adapter lazy-loads on first call
  * 2. Custom queries: `(this.model as ModelStatic<T>).find()` - type-assert model in subclass
  */
-export abstract class BaseRepository<D extends object, I, O> implements RepositoryPort<
-  RepositoryModel<D>,
-  I,
-  O
-> {
+export abstract class BaseRepository<D extends object, I, O>
+  implements RepositoryPort<RepositoryModel<D>, I, O>
+{
   private readonly adapter:
     | ORMPort<MongooseRepositoryModel<D>, I, O>
     | ORMPort<SequelizeRepositoryModel<D>, I, O>;
@@ -63,9 +61,9 @@ export abstract class BaseRepository<D extends object, I, O> implements Reposito
       const exhaustive: never = config;
       throw new InternalServerError({
         message: `Invalid repository config: ${JSON.stringify(exhaustive)}`,
-        reason: "Config is neither Mongoose nor Sequelize format",
-        component: "BaseRepository",
-        operation: "constructor",
+        reason: 'Config is neither Mongoose nor Sequelize format',
+        component: 'BaseRepository',
+        operation: 'constructor',
         metadata: { config: exhaustive },
       });
     }
@@ -100,7 +98,7 @@ export abstract class BaseRepository<D extends object, I, O> implements Reposito
    */
   public async initializeModel(): Promise<void> {
     // Type guard: check if adapter has initialize method (Mongoose)
-    if ("initialize" in this.adapter && typeof this.adapter.initialize === "function") {
+    if ('initialize' in this.adapter && typeof this.adapter.initialize === 'function') {
       await this.adapter.initialize();
     }
     // Sequelize adapters don't need this - users call sequelize.sync() directly
