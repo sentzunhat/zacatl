@@ -1,14 +1,14 @@
-export type StaticConfig = {
+export interface StaticConfig {
   root: string;
   prefix?: string;
-};
+}
 
-export type PageServerConfig = {
+export interface PageServerConfig {
   devServerUrl?: string;
   staticDir?: string;
   customRegister?: (server: unknown) => Promise<void> | void;
   apiPrefix?: string;
-};
+}
 
 /**
  * PageServerPort - Hexagonal Architecture port for frontend/page server

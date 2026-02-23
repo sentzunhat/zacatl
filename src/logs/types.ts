@@ -11,14 +11,14 @@ export type LoggerInput =
 /**
  * Logger interface that wraps Pino with structured logging
  */
-export type Logger = {
+export interface Logger {
   log: (message: string, input?: LoggerInput) => void;
   info: (message: string, input?: LoggerInput) => void;
   trace: (message: string, input?: LoggerInput) => void;
   warn: (message: string, input?: LoggerInput) => void;
   error: (message: string, input?: LoggerInput) => void;
   fatal: (message: string, input?: LoggerInput) => void;
-};
+}
 
 /**
  * Logger port interface - implement this to create custom log transports
@@ -36,7 +36,13 @@ export interface LoggerPort {
 /**
  * Re-export Pino types for convenience
  */
-export type { LoggerOptions as PinoLoggerConfig } from "pino";
+/**
+ * Re-export Pino types for convenience
+ *
+ * @remarks
+ * This is a type-only export and does not introduce runtime dependencies.
+ */
+export type { LoggerOptions as PinoLoggerConfig } from "@zacatl/third-party/pino";
 
 /**
  * Adapter type identifier for built-in adapters

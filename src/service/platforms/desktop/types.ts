@@ -1,7 +1,7 @@
 /**
  * Configuration for Desktop-type services
  */
-export type ConfigDesktop = {
+export interface ConfigDesktop {
   /** Window configuration */
   window: {
     /** Window title */
@@ -25,4 +25,4 @@ export type ConfigDesktop = {
 
   /** Desktop platform/runtime */
   platform: "neutralino" | "electron";
-};
+}

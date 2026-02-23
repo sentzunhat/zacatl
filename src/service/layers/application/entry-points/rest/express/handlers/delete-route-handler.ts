@@ -1,9 +1,9 @@
 import { AbstractRouteHandler } from "./abstract";
 
-export type DeleteRouteHandlerConstructor = {
+export interface DeleteRouteHandlerConstructor {
   url: string;
   schema: Record<string, unknown>;
-};
+}
 
 /**
  * Express DELETE Route Handler convenience class

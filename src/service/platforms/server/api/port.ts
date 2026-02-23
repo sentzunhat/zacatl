@@ -1,11 +1,11 @@
 import type { HookHandler, RouteHandler } from "../../../layers/application";
 
-export type ProxyConfig = {
+export interface ProxyConfig {
   upstream: string;
   prefix: string;
   rewritePrefix?: string;
   http2?: boolean;
-};
+}
 
 /**
  * ApiServerPort - Hexagonal Architecture port for REST API server

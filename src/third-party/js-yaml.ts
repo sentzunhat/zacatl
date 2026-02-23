@@ -8,4 +8,4 @@
  */
 
 export { load, dump } from "js-yaml";
-export type * from "js-yaml";
+export * from "js-yaml";

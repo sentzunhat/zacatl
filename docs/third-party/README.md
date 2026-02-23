@@ -107,6 +107,15 @@ npm install mysql2            # MySQL
 npm install sqlite3           # SQLite
 ```
 
+## Peer dependency policy (short)
+
+- Zacatl treats ORMs and HTTP server runtimes as optional peers: we declare them in `peerDependencies` and mark them optional. This keeps installs small and lets apps choose versions.
+- For local development and CI in this repository we keep those runtimes in `devDependencies` so tests and examples work out of the box.
+- Install the runtimes your project needs (examples above). If you publish a consumer package, list required runtimes in your app's `dependencies` or `peerDependencies` as appropriate.
+- Install the runtimes your project needs (examples above). If you publish a consumer package, list required runtimes in your app's `dependencies` or `peerDependencies` as appropriate.
+
+Use `npm run check:peers` to detect mismatched or missing peer runtimes before publishing or releasing.
+
 ## Related
 
 - [Path Aliases](../utils/path-aliases.md)

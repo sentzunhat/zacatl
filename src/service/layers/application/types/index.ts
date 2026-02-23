@@ -6,24 +6,24 @@ export type ApplicationRestRoutes = Array<
   Constructor<RouteHandler<unknown, unknown, unknown, unknown, unknown>>
 >;
 
-export type RestApplicationEntryPoints = {
+export interface RestApplicationEntryPoints {
   /** Middleware for pre-/post-processing (hooks) */
   hooks?: ApplicationRestHooks;
   /** Endpoints/routes as request targets */
   routes: ApplicationRestRoutes;
-};
+}
 
 export type ApplicationCliCommands = Array<Constructor<unknown>>;
 
-export type CliApplicationEntryPoints = {
+export interface CliApplicationEntryPoints {
   commands: ApplicationCliCommands;
-};
+}
 
 export type ApplicationIpcHandlers = Array<Constructor<unknown>>;
 
-export type IpcApplicationEntryPoints = {
+export interface IpcApplicationEntryPoints {
   handlers: ApplicationIpcHandlers;
-};
+}
 
 /**
  * Entry points configuration for different service contexts
@@ -35,7 +35,7 @@ export type IpcApplicationEntryPoints = {
  *
  * At least one entry point type must be provided based on the service type.
  */
-export type ApplicationEntryPoints = {
+export interface ApplicationEntryPoints {
   /** REST API entry points (for ServiceType.SERVER) */
   rest?: RestApplicationEntryPoints;
 
@@ -44,8 +44,8 @@ export type ApplicationEntryPoints = {
 
   /** IPC handlers entry points (for ServiceType.DESKTOP) */
   ipc?: IpcApplicationEntryPoints;
-};
+}
 
-export type ConfigApplication = {
+export interface ConfigApplication {
   entryPoints: ApplicationEntryPoints;
-};
+}

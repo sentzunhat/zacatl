@@ -1,6 +1,6 @@
+import { getContainer } from "@zacatl/dependency-injection";
 import { InternalServerError } from "@zacatl/error";
 import { configureI18nNode } from "@zacatl/localization";
-import { container } from "@zacatl/third-party";
 import { Mongoose } from "@zacatl/third-party/mongoose";
 import { Sequelize } from "@zacatl/third-party/sequelize";
 
@@ -12,11 +12,26 @@ import type { ConfigService } from "./types";
 
 export type { ConfigService };
 
+/**
+ * Main Service orchestrator.
+ *
+ * Responsible for initializing localization, pre-registering database
+ * instances, instantiating layers and platforms, and optionally
+ * auto-starting the configured platforms.
+ *
+ * @public
+ */
 export class Service {
   private readonly config: ConfigService;
 
-  private platforms: Platforms | undefined;
+  private readonly platforms: Platforms | undefined;
 
+  /**
+   * Construct a Service instance.
+   *
+   * @param config - The `ConfigService` instance that provides layers,
+   *   platforms and runtime options required to initialize the service.
+   */
   constructor(config: ConfigService) {
     configureI18nNode(config.localization);
 
@@ -28,29 +43,29 @@ export class Service {
 
     // Pre-register database instances BEFORE instantiating layers
     // This ensures repositories can resolve database instances in their constructors
-    if (platforms?.server?.databases) {
+    if (platforms?.server?.databases != null) {
       for (const dbConfig of platforms.server.databases) {
         if (dbConfig.vendor === DatabaseVendor.MONGOOSE) {
-          container.register(Mongoose, {
+          getContainer().register(Mongoose, {
             useValue: dbConfig.instance,
           });
         } else if (dbConfig.vendor === DatabaseVendor.SEQUELIZE) {
-          container.register(Sequelize, {
+          getContainer().register(Sequelize, {
             useValue: dbConfig.instance,
           });
         }
       }
     }
 
-    if (layers) {
+    if (layers != null) {
       new Layers(layers);
     }
 
-    if (platforms) {
+    if (platforms != null) {
       this.platforms = new Platforms(platforms);
     }
 
-    if (run && run.auto) {
+    if (run?.auto === true) {
       this.start().catch((err) => {
         throw new InternalServerError({
           message: "Failed to start service automatically",
@@ -68,7 +83,7 @@ export class Service {
 
     const configType = type ?? undefined;
 
-    if (!configType) {
+    if (configType == null) {
       throw new InternalServerError({
         message: "Service configuration must specify a 'type' field",
         reason: "Missing service type",
@@ -79,7 +94,7 @@ export class Service {
 
     switch (configType) {
       case ServiceType.SERVER:
-        if (!platforms?.server) {
+        if (platforms?.server == null) {
           throw new InternalServerError({
             message: "ServiceType.SERVER requires 'platforms.server' configuration",
             reason: "Server platform configuration is missing",
@@ -88,7 +103,7 @@ export class Service {
             metadata: { serviceType: configType },
           });
         }
-        if (!layers?.application || !layers.application.entryPoints?.rest) {
+        if (layers?.application == null || layers.application.entryPoints?.rest == null) {
           throw new InternalServerError({
             message:
               "ServiceType.SERVER requires 'layers.application.entryPoints.rest' configuration",
@@ -101,7 +116,7 @@ export class Service {
         break;
 
       case ServiceType.CLI:
-        if (!platforms?.cli) {
+        if (platforms?.cli == null) {
           throw new InternalServerError({
             message: "ServiceType.CLI requires 'platforms.cli' configuration",
             reason: "CLI platform configuration is missing",
@@ -110,7 +125,7 @@ export class Service {
             metadata: { serviceType: configType },
           });
         }
-        if (!layers?.application || !layers.application.entryPoints?.cli) {
+        if (layers?.application == null || layers.application.entryPoints?.cli == null) {
           throw new InternalServerError({
             message: "ServiceType.CLI requires 'layers.application.entryPoints.cli' configuration",
             reason: "CLI entry points configuration is missing",
@@ -122,7 +137,7 @@ export class Service {
         break;
 
       case ServiceType.DESKTOP:
-        if (!platforms?.desktop) {
+        if (platforms?.desktop == null) {
           throw new InternalServerError({
             message: "ServiceType.DESKTOP requires 'platforms.desktop' configuration",
             reason: "Desktop platform configuration is missing",
@@ -131,7 +146,7 @@ export class Service {
             metadata: { serviceType: configType },
           });
         }
-        if (!layers?.application || !layers.application.entryPoints?.ipc) {
+        if (layers?.application == null || layers.application.entryPoints?.ipc == null) {
           throw new InternalServerError({
             message:
               "ServiceType.DESKTOP requires 'layers.application.entryPoints.ipc' configuration",
@@ -145,6 +160,12 @@ export class Service {
     }
   }
 
+  /**
+   * Start the service platforms and register entrypoints when present.
+   *
+   * @param options - Optional start options. For example `{ port?: number }`.
+   * @returns A promise that resolves when platform startup completes.
+   */
   public async start(options?: { port?: number }): Promise<void> {
     if (this.config.layers?.application?.entryPoints) {
       await this.platforms?.registerEntrypoints(this.config.layers?.application?.entryPoints);

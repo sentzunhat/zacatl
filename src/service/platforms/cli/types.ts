@@ -1,7 +1,7 @@
 /**
  * Configuration for CLI-type services
  */
-export type ConfigCLI = {
+export interface ConfigCLI {
   /** CLI command name (e.g., "ujti", "zacatl") */
   name: string;
 
@@ -10,4 +10,4 @@ export type ConfigCLI = {
 
   /** Description shown in help text */
   description?: string;
-};
+}

@@ -3,7 +3,7 @@ import type { ConfigCLI } from "../cli/types";
 import type { ConfigDesktop } from "../desktop/types";
 import type { ConfigServer } from "../server/server";
 
-export type ConfigPlatforms = {
+export interface ConfigPlatforms {
   /** Server configuration (required for SERVER type) */
   server?: Optional<ConfigServer>;
 
@@ -12,4 +12,4 @@ export type ConfigPlatforms = {
 
   /** Desktop configuration (required for DESKTOP type) */
   desktop?: Optional<ConfigDesktop>;
-};
+}

@@ -1,10 +1,10 @@
 import { AbstractRouteHandler } from "./abstract";
 export type { Request } from "./abstract";
 
-export type PostRouteHandlerConstructor = {
+export interface PostRouteHandlerConstructor {
   url: string;
   schema: Record<string, unknown>;
-};
+}
 
 /**
  * Express POST Route Handler convenience class

@@ -10,10 +10,10 @@ export type LeanDocument<T> = T & {
   updatedAt: Date;
 };
 
-export type SequelizeRepositoryConfig<D extends object = object> = {
+export interface SequelizeRepositoryConfig<D extends object = object> {
   readonly type?: ORMType.Sequelize;
   readonly model: SequelizeRepositoryModel<D>;
-};
+}
 
 export type SequelizeBaseRepositoryConfig<D extends object = object> =
   SequelizeRepositoryConfig<D> & {

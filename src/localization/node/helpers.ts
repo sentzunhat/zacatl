@@ -10,9 +10,7 @@ import { BadRequestError } from "../../error/index";
 /**
  * Type guard: check if value is a plain object.
  */
-export const isPlainObject = (
-  value: unknown,
-): value is Record<string, unknown> => {
+export const isPlainObject = (value: unknown): value is Record<string, unknown> => {
   return (
     typeof value === "object" &&
     value !== null &&

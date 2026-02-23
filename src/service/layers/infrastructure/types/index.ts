@@ -22,6 +22,6 @@ export type InfrastructureRepository =
  */
 export type InfrastructureRepositories = Array<InfrastructureRepository>;
 
-export type ConfigInfrastructure = {
+export interface ConfigInfrastructure {
   repositories?: InfrastructureRepositories;
-};
+}

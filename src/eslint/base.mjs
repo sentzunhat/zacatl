@@ -17,13 +17,16 @@
 
 import tsEslintParser from "@typescript-eslint/parser";
 import tseslint from "typescript-eslint";
+import js from "@eslint/js";
 
 const baseConfig = {
+  ...js.configs.recommended,
+
   files: ["src/**/*.ts", "!src/**/*.d.ts"],
   languageOptions: {
     parser: tsEslintParser,
     parserOptions: {
-      project: "./tsconfig.json",
+      project: ["./tsconfig.json", "./test/tsconfig.json"],
     },
     globals: {
       __dirname: "readonly",

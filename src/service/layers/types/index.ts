@@ -3,7 +3,7 @@ import type { ConfigApplication } from "../application";
 import type { ConfigDomain, ProviderPort } from "../domain";
 import type { ConfigInfrastructure } from "../infrastructure";
 
-export type ConfigLayers = {
+export interface ConfigLayers {
   /** Application layer: Entry points for different contexts */
   application?: Optional<ConfigApplication>;
 
@@ -12,7 +12,7 @@ export type ConfigLayers = {
 
   /** Infrastructure layer: Data access repositories (always required) */
   infrastructure?: Optional<ConfigInfrastructure>;
-};
+}
 
 /**
  * Constructor type that accepts classes with arbitrary parameter signatures
@@ -29,7 +29,7 @@ export type Constructor<T = object> = new (...args: any[]) => T;
  */
 export type Provider = Constructor<ProviderPort>;
 
-export type DependencyInjection<T> = {
+export interface DependencyInjection<T> {
   register: (dependency: Constructor<T>) => void;
   resolve: (dependency: Constructor<T>) => T;
-};
+}

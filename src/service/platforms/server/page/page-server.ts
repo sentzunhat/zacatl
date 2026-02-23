@@ -74,24 +74,24 @@ export class PageServer {
    * Sets up static files and SPA routing
    */
   public async configure(): Promise<void> {
-    if (!this.config.page) {
+    if (this.config.page == null) {
       return;
     }
 
     const { staticDir, apiPrefix, customRegister } = this.config.page;
 
-    if (staticDir) {
+    if (staticDir != null) {
       this.registerStaticFiles({
         root: staticDir,
-        ...(apiPrefix ? { prefix: apiPrefix } : {}),
+        ...(apiPrefix != null ? { prefix: apiPrefix } : {}),
       });
     }
 
-    if (staticDir && apiPrefix) {
+    if (staticDir != null && apiPrefix != null) {
       this.registerSpaFallback(apiPrefix, staticDir);
     }
 
-    if (customRegister) {
+    if (customRegister != null) {
       // Allow custom registration for specific page frameworks
       await customRegister(this.adapter);
     }

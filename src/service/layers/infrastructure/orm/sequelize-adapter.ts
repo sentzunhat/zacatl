@@ -20,7 +20,7 @@ export class SequelizeAdapter<D extends object, I, O> implements ORMPort<
   }
 
   public toLean(input: unknown): O | null {
-    if (!input) return null;
+    if (input == null) return null;
 
     const plain =
       input instanceof Model
@@ -35,12 +35,10 @@ export class SequelizeAdapter<D extends object, I, O> implements ORMPort<
     return {
       ...(plain as O),
       id: idValue !== undefined && idValue !== null ? String(idValue) : "",
-      createdAt: createdAtValue
-        ? new Date(createdAtValue as string | number | Date)
-        : new Date(),
-      updatedAt: updatedAtValue
-        ? new Date(updatedAtValue as string | number | Date)
-        : new Date(),
+      createdAt:
+        createdAtValue != null ? new Date(createdAtValue as string | number | Date) : new Date(),
+      updatedAt:
+        updatedAtValue != null ? new Date(updatedAtValue as string | number | Date) : new Date(),
     } as O;
   }
 
@@ -56,7 +54,7 @@ export class SequelizeAdapter<D extends object, I, O> implements ORMPort<
 
     return entities
       .map((entity) => this.toLean(entity))
-      .filter((entity): entity is O => Boolean(entity));
+      .filter((entity): entity is O => entity != null);
   }
 
   async create(entity: I): Promise<O> {
@@ -78,7 +76,7 @@ export class SequelizeAdapter<D extends object, I, O> implements ORMPort<
 
   async delete(id: string): Promise<O | null> {
     const entity = await this.findById(id);
-    if (!entity) return null;
+    if (entity == null) return null;
 
     await this.model.destroy({
       where: { id } as never,

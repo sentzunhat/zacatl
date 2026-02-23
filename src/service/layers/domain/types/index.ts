@@ -8,7 +8,7 @@ import type { ProviderPort, ServicePort } from "../ports";
 export type DomainProviders = Array<Constructor<ProviderPort>>;
 export type DomainServices = Array<Constructor<ServicePort>>;
 
-export type ConfigDomain = {
+export interface ConfigDomain {
   providers?: DomainProviders;
   services?: DomainServices;
-};
+}

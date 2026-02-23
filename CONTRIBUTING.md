@@ -126,6 +126,8 @@ npm run build           # Clean build
 
 **Fix any issues before committing.**
 
+- When bumping supported runtime versions, update `peerDependencies` in `package.json` and `docs/third-party/README.md`, then run `npm run type:check && npm test`.
+
 ### 4. Commit with Conventional Commits
 
 Follow [Conventional Commits](https://www.conventionalcommits.org/) format:

@@ -45,11 +45,11 @@ export type ToLeanInput<D, T> =
   | null
   | undefined;
 
-export type MongooseRepositoryConfig<D = unknown> = {
+export interface MongooseRepositoryConfig<D = unknown> {
   readonly type?: ORMType.Mongoose;
   readonly name?: string;
   readonly schema: Schema<D>;
-};
+}
 
 export type MongooseBaseRepositoryConfig<D = unknown> =
   MongooseRepositoryConfig<D> & {

@@ -1,3 +1,9 @@
+/**
+ * Custom error primitives and types used across the framework.
+ *
+ * This module defines structured error types with correlation IDs and
+ * helper constructors used by higher-level error wrappers.
+ */
 import { uuidv4 } from "@zacatl/third-party/uuid";
 
 import type { Optional } from "../utils/optionals";
@@ -77,34 +83,66 @@ export class CustomError extends Error {
     this.component = component;
     this.operation = operation;
 
-    if (Error.captureStackTrace) {
+    if (typeof Error.captureStackTrace === "function") {
       Error.captureStackTrace(this, this.constructor);
     }
   }
 
-  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-  toJSON() {
-    return {
+  toJSON(): {
+    name: string;
+    message: string;
+    code?: ErrorCode;
+    reason?: string;
+    metadata?: Record<string, unknown>;
+    component?: string;
+    operation?: string;
+    error?: { name: string; message: string; stack?: string };
+    time: string;
+    id: string;
+    correlationId: string;
+    stack?: string | undefined;
+    custom: boolean;
+  } {
+    const out: {
+      name: string;
+      message: string;
+      code?: ErrorCode;
+      reason?: string;
+      metadata?: Record<string, unknown>;
+      component?: string;
+      operation?: string;
+      error?: { name: string; message: string; stack?: string };
+      time: string;
+      id: string;
+      correlationId: string;
+      stack?: string | undefined;
+      custom: boolean;
+    } = {
       name: this.name,
       message: this.message,
-      code: this.code,
-      reason: this.reason,
-      metadata: this.metadata,
-      component: this.component,
-      operation: this.operation,
-      error: this.error
-        ? {
-            name: this.error.name,
-            message: this.error.message,
-            stack: this.error.stack,
-          }
-        : undefined,
       time: this.time.toISOString(),
       id: this.id,
       correlationId: this.correlationId,
-      stack: this.stack,
       custom: this.custom,
     };
+
+    if (this.code != null) out.code = this.code;
+    if (this.reason != null) out.reason = this.reason;
+    if (this.metadata != null) out.metadata = this.metadata;
+    if (this.component != null) out.component = this.component;
+    if (this.operation != null) out.operation = this.operation;
+    if (this.stack != null) out.stack = this.stack;
+
+    if (this.error != null) {
+      const e: { name: string; message: string; stack?: string } = {
+        name: this.error.name,
+        message: this.error.message,
+      };
+      if (this.error.stack != null) e.stack = this.error.stack;
+      out.error = e;
+    }
+
+    return out;
   }
 
   public override toString(): string {
@@ -117,13 +155,13 @@ export class CustomError extends Error {
       this.message +
       `\nCorrelationId: ` +
       this.correlationId +
-      (this.code ? `\nCode: ` + this.code : "") +
-      (this.component ? `\nComponent: ` + this.component : "") +
-      (this.operation ? `\nOperation: ` + this.operation : "") +
-      (this.reason ? `\nReason: ` + this.reason : "") +
-      (this.metadata ? `\nMetadata: ` + JSON.stringify(this.metadata, null, 2) : "") +
-      (this.error ? `\nCaused by: ` + this.error.toString() : "") +
-      (this.stack ? `\nStack: ` + this.stack : "")
+      (this.code != null ? `\nCode: ${this.code}` : "") +
+      (this.component != null ? `\nComponent: ${this.component}` : "") +
+      (this.operation != null ? `\nOperation: ${this.operation}` : "") +
+      (this.reason != null ? `\nReason: ${this.reason}` : "") +
+      (this.metadata != null ? `\nMetadata: ${JSON.stringify(this.metadata, null, 2)}` : "") +
+      (this.error != null ? `\nCaused by: ${this.error.toString()}` : "") +
+      (this.stack != null ? `\nStack: ${this.stack}` : "")
     );
   }
 }

@@ -1,164 +1,13 @@
 {
   "name": "@sentzunhat/zacatl",
   "type": "module",
-  "main": "build/index.js",
+  "main": "build-cjs/index.js",
   "module": "build/index.js",
   "types": "build/index.d.ts",
-  "version": "0.0.44",
+  "version": "0.0.45",
   "packageManager": "npm@10.9.0",
-  "exports": {
-    ".": {
-      "types": "./build/index.d.ts",
-      "import": "./build/index.js",
-      "require": "./build/index.js"
-    },
-    "./service": {
-      "types": "./build/service/index.d.ts",
-      "import": "./build/service/index.js"
-    },
-    "./third-party": {
-      "types": "./build/third-party/index.d.ts",
-      "import": "./build/third-party/index.js"
-    },
-    "./error": {
-      "types": "./build/error/index.d.ts",
-      "import": "./build/error/index.js"
-    },
-    "./third-party/mongoose": {
-      "types": "./build/third-party/mongoose.d.ts",
-      "import": "./build/third-party/mongoose.js"
-    },
-    "./third-party/sequelize": {
-      "types": "./build/third-party/sequelize.d.ts",
-      "import": "./build/third-party/sequelize.js"
-    },
-    "./third-party/uuid": {
-      "types": "./build/third-party/uuid.d.ts",
-      "import": "./build/third-party/uuid.js"
-    },
-    "./third-party/i18n": {
-      "types": "./build/third-party/i18n.d.ts",
-      "import": "./build/third-party/i18n.js"
-    },
-    "./third-party/tsyringe": {
-      "types": "./build/third-party/tsyringe.d.ts",
-      "import": "./build/third-party/tsyringe.js"
-    },
-    "./third-party/reflect-metadata": {
-      "types": "./build/third-party/reflect-metadata.d.ts",
-      "import": "./build/third-party/reflect-metadata.js"
-    },
-    "./third-party/pino": {
-      "types": "./build/third-party/pino.d.ts",
-      "import": "./build/third-party/pino.js"
-    },
-    "./third-party/zod": {
-      "types": "./build/third-party/zod.d.ts",
-      "import": "./build/third-party/zod.js"
-    },
-    "./third-party/js-yaml": {
-      "types": "./build/third-party/js-yaml.d.ts",
-      "import": "./build/third-party/js-yaml.js"
-    },
-    "./third-party/fastify": {
-      "types": "./build/third-party/fastify.d.ts",
-      "import": "./build/third-party/fastify.js"
-    },
-    "./third-party/express": {
-      "types": "./build/third-party/express.d.ts",
-      "import": "./build/third-party/express.js"
-    },
-    "./third-party/http-proxy-middleware": {
-      "types": "./build/third-party/http-proxy-middleware.d.ts",
-      "import": "./build/third-party/http-proxy-middleware.js"
-    },
-    "./third-party/eslint": {
-      "types": "./build/third-party/eslint.d.ts",
-      "import": "./build/third-party/eslint.js"
-    },
-    "./infrastructure": {
-      "types": "./build/service/layers/infrastructure/repositories/abstract.d.ts",
-      "import": "./build/service/layers/infrastructure/repositories/abstract.js"
-    },
-    "./repository/mongoose": {
-      "types": "./build/service/layers/infrastructure/repositories/mongoose.d.ts",
-      "import": "./build/service/layers/infrastructure/repositories/mongoose.js"
-    },
-    "./repository/sequelize": {
-      "types": "./build/service/layers/infrastructure/repositories/sequelize.d.ts",
-      "import": "./build/service/layers/infrastructure/repositories/sequelize.js"
-    },
-    "./handlers/fastify": {
-      "types": "./build/service/layers/application/entry-points/rest/fastify/handlers/index.d.ts",
-      "import": "./build/service/layers/application/entry-points/rest/fastify/handlers/index.js"
-    },
-    "./handlers/express": {
-      "types": "./build/service/layers/application/entry-points/rest/express/handlers/index.d.ts",
-      "import": "./build/service/layers/application/entry-points/rest/express/handlers/index.js"
-    },
-    "./domain": {
-      "types": "./build/service/layers/domain/index.d.ts",
-      "import": "./build/service/layers/domain/index.js"
-    },
-    "./application": {
-      "types": "./build/service/layers/application/index.d.ts",
-      "import": "./build/service/layers/application/index.js"
-    },
-    "./errors": {
-      "types": "./build/error/index.d.ts",
-      "import": "./build/error/index.js"
-    },
-    "./dependency-injection": {
-      "types": "./build/dependency-injection/index.d.ts",
-      "import": "./build/dependency-injection/index.js"
-    },
-    "./utils": {
-      "types": "./build/utils/index.d.ts",
-      "import": "./build/utils/index.js"
-    },
-    "./utils/optionals": {
-      "types": "./build/utils/optionals.d.ts",
-      "import": "./build/utils/optionals.js"
-    },
-    "./logs": {
-      "types": "./build/logs/index.d.ts",
-      "import": "./build/logs/index.js"
-    },
-    "./localization": {
-      "types": "./build/localization/index.d.ts",
-      "import": "./build/localization/index.js"
-    },
-    "./configuration": {
-      "types": "./build/configuration/index.d.ts",
-      "import": "./build/configuration/index.js"
-    },
-    "./config": {
-      "types": "./build/configuration/index.d.ts",
-      "import": "./build/configuration/index.js"
-    },
-    "./eslint": {
-      "import": "./build/eslint/index.mjs"
-    },
-    "./eslint/base": {
-      "import": "./build/eslint/base.mjs"
-    },
-    "./eslint/naming-conventions": {
-      "import": "./build/eslint/naming-conventions.mjs"
-    },
-    "./eslint/imports": {
-      "import": "./build/eslint/imports.mjs"
-    },
-    "./eslint/file-naming": {
-      "import": "./build/eslint/file-naming.mjs"
-    },
-    "./eslint/solid": {
-      "import": "./build/eslint/solid.mjs"
-    },
-    "./build/*": "./build/*",
-    "./package.json": "./package.json"
-  },
   "bin": {
-    "zacatl-fix-esm": "./scripts/fix-esm.mjs"
+    "zacatl-fix-esm": "./build/scripts/fix-esm.js"
   },
   "repository": {
     "type": "git",
@@ -168,9 +17,6 @@
   "engines": {
     "node": ">=24.0.0",
     "npm": ">=10.0.0"
-  },
-  "volta": {
-    "node": "24.0.0"
   },
   "keywords": [
     "typescript",
@@ -240,30 +86,41 @@
   },
   "scripts": {
     "start": "npx tsx src/index.ts --project ./tsconfig.json",
-    "build": "npm run clean:src && tsc --project tsconfig.json && tsc-alias -p tsconfig.json && node scripts/fix-esm.mjs && npm run clean:src",
-    "build:watch": "tsc --project tsconfig.json --watch",
+    "build:scripts:esm": "npx tsc -p scripts/tsconfig.scripts.esm.json && chmod +x build/scripts/*.js || true",
+    "build:scripts:cjs": "npx tsc -p scripts/tsconfig.scripts.cjs.json",
+    "build:scripts": "npm run build:scripts:esm && npm run build:scripts:cjs",
+    "build:esm": "npm run build:scripts:esm && npx tsc -p tsconfig.json && npx tsc-alias -p tsconfig.json && npx tsx scripts/fix-esm.ts",
+    "build:cjs": "npm run build:scripts:cjs && npx tsc -p tsconfig.cjs.json && npx tsc-alias -p tsconfig.cjs.json",
+    "build": "npm run clean:src && npm run build:esm && npm run build:cjs && npm run clean:src",
+    "build:watch": "npx tsc --project tsconfig.json --watch",
     "test": "NODE_ENV=test ENV=test vitest run",
     "test:watch": "NODE_ENV=test ENV=test vitest",
-    "test:coverage": "npm run test -- --coverage",
+    "test:coverage": "NODE_ENV=test ENV=test vitest run --coverage --reporter json > test-results.json 2>&1 && npm run update:readme-coverage",
     "type:check": "npm run type:check:src && npm run type:check:test",
     "type:check:src": "tsc --noEmit -p ./tsconfig.json",
     "type:check:test": "tsc --noEmit -p ./test/tsconfig.json",
     "lint": "eslint src",
+    "lint:scripts": "eslint --no-ignore --config scripts/.eslintrc.cjs --ext .ts scripts",
     "clean:modules": "rm -rf node_modules && npm run clean:modules:examples",
     "clean:modules:main": "rm -rf node_modules",
     "clean:modules:examples": "rm -rf examples/*/node_modules examples/*/*/node_modules examples/*/*/*/node_modules examples/*/*/*/*/node_modules 2>/dev/null; true",
     "clean:modules:all": "npm run clean:modules",
     "clean:src": "find src -type f \\( -name '*.js' -o -name '*.d.ts' -o -name '*.js.map' -o -name '*.d.ts.map' \\) -delete 2>/dev/null; true",
-    "clean:build": "rm -rf build dist coverage *.tsbuildinfo && npm run clean:src",
-    "clean": "npm run clean:build && npm run clean:modules:all",
-    "prepublish:guard": "node scripts/prepublish-guard.mjs",
+    "clean:build": "rm -rf build build-cjs dist coverage publish *.tsbuildinfo *.log && npm run clean:src",
+    "clean:examples": "npx tsx scripts/clean-examples.ts",
+    "clean": "npm run clean:examples && npm run clean:build && npm run clean:modules:all",
+    "prepublish:guard": "npx tsx scripts/prepublish-guard.ts",
     "prepublish:only": "npm run prepublish:guard && npm run clean:src && npm run test:coverage && npm run type:check && npm run lint && npm run build",
-    "postbuild": "mkdir -p build/eslint && cp -R src/eslint/* build/eslint/ || true && mkdir -p build/localization/locales && cp -R src/localization/locales/* build/localization/locales/ || true && cp README.md LICENSE build/ || true",
-    "prepare-publish": "node scripts/prepare-publish.mjs",
-    "publish:latest": "npm run prepublish:only && npm run prepare-publish && npm publish ./build --access public --tag latest",
-    "publish:otp": "npm run prepublish:only && npm run prepare-publish && npm publish ./build --access public --tag latest --otp",
-    "publish:dry": "npm run prepublish:only && npm run prepare-publish && npm publish ./build --dry-run",
-    "setup:hooks": "bash scripts/setup-git-hooks.sh"
+    "update:readme-coverage": "npx tsx scripts/update-coverage-readme.ts",
+    "postbuild": "mkdir -p build/eslint && cp -R src/eslint/* build/eslint/ || true && mkdir -p build/localization/locales && cp -R src/localization/locales/* build/localization/locales/ || true",
+    "prepare-publish": "npx tsx scripts/prepare-publish.ts",
+    "publish:dry:ci": "npm run prepublish:guard && npm run clean:src && npm run test && npm run type:check && npm run lint && npm run build && npm run prepare-publish && npm publish ./publish --dry-run",
+    "publish:latest": "npm run prepublish:only && npm run prepare-publish && npm publish ./publish --access public --tag latest",
+    "publish:otp": "npm run prepublish:only && npm run prepare-publish && npm publish ./publish --access public --tag latest --otp",
+    "publish:dry": "npm run prepublish:only && npm run prepare-publish && npm publish ./publish --dry-run",
+    "setup:hooks": "npx tsx scripts/setup-git-hooks.ts",
+    "check:peers": "npx tsx scripts/check-peers.ts",
+    "setup:dev": "npm ci && npm run check:peers"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.3",
@@ -284,16 +141,43 @@
     "tsx": "^4.21.0",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.48.1",
+    "eslint-import-resolver-typescript": "^3.5.1",
     "vite": "^7.3.1",
-    "vitest": "^4.0.18"
+    "vitest": "^4.0.18",
+    "pg-mem": "^2.1.0",
+    "sql.js": "^1.8.0",
+    "@types/express": "^5.0.6",
+    "mongoose": "^9.0.0",
+    "sequelize": "^6.0.0",
+    "fastify": "^5.7.4",
+    "express": "^5.2.1",
+    "better-sqlite3": "^12.6.2",
+    "@types/better-sqlite3": "^7.6.13"
   },
   "license": "MIT",
-  "files": [
-    "build"
-  ],
+  "dependencies": {
+    "@fastify/http-proxy": "^11.4.1",
+    "@fastify/static": "^9.0.0",
+    "fastify-type-provider-zod": "^6.1.0",
+    "http-proxy-middleware": "^3.0.5",
+    "i18n": "^0.15.3",
+    "js-yaml": "^4.1.1",
+    "pg": "^8.18.0",
+    "pino": "^10.3.0",
+    "pino-pretty": "^13.1.3",
+    "reflect-metadata": "^0.2.2",
+    "sqlite3": "^5.1.7",
+    "tsyringe": "^4.10.0",
+    "uuid": "^13.0.0",
+    "zod": "^4.3.6"
+  },
+  "optionalDependencies": {},
   "peerDependencies": {
     "mongoose": "^9.0.0",
-    "sequelize": "^6.0.0"
+    "sequelize": "^6.0.0",
+    "fastify": "^5.7.4",
+    "express": "^5.2.1",
+    "better-sqlite3": "^12.6.2"
   },
   "peerDependenciesMeta": {
     "mongoose": {
@@ -302,33 +186,14 @@
     "sequelize": {
       "optional": true
     },
+    "fastify": {
+      "optional": true
+    },
+    "express": {
+      "optional": true
+    },
     "better-sqlite3": {
       "optional": true
     }
-  },
-  "dependencies": {
-    "@fastify/http-proxy": "^11.4.1",
-    "@fastify/static": "^9.0.0",
-    "@types/express": "^5.0.6",
-    "express": "^5.2.1",
-    "fastify": "^5.7.4",
-    "fastify-type-provider-zod": "^6.1.0",
-    "http-proxy-middleware": "^3.0.5",
-    "i18n": "^0.15.3",
-    "js-yaml": "^4.1.1",
-    "mongoose": "^9.0.0",
-    "pg": "^8.18.0",
-    "pino": "^10.3.0",
-    "pino-pretty": "^13.1.3",
-    "reflect-metadata": "^0.2.2",
-    "sequelize": "^6.0.0",
-    "sqlite3": "^5.1.7",
-    "tsyringe": "^4.10.0",
-    "uuid": "^13.0.0",
-    "zod": "^4.3.6"
-  },
-  "optionalDependencies": {
-    "@types/better-sqlite3": "^7.6.13",
-    "better-sqlite3": "^12.6.2"
   }
 }

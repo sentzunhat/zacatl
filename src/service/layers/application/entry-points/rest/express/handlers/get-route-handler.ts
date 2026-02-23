@@ -1,9 +1,9 @@
 import { AbstractRouteHandler } from "./abstract";
 
-export type GetRouteHandlerConstructor = {
+export interface GetRouteHandlerConstructor {
   url: string;
   schema: Record<string, unknown>;
-};
+}
 
 /**
  * Express GET Route Handler convenience class

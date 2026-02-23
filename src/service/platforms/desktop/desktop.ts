@@ -13,8 +13,8 @@ import type { IpcApplicationEntryPoints } from "../../layers/application/types";
  * const desktop = new Desktop({ window: { title: "App" }, platform: "neutralino" });
  */
 export class Desktop {
-  private window: ConfigDesktop["window"];
-  private platform: ConfigDesktop["platform"];
+  private readonly window: ConfigDesktop["window"];
+  private readonly platform: ConfigDesktop["platform"];
 
   constructor(config: ConfigDesktop) {
     this.window = config.window;

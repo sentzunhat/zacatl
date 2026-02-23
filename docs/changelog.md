@@ -2,9 +2,20 @@
 
 ---
 
-## [0.0.44] - 2026-02-22
+## [0.0.45] - 2026-02-22
 
 **Status**: Current release
+
+### 🔧 Maintenance
+
+- **Docs**: Removed Bun runtime claims from documentation and changelog.
+- **Version**: Bumped package version to `0.0.45`.
+
+---
+
+## [0.0.44] - 2026-02-22
+
+**Status**: Previous release
 
 ### ✨ Improvements
 
@@ -419,20 +430,13 @@ const server = new Service({
 
 ### ✨ Enhancements
 
-- **Bun Runtime Support**: Added `"bun"` export conditions to all package.json exports
-  - Bun now automatically uses TypeScript source files (`src/**/*.ts`) instead of compiled JavaScript
-  - Enables native path alias resolution (`@zacatl/*`) without build-time transformation
-  - Significantly improves Docker build times (no framework compilation needed)
-  - Node.js/npm continue to use compiled build artifacts as before
-
 - **Dependency Updates**: Updated to latest stable versions
-  - `@fastify/static`: 8.3.0 → 9.0.0
-  - `@types/bun`: 1.3.6 → 1.3.8
-  - `@types/node`: 24.10.1 → 25.2.1
-  - `fastify`: 5.6.2 → 5.7.4
-  - `knip`: 5.71.0 → 5.83.0
-  - `mongodb-memory-server`: 10.4.1 → 11.0.1
-  - `mongoose`: 9.0.0 → 9.1.6
+- `@fastify/static`: 8.3.0 → 9.0.0
+- `@types/node`: 24.10.1 → 25.2.1
+- `fastify`: 5.6.2 → 5.7.4
+- `knip`: 5.71.0 → 5.83.0
+- `mongodb-memory-server`: 10.4.1 → 11.0.1
+- `mongoose`: 9.0.0 → 9.1.6
 
 ### ✅ Fixes
 
@@ -516,7 +520,7 @@ import { Sequelize, DataTypes } from "@sentzunhat/zacatl/third-party/sequelize";
 
 #### **Issue: CommonJS `require()` in ESM Environment**
 
-**Problem:** v0.0.21 used `require()` for lazy loading adapters, which throws `ReferenceError: require is not defined` in pure ESM environments (Bun, Node.js ESM, Vite, Next.js).
+**Problem:** v0.0.21 used `require()` for lazy loading adapters, which throws `ReferenceError: require is not defined` in pure ESM environments (Node.js ESM, Vite, Next.js).
 
 **Root Cause:**
 
@@ -554,7 +558,6 @@ export async function loadMongooseAdapter(config) {
 ### Testing
 
 - ✅ 169 tests passing (8 new ESM adapter tests)
-- ✅ Verified in Bun runtime
 - ✅ Verified with Node.js ESM
 - ✅ All existing tests pass without modification
 
@@ -625,9 +628,8 @@ import { loadConfig } from "@sentzunhat/zacatl/config";
 - Clearer indication of which ORMs are supported
 - No forced installation of unused dependencies
 
-#### 🧪 Bun Support
+#### 🧪 Testing
 
-- Added `test:bun` and `test:node` scripts
 - Better runtime-specific testing
 
 #### 📚 Documentation

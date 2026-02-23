@@ -10,9 +10,9 @@ import type { ApplicationEntryPoints } from "../layers/application/types";
  * Service orchestrates the platforms
  */
 export class Platforms {
-  private server?: Server;
-  private cli?: CLI;
-  private desktop?: Desktop;
+  private readonly server?: Server;
+  private readonly cli?: CLI;
+  private readonly desktop?: Desktop;
 
   constructor(config: ConfigPlatforms) {
     const { server, cli, desktop } = config;

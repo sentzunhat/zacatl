@@ -1,9 +1,9 @@
 import { AbstractRouteHandler } from "./abstract";
 
-export type PutRouteHandlerConstructor = {
+export interface PutRouteHandlerConstructor {
   url: string;
   schema: Record<string, unknown>;
-};
+}
 
 /**
  * Express PUT Route Handler convenience class

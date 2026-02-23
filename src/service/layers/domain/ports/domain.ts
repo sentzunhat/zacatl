@@ -1,2 +1,2 @@
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export type DomainPort = {};
+ 
+export interface DomainPort {}

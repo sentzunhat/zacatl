@@ -32,10 +32,7 @@ import {
 **Example (eslint.config.mjs):**
 
 ```javascript
-import {
-  tsEslintParser,
-  tseslint,
-} from "@sentzunhat/zacatl/third-party/eslint";
+import { tsEslintParser, tseslint } from "@sentzunhat/zacatl/third-party/eslint";
 
 export default [
   {
@@ -159,10 +156,7 @@ export default [
 
 ```javascript
 // ❌ INCORRECT - Will fail because built package not available during dev
-import {
-  tseslint,
-  tsEslintParser,
-} from "@sentzunhat/zacatl/third-party/eslint";
+import { tseslint, tsEslintParser } from "@sentzunhat/zacatl/third-party/eslint";
 ```
 
 ### TypeScript Service Code (src/\*_/_.ts)
@@ -262,10 +256,7 @@ import { recommended, baseConfig } from "@sentzunhat/zacatl/eslint";
 
 ```typescript
 // ✅ ESLint internals (re-exports)
-import {
-  tseslint,
-  tsEslintParser,
-} from "@sentzunhat/zacatl/third-party/eslint";
+import { tseslint, tsEslintParser } from "@sentzunhat/zacatl/third-party/eslint";
 ```
 
 ### Subpath: `/third-party/mongoose`
@@ -326,7 +317,7 @@ import { BaseRepository, mongooseSupport } from "@sentzunhat/zacatl";
 
 ### Q: Does this affect runtime performance?
 
-**A:** No - it's purely a bundling optimization. At runtime, all imports resolve to the same dependencies.
+**A:** No - it is purely a bundling optimization. At runtime, all imports resolve to the same dependencies.
 
 ### Q: What's the difference between `third-party/mongoose` and plain `mongoose`?
 

@@ -2,10 +2,10 @@ import { FastifySchema } from "@zacatl/third-party/fastify";
 
 import { AbstractRouteHandler } from "./abstract";
 
-export type PutRouteHandlerConstructor = {
+export interface PutRouteHandlerConstructor {
   url: string;
   schema: FastifySchema;
-};
+}
 
 /**
  * Fastify PUT Route Handler convenience class

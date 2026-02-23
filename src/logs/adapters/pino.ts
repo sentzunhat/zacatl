@@ -10,15 +10,14 @@ import type { LoggerPort, LoggerInput } from "../types";
 export class PinoLoggerAdapter implements LoggerPort {
   private readonly pinoLogger: pino.BaseLogger;
 
-  constructor(
-    config?: pino.LoggerOptions,
-    destination?: pino.DestinationStream,
-  ) {
+  constructor(config?: pino.LoggerOptions, destination?: pino.DestinationStream) {
     this.pinoLogger = pino(config ?? createPinoConfig(), destination);
   }
 
   /**
-   * Get the underlying Pino logger instance for advanced usage
+   * Get the underlying Pino logger instance for advanced usage.
+   *
+   * @returns {pino.BaseLogger} The underlying Pino BaseLogger instance
    */
   getPinoInstance(): pino.BaseLogger {
     return this.pinoLogger;
@@ -29,37 +28,22 @@ export class PinoLoggerAdapter implements LoggerPort {
   }
 
   info(message: string, input?: LoggerInput): void {
-    this.pinoLogger.info(
-      { data: input?.data, details: input?.details },
-      message,
-    );
+    this.pinoLogger.info({ data: input?.data, details: input?.details }, message);
   }
 
   trace(message: string, input?: LoggerInput): void {
-    this.pinoLogger.trace(
-      { data: input?.data, details: input?.details },
-      message,
-    );
+    this.pinoLogger.trace({ data: input?.data, details: input?.details }, message);
   }
 
   warn(message: string, input?: LoggerInput): void {
-    this.pinoLogger.warn(
-      { data: input?.data, details: input?.details },
-      message,
-    );
+    this.pinoLogger.warn({ data: input?.data, details: input?.details }, message);
   }
 
   error(message: string, input?: LoggerInput): void {
-    this.pinoLogger.error(
-      { data: input?.data, details: input?.details },
-      message,
-    );
+    this.pinoLogger.error({ data: input?.data, details: input?.details }, message);
   }
 
   fatal(message: string, input?: LoggerInput): void {
-    this.pinoLogger.fatal(
-      { data: input?.data, details: input?.details },
-      message,
-    );
+    this.pinoLogger.fatal({ data: input?.data, details: input?.details }, message);
   }
 }

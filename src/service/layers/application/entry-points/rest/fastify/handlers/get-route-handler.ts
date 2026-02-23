@@ -2,10 +2,10 @@ import { FastifySchema } from "@zacatl/third-party/fastify";
 
 import { AbstractRouteHandler } from "./abstract";
 
-export type GetRouteHandlerConstructor = {
+export interface GetRouteHandlerConstructor {
   url: string;
   schema: FastifySchema;
-};
+}
 
 export abstract class GetRouteHandler<
   TBody = void,

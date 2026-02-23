@@ -6,10 +6,7 @@ Structured, high-performance logging with Pino adapter.
 
 ```typescript
 import { createLogger, logger } from "@sentzunhat/zacatl/logs";
-import {
-  PinoLoggerAdapter,
-  ConsoleLoggerAdapter,
-} from "@sentzunhat/zacatl/logs";
+import { PinoLoggerAdapter, ConsoleLoggerAdapter } from "@sentzunhat/zacatl/logs";
 import { createPinoConfig } from "@sentzunhat/zacatl/logs";
 ```
 
@@ -86,11 +83,7 @@ const logger = createLogger(new ConsoleLoggerAdapter());
 ### Basic Configuration
 
 ```typescript
-import {
-  createLogger,
-  PinoLoggerAdapter,
-  createPinoConfig,
-} from "@sentzunhat/zacatl/logs";
+import { createLogger, PinoLoggerAdapter, createPinoConfig } from "@sentzunhat/zacatl/logs";
 
 const logger = createLogger(
   new PinoLoggerAdapter(
@@ -106,16 +99,10 @@ const logger = createLogger(
 
 ```typescript
 import pino from "pino";
-import {
-  createLogger,
-  PinoLoggerAdapter,
-  createPinoConfig,
-} from "@sentzunhat/zacatl/logs";
+import { createLogger, PinoLoggerAdapter, createPinoConfig } from "@sentzunhat/zacatl/logs";
 
 const fileDestination = pino.destination("/var/log/app/app.log");
-const logger = createLogger(
-  new PinoLoggerAdapter(createPinoConfig(), fileDestination),
-);
+const logger = createLogger(new PinoLoggerAdapter(createPinoConfig(), fileDestination));
 ```
 
 ### Multi-Transport (Console + File)
@@ -123,11 +110,7 @@ const logger = createLogger(
 No spread operator needed - use `pinoConfig` option:
 
 ```typescript
-import {
-  createLogger,
-  PinoLoggerAdapter,
-  createPinoConfig,
-} from "@sentzunhat/zacatl/logs";
+import { createLogger, PinoLoggerAdapter, createPinoConfig } from "@sentzunhat/zacatl/logs";
 
 const logger = createLogger(
   new PinoLoggerAdapter(
@@ -148,11 +131,7 @@ const logger = createLogger(
 ### Third-Party Services (Prometheus, Grafana, etc.)
 
 ```typescript
-import {
-  createLogger,
-  PinoLoggerAdapter,
-  createPinoConfig,
-} from "@sentzunhat/zacatl/logs";
+import { createLogger, PinoLoggerAdapter, createPinoConfig } from "@sentzunhat/zacatl/logs";
 
 const logger = createLogger(
   new PinoLoggerAdapter(
@@ -188,6 +167,9 @@ Override with environment variables:
 - `SERVICE_NAME`: Service identifier in logs
 - `APP_VERSION`: Application version in logs
 
+- `NODE_ENV`: Node environment; used to select pretty (development) vs JSON (production) output
+- `APP_ENV`: Optional environment tag included in structured logs (e.g., staging, production)
+
 ## Dependency Injection
 
 ### Export Pattern
@@ -196,11 +178,7 @@ Create a shared logger instance:
 
 ```typescript
 // src/utils/logger.ts
-import {
-  createLogger,
-  PinoLoggerAdapter,
-  createPinoConfig,
-} from "@sentzunhat/zacatl/logs";
+import { createLogger, PinoLoggerAdapter, createPinoConfig } from "@sentzunhat/zacatl/logs";
 
 export const logger = createLogger(
   new PinoLoggerAdapter(
@@ -250,13 +228,7 @@ class UserService {
 ## TypeScript Types
 
 ```typescript
-import type {
-  Logger,
-  LoggerPort,
-  LoggerInput,
-  LoggerAdapterType,
-  PinoLoggerConfig,
-} from "@sentzunhat/zacatl/logs";
+import type { Logger, LoggerPort, LoggerInput, LoggerAdapterType, PinoLoggerConfig } from "@sentzunhat/zacatl/logs";
 
 // LoggerInput structure
 const input: LoggerInput = {

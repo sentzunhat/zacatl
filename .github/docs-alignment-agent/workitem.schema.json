@@ -1,0 +1,54 @@
+{
+  "name": "docs-alignment-workitem.v1",
+  "description": "WorkItem schema to run the Documentation Alignment Auditor against the repository.",
+  "inputs": {
+    "scanPaths": ["src", "docs"],
+    "includeFiles": ["package.json", "README.md", "docs/changelog.md"],
+    "excludePatterns": ["node_modules", "build", "dist", "publish", "build-cjs"]
+  },
+  "phases": [
+    {
+      "id": "discover",
+      "action": "lexical_scan_and_ast_extract",
+      "output": "codeStructure",
+      "notes": "Extract entry points, public exports, env vars, models, events, CLI commands, external deps."
+    },
+    {
+      "id": "extract_docs",
+      "action": "parse_markdown_and_yaml",
+      "output": "docsClaims",
+      "notes": "Extract documented features, APIs, architecture statements and runtime assumptions."
+    },
+    {
+      "id": "compare",
+      "action": "deterministic_diff",
+      "output": "driftAnalysis",
+      "notes": "Produce classified drift items with exact file/line evidence."
+    },
+    {
+      "id": "propose",
+      "action": "reconstruction_plan",
+      "output": "proposedDocsStructure",
+      "notes": "List files to create/update/delete and provide patch hints."
+    },
+    {
+      "id": "summarize",
+      "action": "score_and_recommend",
+      "output": "documentationHealth",
+      "notes": "Produce health score, risk level and recommended next steps."
+    }
+  ],
+  "outputs": [
+    "codeStructure",
+    "docsClaims",
+    "driftAnalysis",
+    "proposedDocsStructure",
+    "documentationHealth"
+  ],
+  "strictRules": [
+    "treat_src_as_single_source_of_truth",
+    "no_hallucination_only_verifiable_facts",
+    "evidence_must_use_file_paths_and_line_ranges",
+    "do_not_modify_code_only_suggest_docs"
+  ]
+}

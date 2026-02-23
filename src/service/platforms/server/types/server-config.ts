@@ -3,23 +3,23 @@ export enum ServerVendor {
   EXPRESS = "EXPRESS",
 }
 
-export type HttpServerConfig = {
+export interface HttpServerConfig {
   type: ApiServerType;
   vendor: ServerVendor;
   instance: unknown;
   gateway?: GatewayService;
-};
+}
 
-export type ApiServerConfig = {
+export interface ApiServerConfig {
   httpServer: HttpServerConfig;
-};
+}
 
-export type PageServerConfig = {
+export interface PageServerConfig {
   devServerUrl?: string | undefined;
   staticDir?: string | undefined;
   customRegister?: ((server: unknown) => Promise<void> | void) | undefined;
   apiPrefix?: string | undefined;
-};
+}
 
 export enum ApiServerType {
   SERVER = "SERVER",
@@ -31,11 +31,11 @@ export enum ApiServerType {
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export const ServerType = ApiServerType;
 
-type ProxyGateway = {
+interface ProxyGateway {
   upstream: string;
   prefix?: string;
-};
+}
 
 type ProxiesGateway = Array<ProxyGateway>;
 
-type GatewayService = { proxies: ProxiesGateway };
+interface GatewayService { proxies: ProxiesGateway }

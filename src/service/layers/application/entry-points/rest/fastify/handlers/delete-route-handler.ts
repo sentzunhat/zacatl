@@ -2,10 +2,10 @@ import { FastifySchema } from "@zacatl/third-party/fastify";
 
 import { AbstractRouteHandler } from "./abstract";
 
-export type DeleteRouteHandlerConstructor = {
+export interface DeleteRouteHandlerConstructor {
   url: string;
   schema: FastifySchema;
-};
+}
 
 /**
  * Fastify DELETE Route Handler convenience class

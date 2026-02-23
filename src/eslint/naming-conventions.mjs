@@ -31,17 +31,11 @@ const namingConventionsConfig = {
       // - Examples: CreateUserInput, UserOutput, ServerConfig, RouteHandler
       // Note: Suffix requirements are intentionally flexible to allow domain-specific naming
 
-      // Interfaces (Ports) - Hexagonal Architecture pattern
-      // Primary ports: Use "Port" suffix for architectural boundaries
+      // Exported interfaces - allow plain PascalCase names (no forced 'Port' suffix)
       {
         selector: "interface",
         modifiers: ["exported"],
         format: ["PascalCase"],
-        suffix: ["Port"],
-        filter: {
-          match: true,
-          regex: "(Repository|Service|Logger|ORM|Server|I18n|Config.*Loader)$",
-        },
       },
       // Configuration interfaces and data structures (no Port suffix)
       {

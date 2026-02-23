@@ -14,7 +14,7 @@ export type OnDatabaseConnectedFunction = Optional<
   (dbInstance: DatabaseInstance) => Promise<void> | void
 >;
 
-export type DatabaseConfig = {
+export interface DatabaseConfig {
   vendor: DatabaseVendor;
   instance: DatabaseInstance;
   connectionString: string;
@@ -23,7 +23,7 @@ export type DatabaseConfig = {
    * Use this to perform extra initialization or plug additional modules.
    */
   onDatabaseConnected?: OnDatabaseConnectedFunction;
-};
+}
 
 /**
  * DatabaseServerPort - Hexagonal Architecture port for database connections

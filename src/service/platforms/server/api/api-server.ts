@@ -1,7 +1,7 @@
+import { resolveDependencies } from "@zacatl/dependency-injection";
 import { CustomError, InternalServerError } from "@zacatl/error";
 
 import { type ApiServerPort, type ProxyConfig } from "./port";
-import { resolveDependencies } from "../../../../dependency-injection/container";
 import { HookHandler, RouteHandler } from "../../../layers/application";
 import type { RestApplicationEntryPoints } from "../../../layers/application/types";
 import { ApiServerType, type HttpServerConfig } from "../types/server-config";
@@ -13,10 +13,10 @@ export enum HandlersType {
 
 type Handlers = RouteHandler | HookHandler;
 
-type RegisterHandlersInput = {
+interface RegisterHandlersInput {
   handlers: Handlers[];
   handlersType: HandlersType;
-};
+}
 
 /**
  * ApiServer - Encapsulates REST API logic
@@ -35,21 +35,16 @@ export class ApiServer {
   /**
    * Register entry points (routes and hooks) and configure gateway proxies
    */
-  public async registerEntrypoints(
-    entryPoints: RestApplicationEntryPoints,
-  ): Promise<void> {
+  public async registerEntrypoints(entryPoints: RestApplicationEntryPoints): Promise<void> {
     // Register REST entry points
     await this.registerAllRestHandlers(entryPoints);
 
     // Configure gateway proxies if needed
-    if (
-      this.config.type === ApiServerType.GATEWAY &&
-      this.config.gateway?.proxies
-    ) {
+    if (this.config.type === ApiServerType.GATEWAY && this.config.gateway?.proxies != null) {
       for (const proxyConf of this.config.gateway.proxies) {
         this.registerProxy({
           upstream: proxyConf.upstream,
-          prefix: proxyConf.prefix || "/",
+          prefix: proxyConf.prefix ?? "/",
           http2: false,
         });
       }
@@ -91,10 +86,8 @@ export class ApiServer {
   /**
    * Register all hooks from REST entry points config
    */
-  public async registerAllHooks(
-    restEntryPoints: RestApplicationEntryPoints,
-  ): Promise<void> {
-    if (!restEntryPoints.hooks || restEntryPoints.hooks.length === 0) {
+  public async registerAllHooks(restEntryPoints: RestApplicationEntryPoints): Promise<void> {
+    if (restEntryPoints.hooks == null || restEntryPoints.hooks.length === 0) {
       return;
     }
 
@@ -109,10 +102,8 @@ export class ApiServer {
   /**
    * Register all routes from REST entry points config
    */
-  public async registerAllRoutes(
-    restEntryPoints: RestApplicationEntryPoints,
-  ): Promise<void> {
-    if (!restEntryPoints.routes || restEntryPoints.routes.length === 0) {
+  public async registerAllRoutes(restEntryPoints: RestApplicationEntryPoints): Promise<void> {
+    if (restEntryPoints.routes == null || restEntryPoints.routes.length === 0) {
       return;
     }
 
@@ -127,9 +118,7 @@ export class ApiServer {
   /**
    * Register all REST entry points (hooks and routes)
    */
-  public async registerAllRestHandlers(
-    restEntryPoints: RestApplicationEntryPoints,
-  ): Promise<void> {
+  public async registerAllRestHandlers(restEntryPoints: RestApplicationEntryPoints): Promise<void> {
     await this.registerAllHooks(restEntryPoints);
     await this.registerAllRoutes(restEntryPoints);
   }

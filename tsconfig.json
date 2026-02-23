@@ -26,7 +26,7 @@
     "sourceMap": true,
     "inlineSources": true,
     "sourceRoot": "./src",
-    "outDir": "./build",
+    "outDir": "build",
     "removeComments": true,
     "noEmit": false,
     "noEmitOnError": true,

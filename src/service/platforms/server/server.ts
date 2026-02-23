@@ -1,6 +1,7 @@
-import { CustomError, InternalServerError } from "@zacatl/error";
 import { Express } from "express";
 import { FastifyInstance } from "fastify";
+
+import { CustomError, InternalServerError } from "@zacatl/error";
 
 import { ExpressApiAdapter, FastifyApiAdapter } from "./api/adapters";
 import { ApiServer } from "./api/api-server";
@@ -13,14 +14,14 @@ import type { PageServerPort } from "./page/port";
 import { ServerVendor, type HttpServerConfig } from "./types/server-config";
 import type { RestApplicationEntryPoints } from "../../layers/application/types";
 
-type ServerPageConfig = {
+interface ServerPageConfig {
   devServerUrl?: string;
   staticDir?: string;
   customRegister?: (server: unknown) => Promise<void> | void;
   apiPrefix?: string;
-};
+}
 
-export type ConfigServer = {
+export interface ConfigServer {
   name: string;
   server: HttpServerConfig;
   databases: Array<DatabaseConfig>;
@@ -28,7 +29,7 @@ export type ConfigServer = {
   port: number;
   /** REST entry points for route/hook registration */
   entryPoints?: RestApplicationEntryPoints;
-};
+}
 
 /**
  * Server orchestration for REST, pages, and database connections.
@@ -41,8 +42,8 @@ export type ConfigServer = {
  */
 export class Server {
   private readonly config: ConfigServer;
-  private apiAdapter: ApiServerPort;
-  private pageAdapter: PageServerPort;
+  private readonly apiAdapter: ApiServerPort;
+  private readonly pageAdapter: PageServerPort;
   private apiServer?: ApiServer;
   private pageServer?: PageServer;
   private databaseServer?: DatabaseServer;
@@ -96,7 +97,7 @@ export class Server {
     this.apiServer = new ApiServer(this.config.server, this.apiAdapter);
     this.pageServer = new PageServer(this.config, this.pageAdapter);
 
-    if (this.config.databases && this.config.databases.length > 0) {
+    if (this.config.databases.length > 0) {
       this.databaseServer = new DatabaseServer(this.config.name, this.config.databases);
     }
   }

@@ -3,10 +3,10 @@ import { FastifySchema } from "@zacatl/third-party/fastify";
 import { AbstractRouteHandler } from "./abstract";
 export type { Request } from "./abstract";
 
-export type PostRouteHandlerConstructor = {
+export interface PostRouteHandlerConstructor {
   url: string;
   schema: FastifySchema;
-};
+}
 
 export abstract class PostRouteHandler<
   TBody = void,

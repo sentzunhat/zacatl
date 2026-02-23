@@ -15,10 +15,47 @@
  * };
  */
 
-// Core TypeScript ESLint packages
-export { default as tsEslintParser } from "@typescript-eslint/parser";
-export { default as tseslint } from "typescript-eslint";
+// Core TypeScript ESLint packages - use runtime requires so the CJS build
+// step doesn't try to resolve their ESM type entrypoints.
+/* eslint-disable @typescript-eslint/no-require-imports */
+export const tsEslintParser: unknown = (() => {
+  try {
+    // runtime import resolution may vary between environments
+    const mod = require("@typescript-eslint/parser");
+    const candidate = mod != null ? (mod.default ?? mod) : undefined;
+    return candidate as unknown;
+  } catch {
+    return undefined;
+  }
+})();
+
+export const tseslint: unknown = (() => {
+  try {
+    // runtime import resolution may vary between environments
+    return require("typescript-eslint") as unknown;
+  } catch {
+    return undefined;
+  }
+})();
 
 // Additional ESLint plugins
-export { default as tsEslintPlugin } from "@typescript-eslint/eslint-plugin";
-export { default as importPlugin } from "eslint-plugin-import";
+export const tsEslintPlugin: unknown = (() => {
+  try {
+    // runtime import resolution may vary between environments
+    const mod = require("@typescript-eslint/eslint-plugin");
+    const candidate = mod != null ? (mod.default ?? mod) : undefined;
+    return candidate as unknown;
+  } catch {
+    return undefined;
+  }
+})();
+
+export const importPlugin: unknown = (() => {
+  try {
+    // runtime import resolution may vary between environments
+    return require("eslint-plugin-import") as unknown;
+  } catch {
+    return undefined;
+  }
+})();
+/* eslint-enable @typescript-eslint/no-require-imports */

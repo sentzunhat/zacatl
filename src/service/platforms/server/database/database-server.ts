@@ -1,8 +1,7 @@
 import { CustomError } from "@zacatl/error";
 
 import { createDatabaseAdapter } from "./adapters";
-import type { DatabaseConfig } from "./port";
-import type { DatabaseServerPort } from "./port";
+import type { DatabaseConfig, DatabaseServerPort } from "./port";
 
 /**
  * DatabaseServer - Encapsulates database connection logic
@@ -10,9 +9,9 @@ import type { DatabaseServerPort } from "./port";
  * Supports: Mongoose (MongoDB), Sequelize (SQL databases)
  */
 export class DatabaseServer {
-  private serviceName: string;
-  private databases: DatabaseConfig[];
-  private adapters: Map<string, DatabaseServerPort> = new Map();
+  private readonly serviceName: string;
+  private readonly databases: DatabaseConfig[];
+  private readonly adapters: Map<string, DatabaseServerPort> = new Map();
 
   constructor(serviceName: string, databases: DatabaseConfig[]) {
     this.serviceName = serviceName;
@@ -23,12 +22,12 @@ export class DatabaseServer {
    * Configure all databases for the service
    */
   public async configure(): Promise<void> {
-    if (!this.databases || this.databases.length === 0) {
+    if (this.databases.length === 0) {
       return;
     }
 
     for (const database of this.databases) {
-      if (!database.connectionString) {
+      if (database.connectionString == null || database.connectionString.length === 0) {
         throw new CustomError({
           message: "database connection string is not provided",
           code: 500,
@@ -77,8 +76,8 @@ export class DatabaseServer {
    * Disconnect all databases
    */
   public async disconnect(): Promise<void> {
-    const disconnectPromises = Array.from(this.adapters.values()).map(
-      (adapter) => adapter.disconnect?.(),
+    const disconnectPromises = Array.from(this.adapters.values()).map((adapter) =>
+      adapter.disconnect?.(),
     );
     await Promise.all(disconnectPromises);
   }

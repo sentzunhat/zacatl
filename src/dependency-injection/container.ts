@@ -1,9 +1,20 @@
 import "../third-party/reflect-metadata";
 import { InternalServerError } from "@zacatl/error";
 import { container as tsyringeContainer } from "@zacatl/third-party/tsyringe";
-import type { DependencyContainer, InjectionToken } from "@zacatl/third-party/tsyringe";
+import type { InjectionToken } from "@zacatl/third-party/tsyringe";
 
 import type { Constructor } from "../service/layers/types";
+
+export const getContainer = (): typeof tsyringeContainer => {
+  return tsyringeContainer;
+};
+
+export const registerDependency = <T>(
+  token: InjectionToken<T>,
+  implementation: new (...args: unknown[]) => T,
+): void => {
+  tsyringeContainer.register(token, { useClass: implementation });
+};
 
 /**
  * Standalone DI container decoupled from microservice architecture.
@@ -27,22 +38,25 @@ import type { Constructor } from "../service/layers/types";
  * ```typescript
  * const service = new Service({
  *   layers: {
- *     domain: { providers: [CustomService] }
- *   }
- * });
+/**
+ * Resolve dependencies from the DI container
+ *
+ * Retrieve instances of already-registered classes.
+ * Dependencies must be registered first (Service layers handle this automatically).
+ * This function does not auto-register unregistered classes; it will throw if a
+ * dependency is not registered. Ensure classes are decorated with `@injectable()`
+ * (or `@singleton()`) and are registered by Service layer composition before
+ * resolving.
+ *
+ * @param dependencies - Array of class constructors to resolve
+ * @returns Array of resolved instances in the same order
+ *
+ * @example
+ * ```typescript
+ * // Resolve services that were registered by Service layers
+ * const services = resolveDependencies<Service>([UserService, ProductService]);
  * ```
  */
-
-export const getContainer = (): DependencyContainer => {
-  return tsyringeContainer;
-};
-
-export const registerDependency = <T>(
-  token: InjectionToken<T>,
-  implementation: new (...args: unknown[]) => T,
-): void => {
-  tsyringeContainer.register(token, { useClass: implementation });
-};
 
 export const registerSingleton = <T>(
   token: InjectionToken<T>,

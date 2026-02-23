@@ -184,6 +184,8 @@ archive/
 build
 dist
 out-tsc
+build-cjs
+publish
 
 # Compiled TypeScript files in src (keep eslint .mjs files)
 src/**/*.js
@@ -209,3 +211,9 @@ typings
 # Optional eslint cache
 .eslintcache
 .archive-audits/
+
+# Database initialization scripts - allow committed mongo init files
+# These are intentionally included for example setups and deployment
+!**/**/mongo-init.js
+
+test-results.json

@@ -13,8 +13,8 @@ import type { CliApplicationEntryPoints } from "../../layers/application/types";
  * const cli = new CLI({ name: "my-cli", version: "0.1.0" });
  */
 export class CLI {
-  private name: string;
-  private version: string;
+  private readonly name: string;
+  private readonly version: string;
 
   constructor(config: ConfigCLI) {
     this.name = config.name;

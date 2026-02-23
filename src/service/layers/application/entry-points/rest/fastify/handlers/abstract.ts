@@ -7,25 +7,25 @@ import type { Request } from "../../common/request";
 
 export type { Request } from "../../common/request";
 
-export type RouteSchema<
+export interface RouteSchema<
   TBody = void,
   TQuerystring = void,
   TParams = void,
   THeaders = void,
   TResponse = void,
-> = {
+> {
   body?: z.ZodType<TBody>;
   querystring?: z.ZodType<TQuerystring>;
   params?: z.ZodType<TParams>;
   headers?: z.ZodType<THeaders>;
   response?: z.ZodType<TResponse>;
-};
+}
 
-export type AbstractRouteHandlerConstructor = {
+export interface AbstractRouteHandlerConstructor {
   url: string;
   method: HTTPMethod;
   schema: RouteSchema | FastifySchema | Record<string, unknown>;
-};
+}
 
 export type HandlerOutput<TResponse> = TResponse;
 

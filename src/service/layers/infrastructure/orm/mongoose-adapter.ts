@@ -1,6 +1,5 @@
 import { InternalServerError } from "../../../../error";
-import { uuidv4 } from "../../../../third-party";
-import { container } from "../../../../third-party";
+import { uuidv4, container } from "../../../../third-party";
 import { Mongoose } from "../../../../third-party/mongoose";
 import type {
   MongooseRepositoryConfig,
@@ -12,11 +11,7 @@ import type {
 /**
  * Mongoose ORM adapter - handles Mongoose-specific database operations
  */
-export class MongooseAdapter<D, I, O> implements ORMPort<
-  MongooseRepositoryModel<D>,
-  I,
-  O
-> {
+export class MongooseAdapter<D, I, O> implements ORMPort<MongooseRepositoryModel<D>, I, O> {
   private _model: MongooseRepositoryModel<D> | null = null;
   private readonly config: MongooseRepositoryConfig<D>;
 
@@ -26,7 +21,7 @@ export class MongooseAdapter<D, I, O> implements ORMPort<
 
   public get model(): MongooseRepositoryModel<D> {
     const existingModel = this._model;
-    if (existingModel) {
+    if (existingModel != null) {
       return existingModel;
     }
 
@@ -37,7 +32,7 @@ export class MongooseAdapter<D, I, O> implements ORMPort<
     // Async bootstrapping (createCollection, createIndexes, init) must NOT be called
     // fire-and-forget here; they are handled explicitly via initialize() during
     // DatabaseServer.configure() so we can await and surface errors at startup.
-    const model = mongoose.model<D>(name || uuidv4(), schema);
+    const model = mongoose.model<D>(name ?? uuidv4(), schema);
     this._model = model;
 
     return model;
@@ -56,18 +51,17 @@ export class MongooseAdapter<D, I, O> implements ORMPort<
   }
 
   public toLean(input: unknown): O | null {
-    if (!input) {
+    if (input == null) {
       return null;
     }
 
     let base: LeanWithMeta<O>;
 
     if (
-      input &&
+      input != null &&
       typeof input === "object" &&
       "toObject" in input &&
-      typeof (input as unknown as Record<string, unknown>)["toObject"] ===
-        "function"
+      typeof (input as unknown as Record<string, unknown>)["toObject"] === "function"
     ) {
       base = (
         input as unknown as {
@@ -80,26 +74,29 @@ export class MongooseAdapter<D, I, O> implements ORMPort<
       base = input as LeanWithMeta<O>;
     }
 
+    const baseRec = base as unknown as Record<string, unknown>;
+
+    const idVal = (() => {
+      if (typeof baseRec["id"] === "string") return baseRec["id"] as string;
+      if (typeof baseRec["_id"] === "string") return baseRec["_id"] as string;
+      if (baseRec["_id"] !== undefined && baseRec["_id"] !== null)
+        return String(baseRec["_id"]);
+      return "";
+    })();
+
     const result: O = {
       ...(base as O),
-      id:
-        typeof base.id === "string"
-          ? base.id
-          : typeof base._id === "string"
-            ? base._id
-            : base._id !== undefined
-              ? String(base._id)
-              : "",
+      id: idVal,
       createdAt:
         base.createdAt instanceof Date
           ? base.createdAt
-          : base.createdAt
+          : base.createdAt != null
             ? new Date(base.createdAt as string | number)
             : new Date(),
       updatedAt:
         base.updatedAt instanceof Date
           ? base.updatedAt
-          : base.updatedAt
+          : base.updatedAt != null
             ? new Date(base.updatedAt as string | number)
             : new Date(),
     } as O;
@@ -109,10 +106,7 @@ export class MongooseAdapter<D, I, O> implements ORMPort<
 
   async findById(id: string): Promise<O | null> {
     try {
-      const entity = await this.model
-        .findById(id)
-        .lean<O>({ virtuals: true })
-        .exec();
+      const entity = await this.model.findById(id).lean<O>({ virtuals: true }).exec();
 
       return this.toLean(entity);
     } catch {
@@ -129,7 +123,7 @@ export class MongooseAdapter<D, I, O> implements ORMPort<
 
     return entities
       .map((entity) => this.toLean(entity))
-      .filter((entity): entity is O => Boolean(entity));
+      .filter((entity): entity is O => entity != null);
   }
 
   async create(entity: I): Promise<O> {
@@ -137,7 +131,7 @@ export class MongooseAdapter<D, I, O> implements ORMPort<
 
     const leanDocument = this.toLean(document);
 
-    if (!leanDocument) {
+    if (leanDocument == null) {
       throw new InternalServerError({
         message: "Failed to create document",
         reason: "Document was created but toLean returned null",
@@ -165,10 +159,7 @@ export class MongooseAdapter<D, I, O> implements ORMPort<
 
   async delete(id: string): Promise<O | null> {
     try {
-      const entity = await this.model
-        .findByIdAndDelete(id)
-        .lean<O>({ virtuals: true })
-        .exec();
+      const entity = await this.model.findByIdAndDelete(id).lean<O>({ virtuals: true }).exec();
 
       return this.toLean(entity);
     } catch {
@@ -180,7 +171,7 @@ export class MongooseAdapter<D, I, O> implements ORMPort<
   async exists(id: string): Promise<boolean> {
     try {
       const result = await this.model.exists({ _id: id });
-      return Boolean(result);
+      return result != null;
     } catch {
       // Silently handle invalid ObjectId errors
       return false;

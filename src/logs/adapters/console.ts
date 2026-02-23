@@ -13,19 +13,13 @@ export class ConsoleLoggerAdapter implements LoggerPort {
     this.enableTimestamps = options?.timestamps ?? true;
   }
 
-  private formatMessage(
-    level: string,
-    message: string,
-    input?: LoggerInput,
-  ): string {
-    const timestamp = this.enableTimestamps
-      ? `[${new Date().toISOString()}]`
-      : "";
+  private formatMessage(level: string, message: string, input?: LoggerInput): string {
+    const timestamp = this.enableTimestamps ? `[${new Date().toISOString()}]` : "";
     const levelTag = `[${level.toUpperCase()}]`;
 
     let output = `${timestamp} ${levelTag} ${message}`;
 
-    if (input) {
+    if (input != null) {
       const structured: Record<string, unknown> = {};
 
       if (input.data !== undefined) {
@@ -56,7 +50,7 @@ export class ConsoleLoggerAdapter implements LoggerPort {
       magenta: "\x1b[35m",
     };
 
-    return `${colors[color] || ""}${text}${colors["reset"]}`;
+    return `${colors[color] ?? ""}${text}${colors["reset"]}`;
   }
 
   log(message: string, input?: LoggerInput): void {
@@ -65,12 +59,16 @@ export class ConsoleLoggerAdapter implements LoggerPort {
 
   info(message: string, input?: LoggerInput): void {
     const formatted = this.formatMessage("info", message, input);
+    /* eslint-disable no-console */
     console.log(this.colorize(formatted, "blue"));
+    /* eslint-enable no-console */
   }
 
   trace(message: string, input?: LoggerInput): void {
     const formatted = this.formatMessage("trace", message, input);
+    /* eslint-disable no-console */
     console.log(this.colorize(formatted, "gray"));
+    /* eslint-enable no-console */
   }
 
   warn(message: string, input?: LoggerInput): void {

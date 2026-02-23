@@ -42,7 +42,7 @@ export default defineConfig({
     logHeapUsage: true,
     reporters: "verbose",
     globalSetup: "./test/unit/lib/global-setup.ts",
-    setupFiles: ["./test/unit/lib/setup-files.ts"],
+    setupFiles: ["./test/setup.ts", "./test/unit/lib/setup-files.ts"],
     coverage: {
       reporter: ["lcov", "text"],
       reportsDirectory: "./coverage",

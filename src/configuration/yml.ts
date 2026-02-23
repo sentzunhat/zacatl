@@ -1,9 +1,10 @@
 import { readFileSync } from "fs";
 
+import { load } from "js-yaml";
+
 import { BadRequestError, NotFoundError, ValidationError } from "@zacatl/error";
 import type { ZodType } from "@zacatl/third-party";
 import { isNodeError, isZodError } from "@zacatl/utils";
-import { load } from "js-yaml";
 
 export const loadYML = <T = unknown>(filePath: string, schema?: ZodType<T>): T => {
   try {

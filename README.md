@@ -5,8 +5,9 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![TypeScript](https://img.shields.io/badge/%3C%2F%3E-TypeScript-3178c6.svg)](https://www.typescriptlang.org/)
 [![Node.js 24+](https://img.shields.io/badge/Node.js-24%2B-brightgreen.svg)](https://nodejs.org/)
-[![Tests: 214](https://img.shields.io/badge/Tests-214-blue.svg)](#testing)
-[![Coverage: 52.45%](https://img.shields.io/badge/Coverage-52.45%25-yellow.svg)](#testing)
+[![Build](https://github.com/sentzunhat/zacatl/actions/workflows/publish-dry.yml/badge.svg)](https://github.com/sentzunhat/zacatl/actions/workflows/publish-dry.yml)
+[![Tests: 307](https://img.shields.io/badge/Tests-307-blue.svg)](#testing)
+[![Coverage: 68.39%](https://img.shields.io/badge/Coverage-68.39%25-orange.svg)](#testing)
 
 **Universal TypeScript framework for building CLI tools, desktop apps, APIs, and distributed systems.**
 
@@ -22,12 +23,14 @@ Zacatl enforces clean, layered architecture with dependency injection, validatio
 - **🗄️ Pluggable ORM Adapters** - Sequelize, Mongoose, or build your own
 - **🌐 Multi-Language Support** - Pluggable i18n with filesystem/memory adapters
 - **🔌 Adapter Pattern** - Easy integration with any database or service
-- **🧪 Comprehensive Testing** - 214 tests, 52.45% coverage, Vitest
+- **🧪 Comprehensive Testing** - 214 tests, 61.19% coverage, Vitest
 - **📝 Production Ready** - Structured logging, monitoring, and error tracking
 
 ## 🎯 Multi-Context Support
 
 Build **CLI tools**, **Desktop apps**, and **HTTP servers** with the same architecture:
+
+> **Platform availability:** CLI and Desktop platform adapters are planned; the HTTP server platform is the primary supported runtime. See [Service Module](./docs/service/README.md) for platform status and availability.
 
 ```typescript
 import { Service, ServiceType } from "@sentzunhat/zacatl";
@@ -100,6 +103,25 @@ Zacatl is MIT-licensed (permissive). Please don’t use it to harm people.
 
 ```bash
 npm install @sentzunhat/zacatl
+```
+
+> Note: Zacatl treats runtime adapters (ORMs and HTTP servers) as peerDependencies so consumers can choose implementations and versions. Install the runtimes your app needs. Examples:
+
+```bash
+# Fastify + Mongoose
+npm install fastify mongoose
+
+# Express + Sequelize
+npm install express sequelize
+
+# Optional native SQLite (only if you need it)
+npm install better-sqlite3
+```
+
+Also validate peer runtimes locally with:
+
+```bash
+npm run check:peers
 ```
 
 ### Hello World HTTP Service

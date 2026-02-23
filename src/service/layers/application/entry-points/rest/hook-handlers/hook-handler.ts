@@ -6,7 +6,7 @@ export type HookHandlerName =
   | "preValidation"
   | "preSerialization";
 
-export type HookHandler = {
+export interface HookHandler {
   name: HookHandlerName;
   execute: (request: FastifyRequest, reply: FastifyReply) => Promise<void>;
-};
+}

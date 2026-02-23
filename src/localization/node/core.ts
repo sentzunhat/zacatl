@@ -5,8 +5,6 @@
 
 import fs from "fs";
 import path from "path";
-import { fileURLToPath } from "url";
-
 
 import { readJsonFile, deepMerge, findExistingDir } from "./helpers";
 import type {
@@ -27,9 +25,7 @@ import { NotFoundError } from "../../error/index";
  *   supportedLocales: ['en', 'es']
  * });
  */
-export const loadStaticCatalog = (
-  input: LoadStaticCatalogInput,
-): I18nStaticCatalogType => {
+export const loadStaticCatalog = (input: LoadStaticCatalogInput): I18nStaticCatalogType => {
   const { localesDir, supportedLocales } = input;
 
   const catalog: I18nStaticCatalogType = {};
@@ -55,8 +51,21 @@ export const loadStaticCatalog = (
  *
  * @throws {Error} If the locales directory cannot be found
  */
+const getHere = (): string => {
+  if (typeof __dirname !== "undefined") return __dirname;
+  if (
+    typeof process !== "undefined" &&
+    Array.isArray(process.argv) &&
+    typeof process.argv[1] === "string" &&
+    process.argv[1].length > 0
+  ) {
+    return path.dirname(process.argv[1]);
+  }
+  return process.cwd();
+};
+
 export const resolveBuiltInLocalesDir = (): string => {
-  const here = path.dirname(fileURLToPath(import.meta.url));
+  const here = getHere();
 
   const candidates = [
     path.resolve(here, "../locales"),
@@ -65,7 +74,7 @@ export const resolveBuiltInLocalesDir = (): string => {
   ];
 
   const found = findExistingDir(candidates);
-  if (!found) {
+  if (found == null) {
     throw new NotFoundError({
       message: `Unable to locate Zacatl built-in locales directory. Tried: ${candidates.join(", ")}`,
       reason: "Built-in locales directory not found in expected paths",
@@ -91,9 +100,7 @@ export const resolveBuiltInLocalesDir = (): string => {
  *   overrideBuiltIn: true
  * });
  */
-export const mergeStaticCatalogs = (
-  input: MergeStaticCatalogsInput,
-): I18nStaticCatalogType => {
+export const mergeStaticCatalogs = (input: MergeStaticCatalogsInput): I18nStaticCatalogType => {
   const { base, additions, overrideBuiltIn } = input;
 
   const out: I18nStaticCatalogType = {};
@@ -109,7 +116,7 @@ export const mergeStaticCatalogs = (
     const additionsLocale = additions.reduce<Record<string, unknown>>(
       (acc: Record<string, unknown>, addition: Record<string, unknown>) => {
         const addLocale = addition[locale];
-        if (!addLocale) {
+        if (addLocale == null) {
           return acc;
         }
 

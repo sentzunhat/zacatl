@@ -1,0 +1,15 @@
+{
+  "extends": "../tsconfig.cjs.json",
+  "compilerOptions": {
+    "outDir": "../build-cjs/scripts",
+    "rootDir": ".",
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "target": "ES2022",
+    "esModuleInterop": true,
+    "declaration": false,
+    "skipLibCheck": true
+  },
+  "include": ["*.ts"],
+  "exclude": ["fix-esm.ts", "update-coverage-readme.ts", "check-peers.ts"]
+}

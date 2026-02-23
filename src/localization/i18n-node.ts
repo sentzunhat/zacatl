@@ -1,13 +1,12 @@
 import fs from "fs";
 import path from "path";
-import { fileURLToPath } from "url";
 
 import { NotFoundError, BadRequestError } from "@zacatl/error";
 import i18n from "@zacatl/third-party/i18n";
 
 export type I18nCatalogType = Record<string, Record<string, unknown>>;
 
-export type ConfigureI18nInput = {
+export interface ConfigureI18nInput {
   locales?: {
     default?: string;
     supported?: string[];
@@ -15,18 +14,18 @@ export type ConfigureI18nInput = {
   };
   objectNotation?: boolean;
   overrideBuiltIn?: boolean;
-};
+}
 
-export type LoadCatalogInput = {
+export interface LoadCatalogInput {
   localesDir: string;
   supportedLocales: string[];
-};
+}
 
-export type MergeCatalogsInput = {
+export interface MergeCatalogsInput {
   base: I18nCatalogType;
   additions: I18nCatalogType[];
   overrideBuiltIn: boolean;
-};
+}
 
 const isPlainObject = (value: unknown): value is Record<string, unknown> => {
   return (
@@ -104,8 +103,22 @@ export const loadCatalog = (input: LoadCatalogInput): I18nCatalogType => {
   return catalog;
 };
 
+const getHere = (): string => {
+  if (typeof __dirname !== "undefined") return __dirname;
+  // Be explicit about the shape/value checks to satisfy strict-boolean-expressions
+  if (
+    typeof process !== "undefined" &&
+    Array.isArray(process.argv) &&
+    typeof process.argv[1] === "string" &&
+    process.argv[1].length > 0
+  ) {
+    return path.dirname(process.argv[1]);
+  }
+  return process.cwd();
+};
+
 export const resolveBuiltInLocalesDir = (): string => {
-  const here = path.dirname(fileURLToPath(import.meta.url));
+  const here = getHere();
 
   // Candidate directories to search for built-in locales.
   // We include multiple layouts to support development (src/), build output
@@ -125,7 +138,7 @@ export const resolveBuiltInLocalesDir = (): string => {
   ];
 
   const found = findExistingDir(candidates);
-  if (!found) {
+  if (found == null) {
     throw new NotFoundError({
       message: `Unable to locate built-in locales directory. Tried: ${candidates.join(", ")}`,
       reason: "Built-in locales directory not found in expected paths",
@@ -152,7 +165,7 @@ export const mergeCatalogs = (input: MergeCatalogsInput): I18nCatalogType => {
 
     const additionsLocale = additions.reduce<Record<string, unknown>>((acc, addition) => {
       const addLocale = addition[locale];
-      if (!addLocale) {
+      if (addLocale == null) {
         return acc;
       }
 
@@ -183,7 +196,7 @@ export const configureI18nNode = (input: ConfigureI18nInput = {}): typeof i18n =
   });
 
   const additionalCatalogs = (input.locales?.directories ?? [])
-    .filter((dir): dir is string => dir.length > 0)
+    .filter((dir): dir is string => dir != null && dir.length > 0)
     .map((localesDir) => loadCatalog({ localesDir, supportedLocales }));
 
   const staticCatalog = mergeCatalogs({

@@ -11,10 +11,7 @@ import {
   ORMPort,
   ORMType,
 } from "./types";
-import {
-  createMongooseAdapter,
-  createSequelizeAdapter,
-} from "../orm/adapter-loader";
+import { createMongooseAdapter, createSequelizeAdapter } from "../orm/adapter-loader";
 
 export * from "./types";
 
@@ -37,11 +34,11 @@ const isSequelizeConfig = <D extends object>(
  * 1. Direct method calls: `await repo.findById()` - adapter lazy-loads on first call
  * 2. Custom queries: `(this.model as ModelStatic<T>).find()` - type-assert model in subclass
  */
-export abstract class BaseRepository<
-  D extends object,
+export abstract class BaseRepository<D extends object, I, O> implements RepositoryPort<
+  RepositoryModel<D>,
   I,
-  O,
-> implements RepositoryPort<RepositoryModel<D>, I, O> {
+  O
+> {
   private readonly adapter:
     | ORMPort<MongooseRepositoryModel<D>, I, O>
     | ORMPort<SequelizeRepositoryModel<D>, I, O>;
@@ -78,6 +75,9 @@ export abstract class BaseRepository<
     return this.ormType === ORMType.Mongoose;
   }
 
+  /**
+   * Returns true when the configured ORM is Mongoose
+   */
   public isSequelize(): boolean {
     return this.ormType === ORMType.Sequelize;
   }
@@ -100,39 +100,65 @@ export abstract class BaseRepository<
    */
   public async initializeModel(): Promise<void> {
     // Type guard: check if adapter has initialize method (Mongoose)
-    if (
-      "initialize" in this.adapter &&
-      typeof this.adapter.initialize === "function"
-    ) {
+    if ("initialize" in this.adapter && typeof this.adapter.initialize === "function") {
       await this.adapter.initialize();
     }
     // Sequelize adapters don't need this - users call sequelize.sync() directly
   }
 
+  /**
+   * Convert an ORM-specific entity/document to a plain lean output
+   * @param input ORM entity/document or plain object
+   */
   public toLean(input: unknown): O | null {
     return this.adapter.toLean(input);
   }
 
+  /**
+   * Find an entity by its id
+   * @param id Entity identifier
+   */
   async findById(id: string): Promise<O | null> {
     return this.adapter.findById(id);
   }
 
+  /**
+   * Find multiple entities matching a filter
+   * @param filter Optional query filter
+   */
   async findMany(filter?: Record<string, unknown>): Promise<O[]> {
     return this.adapter.findMany(filter);
   }
 
+  /**
+   * Create a new entity
+   * @param entity Input data for creation
+   */
   async create(entity: I): Promise<O> {
     return this.adapter.create(entity);
   }
 
+  /**
+   * Update an existing entity by id
+   * @param id Entity identifier
+   * @param update Partial update payload
+   */
   async update(id: string, update: Partial<I>): Promise<O | null> {
     return this.adapter.update(id, update);
   }
 
+  /**
+   * Delete an entity by id
+   * @param id Entity identifier
+   */
   async delete(id: string): Promise<O | null> {
     return this.adapter.delete(id);
   }
 
+  /**
+   * Check existence of an entity by id
+   * @param id Entity identifier
+   */
   async exists(id: string): Promise<boolean> {
     return this.adapter.exists(id);
   }

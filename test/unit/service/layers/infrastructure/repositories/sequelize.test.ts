@@ -6,10 +6,7 @@ import {
   SequelizeRepository,
   ORMType,
 } from "../../../../../../src/service/layers/infrastructure/repositories/sequelize";
-import {
-  SequelizeModel as Model,
-  ModelStatic,
-} from "../../../../../../src/third-party/sequelize";
+import { SequelizeModel as Model, ModelStatic } from "../../../../../../src/third-party/sequelize";
 
 interface UserTestDb extends Model {
   id: string;
@@ -20,7 +17,7 @@ interface UserTestDb extends Model {
 
 let UserModel: ModelStatic<UserTestDb>;
 
-const initializeSequelizeModel = () => {
+const initializeSequelizeModel = async () => {
   const sequelize = new Sequelize("sqlite::memory:");
 
   UserModel = sequelize.define(
@@ -68,16 +65,13 @@ describe("SequelizeRepository", () => {
   let sequelize: Sequelize;
 
   beforeAll(async () => {
-    sequelize = initializeSequelizeModel();
-
+    sequelize = await initializeSequelizeModel();
     try {
       await sequelize.sync({ force: true });
       repository = new UserTestRepository();
     } catch (error: any) {
       if (error.message?.includes("Sequelize is not installed")) {
-        console.log(
-          "Skipping SequelizeRepository tests - running from TypeScript source",
-        );
+        console.log("Skipping SequelizeRepository tests - running from TypeScript source");
         return;
       }
       throw error;
@@ -266,9 +260,7 @@ describe("SequelizeRepository", () => {
       const created = await repository.create({ name: "Jack" });
       const updated = await repository.update(created.id, { name: "Jordan" });
 
-      expect(updated?.updatedAt.getTime()).toBeGreaterThanOrEqual(
-        created.updatedAt.getTime(),
-      );
+      expect(updated?.updatedAt.getTime()).toBeGreaterThanOrEqual(created.updatedAt.getTime());
     });
   });
 

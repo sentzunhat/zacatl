@@ -1,8 +1,9 @@
+import { resolveDependencies } from "@zacatl/dependency-injection";
 import { InternalServerError } from "@zacatl/error";
-import { container } from "@zacatl/third-party/tsyringe";
 
 import type { ConfigApplication } from "./types";
-import { resolveDependencies } from "../../../dependency-injection/container";
+import { getContainer } from "../../../dependency-injection/container";
+
 
 export class Application {
   protected config: ConfigApplication;
@@ -14,7 +15,7 @@ export class Application {
   }
 
   private register(): void {
-    if (this.config.entryPoints.rest) {
+    if (this.config.entryPoints.rest != null) {
       this.registerRestEntryPoints();
     }
   }
@@ -22,7 +23,7 @@ export class Application {
   private registerRestEntryPoints(): void {
     const restEntryPoints = this.config.entryPoints.rest;
 
-    if (!restEntryPoints) {
+    if (restEntryPoints == null) {
       return;
     }
 
@@ -34,36 +35,39 @@ export class Application {
     // singleton instance. @injectable() handlers are not self-registered, so
     // the framework registers them here. Both decorators produce singletons —
     // use whichever reads better in your codebase.
-    if (restHooks && restHooks.length > 0) {
+    if (restHooks != null && restHooks.length > 0) {
       for (const hook of restHooks) {
-        if (!container.isRegistered(hook)) {
-          container.registerSingleton(hook, hook);
+        if (!getContainer().isRegistered(hook)) {
+          getContainer().registerSingleton(hook, hook);
         }
       }
     }
 
-    if (restRoutes && restRoutes.length > 0) {
+    if (restRoutes != null && restRoutes.length > 0) {
       for (const route of restRoutes) {
-        if (!container.isRegistered(route)) {
-          container.registerSingleton(route, route);
+        if (!getContainer().isRegistered(route)) {
+          getContainer().registerSingleton(route, route);
         }
       }
     }
 
     // Verify all handlers can be resolved
-    const hooks = restHooks ? resolveDependencies(restHooks) : [];
-    const routes = restRoutes ? resolveDependencies(restRoutes) : [];
+    const hooks = restHooks != null ? resolveDependencies(restHooks) : [];
+    const routes = restRoutes != null ? resolveDependencies(restRoutes) : [];
 
-    if (hooks.length !== (restHooks?.length || 0) || routes.length !== (restRoutes?.length || 0)) {
+    if (
+      hooks.length !== (restHooks != null ? restHooks.length : 0) ||
+      routes.length !== (restRoutes != null ? restRoutes.length : 0)
+    ) {
       throw new InternalServerError({
         message: "Failed to register all REST entry point dependencies",
         reason: "Not all REST hooks and routes could be resolved from DI container",
         component: "ApplicationLayer",
         operation: "register",
         metadata: {
-          expectedHooks: restHooks?.length || 0,
+          expectedHooks: restHooks != null ? restHooks.length : 0,
           resolvedHooks: hooks.length,
-          expectedRoutes: restRoutes?.length || 0,
+          expectedRoutes: restRoutes != null ? restRoutes.length : 0,
           resolvedRoutes: routes.length,
         },
       });

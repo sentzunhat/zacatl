@@ -1,14 +1,18 @@
+import { resolveDependencies } from "@zacatl/dependency-injection";
 import { InternalServerError } from "@zacatl/error";
-import { container } from "@zacatl/third-party";
 
-import type {
-  ConfigInfrastructure,
-  InfrastructureUnknownRepository,
-} from "./types";
-import { resolveDependencies } from "../../../dependency-injection/container";
+import type { ConfigInfrastructure, InfrastructureUnknownRepository } from "./types";
+import { getContainer } from "../../../dependency-injection/container";
+
 
 export type { ConfigInfrastructure };
 
+/**
+ * Infrastructure layer bootstrapper
+ *
+ * Responsible for registering infrastructure-level components (repositories)
+ * in the DI container and performing basic lifecycle hooks.
+ */
 export class Infrastructure {
   protected config: ConfigInfrastructure;
 
@@ -31,18 +35,16 @@ export class Infrastructure {
 
     // Register repositories - tsyringe auto-injects from @injectable metadata
     for (const repository of this.config.repositories) {
-      container.registerSingleton(repository, repository);
+      getContainer().registerSingleton(repository, repository);
     }
 
-    const resolvedRepositories =
-      resolveDependencies<InfrastructureUnknownRepository>(
-        this.config.repositories,
-      );
+    const resolvedRepositories = resolveDependencies<InfrastructureUnknownRepository>(
+      this.config.repositories,
+    );
 
     if (resolvedRepositories.length !== this.config.repositories.length) {
       throw new InternalServerError({
-        message:
-          "Failed to register all infrastructure repository dependencies",
+        message: "Failed to register all infrastructure repository dependencies",
         reason: "Not all repositories could be resolved from DI container",
         component: "InfrastructureLayer",
         operation: "register",
@@ -54,5 +56,9 @@ export class Infrastructure {
     }
   }
 
+  /**
+   * Start the infrastructure layer. No-op by default; provided for consumers
+   * that require explicit lifecycle start hooks.
+   */
   public start(): void {}
 }

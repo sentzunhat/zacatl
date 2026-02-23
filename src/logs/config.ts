@@ -48,10 +48,10 @@ export interface PinoConfigOptions {
  * const dest = pino.destination('/var/log/app.log');
  * const logger = new PinoLoggerAdapter(createPinoConfig(), dest);
  * ```
+ *
+ * @returns {LoggerOptions} Pino logger options ready to be passed to `pino()`
  */
-export const createPinoConfig = (
-  options?: PinoConfigOptions,
-): LoggerOptions => {
+export const createPinoConfig = (options?: PinoConfigOptions): LoggerOptions => {
   const env = options?.env ?? process.env["NODE_ENV"] ?? "development";
   const isPretty = env !== "production";
 
@@ -71,12 +71,10 @@ export const createPinoConfig = (
       bindings: (bindings) => {
         return {
           pid: bindings["pid"],
-          service:
-            options?.serviceName ?? process.env["SERVICE_NAME"] ?? "zacatl",
+          service: options?.serviceName ?? process.env["SERVICE_NAME"] ?? "zacatl",
           environment: env,
           app: {
-            version:
-              options?.appVersion ?? process.env["APP_VERSION"] ?? "0.0.0",
+            version: options?.appVersion ?? process.env["APP_VERSION"] ?? "0.0.0",
             environment: options?.appEnv ?? process.env["APP_ENV"] ?? env,
           },
           host: bindings["hostname"],

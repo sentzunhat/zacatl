@@ -3,8 +3,7 @@ import type {
   SequelizeRepositoryModel,
 } from "./types";
 import { createSequelizeAdapter } from "../../orm/adapter-loader";
-import type { RepositoryPort } from "../types";
-import type { ORMPort } from "../types";
+import type { RepositoryPort , ORMPort } from "../types";
 
 /**
  * Standalone Sequelize Repository - delegates to SequelizeAdapter

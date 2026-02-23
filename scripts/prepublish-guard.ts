@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-
 import { execSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
@@ -7,19 +6,19 @@ import { resolve } from "node:path";
 const root = process.cwd();
 const packagePath = resolve(root, "package.json");
 const changelogPath = resolve(root, "docs/changelog.md");
-const skipGuard = process.env.SKIP_PREPUBLISH_GUARD === "1";
-const skipGuardReason = process.env.SKIP_PREPUBLISH_GUARD_REASON?.trim();
+const skipGuard = process.env["SKIP_PREPUBLISH_GUARD"] === "1";
+const skipGuardReason = (process.env["SKIP_PREPUBLISH_GUARD_REASON"] || "").trim();
 
-const fail = (message) => {
+const fail = (message: string) => {
   console.error(`❌ prepublish guard failed: ${message}`);
   process.exit(1);
 };
 
-const warn = (message) => {
+const warn = (message: string) => {
   console.warn(`⚠️  prepublish guard warning: ${message}`);
 };
 
-const pass = (message) => {
+const pass = (message: string) => {
   console.log(`✅ ${message}`);
 };
 
@@ -29,14 +28,11 @@ if (skipGuard) {
       "SKIP_PREPUBLISH_GUARD=1 requires SKIP_PREPUBLISH_GUARD_REASON with a non-empty emergency reason",
     );
   }
-
-  warn(
-    `Bypassing prepublish guard due to emergency override. Reason: ${skipGuardReason}`,
-  );
+  warn(`Bypassing prepublish guard due to emergency override. Reason: ${skipGuardReason}`);
   process.exit(0);
 }
 
-let packageJson;
+let packageJson: any;
 try {
   packageJson = JSON.parse(readFileSync(packagePath, "utf8"));
 } catch {
@@ -46,11 +42,9 @@ try {
 const packageName = packageJson.name;
 const packageVersion = packageJson.version;
 
-if (!packageName || !packageVersion) {
-  fail("package.json must include both name and version");
-}
+if (!packageName || !packageVersion) fail("package.json must include both name and version");
 
-let changelogContent;
+let changelogContent: string = "";
 try {
   changelogContent = readFileSync(changelogPath, "utf8");
 } catch {
@@ -59,22 +53,15 @@ try {
 
 const lines = changelogContent.split(/\r?\n/);
 const firstSeparatorIndex = lines.findIndex((line) => line.trim() === "---");
-if (firstSeparatorIndex === -1) {
-  fail("docs/changelog.md is missing the top '---' separator");
-}
+if (firstSeparatorIndex === -1) fail("docs/changelog.md is missing the top '---' separator");
 
 const headerRegex = /^## \[([^\]]+)\]/;
-const firstEntryLine = lines
-  .slice(firstSeparatorIndex + 1)
-  .find((line) => headerRegex.test(line));
-if (!firstEntryLine) {
-  fail("docs/changelog.md has no release entry after the top separator");
-}
+const firstEntryLine = lines.slice(firstSeparatorIndex + 1).find((line) => headerRegex.test(line));
+if (!firstEntryLine) fail("docs/changelog.md has no release entry after the top separator");
 
-const [, topVersion] = firstEntryLine.match(headerRegex) ?? [];
-if (!topVersion) {
-  fail("Unable to parse top changelog version entry");
-}
+const match = (firstEntryLine?.match(headerRegex) ?? []) as RegExpMatchArray;
+const topVersion = match[1];
+if (!topVersion) fail("Unable to parse top changelog version entry");
 
 if (topVersion !== packageVersion) {
   fail(
@@ -84,7 +71,7 @@ if (topVersion !== packageVersion) {
 
 pass(`Version alignment passed for ${packageName}@${packageVersion}`);
 
-let publishedVersions = [];
+let publishedVersions: string[] = [];
 try {
   const output = execSync(`npm view ${packageName} versions --json`, {
     cwd: root,
@@ -93,7 +80,7 @@ try {
   });
   const parsed = JSON.parse(output);
   publishedVersions = Array.isArray(parsed) ? parsed : parsed ? [parsed] : [];
-} catch (error) {
+} catch (error: any) {
   const stderr = error?.stderr?.toString?.() ?? "";
   if (stderr.includes("E404")) {
     warn(`${packageName} is not yet published on npm (E404). Proceeding.`);
@@ -103,9 +90,7 @@ try {
 }
 
 if (publishedVersions.includes(packageVersion)) {
-  fail(
-    `Version ${packageVersion} is already published to npm for ${packageName}`,
-  );
+  fail(`Version ${packageVersion} is already published to npm for ${packageName}`);
 }
 
 pass(`Published-version check passed: ${packageVersion} is not on npm yet`);

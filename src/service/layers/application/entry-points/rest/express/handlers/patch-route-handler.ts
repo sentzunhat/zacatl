@@ -1,9 +1,9 @@
 import { AbstractRouteHandler } from "./abstract";
 
-export type PatchRouteHandlerConstructor = {
+export interface PatchRouteHandlerConstructor {
   url: string;
   schema: Record<string, unknown>;
-};
+}
 
 /**
  * Express PATCH Route Handler convenience class
