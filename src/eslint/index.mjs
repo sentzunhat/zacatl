@@ -8,6 +8,7 @@
  */
 
 import baseConfig from './base.mjs';
+import strictConfig from './strict.mjs';
 import importsConfig from './imports.mjs';
 import namingConventions from './naming-conventions.mjs';
 import fileNamingRules from './file-naming.mjs';
@@ -16,10 +17,25 @@ import solidConfig from './solid.mjs';
 /**
  * Recommended ESLint configuration combining all Zacatl configs
  */
-const recommended = [baseConfig, importsConfig, namingConventions, fileNamingRules, ...solidConfig];
+const recommended = [
+  baseConfig,
+  strictConfig,
+  importsConfig,
+  namingConventions,
+  fileNamingRules,
+  ...solidConfig,
+];
 
 // Named exports for granular control
-export { baseConfig, importsConfig, namingConventions, fileNamingRules, solidConfig, recommended };
+export {
+  baseConfig,
+  strictConfig,
+  importsConfig,
+  namingConventions,
+  fileNamingRules,
+  solidConfig,
+  recommended,
+};
 
 // Default export for convenience
 export default recommended;

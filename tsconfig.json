@@ -26,7 +26,7 @@
     "sourceMap": true,
     "inlineSources": true,
     "sourceRoot": "./src",
-    "outDir": "build",
+    "outDir": "build-src-esm",
     "removeComments": true,
     "noEmit": false,
     "noEmitOnError": true,
@@ -87,5 +87,5 @@
     }
   },
   "include": ["src/**/*.ts", "src/**/*.js"],
-  "exclude": ["node_modules", "build", "coverage", "test", "examples"]
+  "exclude": ["node_modules", "build-src-esm", "build-src-cjs", "coverage", "test", "examples"]
 }

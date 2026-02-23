@@ -223,14 +223,7 @@ const namingConventionsConfig = {
       },
     ],
 
-    // Enforce consistent naming in imports
-    '@typescript-eslint/no-unused-vars': [
-      'warn',
-      {
-        argsIgnorePattern: '^_',
-        varsIgnorePattern: '^_',
-      },
-    ],
+    // Enforce consistent naming in imports (core strict rules are provided by `strict.mjs`)
   },
 };
 

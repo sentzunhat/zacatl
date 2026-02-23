@@ -3,11 +3,11 @@
   "compilerOptions": {
     "module": "CommonJS",
     "moduleResolution": "node",
-    "outDir": "./build-cjs",
+    "outDir": "./build-src-cjs",
     "declaration": false,
     "declarationMap": false,
     "emitDeclarationOnly": false
   },
   "include": ["src/**/*.ts", "src/**/*.js"],
-  "exclude": ["node_modules", "build", "build-cjs", "coverage", "test", "examples"]
+  "exclude": ["node_modules", "build", "build-src-cjs", "coverage", "test", "examples"]
 }

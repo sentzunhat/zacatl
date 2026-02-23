@@ -33,7 +33,7 @@ function fixEntryKeepBuild(entry: any): any {
 
 try {
   fs.rmSync(publishDir, { recursive: true, force: true });
-} catch (e) {}
+} catch (_) {}
 fs.mkdirSync(publishDir, { recursive: true });
 
 const buildSrc = path.join(root, 'build');
@@ -55,7 +55,7 @@ function removeSourceMaps(dir: string) {
     else if (it.isFile() && full.endsWith('.map')) {
       try {
         fs.rmSync(full);
-      } catch (e) {}
+      } catch (_) {}
     }
   }
 }

@@ -38,14 +38,7 @@ const baseConfig = {
     '@typescript-eslint': tseslint.plugin,
   },
   rules: {
-    // TypeScript-specific rules
-    '@typescript-eslint/no-unused-vars': [
-      'warn',
-      {
-        argsIgnorePattern: '^_',
-        varsIgnorePattern: '^_',
-      },
-    ],
+    // TypeScript-specific rules (core strict rules are provided by `strict.mjs`)
     '@typescript-eslint/no-empty-object-type': [
       'error',
       {

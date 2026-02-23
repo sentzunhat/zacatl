@@ -83,7 +83,6 @@ export default [
       ],
 
       /* TypeScript strictness and best-practices */
-      '@typescript-eslint/no-explicit-any': 'error',
       '@typescript-eslint/strict-boolean-expressions': 'error',
       '@typescript-eslint/no-floating-promises': 'error',
       '@typescript-eslint/no-misused-promises': 'error',
@@ -92,10 +91,6 @@ export default [
         { allowTypedFunctionExpressions: true },
       ],
       '@typescript-eslint/consistent-type-definitions': ['warn', 'interface'],
-      '@typescript-eslint/no-unused-vars': [
-        'error',
-        { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
-      ],
       '@typescript-eslint/prefer-readonly': ['error', { onlyInlineLambdas: false }],
 
       /* General best-practices */

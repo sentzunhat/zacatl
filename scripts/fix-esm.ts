@@ -7,16 +7,28 @@ import { dirname } from 'path';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const rootDir = path.resolve(__dirname, '..');
 
-const targetDir = process.argv[2] || 'build';
+const targetDir = process.argv[2] || 'build-src-esm';
 let distDir: string;
 
 if (path.isAbsolute(targetDir)) {
   distDir = targetDir;
 } else {
   distDir = path.resolve(process.cwd(), targetDir);
-  if (!fs.existsSync(distDir) && targetDir === 'build') {
-    const rootBuild = path.join(rootDir, 'build');
-    if (fs.existsSync(rootBuild)) distDir = rootBuild;
+  if (!fs.existsSync(distDir)) {
+    const candidates = [
+      'build-src-esm',
+      'build-scripts-esm',
+      'build-esm',
+      'build',
+      'publish/build-esm',
+    ];
+    for (const cand of candidates) {
+      const candPath = path.join(rootDir, cand);
+      if (fs.existsSync(candPath)) {
+        distDir = candPath;
+        break;
+      }
+    }
   }
 }
 

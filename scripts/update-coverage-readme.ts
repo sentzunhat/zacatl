@@ -8,7 +8,7 @@ async function main() {
   let lcov: string;
   try {
     lcov = await fs.readFile(lcovPath, 'utf8');
-  } catch (err) {
+  } catch (_) {
     console.error('coverage/lcov.info not found. Run tests with coverage first.');
     process.exit(1);
   }
@@ -80,7 +80,7 @@ async function main() {
       const full = path.join(repoRoot, p);
       const txt = await fs.readFile(full, 'utf8');
       return JSON.parse(txt);
-    } catch (e) {
+    } catch (_) {
       return undefined;
     }
   }
@@ -142,7 +142,7 @@ async function main() {
           }
         }
         if (testCount) break;
-      } catch (e) {
+      } catch (_) {
         // ignore
       }
     }

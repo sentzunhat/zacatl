@@ -1,6 +1,5 @@
 #!/usr/bin/env -S node
-import { spawnSync, spawn } from 'child_process';
-import { existsSync, rmSync } from 'fs';
+import { spawnSync } from 'child_process';
 
 function runQuiet(command: string, args: string[] = []) {
   try {

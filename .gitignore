@@ -85,6 +85,10 @@ examples/**/*.d.ts.map
 examples/**/*.js
 examples/**/*.js.map
 !examples/**/node_modules/**
+build-scripts-cjs
+build-scripts-esm
+build-src-cjs
+build-src-esm
 
 # ------------------------------
 # Testing / Coverage
