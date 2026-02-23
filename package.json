@@ -92,7 +92,7 @@
     "build:watch": "npx tsc --project tsconfig.json --watch",
     "test": "NODE_ENV=test ENV=test vitest run",
     "test:watch": "NODE_ENV=test ENV=test vitest",
-    "test:coverage": "NODE_ENV=test ENV=test bash -lc \"npx vitest run --coverage --reporter json | tee test-results.json; exit ${PIPESTATUS[0]}\" && npm run update:readme-coverage",
+    "test:coverage": "NODE_ENV=test ENV=test npx vitest run --coverage --reporter json | tee test-results.json && npm run update:readme-coverage",
     "type:check": "npm run type:src:check && npm run type:test:check",
     "type:src:check": "tsc --noEmit -p ./tsconfig.json",
     "type:test:check": "tsc --noEmit -p ./test/tsconfig.json",
@@ -134,31 +134,33 @@
     "setup:dev": "npm ci && npm run check:peers"
   },
   "devDependencies": {
+    "@types/better-sqlite3": "^7.6.13",
+    "@types/express": "^5.0.6",
+    "@types/i18n": "^0.13.12",
+    "@types/js-yaml": "^4.0.9",
     "@types/sequelize": "^4.28.20",
     "@types/uuid": "^10.0.0",
     "@typescript-eslint/eslint-plugin": "^8.48.1",
     "@typescript-eslint/parser": "^8.48.1",
     "@vitest/coverage-istanbul": "^4.0.15",
+    "better-sqlite3": "^12.6.2",
     "eslint": "^9.39.1",
+    "eslint-import-resolver-typescript": "^3.5.1",
     "eslint-plugin-import": "^2.32.0",
+    "express": "^5.2.1",
+    "fastify": "^5.7.4",
     "mongodb-memory-server": "^11.0.1",
+    "mongoose": "^9.0.0",
+    "pg-mem": "^2.1.0",
+    "prettier": "^2.8.8",
+    "sequelize": "^6.0.0",
+    "sql.js": "^1.8.0",
     "tsc-alias": "^1.8.16",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.48.1",
-    "eslint-import-resolver-typescript": "^3.5.1",
     "vite": "^7.3.1",
-    "vitest": "^4.0.18",
-    "pg-mem": "^2.1.0",
-    "sql.js": "^1.8.0",
-    "@types/express": "^5.0.6",
-    "mongoose": "^9.0.0",
-    "sequelize": "^6.0.0",
-    "fastify": "^5.7.4",
-    "express": "^5.2.1",
-    "better-sqlite3": "^12.6.2",
-    "@types/better-sqlite3": "^7.6.13",
-    "prettier": "^2.8.8"
+    "vitest": "^4.0.18"
   },
   "license": "MIT",
   "dependencies": {
@@ -177,13 +179,12 @@
     "uuid": "^13.0.0",
     "zod": "^4.3.6"
   },
-  "optionalDependencies": {},
   "peerDependencies": {
-    "mongoose": "^9.0.0",
-    "sequelize": "^6.0.0",
-    "fastify": "^5.7.4",
+    "better-sqlite3": "^12.6.2",
     "express": "^5.2.1",
-    "better-sqlite3": "^12.6.2"
+    "fastify": "^5.7.4",
+    "mongoose": "^9.0.0",
+    "sequelize": "^6.0.0"
   },
   "peerDependenciesMeta": {
     "mongoose": {
