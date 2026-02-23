@@ -18,12 +18,12 @@ function runQuiet(command: string, args: string[] = []) {
   runQuiet('npm run clean:gitignored:allow-node');
 
   // Remove top-level node_modules and publish quickly
-    // Remove top-level node_modules and publish quickly using shell rm for robustness
-    try {
-      spawnSync("rm -rf node_modules publish", { shell: true, stdio: 'ignore' });
-    } catch (_) {
-      // ignore
-    }
+  // Remove top-level node_modules and publish quickly using shell rm for robustness
+  try {
+    spawnSync('rm -rf node_modules publish', { shell: true, stdio: 'ignore' });
+  } catch (_) {
+    // ignore
+  }
 
   // Synchronously remove nested node_modules (excluding top-level) — quiet but may take time
   try {
