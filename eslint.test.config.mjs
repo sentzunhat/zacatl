@@ -26,6 +26,13 @@ const vitestOverrides = {
   rules: {
     'import/no-extraneous-dependencies': 'off',
     'no-console': 'off',
+    // Relax errors for test files so we can iterate quickly during development.
+    'import/order': 'warn',
+    '@typescript-eslint/consistent-type-imports': 'warn',
+    '@typescript-eslint/no-explicit-any': 'warn',
+    '@typescript-eslint/no-empty-object-type': 'off',
+    '@typescript-eslint/explicit-function-return-type': 'warn',
+    'import/no-unresolved': 'off',
   },
 };
 

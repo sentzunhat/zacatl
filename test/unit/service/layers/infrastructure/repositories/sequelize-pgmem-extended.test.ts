@@ -59,7 +59,7 @@ describe('Sequelize + pg-mem extended operations', () => {
         expect(inside).toBe(1);
         throw new Error('force rollback');
       });
-    } catch (err) {
+    } catch {
       // swallow the forced rollback error
     }
     // Note: pg-mem's transaction rollback semantics may differ from a real Postgres
@@ -98,9 +98,9 @@ describe('Sequelize + pg-mem extended operations', () => {
     let caught = false;
     try {
       await User.create({ email: 'dup@example.com', name: 'Y' });
-    } catch (err: any) {
+    } catch (_err: any) {
       caught = true;
-      expect(err).toBeTruthy();
+      expect(_err).toBeTruthy();
     }
     expect(caught).toBe(true);
   });

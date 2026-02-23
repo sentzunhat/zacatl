@@ -15,53 +15,42 @@ export const startMongoServerAndSetEnvConnectionString = async (): Promise<void>
     return;
   }
 
-  try {
-    mongoDBMemoryServer = await MongoMemoryServer.create({
-      instance: {
-        dbName,
-        storageEngine: dbStorageEngine,
-      },
-      binary: {
-        version: dbVersion,
-      },
-    });
+  mongoDBMemoryServer = await MongoMemoryServer.create({
+    instance: {
+      dbName,
+      storageEngine: dbStorageEngine,
+    },
+    binary: {
+      version: dbVersion,
+    },
+  });
 
-    const mongoDBUri = mongoDBMemoryServer.getUri();
-    const connectionString = `${mongoDBUri}${dbName}`;
+  const mongoDBUri = mongoDBMemoryServer.getUri();
+  const connectionString = `${mongoDBUri}${dbName}`;
 
-    process.env['MONGO_DB_CONNECTION_STRING'] = connectionString;
-    //   console.info(
-    //     `MongoDB memory server started. Connection string set to: ${connectionString}`
-    //   );
-  } catch (error) {
-    //   console.error("Failed to start MongoDB memory server:", error);
-    throw error;
-  }
+  process.env['MONGO_DB_CONNECTION_STRING'] = connectionString;
+  //   console.info(
+  //     `MongoDB memory server started. Connection string set to: ${connectionString}`
+  //   );
 };
 
 export const connectToMongoServerAndRegisterDependency = async () => {
   const connectionString = process.env['MONGO_DB_CONNECTION_STRING'] ?? '';
   const dbName = 'sentzunhat-zacatl';
 
-  try {
-    const conn = await connect(connectionString, {
-      dbName,
-      autoCreate: true,
-      autoIndex: true,
-    });
+  const conn = await connect(connectionString, {
+    dbName,
+    autoCreate: true,
+    autoIndex: true,
+  });
 
-    dbConnection = conn.connection;
+  dbConnection = conn.connection;
 
-    container.register<Mongoose>(Mongoose, {
-      useValue: conn,
-    });
+  container.register<Mongoose>(Mongoose, {
+    useValue: conn,
+  });
 
-    // logger.info("Mongo DB memory server connected");
-  } catch (error) {
-    // logger.error("Mongo DB memory server connection error");
-    // console.error(error);
-    throw error;
-  }
+  // logger.info("Mongo DB memory server connected");
 };
 
 export const mongoTeardown = async (): Promise<void> => {

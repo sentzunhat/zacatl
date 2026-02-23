@@ -234,7 +234,6 @@ describe('Error Guard Utilities', () => {
       const err = new TypeError('Type error');
       expect(isSyntaxError(err)).toBe(false);
     });
-
     it('should reject null', () => {
       expect(isSyntaxError(null)).toBe(false);
     });
@@ -262,7 +261,6 @@ describe('Error Guard Utilities', () => {
       expect(isCustomError(err)).toBe(true);
       expect(isZodError(err)).toBe(false);
     });
-
     it('should handle error chains', () => {
       const originalErr = new Error('Original error');
       const wrappedErr = new CustomError({

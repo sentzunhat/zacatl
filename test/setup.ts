@@ -20,7 +20,7 @@ function ensureTracingChannelOn(obj: any) {
     // Prefer direct assignment (works in most environments).
     obj.tracingChannel = () => fallback();
     if (typeof obj.tracingChannel === 'function') return;
-  } catch (err) {
+  } catch {
     // Assignment may fail for non-writable/non-configurable properties.
   }
 
@@ -33,7 +33,7 @@ function ensureTracingChannelOn(obj: any) {
       enumerable: false,
     });
     return;
-  } catch (err) {
+  } catch {
     // If all attempts fail, we cannot make it callable — tests will try to
     // proceed but some libraries may still call it. Best effort only.
   }
@@ -47,6 +47,6 @@ try {
   const requireC = createRequire(import.meta.url);
   const diagC = requireC('diagnostics_channel');
   ensureTracingChannelOn(diagC);
-} catch (err) {
+} catch {
   // If require/import fails for any reason, ignore — we've already tried ESM.
 }

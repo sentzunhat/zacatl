@@ -1,9 +1,9 @@
 import { describe, it, expect, vi } from 'vitest';
-import { FastifyRequest } from 'fastify';
+import type { FastifyRequest } from 'fastify';
 import { container } from 'tsyringe';
 
-import {
-  Application,
+import { Application } from '../../../../../src/service/layers/application';
+import type {
   ConfigApplication,
   HookHandler,
   HookHandlerName,

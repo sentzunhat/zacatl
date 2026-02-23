@@ -13,30 +13,92 @@ import path from 'path';
 import readline from 'readline';
 
 function getIgnoredFiles(): string[] {
-  const git = spawnSync('git', ['ls-files', '--others', '-i', '--exclude-from=.gitignore', '-z'], {
-    encoding: 'utf8',
-  });
-  if (git.error || git.status !== 0) {
-    console.warn(
-      'Warning: git unavailable or not a git repository; skipping clean-gitignored step.',
-    );
-    if (git.stderr) console.warn(String(git.stderr));
+  // Try to use git to enumerate ignored files. Use a larger buffer to avoid
+  // ENOBUFS in some environments. If git fails, fall back to parsing
+  // .gitignore and scanning the working tree.
+  try {
+    const git = spawnSync('git', ['ls-files', '--others', '-i', '--exclude-from=.gitignore', '-z'], {
+      encoding: 'utf8',
+      maxBuffer: 10 * 1024 * 1024,
+    } as any);
+
+    if (!git.error && git.status === 0) {
+      const out = git.stdout || '';
+      return out.split('\0').filter(Boolean).filter((p) => !p.startsWith('!'));
+    }
+
     if (git.error) console.warn(String(git.error));
-    return [];
+    if (git.stderr) console.warn(String(git.stderr));
+  } catch (err: any) {
+    console.warn('git enumeration failed:', err?.message || err);
   }
-  const out = git.stdout || '';
-  // Split null-separated output and ignore any entries that start with '!'.
-  return out
-    .split('\0')
-    .filter(Boolean)
-    .filter((p) => !p.startsWith('!'));
+
+  // Fallback: parse .gitignore and match files in the repository root.
+  const gitignorePath = path.resolve(process.cwd(), '.gitignore');
+  if (!fs.existsSync(gitignorePath)) return [];
+
+  const lines = fs.readFileSync(gitignorePath, 'utf8').split(/\r?\n/).map((l) => l.trim());
+  const patterns = lines.filter((l) => l && !l.startsWith('#'));
+  const negatives = patterns.filter((p) => p.startsWith('!')).map((p) => p.slice(1));
+  const positives = patterns.filter((p) => !p.startsWith('!'));
+
+  // Basic glob -> regex conversion supporting '*', '**', and '?'
+  function globToRegex(p: string) {
+    const pat = p.replace(/\\\\/g, '/');
+    let s = pat.replace(/[.+^${}()|[\\]\\]/g, (m) => `\\${m}`);
+    s = s.replace(/\\\\\\\\/g, '/');
+    s = s.replace(/\*\*/g, '::DOUBLESTAR::');
+    s = s.replace(/\*/g, '[^/]*');
+    s = s.replace(/::DOUBLESTAR::/g, '.*');
+    s = s.replace(/\?/g, '.');
+    if (pat.startsWith('/')) return new RegExp('^' + s + '$');
+    return new RegExp('(^|/)' + s + '$');
+  }
+
+  const posRegex = positives.map(globToRegex);
+  const negRegex = negatives.map(globToRegex);
+
+  const matches: string[] = [];
+
+  function walk(dir: string) {
+    const entries = fs.readdirSync(dir, { withFileTypes: true });
+    for (const e of entries) {
+      if (e.name === '.git') continue;
+      const full = path.join(dir, e.name);
+      const rel = path.relative(process.cwd(), full).replace(/\\\\/g, '/');
+      if (e.isDirectory()) {
+        walk(full);
+      } else {
+        for (const rx of posRegex) {
+          if (rx.test(rel)) {
+            if (negRegex.some((nrx) => nrx.test(rel))) break;
+            matches.push(rel);
+            break;
+          }
+        }
+      }
+    }
+  }
+
+  try {
+    walk(process.cwd());
+  } catch (err: any) {
+    console.warn('Fallback .gitignore scan failed:', err?.message || err);
+  }
+
+  return matches;
 }
 
 const args = process.argv.slice(2);
 const dryRun = args.includes('--dry-run') || args.includes('-n');
 const assumeYes = args.includes('--yes') || args.includes('-y');
+const allowNodeModules = args.includes('--allow-node-modules') || args.includes('--allow-node');
 
-const files = getIgnoredFiles();
+let files = getIgnoredFiles();
+// By default, do not remove anything under node_modules unless explicitly allowed.
+if (!allowNodeModules) {
+  files = files.filter((f) => !f.startsWith('node_modules/') && f !== 'node_modules');
+}
 if (files.length === 0) {
   console.log('No ignored untracked files found.');
   process.exit(0);
