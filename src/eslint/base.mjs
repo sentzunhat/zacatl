@@ -26,7 +26,7 @@ const baseConfig = {
   languageOptions: {
     parser: tsEslintParser,
     parserOptions: {
-      project: ['./tsconfig.json', './test/tsconfig.json'],
+      project: ['./tsconfig.json'],
     },
     globals: {
       __dirname: 'readonly',
