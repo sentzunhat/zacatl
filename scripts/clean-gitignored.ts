@@ -25,7 +25,11 @@ function getIgnoredFiles(): string[] {
     return [];
   }
   const out = git.stdout || '';
-  return out.split('\0').filter(Boolean);
+  // Split null-separated output and ignore any entries that start with '!'.
+  return out
+    .split('\0')
+    .filter(Boolean)
+    .filter((p) => !p.startsWith('!'));
 }
 
 const args = process.argv.slice(2);

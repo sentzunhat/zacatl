@@ -1,32 +1,20 @@
-import path from 'path';
-import { fileURLToPath } from 'url';
-import tsPlugin from '@typescript-eslint/eslint-plugin';
-import tsParser from '@typescript-eslint/parser';
-import importPlugin from 'eslint-plugin-import';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-// Scripts-specific linting: support various script file extensions and allow dev deps
-export default [
+module.exports = [
   {
-    plugins: { '@typescript-eslint': tsPlugin, import: importPlugin },
-    files: ['scripts/**/*.{ts,cts,mts,js,cjs,mjs}'],
+    files: ['scripts/**/*.{ts,cts,mts}'],
     languageOptions: {
-      parser: tsParser,
+      parser: require('@typescript-eslint/parser'),
       parserOptions: {
-        project: ['./tsconfig.scripts.cjs.json', './tsconfig.scripts.esm.json', './tsconfig.json'],
+        project: ['./tsconfig.scripts.cjs.json', './tsconfig.scripts.esm.json'],
         tsconfigRootDir: __dirname,
-      },
-      globals: {
-        require: 'readonly',
-        module: 'writable',
-        process: 'readonly',
-        __dirname: 'readonly',
+        sourceType: 'module',
       },
     },
+    plugins: {
+      '@typescript-eslint': require('@typescript-eslint/eslint-plugin'),
+      import: require('eslint-plugin-import'),
+    },
     settings: {
-      'import/resolver': { typescript: { project: './tsconfig.json' } },
+      'import/resolver': { typescript: { project: './tsconfig.scripts.cjs.json' } },
     },
     rules: {
       '@typescript-eslint/no-empty-object-type': [
