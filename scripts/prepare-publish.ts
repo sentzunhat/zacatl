@@ -87,15 +87,37 @@ const scriptsCandidates = [
   path.join(root, 'build-scripts-cjs', 'fix-esm.js'),
   path.join(root, 'build-scripts-esm', 'fix-esm.js'),
 ];
-for (const cand of scriptsCandidates) {
-  if (fs.existsSync(cand)) {
-    const dest = path.join(binDir, path.basename(cand));
+// Copy any prepared `build/bin` first (preferred). Otherwise, copy useful
+// helper scripts from build-scripts-* folders.
+const buildBinCandidates = [
+  path.join(root, 'build', 'bin'),
+  path.join(root, 'build-src-cjs', 'bin'),
+  path.join(root, 'build-src-esm', 'bin'),
+  path.join(root, 'bin'),
+];
+
+let copiedBin = false;
+for (const b of buildBinCandidates) {
+  if (fs.existsSync(b)) {
     try {
-      fs.copyFileSync(cand, dest);
-      try {
-        fs.chmodSync(dest, 0o755);
-      } catch (_) {}
+      fs.cpSync(b, binDir, { recursive: true });
+      copiedBin = true;
     } catch (_) {}
+    break;
+  }
+}
+
+if (!copiedBin) {
+  for (const cand of scriptsCandidates) {
+    if (fs.existsSync(cand)) {
+      const dest = path.join(binDir, path.basename(cand));
+      try {
+        fs.copyFileSync(cand, dest);
+        try {
+          fs.chmodSync(dest, 0o755);
+        } catch (_) {}
+      } catch (_) {}
+    }
   }
 }
 
@@ -118,6 +140,23 @@ function removeSourceMaps(dir: string) {
 
 removeSourceMaps(buildEsmDest);
 removeSourceMaps(buildCjsDest);
+
+// Ensure ESLint config and localization locales exist in the CJS build so
+// package exports can include `require` targets for consumers that use CJS.
+try {
+  const esmEslint = path.join(buildEsmDest, 'eslint');
+  const esmLocalization = path.join(buildEsmDest, 'localization');
+  if (fs.existsSync(esmEslint) && !fs.existsSync(path.join(buildCjsDest, 'eslint'))) {
+    try {
+      fs.cpSync(esmEslint, path.join(buildCjsDest, 'eslint'), { recursive: true });
+    } catch (_) {}
+  }
+  if (fs.existsSync(esmLocalization) && !fs.existsSync(path.join(buildCjsDest, 'localization'))) {
+    try {
+      fs.cpSync(esmLocalization, path.join(buildCjsDest, 'localization'), { recursive: true });
+    } catch (_) {}
+  }
+} catch (_) {}
 
 // Do not copy script folders into the publish root. Published CLIs should
 // point at compiled scripts inside `build-esm/`.
