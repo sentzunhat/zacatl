@@ -89,7 +89,8 @@ try {
   for (const file of files) if (fixFile(file)) fixed++;
   console.log(`✓ Fixed ESM exports: ${fixed} file(s) updated`);
   process.exit(0);
-} catch (error: any) {
-  console.error(`✗ Error fixing ESM exports: ${error?.message ?? error}`);
+} catch (error: unknown) {
+  const msg = error instanceof Error ? error.message : String(error);
+  console.error(`✗ Error fixing ESM exports: ${msg}`);
   process.exit(1);
 }

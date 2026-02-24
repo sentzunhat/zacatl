@@ -161,15 +161,21 @@ async function main() {
     /!\[Tests:\s*([\d]+)\]\(https?:\/\/img\.shields\.io\/badge\/Tests-([\d]+)-([a-zA-Z0-9_%-]+)\.svg\)/i;
 
   if (testsLinkedRegex.test(newReadme)) {
-    newReadme = newReadme.replace(testsLinkedRegex, (...args: any[]) => {
-      const color = args[3] || 'blue';
-      return `[![Tests: ${testCount}](https://img.shields.io/badge/Tests-${testCount}-${color}.svg)](#testing)`;
-    });
+    newReadme = newReadme.replace(
+      testsLinkedRegex,
+      (_match: string, g1: string, g2: string, color?: string) => {
+        const c = color || 'blue';
+        return `[![Tests: ${testCount}](https://img.shields.io/badge/Tests-${testCount}-${c}.svg)](#testing)`;
+      },
+    );
   } else if (testsImageRegex.test(newReadme)) {
-    newReadme = newReadme.replace(testsImageRegex, (...args: any[]) => {
-      const color = args[3] || 'blue';
-      return `![Tests: ${testCount}](https://img.shields.io/badge/Tests-${testCount}-${color}.svg)`;
-    });
+    newReadme = newReadme.replace(
+      testsImageRegex,
+      (_match: string, g1: string, g2: string, color?: string) => {
+        const c = color || 'blue';
+        return `![Tests: ${testCount}](https://img.shields.io/badge/Tests-${testCount}-${c}.svg)`;
+      },
+    );
   } else {
     console.error(
       'No existing Tests badge found in README.md — updater requires an existing Tests badge to update in-place.',
@@ -182,7 +188,8 @@ async function main() {
   console.log(`Updated README.md coverage to ${percentStr}% and tests to ${testCount}`);
 }
 
-main().catch((err) => {
-  console.error(err);
+main().catch((err: unknown) => {
+  const msg = err instanceof Error ? err.stack || err.message : String(err);
+  console.error(msg);
   process.exit(1);
 });

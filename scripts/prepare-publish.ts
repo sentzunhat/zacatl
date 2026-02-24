@@ -7,7 +7,7 @@ const publishDir = path.join(root, 'publish');
 const publishPkgPath = path.join(publishDir, 'package.json');
 
 const pkgRaw = fs.readFileSync(pkgPath, 'utf8');
-const pkg = JSON.parse(pkgRaw) as any;
+const pkg = JSON.parse(pkgRaw) as Record<string, unknown>;
 
 function ensureDot(p: unknown) {
   if (typeof p !== 'string') return p;
@@ -17,15 +17,16 @@ function ensureDot(p: unknown) {
   return p;
 }
 
-function fixEntryKeepBuild(entry: any): any {
+function fixEntryKeepBuild(entry: unknown): unknown {
   if (typeof entry === 'string') {
     const p = ensureDot(entry) as string;
     return p.replace(/^(\.\/)?build\//, './build/esm/');
   }
   if (Array.isArray(entry)) return entry.map(fixEntryKeepBuild);
   if (entry && typeof entry === 'object') {
-    const out: any = {};
-    for (const [k, v] of Object.entries(entry)) out[k] = fixEntryKeepBuild(v);
+    const out: Record<string, unknown> = {};
+    for (const [k, v] of Object.entries(entry as Record<string, unknown>))
+      out[k] = fixEntryKeepBuild(v);
     return out;
   }
   return entry;
@@ -161,32 +162,55 @@ try {
 // Do not copy script folders into the publish root. Published CLIs should
 // point at compiled scripts inside `build-esm/`.
 
-const newPkg: any = {
-  name: pkg.name,
-  version: pkg.version,
-  description: pkg.description,
-  license: pkg.license,
-  keywords: pkg.keywords,
-  repository: pkg.repository,
-  bugs: pkg.bugs,
-  author: pkg.author,
-  engines: pkg.engines,
-  peerDependencies: pkg.peerDependencies,
-  dependencies: pkg.dependencies,
-  main: pkg.main
-    ? (ensureDot(pkg.main) as string).replace(/^(\.\/)?(build-cjs|cjs|build|esm)\//, './build/cjs/')
+interface PublishPkg {
+  name?: string;
+  version?: string;
+  description?: string;
+  license?: string;
+  keywords?: string[] | unknown;
+  repository?: unknown;
+  bugs?: unknown;
+  author?: unknown;
+  engines?: unknown;
+  peerDependencies?: Record<string, string> | unknown;
+  dependencies?: Record<string, string> | unknown;
+  main?: string | undefined;
+  module?: string | undefined;
+  types?: string | undefined;
+  exports?: Record<string, unknown> | undefined;
+  bin?: Record<string, string> | string | undefined;
+  files?: string[] | undefined;
+}
+
+const newPkg: PublishPkg = {
+  name: typeof pkg['name'] === 'string' ? (pkg['name'] as string) : undefined,
+  version: typeof pkg['version'] === 'string' ? (pkg['version'] as string) : undefined,
+  description: typeof pkg['description'] === 'string' ? (pkg['description'] as string) : undefined,
+  license: typeof pkg['license'] === 'string' ? (pkg['license'] as string) : undefined,
+  keywords: Array.isArray(pkg['keywords']) ? (pkg['keywords'] as string[]) : undefined,
+  repository: pkg['repository'],
+  bugs: pkg['bugs'],
+  author: pkg['author'],
+  engines: pkg['engines'],
+  peerDependencies: pkg['peerDependencies'],
+  dependencies: pkg['dependencies'],
+  main: pkg['main']
+    ? (ensureDot(pkg['main']) as string).replace(
+        /^(\.\/)?(build-cjs|cjs|build|esm)\//,
+        './build/cjs/',
+      )
     : undefined,
-  module: pkg.module
-    ? (ensureDot(pkg.module) as string).replace(/^(\.\/)?(build|esm)\//, './build/esm/')
+  module: pkg['module']
+    ? (ensureDot(pkg['module']) as string).replace(/^(\.\/)?(build|esm)\//, './build/esm/')
     : undefined,
-  types: pkg.types
-    ? (ensureDot(pkg.types) as string).replace(/^(\.\/)?(build|esm)\//, './build/esm/')
+  types: pkg['types']
+    ? (ensureDot(pkg['types']) as string).replace(/^(\.\/)?(build|esm)\//, './build/esm/')
     : undefined,
   exports: undefined,
 };
 
 // Preserve bin mappings but point them to compiled CJS scripts inside publish
-if (pkg.bin) {
+if (pkg['bin']) {
   const makeLocalBin = (b: string) => {
     if (!b || typeof b !== 'string') return b;
     const p = ensureDot(b) as string;
@@ -194,35 +218,44 @@ if (pkg.bin) {
     const base = path.basename(p).replace(/\.ts$|\.js$/i, '');
     return `./build/bin/${base}.js`;
   };
-  if (typeof pkg.bin === 'string') newPkg.bin = makeLocalBin(pkg.bin);
-  else if (typeof pkg.bin === 'object') {
-    const nb: any = {};
-    for (const [k, v] of Object.entries(pkg.bin)) nb[k] = makeLocalBin(v as any);
-    newPkg.bin = nb;
+  if (typeof pkg['bin'] === 'string') newPkg['bin'] = makeLocalBin(pkg['bin']);
+  else if (typeof pkg['bin'] === 'object') {
+    const nb: Record<string, string> = {};
+    for (const [k, v] of Object.entries(pkg['bin'] as Record<string, unknown>)) {
+      const mv = makeLocalBin(typeof v === 'string' ? v : String(v));
+      if (typeof mv === 'string') nb[k] = mv;
+    }
+    newPkg['bin'] = nb;
   }
 }
 
-if (pkg.exports) {
-  const fixed: any = {};
-  for (const [k, v] of Object.entries(pkg.exports)) fixed[k] = fixEntryKeepBuild(v as any);
-  newPkg.exports = fixed;
+if (pkg['exports']) {
+  const fixed: Record<string, unknown> = {};
+  for (const [k, v] of Object.entries(pkg['exports'] as Record<string, unknown>))
+    fixed[k] = fixEntryKeepBuild(v);
+  newPkg['exports'] = fixed;
 }
 // If the root package did not include `exports`, dynamically generate exports
 // by scanning the compiled build folders for JS/MJS files and matching types.
-if (!newPkg.exports) {
+if (!newPkg['exports']) {
+  // Generate a controlled, per-file exports map by scanning the compiled
+  // ESM build directory. This approach exports only files that actually
+  // exist in the published build and creates precise subpaths for deep
+  // imports (e.g. @sentzunhat/zacatl/foo/bar).
   const buildEsm = buildEsmDest;
-  const exportsObj: any = {};
+  const exportsObj: Record<string, unknown> = {};
 
   if (fs.existsSync(buildEsm)) {
-    function addExportFromFile(fullPath: string) {
+    function addExport(fullPath: string) {
       const rel = path.relative(buildEsm, fullPath).split(path.sep).join('/');
       const ext = path.extname(rel);
       if (ext !== '.js' && ext !== '.mjs') return;
 
-      // derive subpath: index files map to their directory, others map to file path without ext
       const parts = rel.split('/');
       const last = parts[parts.length - 1] ?? '';
       const isIndex = last.startsWith('index.');
+
+      // Subpath exposed to consumers
       const sub = isIndex
         ? parts.length === 1
           ? '.'
@@ -233,18 +266,16 @@ if (!newPkg.exports) {
       const typesPath = `./build/esm/${rel.slice(0, -ext.length)}.d.ts`;
       const requirePath = `./build/cjs/${rel.replace(/\.mjs$/, '.js')}`;
 
-      const entry: any = {};
+      const entry: Record<string, string> = {};
       if (fs.existsSync(path.join(publishDir, importPath.replace(/^\.\//, ''))))
-        entry.import = importPath;
-      else return; // skip if import target doesn't actually exist
+        entry['import'] = importPath;
+      else return; // skip if import target doesn't exist
 
       if (fs.existsSync(path.join(publishDir, typesPath.replace(/^\.\//, ''))))
-        entry.types = typesPath;
-
+        entry['types'] = typesPath;
       if (fs.existsSync(path.join(publishDir, requirePath.replace(/^\.\//, ''))))
-        entry.require = requirePath;
+        entry['require'] = requirePath;
 
-      // prefer .mjs import-only entries where appropriate
       exportsObj[sub] = entry;
     }
 
@@ -252,17 +283,16 @@ if (!newPkg.exports) {
       for (const it of fs.readdirSync(dir, { withFileTypes: true })) {
         const full = path.join(dir, it.name);
         if (it.isDirectory()) walk(full);
-        else if (it.isFile()) addExportFromFile(full);
+        else if (it.isFile()) addExport(full);
       }
     }
 
     walk(buildEsm);
 
-    // Add a convenience mapping for build globs and package.json
-    exportsObj['./build/*'] = './build/esm/*';
+    // Always expose package.json
     exportsObj['./package.json'] = './package.json';
 
-    newPkg.exports = exportsObj;
+    newPkg['exports'] = exportsObj;
   }
 }
 const copyIfExists = (name: string) => {
@@ -272,6 +302,18 @@ const copyIfExists = (name: string) => {
 };
 copyIfExists('README.md');
 copyIfExists('LICENSE');
+
+// Ensure the `zacatl-fix-esm` CLI entry exists in the published package.
+// Ensure the `zacatl-fix-esm` CLI entry exists in the published package.
+// Preserve original `pkg.bin` but force the known CLI entry for consumers
+// that depend on the helper script being available in published packages.
+if (!newPkg.bin || typeof newPkg.bin === 'string') newPkg.bin = {};
+if (!(newPkg.bin as Record<string, string>)['zacatl-fix-esm']) {
+  (newPkg.bin as Record<string, string>)['zacatl-fix-esm'] = './build/bin/fix-esm.js';
+}
+
+// Limit published files to the compiled build and the package manifest.
+if (!newPkg['files']) newPkg['files'] = ['build', 'package.json'];
 
 fs.writeFileSync(publishPkgPath, JSON.stringify(newPkg, null, 2) + '\n');
 console.log('Wrote', publishPkgPath);

@@ -21,8 +21,9 @@ async function main() {
 
       await import(name);
       console.log('OK:', name);
-    } catch (err: any) {
-      console.error('ERROR importing', name, err?.message || err);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      console.error('ERROR importing', name, msg);
       failed.push(name);
     }
   }

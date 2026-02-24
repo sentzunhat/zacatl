@@ -32,15 +32,17 @@ if (skipGuard) {
   process.exit(0);
 }
 
-let packageJson: any;
+let packageJson: Record<string, unknown> | undefined;
 try {
-  packageJson = JSON.parse(readFileSync(packagePath, 'utf8'));
+  packageJson = JSON.parse(readFileSync(packagePath, 'utf8')) as Record<string, unknown>;
 } catch {
   fail('Unable to read package.json');
 }
 
-const packageName = packageJson.name;
-const packageVersion = packageJson.version;
+if (!packageJson) fail('Unable to read package.json');
+
+const packageName = typeof packageJson['name'] === 'string' ? packageJson['name'] : '';
+const packageVersion = typeof packageJson['version'] === 'string' ? packageJson['version'] : '';
 
 if (!packageName || !packageVersion) fail('package.json must include both name and version');
 
@@ -80,8 +82,13 @@ try {
   });
   const parsed = JSON.parse(output);
   publishedVersions = Array.isArray(parsed) ? parsed : parsed ? [parsed] : [];
-} catch (error: any) {
-  const stderr = error?.stderr?.toString?.() ?? '';
+} catch (err: unknown) {
+  let stderr = '';
+  if (err && typeof err === 'object') {
+    const maybe = err as { stderr?: unknown };
+    if (maybe.stderr != null)
+      stderr = typeof maybe.stderr === 'string' ? maybe.stderr : String(maybe.stderr);
+  }
   if (stderr.includes('E404')) {
     warn(`${packageName} is not yet published on npm (E404). Proceeding.`);
     process.exit(0);

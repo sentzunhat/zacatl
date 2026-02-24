@@ -1,10 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 
-import type {
-  Request} from '../../../../../../../../src/service/layers/application/entry-points/rest/fastify/handlers/abstract';
-import {
-  AbstractRouteHandler
-} from '../../../../../../../../src/service/layers/application/entry-points/rest/fastify/handlers/abstract';
+import type { Request } from '../../../../../../../../src/service/layers/application/entry-points/rest/fastify/handlers/abstract';
+import { AbstractRouteHandler } from '../../../../../../../../src/service/layers/application/entry-points/rest/fastify/handlers/abstract';
 import {
   createFakeFastifyReply,
   createFakeFastifyRequest,

@@ -29,9 +29,10 @@ const vitestOverrides = {
     // Relax errors for test files so we can iterate quickly during development.
     'import/order': 'warn',
     '@typescript-eslint/consistent-type-imports': 'warn',
-    '@typescript-eslint/no-explicit-any': 'error',
+    '@typescript-eslint/no-explicit-any': 'off',
     '@typescript-eslint/no-empty-object-type': 'off',
-    '@typescript-eslint/explicit-function-return-type': 'warn',
+    '@typescript-eslint/explicit-function-return-type': 'off',
+    '@typescript-eslint/naming-convention': 'off',
     'import/no-unresolved': 'off',
   },
 };

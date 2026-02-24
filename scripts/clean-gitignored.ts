@@ -23,7 +23,7 @@ function getIgnoredFiles(): string[] {
       {
         encoding: 'utf8',
         maxBuffer: 10 * 1024 * 1024,
-      } as any,
+      },
     );
 
     if (!git.error && git.status === 0) {
@@ -36,8 +36,9 @@ function getIgnoredFiles(): string[] {
 
     if (git.error) console.warn(String(git.error));
     if (git.stderr) console.warn(String(git.stderr));
-  } catch (err: any) {
-    console.warn('git enumeration failed:', err?.message || err);
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err);
+    console.warn('git enumeration failed:', msg);
   }
 
   // Fallback: parse .gitignore and match files in the repository root.
@@ -92,8 +93,9 @@ function getIgnoredFiles(): string[] {
 
   try {
     walk(process.cwd());
-  } catch (err: any) {
-    console.warn('Fallback .gitignore scan failed:', err?.message || err);
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err);
+    console.warn('Fallback .gitignore scan failed:', msg);
   }
 
   return matches;
@@ -138,8 +140,9 @@ async function confirmAndDelete(list: string[]) {
       } else {
         console.log('Not found (skipped)', rel);
       }
-    } catch (err: any) {
-      console.error('Failed to remove', rel, ':', err?.message || err);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      console.error('Failed to remove', rel, ':', msg);
     }
   }
 }

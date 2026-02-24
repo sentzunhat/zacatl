@@ -1,7 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { z } from 'zod';
 
-import type { RouteHandler, HookHandler } from '../../../../../../../src/service/layers/application';
+import type {
+  RouteHandler,
+  HookHandler,
+} from '../../../../../../../src/service/layers/application';
 import { FastifyApiAdapter } from '../../../../../../../src/service/platforms/server/api/adapters';
 
 describe('FastifyApiAdapter', () => {

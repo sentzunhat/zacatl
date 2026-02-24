@@ -49,8 +49,9 @@ if (dryRun) process.exit(0);
     try {
       fs.rmSync(p, { recursive: true, force: true });
       console.log('Removed', p);
-    } catch (err: any) {
-      console.error('Failed to remove', p, ':', err?.message || err);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      console.error('Failed to remove', p, ':', msg);
     }
   }
 

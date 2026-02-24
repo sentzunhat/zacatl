@@ -1,5 +1,5 @@
 import { MongoMemoryServer } from 'mongodb-memory-server';
-import type { Connection} from 'mongoose';
+import type { Connection } from 'mongoose';
 import { connect, Mongoose } from 'mongoose';
 import { container } from 'tsyringe';
 

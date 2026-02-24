@@ -1,3 +1,4 @@
+/* eslint-disable import/order */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { z } from 'zod';
 
@@ -10,6 +11,8 @@ vi.mock('http-proxy-middleware', () => ({
 }));
 
 import { createProxyMiddleware } from 'http-proxy-middleware';
+
+/* eslint-enable import/order */
 
 describe('ExpressApiAdapter', () => {
   let adapter: ExpressApiAdapter;

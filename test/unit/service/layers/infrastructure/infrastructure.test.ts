@@ -1,10 +1,7 @@
 import { container } from 'tsyringe';
 
-import type {
-  ConfigInfrastructure} from '../../../../../src/service/layers/infrastructure';
-import {
-  Infrastructure,
-} from '../../../../../src/service/layers/infrastructure';
+import type { ConfigInfrastructure } from '../../../../../src/service/layers/infrastructure';
+import { Infrastructure } from '../../../../../src/service/layers/infrastructure';
 import type { RepositoryModel } from '../../../../../src/service/layers/infrastructure/repositories/types';
 import type { RepositoryPort } from '../../../../../src/service/layers/infrastructure/types';
 
