@@ -1,26 +1,7 @@
 #!/usr/bin/env node
 import fs from 'fs';
 import path from 'path';
-
-function removeDir(target: string) {
-  try {
-    fs.rmSync(target, { recursive: true, force: true });
-    console.log('removed:', target);
-  } catch {
-    // ignore
-  }
-}
-
-function walk(dir: string, cb: (filePath: string, stat: fs.Stats) => void) {
-  if (!fs.existsSync(dir)) return;
-  const entries = fs.readdirSync(dir, { withFileTypes: true });
-  for (const e of entries) {
-    const full = path.join(dir, e.name);
-    const stat = fs.statSync(full);
-    cb(full, stat);
-    if (stat.isDirectory()) walk(full, cb);
-  }
-}
+import { removeDir, walk } from './common';
 
 const root = path.resolve(process.cwd(), 'examples');
 if (!fs.existsSync(root)) process.exit(0);

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import fs from 'fs';
 import path from 'path';
-import readline from 'readline';
+import { walk, confirm } from './common';
 
 const args = process.argv.slice(2);
 const dryRun = args.includes('--dry-run') || args.includes('-n');
@@ -15,25 +15,14 @@ function isTargetDir(name: string) {
   return /^build(?:$|-)|^dist$/.test(name);
 }
 
-function walk(dir: string, cb: (p: string) => void) {
-  const entries = fs.readdirSync(dir, { withFileTypes: true });
-  for (const e of entries) {
-    if (e.name.startsWith('.')) continue;
-    const full = path.join(dir, e.name);
-    if (e.isDirectory()) {
-      cb(full);
-      // do not recurse into skipped top-level directories
-      const rel = path.relative(root, full).split(path.sep)[0];
-      if (skipTop.has(rel)) continue;
-      walk(full, cb);
-    }
-  }
-}
-
 const found = new Set<string>();
 walk(root, (p) => {
+  const rel = path.relative(root, p);
   const name = path.basename(p);
   if (isTargetDir(name)) found.add(p);
+  // avoid recursing into top-level skip folders
+  const top = rel.split(path.sep)[0];
+  if (skipTop.has(top)) return;
 });
 
 const list = Array.from(found).sort();
@@ -46,16 +35,6 @@ console.log('Found the following build/dist folders:');
 for (const p of list) console.log('  -', p);
 
 if (dryRun) process.exit(0);
-
-function confirm(prompt: string) {
-  return new Promise<boolean>((resolve) => {
-    const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
-    rl.question(prompt, (ans) => {
-      rl.close();
-      resolve(ans === 'yes' || ans === 'y');
-    });
-  });
-}
 
 (async () => {
   if (!assumeYes) {
