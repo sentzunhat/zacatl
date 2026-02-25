@@ -78,6 +78,40 @@ const server = new Service({
 });
 ```
 
+## Platform Support Status
+
+| Platform | Status |
+| -------- | ------ |
+| Server   | Stable |
+| CLI      | Planned (stub only) |
+| Desktop  | Planned (stub only) |
+
+## Service Configuration (notable options)
+
+- `run.auto`: When `true`, the `Service` will attempt to start automatically when `start()` is invoked without additional manual orchestration. Defaults to `false` when omitted. This option is part of the `ConfigService` root config; see the `service` docs for full configuration examples.
+
+## Public API Surface
+
+The following modules are considered the stable, public surface of Zacatl:
+
+- `configuration`
+- `service`
+- `dependency-injection`
+- `error`
+- `logs`
+- `localization`
+- `third-party/*`
+
+## What Zacatl Does NOT Do
+
+- Zacatl does not bundle or force runtime adapters (ORMs, HTTP servers) — those are peerDependencies so consumers choose and pin runtime implementations.
+- Zacatl is not an end-user UI framework; Desktop and CLI adapters are planned and currently implemented as minimal stubs.
+
+## Architectural Guarantees
+
+- Layered / hexagonal architecture with strict inward dependency flow.
+- Public API surface is stable; internal modules may change between minor versions.
+
 ## 📖 Documentation
 
 - **[Architecture Overview](./docs/guidelines/framework-overview.md)** - System design and module map

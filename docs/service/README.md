@@ -299,34 +299,30 @@ import { ExpressPageAdapter } from '@sentzunhat/zacatl/service/platforms/server/
 Simple REST API server with Fastify.
 
 ```typescript
-import Fastify from "fastify";
-import { Service, ServerVendor, ServerType } from "@sentzunhat/zacatl";
-
-const fastify = Fastify();
-ServerType } from "@sentzunhat/zacatl";
+import Fastify from 'fastify';
+import { Service, ServiceType, ServerVendor, ServerType } from '@sentzunhat/zacatl';
 
 const fastify = Fastify();
 
 const service = new Service({
-  type: "SERVER",
-  platforms: {
-    server: {
-      name: "my-api",
-      port: 3000,
-      server: {
-        type:
-      databases: [],
-    },
-  },
+  type: ServiceType.SERVER,
   layers: {
     application: {
-      entryPoints: {
-        rest: {
-          routes: [
-            /* your route handlers */
-          ],
-        },
+      entryPoints: { rest: { hooks: [], routes: [] } },
+    },
+    domain: { services: [] },
+    infrastructure: { repositories: [] },
+  },
+  platforms: {
+    server: {
+      name: 'my-api',
+      port: 3000,
+      server: {
+        type: ServerType.SERVER,
+        vendor: ServerVendor.FASTIFY,
+        instance: fastify,
       },
+      databases: [],
     },
   },
 });

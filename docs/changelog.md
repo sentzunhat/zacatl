@@ -22,9 +22,9 @@
 
 ---
 
-## [0.0.47] - 2026-02-24
+## Unreleased
 
-**Status**: Current patch
+**Status**: Pending release (documented changes intended for 0.0.47)
 
 ### ✨ Improvements
 

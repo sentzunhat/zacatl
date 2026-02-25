@@ -1,6 +1,6 @@
 #!/usr/bin/env -S node
-import { spawnSync } from 'child_process';
 import { runQuiet } from './common';
+import { resolveAndValidate, removePath } from './lib/safe-rm';
 
 (async () => {
   // Run main clean steps quietly. Avoid removing `node_modules` for now —
@@ -12,7 +12,9 @@ import { runQuiet } from './common';
 
   // Remove publish folder only (keep node_modules intact)
   try {
-    spawnSync('rm -rf publish', { shell: true, stdio: 'ignore' });
+    const repoRoot = process.cwd();
+    const publish = resolveAndValidate(repoRoot, 'publish');
+    await removePath(publish, { verbose: false });
   } catch (_) {
     // ignore
   }
