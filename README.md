@@ -23,7 +23,7 @@ Zacatl enforces clean, layered architecture with dependency injection, validatio
 - **🗄️ Pluggable ORM Adapters** - Sequelize, Mongoose, or build your own
 - **🌐 Multi-Language Support** - Pluggable i18n with filesystem/memory adapters
 - **🔌 Adapter Pattern** - Easy integration with any database or service
-- **🧪 Comprehensive Testing** - 214 tests, 61.19% coverage, Vitest
+- **🧪 Comprehensive Testing** - See the badges above for the current test count and coverage; Vitest
 - **📝 Production Ready** - Structured logging, monitoring, and error tracking
 
 ## 🎯 Multi-Context Support
@@ -360,7 +360,7 @@ throw new NotFoundError({ message: 'User not found', metadata: { userId: 123 } }
 
 ## 🧪 Testing
 
-Zacatl comes with **214 tests** and **52.45% coverage**:
+Zacatl's test count and coverage are shown in the badges at the top of this README. Run the commands below to run tests and generate coverage:
 
 ```bash
 npm test                 # Run all tests

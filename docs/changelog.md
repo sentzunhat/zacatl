@@ -22,6 +22,31 @@
 
 ---
 
+## [0.0.47] - 2026-02-24
+
+**Status**: Current patch
+
+### ✨ Improvements
+
+- **Build & publishing overhaul** — Split post-build into separate ESM/CJS flows, added dedicated build and publish helper scripts, and introduced an execution-time utility to make build steps more observable and reliable.
+- **Type safety & linting** — Tightened TypeScript and ESLint configurations, added a strict ESLint profile (`src/eslint/strict.mjs`), consolidated lint/type scripts, and added a silent lint-fix helper to improve CI stability.
+- **Lazy-load DB adapters** — Made the Sequelize adapter load its runtime implementation lazily so optional Postgres/Sequelize dependencies are not traversed by bundlers unless explicitly used.
+
+### 🔧 Maintenance
+
+- **Package metadata & scripts** — Updated `package.json` and lockfile, removed unnecessary `bin` entries, and adjusted publish-preparation scripts for cleaner npm publishes.
+- **Tooling** — Added `scripts/` tooling and supporting `build-scripts-*` helpers for cleanup, formatting, and publish checks; added `.prettierrc.json` for consistent formatting.
+- **Dependency hygiene** — Added missing ambient type packages (e.g. `@types/i18n`, `@types/js-yaml`) and restored development dependencies required by new build and lint flows.
+
+### 📚 Documentation
+
+- **Docs refresh** — Updated many docs across `docs/` and example projects to reflect new build outputs, publishing guidance, and server/platform documentation.
+
+### 🐛 Fixes
+
+- **ESLint parsing** — Fixed ESLint/TS parsing errors by limiting base `tsconfig` references where they caused cross-config contamination.
+- **Bundling** — Prevented accidental bundling of optional ORM runtimes (notably Sequelize/Postgres) when consumers do not use those adapters.
+
 ## [0.0.45] - 2026-02-22
 
 **Status**: Current release
