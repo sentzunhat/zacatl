@@ -2,9 +2,9 @@
 /*
  Safe cleanup: list and optionally delete git-ignored, untracked files
  Usage:
-   npx tsx scripts/clean-gitignored.ts --dry-run
-   npx tsx scripts/clean-gitignored.ts
-   npx tsx scripts/clean-gitignored.ts --yes
+   npx tsx scripts/clean/clean-gitignored.ts --dry-run
+   npx tsx scripts/clean/clean-gitignored.ts
+   npx tsx scripts/clean/clean-gitignored.ts --yes
 */
 
 import { spawnSync } from 'child_process';
@@ -13,9 +13,6 @@ import path from 'path';
 import { confirm, removeDir } from './common';
 
 function getIgnoredFiles(): string[] {
-  // Try to use git to enumerate ignored files. Use a larger buffer to avoid
-  // ENOBUFS in some environments. If git fails, fall back to parsing
-  // .gitignore and scanning the working tree.
   try {
     const git = spawnSync(
       'git',
@@ -41,7 +38,6 @@ function getIgnoredFiles(): string[] {
     console.warn('git enumeration failed:', msg);
   }
 
-  // Fallback: parse .gitignore and match files in the repository root.
   const gitignorePath = path.resolve(process.cwd(), '.gitignore');
   if (!fs.existsSync(gitignorePath)) return [];
 
@@ -53,11 +49,10 @@ function getIgnoredFiles(): string[] {
   const negatives = patterns.filter((p) => p.startsWith('!')).map((p) => p.slice(1));
   const positives = patterns.filter((p) => !p.startsWith('!'));
 
-  // Basic glob -> regex conversion supporting '*', '**', and '?'
   function globToRegex(p: string) {
     const pat = p.replace(/\\\\/g, '/');
     let s = pat.replace(/[.+^${}()|[\\]\\]/g, (m) => `\\${m}`);
-    s = s.replace(/\\\\\\\\/g, '/');
+    s = s.replace(/\\\\\\/g, '/');
     s = s.replace(/\*\*/g, '::DOUBLESTAR::');
     s = s.replace(/\*/g, '[^/]*');
     s = s.replace(/::DOUBLESTAR::/g, '.*');
@@ -107,7 +102,6 @@ const assumeYes = args.includes('--yes') || args.includes('-y');
 const allowNodeModules = args.includes('--allow-node-modules') || args.includes('--allow-node');
 
 let files = getIgnoredFiles();
-// By default, do not remove anything under node_modules unless explicitly allowed.
 if (!allowNodeModules) {
   files = files.filter((f) => !f.startsWith('node_modules/') && f !== 'node_modules');
 }

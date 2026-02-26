@@ -22,9 +22,9 @@ export async function removePath(
   try {
     await fs.rm(targetAbs, { recursive: true, force: true });
     if (verbose) console.log('removed:', targetAbs);
-  } catch (err) {
-    console.error('failed to remove', targetAbs, err);
-    throw err;
+  } catch (_err) {
+    console.error('failed to remove', targetAbs, _err);
+    throw _err;
   }
 }
 
@@ -38,7 +38,7 @@ async function walkDirs(
   let entries: string[];
   try {
     entries = await fs.readdir(root);
-  } catch (err) {
+  } catch (_err) {
     return;
   }
   await cb(root);

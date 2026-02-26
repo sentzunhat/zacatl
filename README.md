@@ -80,9 +80,9 @@ const server = new Service({
 
 ## Platform Support Status
 
-| Platform | Status |
-| -------- | ------ |
-| Server   | Stable |
+| Platform | Status              |
+| -------- | ------------------- |
+| Server   | Stable              |
 | CLI      | Planned (stub only) |
 | Desktop  | Planned (stub only) |
 

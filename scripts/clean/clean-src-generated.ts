@@ -1,4 +1,3 @@
-import path from 'path';
 import { findFilesWithExtensions, removePath, resolveAndValidate } from './lib/safe-rm';
 
 function parseFlags() {

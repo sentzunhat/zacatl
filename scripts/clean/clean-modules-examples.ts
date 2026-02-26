@@ -1,4 +1,3 @@
-import path from 'path';
 import { findDirsByName, removePath, resolveAndValidate } from './lib/safe-rm';
 
 function parseFlags() {
