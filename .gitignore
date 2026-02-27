@@ -130,4 +130,6 @@ test-results.json
 archive/
 personal/
 !**/**/mongo-init.js
+!/scripts/publish
+!/scripts/build
 # public

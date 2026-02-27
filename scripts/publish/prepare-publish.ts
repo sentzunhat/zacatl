@@ -20,13 +20,12 @@ function ensureDot(p: unknown) {
 function fixEntryKeepBuild(entry: unknown): unknown {
   if (typeof entry === 'string') {
     const p = ensureDot(entry) as string;
-    return p.replace(/^(\.\/)?build\//, './build/esm/');
+    return p.replace(/^(.\/)?build\//, './build/esm/');
   }
   if (Array.isArray(entry)) return entry.map(fixEntryKeepBuild);
   if (entry && typeof entry === 'object') {
     const out: Record<string, unknown> = {};
-    for (const [k, v] of Object.entries(entry as Record<string, unknown>))
-      out[k] = fixEntryKeepBuild(v);
+    for (const [k, v] of Object.entries(entry as Record<string, unknown>)) out[k] = fixEntryKeepBuild(v);
     return out;
   }
   return entry;
@@ -46,10 +45,6 @@ try {
   fs.mkdirSync(buildCjsDest, { recursive: true });
 } catch (_) {}
 
-// Prefer build output folders produced by TypeScript build scripts. Projects
-// in this repo may emit to `build-src-esm`/`build-src-cjs`, `esm`/`cjs`, or
-// `build/esm`/`build/cjs`. Check common candidates and copy the first one
-// that exists for each format.
 const esmCandidates = [
   path.join(root, 'build-src-esm'),
   path.join(root, 'build', 'esm'),
@@ -76,9 +71,6 @@ const usedCjs = copyFirstExisting(cjsCandidates, buildCjsDest);
 if (!usedEsm) console.warn('No ESM build source found in', esmCandidates);
 if (!usedCjs) console.warn('No CJS build source found in', cjsCandidates);
 
-// Copy selected built scripts (CLI helpers) into publish/build/bin so published
-// package provides stable CLI entrypoints without copying the whole scripts
-// source folder. Prefer cjs versions for bin compatibility.
 const binDir = path.join(buildDest, 'bin');
 try {
   fs.mkdirSync(binDir, { recursive: true });
@@ -88,8 +80,7 @@ const scriptsCandidates = [
   path.join(root, 'build-scripts-cjs', 'fix-esm.js'),
   path.join(root, 'build-scripts-esm', 'fix-esm.js'),
 ];
-// Copy any prepared `build/bin` first (preferred). Otherwise, copy useful
-// helper scripts from build-scripts-* folders.
+
 const buildBinCandidates = [
   path.join(root, 'build', 'bin'),
   path.join(root, 'build-src-cjs', 'bin'),
@@ -122,10 +113,6 @@ if (!copiedBin) {
   }
 }
 
-// Remove source map files from the publish bundle to avoid publishing
-// generated maps (optional: keeps package smaller and avoids exposing
-// source through uploaded maps). If you prefer to keep maps for
-// debugging, remove this block.
 function removeSourceMaps(dir: string) {
   if (!fs.existsSync(dir)) return;
   for (const it of fs.readdirSync(dir, { withFileTypes: true })) {
@@ -142,8 +129,6 @@ function removeSourceMaps(dir: string) {
 removeSourceMaps(buildEsmDest);
 removeSourceMaps(buildCjsDest);
 
-// Ensure ESLint config and localization locales exist in the CJS build so
-// package exports can include `require` targets for consumers that use CJS.
 try {
   const esmEslint = path.join(buildEsmDest, 'eslint');
   const esmLocalization = path.join(buildEsmDest, 'localization');
@@ -158,9 +143,6 @@ try {
     } catch (_) {}
   }
 } catch (_) {}
-
-// Do not copy script folders into the publish root. Published CLIs should
-// point at compiled scripts inside `build-esm/`.
 
 interface PublishPkg {
   name?: string;
@@ -209,12 +191,10 @@ const newPkg: PublishPkg = {
   exports: undefined,
 };
 
-// Preserve bin mappings but point them to compiled CJS scripts inside publish
 if (pkg['bin']) {
   const makeLocalBin = (b: string) => {
     if (!b || typeof b !== 'string') return b;
     const p = ensureDot(b) as string;
-    // Map any script path to ./build/bin/<file>.js
     const base = path.basename(p).replace(/\.ts$|\.js$/i, '');
     return `./build/bin/${base}.js`;
   };
@@ -231,17 +211,11 @@ if (pkg['bin']) {
 
 if (pkg['exports']) {
   const fixed: Record<string, unknown> = {};
-  for (const [k, v] of Object.entries(pkg['exports'] as Record<string, unknown>))
-    fixed[k] = fixEntryKeepBuild(v);
+  for (const [k, v] of Object.entries(pkg['exports'] as Record<string, unknown>)) fixed[k] = fixEntryKeepBuild(v);
   newPkg['exports'] = fixed;
 }
-// If the root package did not include `exports`, dynamically generate exports
-// by scanning the compiled build folders for JS/MJS files and matching types.
+
 if (!newPkg['exports']) {
-  // Generate a controlled, per-file exports map by scanning the compiled
-  // ESM build directory. This approach exports only files that actually
-  // exist in the published build and creates precise subpaths for deep
-  // imports (e.g. @sentzunhat/zacatl/foo/bar).
   const buildEsm = buildEsmDest;
   const exportsObj: Record<string, unknown> = {};
 
@@ -255,7 +229,6 @@ if (!newPkg['exports']) {
       const last = parts[parts.length - 1] ?? '';
       const isIndex = last.startsWith('index.');
 
-      // Subpath exposed to consumers
       const sub = isIndex
         ? parts.length === 1
           ? '.'
@@ -267,14 +240,11 @@ if (!newPkg['exports']) {
       const requirePath = `./build/cjs/${rel.replace(/\.mjs$/, '.js')}`;
 
       const entry: Record<string, string> = {};
-      if (fs.existsSync(path.join(publishDir, importPath.replace(/^\.\//, ''))))
-        entry['import'] = importPath;
-      else return; // skip if import target doesn't exist
+      if (fs.existsSync(path.join(publishDir, importPath.replace(/^\.\//, '')))) entry['import'] = importPath;
+      else return;
 
-      if (fs.existsSync(path.join(publishDir, typesPath.replace(/^\.\//, ''))))
-        entry['types'] = typesPath;
-      if (fs.existsSync(path.join(publishDir, requirePath.replace(/^\.\//, ''))))
-        entry['require'] = requirePath;
+      if (fs.existsSync(path.join(publishDir, typesPath.replace(/^\.\//, '')))) entry['types'] = typesPath;
+      if (fs.existsSync(path.join(publishDir, requirePath.replace(/^\.\//, '')))) entry['require'] = requirePath;
 
       exportsObj[sub] = entry;
     }
@@ -289,7 +259,6 @@ if (!newPkg['exports']) {
 
     walk(buildEsm);
 
-    // Always expose package.json
     exportsObj['./package.json'] = './package.json';
 
     newPkg['exports'] = exportsObj;
@@ -303,16 +272,11 @@ const copyIfExists = (name: string) => {
 copyIfExists('README.md');
 copyIfExists('LICENSE');
 
-// Ensure the `zacatl-fix-esm` CLI entry exists in the published package.
-// Ensure the `zacatl-fix-esm` CLI entry exists in the published package.
-// Preserve original `pkg.bin` but force the known CLI entry for consumers
-// that depend on the helper script being available in published packages.
 if (!newPkg.bin || typeof newPkg.bin === 'string') newPkg.bin = {};
 if (!(newPkg.bin as Record<string, string>)['zacatl-fix-esm']) {
   (newPkg.bin as Record<string, string>)['zacatl-fix-esm'] = './build/bin/fix-esm.js';
 }
 
-// Limit published files to the compiled build and the package manifest.
 if (!newPkg['files']) newPkg['files'] = ['build', 'package.json'];
 
 fs.writeFileSync(publishPkgPath, JSON.stringify(newPkg, null, 2) + '\n');

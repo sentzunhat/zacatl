@@ -4,8 +4,21 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 
+function findRepoRoot(startDir: string): string {
+  let cur = startDir;
+  for (let i = 0; i < 6; i++) {
+    const pkg = path.join(cur, 'package.json');
+    if (fs.existsSync(pkg)) return cur;
+    const parent = path.dirname(cur);
+    if (parent === cur) break;
+    cur = parent;
+  }
+  return startDir;
+}
+
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const rootDir = path.resolve(__dirname, '..');
+const scriptDir = __dirname;
+const rootDir = findRepoRoot(scriptDir);
 
 const targetDir = process.argv[2] || 'build-src-esm';
 let distDir: string;

@@ -86,8 +86,7 @@ try {
   let stderr = '';
   if (err && typeof err === 'object') {
     const maybe = err as { stderr?: unknown };
-    if (maybe.stderr != null)
-      stderr = typeof maybe.stderr === 'string' ? maybe.stderr : String(maybe.stderr);
+    if (maybe.stderr != null) stderr = typeof maybe.stderr === 'string' ? maybe.stderr : String(maybe.stderr);
   }
   if (stderr.includes('E404')) {
     warn(`${packageName} is not yet published on npm (E404). Proceeding.`);
