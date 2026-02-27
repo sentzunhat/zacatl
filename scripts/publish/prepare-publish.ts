@@ -25,7 +25,8 @@ function fixEntryKeepBuild(entry: unknown): unknown {
   if (Array.isArray(entry)) return entry.map(fixEntryKeepBuild);
   if (entry && typeof entry === 'object') {
     const out: Record<string, unknown> = {};
-    for (const [k, v] of Object.entries(entry as Record<string, unknown>)) out[k] = fixEntryKeepBuild(v);
+    for (const [k, v] of Object.entries(entry as Record<string, unknown>))
+      out[k] = fixEntryKeepBuild(v);
     return out;
   }
   return entry;
@@ -211,7 +212,8 @@ if (pkg['bin']) {
 
 if (pkg['exports']) {
   const fixed: Record<string, unknown> = {};
-  for (const [k, v] of Object.entries(pkg['exports'] as Record<string, unknown>)) fixed[k] = fixEntryKeepBuild(v);
+  for (const [k, v] of Object.entries(pkg['exports'] as Record<string, unknown>))
+    fixed[k] = fixEntryKeepBuild(v);
   newPkg['exports'] = fixed;
 }
 
@@ -240,11 +242,14 @@ if (!newPkg['exports']) {
       const requirePath = `./build/cjs/${rel.replace(/\.mjs$/, '.js')}`;
 
       const entry: Record<string, string> = {};
-      if (fs.existsSync(path.join(publishDir, importPath.replace(/^\.\//, '')))) entry['import'] = importPath;
+      if (fs.existsSync(path.join(publishDir, importPath.replace(/^\.\//, ''))))
+        entry['import'] = importPath;
       else return;
 
-      if (fs.existsSync(path.join(publishDir, typesPath.replace(/^\.\//, '')))) entry['types'] = typesPath;
-      if (fs.existsSync(path.join(publishDir, requirePath.replace(/^\.\//, '')))) entry['require'] = requirePath;
+      if (fs.existsSync(path.join(publishDir, typesPath.replace(/^\.\//, ''))))
+        entry['types'] = typesPath;
+      if (fs.existsSync(path.join(publishDir, requirePath.replace(/^\.\//, ''))))
+        entry['require'] = requirePath;
 
       exportsObj[sub] = entry;
     }
