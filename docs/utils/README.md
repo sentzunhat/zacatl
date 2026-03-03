@@ -4,6 +4,7 @@ Shared utility helpers that are independent of services and platform wiring.
 
 ## Included Helpers
 
+- **[command-runner](command-runner.md)** - Shell-free command execution with policy-driven security controls
 - **[optionals](optionals.md)** - Type utilities for optional, nullable, and maybe values
 - encode-decode (base64 and string helpers)
 - error-guards (type guards for errors)
@@ -14,7 +15,7 @@ Shared utility helpers that are independent of services and platform wiring.
 Utilities for handling values that may or may not be present.
 
 ```typescript
-import { Optional, Nullable, Maybe } from "@sentzunhat/zacatl";
+import { Optional, Nullable, Maybe } from '@sentzunhat/zacatl';
 
 // Optional<T> = T | undefined (regular JS optional)
 const opt: Optional<string> = undefined;

@@ -1,12 +1,14 @@
-export { MongooseAdapter } from "./mongoose-adapter";
-export { SequelizeAdapter } from "./sequelize-adapter";
+export { MongooseAdapter } from './mongoose-adapter';
+export { SequelizeAdapter } from './sequelize-adapter';
+export { SqliteAdapter } from './sqlite-adapter';
 
-import { CustomError } from "@zacatl/error";
+import { CustomError } from '@zacatl/error';
 
-import { MongooseAdapter as _MongooseAdapter } from "./mongoose-adapter";
-import type { DatabaseServerPort } from "./port";
-import { DatabaseVendor } from "./port";
-import { SequelizeAdapter as _SequelizeAdapter } from "./sequelize-adapter";
+import { MongooseAdapter as _MongooseAdapter } from './mongoose-adapter';
+import type { DatabaseServerPort } from './port';
+import { DatabaseVendor } from './port';
+import { SequelizeAdapter as _SequelizeAdapter } from './sequelize-adapter';
+import { SqliteAdapter as _SqliteAdapter } from './sqlite-adapter';
 
 export const createDatabaseAdapter = (vendor: DatabaseVendor): DatabaseServerPort => {
   switch (vendor) {
@@ -14,11 +16,13 @@ export const createDatabaseAdapter = (vendor: DatabaseVendor): DatabaseServerPor
       return new _MongooseAdapter();
     case DatabaseVendor.SEQUELIZE:
       return new _SequelizeAdapter();
+    case DatabaseVendor.SQLITE:
+      return new _SqliteAdapter();
     default:
       throw new CustomError({
         message: `Unsupported database vendor: ${vendor}`,
         code: 500,
-        reason: "database vendor not supported",
+        reason: 'database vendor not supported',
       });
   }
 };

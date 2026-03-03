@@ -1,9 +1,9 @@
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect, vi } from 'vitest';
 
 // Mock the platform implementations to keep the test isolated and simple
 const serverStart = vi.fn(async () => {});
 const serverRegister = vi.fn(async () => {});
-vi.mock("../../../src/service/platforms/server/server", () => ({
+vi.mock('../../../src/service/platforms/server/server', () => ({
   Server: class {
     constructor(public cfg: unknown) {
       // noop
@@ -15,7 +15,7 @@ vi.mock("../../../src/service/platforms/server/server", () => ({
 
 const cliStart = vi.fn(async () => {});
 const cliRegister = vi.fn(async () => {});
-vi.mock("../../../src/service/platforms/cli", () => ({
+vi.mock('../../../src/service/platforms/cli', () => ({
   CLI: class {
     constructor(public cfg: unknown) {}
     registerEntrypoints = cliRegister;
@@ -25,7 +25,7 @@ vi.mock("../../../src/service/platforms/cli", () => ({
 
 const desktopStart = vi.fn(async () => {});
 const desktopRegister = vi.fn(async () => {});
-vi.mock("../../../src/service/platforms/desktop", () => ({
+vi.mock('../../../src/service/platforms/desktop', () => ({
   Desktop: class {
     constructor(public cfg: unknown) {}
     registerEntrypoints = desktopRegister;
@@ -33,11 +33,11 @@ vi.mock("../../../src/service/platforms/desktop", () => ({
   },
 }));
 
-import { Platforms } from "../../../src/service/platforms/platforms";
+import { Platforms } from '../../../src/service/platforms/platforms';
 
-describe("Platforms wrapper", () => {
-  it("forwards registerEntrypoints and start to server when only server configured", async () => {
-    const platforms = new Platforms({ server: { foo: "bar" } as any });
+describe('Platforms wrapper', () => {
+  it('forwards registerEntrypoints and start to server when only server configured', async () => {
+    const platforms = new Platforms({ server: { foo: 'bar' } as any });
 
     await platforms.registerEntrypoints({ rest: {} } as any);
     expect(serverRegister).toHaveBeenCalled();
@@ -46,7 +46,7 @@ describe("Platforms wrapper", () => {
     expect(serverStart).toHaveBeenCalledWith({ port: 123 });
   });
 
-  it("forwards to all configured platforms", async () => {
+  it('forwards to all configured platforms', async () => {
     const platforms = new Platforms({
       server: { foo: 1 } as any,
       cli: { bar: 2 } as any,

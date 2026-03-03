@@ -2,6 +2,125 @@
 
 ---
 
+## [0.0.46] - Unreleased
+
+**Status**: Pending release
+
+### ✨ New
+
+- **Node 24 LTS standardization** — Bumped `engines.node` to `>=24.14.0` (LTS point release). Added
+  native `imports` field (`"#/*": "./src/*"`) to `package.json` for Node-native subpath imports,
+  removing the need for TypeScript path-alias hacks in consuming projects.
+
+- **Built-in SQLite adapter (`node:sqlite`)** — Added `DatabaseVendor.SQLITE` and
+  `src/service/platforms/server/database/sqlite-adapter.ts` using the Node 24 built-in
+  `node:sqlite` (`DatabaseSync`). Defensive mode is enabled by default. No external SQLite
+  package or native bindings required. `instance` is now optional in `DatabaseConfig` — only
+  needed for Mongoose / Sequelize.
+
+- **Request context module (AsyncLocalStorage)** — Added
+  `src/service/platforms/context/request-context.ts` exposing:
+
+  - `requestContext` — singleton `AsyncLocalStorage<RequestContext>` for propagating
+    `requestId`, `tenantId`, and `userId` (all optional) across async layers without
+    manual parameter threading.
+  - `requestContextMixin` — opt-in Pino mixin function that automatically merges the
+    current request context into every log entry when passed to `PinoLoggerAdapter`.
+    Both exports are re-exported from the package root.
+
+- **ESLint: `node:` core modules** — Added `import/core-modules` setting to the imports
+  ESLint config so `node:sqlite`, `node:async_hooks`, and all other `node:`-prefixed
+  built-ins resolve cleanly without spurious "unable to resolve" warnings.
+
+- **Command Runner module** — Added `src/utils/command-runner/`, a structured, shell-free command
+  execution module built on `child_process.spawn` with `shell: false`. Includes:
+
+  - `CommandSpec` Zod schema and type (cmd + args kept separate to prevent shell injection)
+  - `RunnerPolicy` Zod schema with configurable allowlist, deny patterns, cwd prefix restriction,
+    timeout, output byte cap, and concurrency limit
+  - `runCommand` — single command executor with SIGTERM → SIGKILL timeout fallback
+  - `executeCommands` — parallel batch executor bounded by `maxConcurrency`
+  - `validateCommandSpec` — standalone policy guard for use at API boundaries
+  - `scripts/dev/parallel-execution.ts` — developer script demonstrating concurrent execution
+  - Full unit test coverage in `test/unit/utils/command-runner.test.ts`
+  - Module documentation in `docs/utils/command-runner.md`
+
+### ✨ Improvements
+
+- **Fastify compiler helpers re-exported** — `serializerCompiler` and `validatorCompiler` from
+  `fastify-type-provider-zod` are now exported via `@sentzunhat/zacatl/third-party/fastify`,
+  so consumers no longer need a direct `fastify-type-provider-zod` dependency.
+
+- **Lazy-load DB adapters** — Prevented top-level imports from pulling in heavy ORM runtime deps (notably `sequelize`/`pg` and `pg-hstore`) by:
+
+  - Making the Sequelize adapter a lazy wrapper that dynamically imports the runtime implementation when first used.
+  - Converting internal Sequelize runtime imports to type-only where appropriate.
+  - Registering concrete DB instances by their runtime constructor to avoid importing adapter classes at module load.
+
+  This fixes bundler failures (e.g. `bun build`) where consumers that only use Mongoose were required to install Postgres packages.
+
+### 🔧 Fixes
+
+- **`ServerType` added to public barrel** — `ServerType` was missing from the
+  `service/platforms/server` public exports; it is now re-exported alongside `ServerVendor` and
+  `DatabaseVendor` so consumers can reference it without internal path imports.
+
+- **Bundling**: Importing the library root no longer causes bundlers to traverse `sequelize` at bundle time unless explicitly used.
+
+- **Lazy-load Mongoose adapter** — Removed the top-level static `import { MongooseAdapter }` from
+  `src/service/layers/infrastructure/orm/adapter-loader.ts`. The `mongoose` npm package is now
+  dynamically imported only when an async repository method is first called (same lazy pattern
+  already applied to Sequelize). Main entry import no longer evaluates `mongoose` as a side
+  effect for consumers that only target SQL or non-ORM backends.
+
+### 📦 Dependencies
+
+- **Batteries-included install** — Moved `mongoose`, `sequelize`, `express`, `fastify`, and
+  `better-sqlite3` from `peerDependencies` into `dependencies`. A single
+  `npm install @sentzunhat/zacatl` now provides all supported ORMs and platforms without extra
+  peer install steps. Platform-specific code remains gated behind subpath imports
+  (`@sentzunhat/zacatl/third-party/mongoose`, `/third-party/sequelize`, etc.) so the main entry
+  stays lean. Removed corresponding `peerDependenciesMeta` block.
+
+### 🔧 Tooling
+
+- **Local exports map sync** — Added `scripts/dev/sync-local-exports.ts`, wired into
+  `postbuild`. After every build it walks `build-src-esm/` and writes a complete `exports` map
+  (with `types`, `import`, and `require` conditions) into root `package.json`. This lets the
+  `file:`-linked local package resolve all subpath imports (e.g.
+  `@sentzunhat/zacatl/third-party/fastify`) in consuming projects without manual `paths` hacks
+  in their tsconfigs.
+
+- **`prepare-publish` hardening** — Fixed two npm v10 publish warnings in the generated
+  `publish/package.json`: `repository.url` is now always prefixed with `git+`, and bin script
+  paths no longer carry a leading `./` (npm v10 normalizes both; they are now written correctly
+  by the script).
+
+- **`fixEntryKeepBuild` double-path bug** — The third regex in `fixEntryKeepBuild` inside
+  `prepare-publish.ts` was incorrectly re-processing already-transformed paths
+  (`./build/esm/…` → `./build/esm/esm/…`, `./build/cjs/…` → `./build/esm/cjs/…`). Fixed
+  with a negative lookahead (`(?!esm/|cjs/)`) so the fallback replacement only applies to
+  plain `build/` paths that were not yet normalized by either of the earlier two passes.
+
+- **Deterministic barrel generation** — Added `scripts/dev/generate-barrels.ts` and two new npm
+  scripts:
+
+  - `npm run barrels:generate` — walks `src/` and regenerates every `index.ts` barrel that opts in
+    with a `// @barrel-generated` header. Output is alphabetically sorted and idempotent (two
+    consecutive runs produce no diff). Runs automatically on `npm run setup:dev` and in the
+    pre-commit hook (updated barrels are auto-staged before every commit).
+  - `npm run barrels:verify` — runs the generator then calls
+    `git diff --exit-code -- 'src/**/index.ts'` (scoped to barrel files only), failing CI
+    when committed barrels diverge from generated output. Included in `prepublish:only`,
+    `publish:dry:ci`, and the `publish-dry.yml` CI workflow.
+
+  Barrels that require selective or hand-crafted exports (e.g. backward-compat aliases, type-only
+  re-exports, ORM exclusions) carry a `// @barrel-manual` header and are never touched by the
+  script. Per-directory exclusion rules (`EXCLUSIONS` map in the script) prevent optional heavy
+  peer-dependencies from being pulled in as side-effects at the barrel level.
+
+---
+
 ## [0.0.45] - 2026-02-22
 
 **Status**: Current release
@@ -81,7 +200,7 @@ export class MyHandler extends PostRouteHandler<Input, MyData> {
   };
 
   async handler({ body }): Promise<MyData> {
-    return { id: "1" }; // returns plain data
+    return { id: '1' }; // returns plain data
   }
 }
 // HTTP response: { id: "1" }
@@ -99,11 +218,11 @@ export class MyHandler extends PostRouteHandler<Input, MyData> {
   };
 
   async handler({ body }): Promise<MyData> {
-    return { id: "1" };
+    return { id: '1' };
   }
 
   protected buildResponse(data: MyData) {
-    return { ok: true, message: "Success", data };
+    return { ok: true, message: 'Success', data };
   }
 }
 // HTTP response: { ok: true, message: "Success", data: { id: "1" } }
@@ -179,11 +298,13 @@ export class MyHandler extends PostRouteHandler<Input, MyData> {
 Three Express examples targeting parity with existing Fastify examples:
 
 - `04-with-sqlite` (Express + SQLite via Sequelize)
+
   - Backend API with full CRUD greetings endpoint
   - React frontend loading from Express API
   - E2E verified: API call → handler → service → repository → SQLite → response
 
 - `05-with-mongodb` (Express + MongoDB via Mongoose)
+
   - Backend API with full CRUD greetings endpoint
   - React frontend loading from Express API
   - E2E verified: API call → handler → service → repository → MongoDB → response
@@ -465,15 +586,15 @@ const server = new Service({
 **Option 1 - Main Package (Convenience):**
 
 ```typescript
-import { Service, mongoose, Schema, Sequelize } from "@sentzunhat/zacatl";
+import { Service, mongoose, Schema, Sequelize } from '@sentzunhat/zacatl';
 ```
 
 **Option 2 - Subpath Imports (Minimal Bundle):**
 
 ```typescript
-import { Service } from "@sentzunhat/zacatl";
-import { mongoose, Schema } from "@sentzunhat/zacatl/third-party/mongoose";
-import { Sequelize, DataTypes } from "@sentzunhat/zacatl/third-party/sequelize";
+import { Service } from '@sentzunhat/zacatl';
+import { mongoose, Schema } from '@sentzunhat/zacatl/third-party/mongoose';
+import { Sequelize, DataTypes } from '@sentzunhat/zacatl/third-party/sequelize';
 ```
 
 #### Why Both Options?
@@ -527,7 +648,7 @@ import { Sequelize, DataTypes } from "@sentzunhat/zacatl/third-party/sequelize";
 ```typescript
 // v0.0.21 - BROKEN in ESM
 export function loadMongooseAdapter(config) {
-  const adapters = require("./adapters/mongoose-adapter"); // ❌
+  const adapters = require('./adapters/mongoose-adapter'); // ❌
   return new adapters.MongooseAdapter(config);
 }
 ```
@@ -537,7 +658,7 @@ export function loadMongooseAdapter(config) {
 ```typescript
 // v0.0.22 - Works in ALL environments
 export async function loadMongooseAdapter(config) {
-  const adapters = await import("./adapters/mongoose-adapter"); // ✅
+  const adapters = await import('./adapters/mongoose-adapter'); // ✅
   return new adapters.MongooseAdapter(config);
 }
 ```
@@ -592,13 +713,13 @@ npm install @sentzunhat/zacatl mongoose
 **Before:**
 
 ```typescript
-import { connection } from "mongoose"; // ❌ Breaks in v9
+import { connection } from 'mongoose'; // ❌ Breaks in v9
 ```
 
 **After:**
 
 ```typescript
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 mongoose.connection; // ✅ Works in v9
 ```
 
@@ -617,9 +738,9 @@ mongoose.connection; // ✅ Works in v9
 **New Import Shortcuts:**
 
 ```typescript
-import { BaseRepository, ORMType } from "@sentzunhat/zacatl/infrastructure";
-import { CustomError } from "@sentzunhat/zacatl/errors";
-import { loadConfig } from "@sentzunhat/zacatl/config";
+import { BaseRepository, ORMType } from '@sentzunhat/zacatl/infrastructure';
+import { CustomError } from '@sentzunhat/zacatl/errors';
+import { loadConfig } from '@sentzunhat/zacatl/config';
 ```
 
 #### 🔧 Peer Dependencies

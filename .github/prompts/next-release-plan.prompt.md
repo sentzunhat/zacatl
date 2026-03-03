@@ -1,8 +1,8 @@
 ---
-name: "next-release-plan"
-description: "Describe what to build next and propose the next Zacatl release scope"
-argument-hint: "goal=<what to ship next>"
-agent: "agent"
+name: 'next-release-plan'
+description: 'Describe what to build next and propose the next Zacatl release scope'
+argument-hint: 'goal=<what to ship next>'
+agent: 'agent'
 ---
 
 Describe what to build next for the upcoming Zacatl release.
@@ -18,7 +18,7 @@ Use these references:
 - User goal: `${input:goal:improve framework reliability}`
 - Workspace: `${workspaceFolderBasename}`
 - Current file context (if any): `${file}`
-- Selected context (if any): `${selectedText}`
+- Selected context (if any): `${selection}`
 
 ## Required Output
 

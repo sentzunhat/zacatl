@@ -11,7 +11,7 @@ recommended, baseConfig, importsConfig, namingConventions, fileNamingRules
 ## Quick use
 
 ```javascript
-import { recommended } from "@sentzunhat/zacatl/eslint";
+import { recommended } from '@sentzunhat/zacatl/eslint';
 export default [...recommended];
 ```
 
@@ -56,11 +56,11 @@ Use all Zacatl ESLint configs with sensible defaults:
 
 ```javascript
 // eslint.config.mjs
-import { recommended } from "@sentzunhat/zacatl/eslint";
+import { recommended } from '@sentzunhat/zacatl/eslint';
 
 export default [
   {
-    ignores: ["build/**", "node_modules/**"],
+    ignores: ['build/**', 'node_modules/**'],
   },
   ...recommended,
 ];
@@ -72,11 +72,11 @@ Pick and choose individual configurations:
 
 ```javascript
 // eslint.config.mjs
-import { baseConfig, namingConventions } from "@sentzunhat/zacatl/eslint";
+import { baseConfig, namingConventions } from '@sentzunhat/zacatl/eslint';
 
 export default [
   {
-    ignores: ["build/**", "node_modules/**"],
+    ignores: ['build/**', 'node_modules/**'],
   },
   baseConfig,
   namingConventions,
@@ -88,9 +88,9 @@ export default [
 
 ```javascript
 // eslint.config.mjs
-import baseConfig from "@sentzunhat/zacatl/eslint/base";
-import namingConventions from "@sentzunhat/zacatl/eslint/naming-conventions";
-import importsConfig from "@sentzunhat/zacatl/eslint/imports";
+import baseConfig from '@sentzunhat/zacatl/eslint/base';
+import namingConventions from '@sentzunhat/zacatl/eslint/naming-conventions';
+import importsConfig from '@sentzunhat/zacatl/eslint/imports';
 
 export default [baseConfig, namingConventions, importsConfig];
 ```
@@ -112,9 +112,9 @@ Core TypeScript linting rules with sensible defaults.
 **Import:**
 
 ```javascript
-import { baseConfig } from "@sentzunhat/zacatl/eslint";
+import { baseConfig } from '@sentzunhat/zacatl/eslint';
 // or
-import baseConfig from "@sentzunhat/zacatl/eslint/base";
+import baseConfig from '@sentzunhat/zacatl/eslint/base';
 ```
 
 ### `namingConventions`
@@ -137,9 +137,9 @@ Enforces Hexagonal Architecture naming patterns.
 **Import:**
 
 ```javascript
-import { namingConventions } from "@sentzunhat/zacatl/eslint";
+import { namingConventions } from '@sentzunhat/zacatl/eslint';
 // or
-import namingConventions from "@sentzunhat/zacatl/eslint/naming-conventions";
+import namingConventions from '@sentzunhat/zacatl/eslint/naming-conventions';
 ```
 
 ### `importsConfig`
@@ -162,9 +162,9 @@ Enforces consistent import organization.
 **Import:**
 
 ```javascript
-import { importsConfig } from "@sentzunhat/zacatl/eslint";
+import { importsConfig } from '@sentzunhat/zacatl/eslint';
 // or
-import importsConfig from "@sentzunhat/zacatl/eslint/imports";
+import importsConfig from '@sentzunhat/zacatl/eslint/imports';
 ```
 
 ### `recommended`
@@ -174,9 +174,9 @@ Combines all Zacatl configs for comprehensive linting.
 **Import:**
 
 ```javascript
-import { recommended } from "@sentzunhat/zacatl/eslint";
+import { recommended } from '@sentzunhat/zacatl/eslint';
 // or (default export)
-import recommended from "@sentzunhat/zacatl/eslint";
+import recommended from '@sentzunhat/zacatl/eslint';
 ```
 
 ## Extending Configurations
@@ -184,16 +184,16 @@ import recommended from "@sentzunhat/zacatl/eslint";
 ### Override Specific Rules
 
 ```javascript
-import { recommended } from "@sentzunhat/zacatl/eslint";
+import { recommended } from '@sentzunhat/zacatl/eslint';
 
 export default [
   ...recommended,
   {
-    files: ["src/**/*.ts"],
+    files: ['src/**/*.ts'],
     rules: {
-      "@typescript-eslint/naming-convention": "off", // Disable if needed
-      "import/order": [
-        "error",
+      '@typescript-eslint/naming-convention': 'off', // Disable if needed
+      'import/order': [
+        'error',
         {
           /* custom config */
         },
@@ -206,17 +206,17 @@ export default [
 ### Add Project-Specific Configs
 
 ```javascript
-import { recommended } from "@sentzunhat/zacatl/eslint";
+import { recommended } from '@sentzunhat/zacatl/eslint';
 
 export default [
   {
-    ignores: ["build/**", "coverage/**", "*.config.js"],
+    ignores: ['build/**', 'coverage/**', '*.config.js'],
   },
   ...recommended,
   {
-    files: ["src/tests/**/*.ts"],
+    files: ['src/tests/**/*.ts'],
     rules: {
-      "@typescript-eslint/explicit-function-return-type": "off",
+      '@typescript-eslint/explicit-function-return-type': 'off',
     },
   },
 ];
@@ -225,8 +225,8 @@ export default [
 ### Combine with Other Configs
 
 ```javascript
-import eslint from "@eslint/js";
-import { recommended as zacatlRecommended } from "@sentzunhat/zacatl/eslint";
+import eslint from '@eslint/js';
+import { recommended as zacatlRecommended } from '@sentzunhat/zacatl/eslint';
 
 export default [
   eslint.configs.recommended,
@@ -335,7 +335,7 @@ Before:
 After:
 
 ```javascript
-import { recommended } from "@sentzunhat/zacatl/eslint";
+import { recommended } from '@sentzunhat/zacatl/eslint';
 
 export default [
   ...recommended,

@@ -38,8 +38,8 @@ This guide covers formatting, naming conventions, and language-specific rules fo
     "sourceMap": true,
     "outDir": "./build",
     "rootDir": "./src",
-    "removeComments": true,
-  },
+    "removeComments": true
+  }
 }
 ```
 
@@ -54,9 +54,11 @@ This guide covers formatting, naming conventions, and language-specific rules fo
 
 ### Runtime Requirements
 
-- **Node.js**: 24+ (supports native ES modules and latest APIs)
-- **Package Manager**: npm 10.9.0+
+- **Node.js**: 24.14.0 LTS+ (minimum required — enables `node:sqlite`, `AsyncLocalStorage` improvements, and native subpath imports)
+- **Package Manager**: npm 10.0.0+
 - **Module System**: ES Modules (ESM) only — no CommonJS
+
+> **Upgrade note**: run `nvm install 24.14.0 && nvm use 24.14.0` (or equivalent) if your local Node is below 24.14.0.
 
 ### Build Process
 
@@ -67,12 +69,12 @@ This guide covers formatting, naming conventions, and language-specific rules fo
 npm run build:watch       # Watch mode compilation
 
 # Production build
-npm run build            # tsc + tsc-alias + fix-esm.mjs
+npm run build            # tsc + tsc-alias + fix-esm.ts
 
 # Steps:
 # 1. tsc compiles TS to JS (ESNext target)
 # 2. tsc-alias resolves path aliases
-# 3. fix-esm.mjs fixes ESM module exports for Node.js
+# 3. fix-esm.ts fixes ESM module exports for Node.js
 ```
 
 **No bundler** (Vite, esbuild, Rollup) — direct TypeScript compilation for cleaner, more transparent output.
@@ -145,9 +147,9 @@ type constructor<T> = ...;
 ```typescript
 // ✅ Good
 const userCount = 0;
-const getDatabaseVendor = () => "MONGOOSE";
+const getDatabaseVendor = () => 'MONGOOSE';
 const TIMEOUT_MS = 5000;
-const DATABASE_VENDOR = "MONGODB";
+const DATABASE_VENDOR = 'MONGODB';
 let currentUser = null;
 
 // ❌ Avoid
@@ -190,21 +192,21 @@ src/
 ```typescript
 // ✅ Good
 enum ServerVendor {
-  FASTIFY = "FASTIFY",
-  EXPRESS = "EXPRESS",
+  FASTIFY = 'FASTIFY',
+  EXPRESS = 'EXPRESS',
 }
 
 enum DatabaseVendor {
-  MONGOOSE = "MONGOOSE",
-  SEQUELIZE = "SEQUELIZE",
+  MONGOOSE = 'MONGOOSE',
+  SEQUELIZE = 'SEQUELIZE',
 }
 
 // ❌ Avoid
 enum serverVendor {
-  fastify = "fastify",
+  fastify = 'fastify',
 }
 enum DATABASE_VENDOR {
-  Mongoose = "mongodb",
+  Mongoose = 'mongodb',
 }
 ```
 
@@ -222,16 +224,16 @@ enum DATABASE_VENDOR {
 ```typescript
 // ✅ Good
 const config = {
-  name: "my-service",
+  name: 'my-service',
   port: 3000,
   debug: true,
 };
 
-const items = ["item1", "item2", "item3"];
+const items = ['item1', 'item2', 'item3'];
 
 // ❌ Avoid
-const config = { name: "my-service", port: 3000, debug: true }; // Too long
-const items = ["item1", "item2", "item3"]; // Missing trailing comma
+const config = { name: 'my-service', port: 3000, debug: true }; // Too long
+const items = ['item1', 'item2', 'item3']; // Missing trailing comma
 ```
 
 ### Quotes
@@ -241,13 +243,13 @@ const items = ["item1", "item2", "item3"]; // Missing trailing comma
 
 ```typescript
 // ✅ Good
-const message = "Hello, world!";
+const message = 'Hello, world!';
 const greeting = `Hello, ${name}!`;
-const path = "src/services/index.ts";
+const path = 'src/services/index.ts';
 
 // ❌ Avoid
-const message = "Hello, world!"; // Single quotes
-const path = "src/services/index.ts";
+const message = 'Hello, world!'; // Single quotes
+const path = 'src/services/index.ts';
 ```
 
 ### Semicolons
@@ -267,17 +269,33 @@ function doSomething() {}
 
 ### Arrow Functions
 
-- Use arrow functions for callbacks, anonymous functions
-- Use named functions for exported/public APIs
+- Use arrow functions for callbacks, anonymous functions, and non-class module exports
+- Use `class` for domain objects that need constructors
+- Script entry points must be wrapped in `const main = (): void =>` + a `main()` call at the bottom of the file — this prevents top-level side effects and keeps the entry-point testable
 
 ```typescript
-// ✅ Good
+// ✅ Good — callbacks
 const doubled = numbers.map((n) => n * 2);
 const filtered = items.filter((item) => item.active);
-export function createLogger() {}
 
-// ❌ Avoid
-const doubled = numbers.map((n) => n * 2); // Missing parens when multiline
+// ✅ Good — exported function
+export const createLogger = (): Logger => new PinoLoggerAdapter();
+
+// ✅ Good — script entry point
+const main = (): void => {
+  doSetup();
+  doWork();
+};
+main();
+
+// ❌ Avoid — function declarations in script files
+function main() {
+  // prefer const main = (): void =>
+  doSetup();
+}
+main();
+
+// ❌ Avoid — anonymous functions
 const doubled = numbers.map(function (n) {
   return n * 2;
 });
@@ -310,26 +328,26 @@ const items: Array<number> = [1, 2, 3]; // Unnecessary annotation
 
 ```typescript
 // ✅ Good — imports from root and subpaths
-import { Service } from "@zacatl/zacatl";
-import { BadRequestError } from "@zacatl/error";
-import { GetRouteHandler } from "@zacatl/service";
+import { Service } from '@zacatl/zacatl';
+import { BadRequestError } from '@zacatl/error';
+import { GetRouteHandler } from '@zacatl/service';
 
 // ✅ Good — framework/library imports via subpaths
-import { z } from "@zacatl/third-party/zod";
-import { v4 as uuidv4 } from "@zacatl/third-party/uuid";
-import { container } from "@zacatl/third-party/tsyringe";
-import FastifyClass from "@zacatl/third-party/fastify";
+import { z } from '@zacatl/third-party/zod';
+import { v4 as uuidv4 } from '@zacatl/third-party/uuid';
+import { container } from '@zacatl/third-party/tsyringe';
+import FastifyClass from '@zacatl/third-party/fastify';
 
 // ✅ Good — namespace import (for large modules)
-import * as utils from "./utils";
+import * as utils from './utils';
 const result = utils.encode(input);
 
 // ✅ Good — default export (for single primary export)
 export default class Service {}
-import Service from "./service";
+import Service from './service';
 
 // ❌ Avoid
-const { GetRouteHandler } = require("./handlers"); // CommonJS
+const { GetRouteHandler } = require('./handlers'); // CommonJS
 module.exports = Service; // CommonJS
 ```
 
@@ -339,10 +357,10 @@ module.exports = Service; // CommonJS
 
 ```typescript
 // src/error/index.ts
-export * from "./bad-request";
-export * from "./unauthorized";
-export * from "./custom";
-export type { CustomErrorsArgs } from "./custom";
+export * from './bad-request';
+export * from './unauthorized';
+export * from './custom';
+export type { CustomErrorsArgs } from './custom';
 ```
 
 **All Dependencies via Subpaths:**
@@ -377,6 +395,33 @@ All third-party dependencies (frameworks, ORMs, utilities) are exported via libr
 - Single source of truth for all dependency versions
 - Easier version management and updates
 - Prevents inconsistent usage patterns
+
+### Third-party imports and bundling
+
+- Prefer explicit third-party subpath imports from the library, for example:
+
+```ts
+import { Schema } from '@zacatl/third-party/mongoose';
+import type { Sequelize } from '@zacatl/third-party/sequelize'; // type-only
+```
+
+- Avoid importing the package root (`@zacatl`) for runtime implementations; prefer explicit subpaths (the project enforces this with `no-restricted-imports` as a warning).
+- Use `import type { ... } from '...'` for type-only references so bundlers and TypeScript can avoid pulling runtime code into consumers that only need types. The project enforces type-only imports with `@typescript-eslint/consistent-type-imports`.
+- When writing adapter or plugin code that requires a heavy runtime dependency (e.g. `sequelize`), use dynamic imports to lazy-load the implementation at runtime:
+
+```ts
+// lazy load the runtime implementation only when needed
+const { SequelizeAdapter } = await import(
+  '@zacatl/service/layers/infrastructure/orm/sequelize-adapter'
+);
+```
+
+- These patterns reduce accidental bundling of optional/peer deps (for example Postgres `pg`/`pg-hstore`) for consumers that only use Mongoose.
+
+### Formatting & Editor Integration
+
+- This repository uses Prettier for formatting; configuration is in `.prettierrc.json`. Run `npm run format` to apply formatting across the repo.
+- VS Code workspace settings already prefer Prettier and enable `formatOnSave` for TypeScript/JavaScript. Keep those settings in sync if you use another editor.
 
 ---
 
@@ -426,8 +471,8 @@ class BadRequestError extends CustomError {
 }
 
 // ❌ Avoid
-throw new Error("Bad request");
-throw "Bad request";
+throw new Error('Bad request');
+throw 'Bad request';
 ```
 
 ### Generics
@@ -565,23 +610,23 @@ trim_trailing_whitespace = false
 Use [ESLint flat config format](https://eslint.org/docs/latest/use/configure/configuration-files-new):
 
 ```javascript
-import js from "@eslint/js";
-import tsPlugin from "@typescript-eslint/eslint-plugin";
+import js from '@eslint/js';
+import tsPlugin from '@typescript-eslint/eslint-plugin';
 
 export default [
   {
-    ignores: ["build/**/*", "dist/**/*", "node_modules/**/*"],
+    ignores: ['build/**/*', 'dist/**/*', 'node_modules/**/*'],
   },
   js.configs.recommended,
   {
-    files: ["src/**/*.ts"],
+    files: ['src/**/*.ts'],
     languageOptions: {
-      parserOptions: { ecmaVersion: "latest" },
+      parserOptions: { ecmaVersion: 'latest' },
     },
     rules: {
-      "@typescript-eslint/no-explicit-any": "warn",
-      "@typescript-eslint/no-unused-vars": "error",
-      "no-console": ["warn", { allow: ["warn", "error"] }],
+      '@typescript-eslint/no-explicit-any': 'warn',
+      '@typescript-eslint/no-unused-vars': 'error',
+      'no-console': ['warn', { allow: ['warn', 'error'] }],
     },
   },
 ];
@@ -616,6 +661,26 @@ Add `.prettierrc.json` or `prettier` key in `package.json`:
 }
 ```
 
+**Script Naming Convention — noun-first grouping:**
+
+Script names use a `<noun>:<verb>` pattern so related scripts sort together:
+
+```
+barrels:generate    # Generate barrel files
+barrels:verify      # Verify barrel files match generated output
+build:src           # Build source only
+build:watch         # Watch mode build
+type:check          # Type-check all
+type:check:src      # Type-check source only
+lint                # Lint all
+lint:src            # Lint source only
+clean:build         # Clean build output
+clean:src           # Clean source artifacts
+```
+
+Avoid `verb-noun` (e.g. `generateBarrels`, `checkTypes`) — the noun-first form keeps
+related scripts adjacent in `package.json` and in shell autocomplete.
+
 ---
 
 ## Build Process
@@ -626,7 +691,7 @@ The build process follows three stages:
 
 ```bash
 npm run build
-# Executes: tsc → tsc-alias → fix-esm.mjs → clean:src
+# Executes: tsc → tsc-alias → fix-esm.ts → clean:src
 ```
 
 **Stage 1: TypeScript Compilation**
@@ -652,7 +717,7 @@ tsc-alias -p tsconfig.json
 **Stage 3: ESM Module Fixing**
 
 ```bash
-node scripts/fix-esm.mjs
+npx tsx scripts/build/fix-esm.ts
 ```
 
 - Adds `.js` extensions to relative imports (Node.js ESM requirement)
@@ -694,23 +759,23 @@ This project doesn't use bundlers (Vite, esbuild, Rollup) for the library build:
 ### Logger Creation
 
 ```typescript
-import { createLogger } from "@zacatl/logs";
+import { createLogger } from '@zacatl/logs';
 
 // Default logger (Pino adapter)
 const logger = createLogger();
 
 // Custom adapter
-import { ConsoleLoggerAdapter } from "@zacatl/logs";
+import { ConsoleLoggerAdapter } from '@zacatl/logs';
 const cliLogger = createLogger(new ConsoleLoggerAdapter());
 ```
 
 ### Log Levels
 
 ```typescript
-logger.debug("Detailed diagnostic info", { userId: "123" });
-logger.info("General information", { event: "user.login" });
-logger.warn("Warning message", { retries: 3 });
-logger.error("Error occurred", { error: err, correlationId });
+logger.debug('Detailed diagnostic info', { userId: '123' });
+logger.info('General information', { event: 'user.login' });
+logger.warn('Warning message', { retries: 3 });
+logger.error('Error occurred', { error: err, correlationId });
 ```
 
 ### Structured Logging
@@ -719,7 +784,7 @@ Always include context as second parameter:
 
 ```typescript
 // ✅ Good — structured data
-logger.info("User created", {
+logger.info('User created', {
   userId: user.id,
   email: user.email,
   timestamp: new Date(),
@@ -735,19 +800,16 @@ Include correlation IDs for request tracing:
 
 ```typescript
 class GetUserHandler extends GetRouteHandler<User> {
-  constructor(
-    private service: UserService,
-    private logger: Logger,
-  ) {}
+  constructor(private service: UserService, private logger: Logger) {}
 
   async execute(request: FastifyRequest): Promise<User> {
     const correlationId = request.id; // Fastify request ID
-    this.logger.info("Fetching user", { userId: request.params.id, correlationId });
+    this.logger.info('Fetching user', { userId: request.params.id, correlationId });
 
     try {
       return await this.service.getUser(request.params.id);
     } catch (error) {
-      this.logger.error("Failed to fetch user", {
+      this.logger.error('Failed to fetch user', {
         userId: request.params.id,
         correlationId,
         error,
@@ -765,25 +827,25 @@ class GetUserHandler extends GetRouteHandler<User> {
 ### Loading Configuration
 
 ```typescript
-import { loadJSON, loadYAML } from "@zacatl/configuration";
-import { z } from "@zacatl/third-party/zod";
+import { loadJSON, loadYAML } from '@zacatl/configuration';
+import { z } from '@zacatl/third-party/zod';
 
 // Define schema
 const ServerConfigSchema = z.object({
   port: z.number().min(1).max(65535),
   host: z.string(),
-  logLevel: z.enum(["debug", "info", "warn", "error"]),
+  logLevel: z.enum(['debug', 'info', 'warn', 'error']),
 });
 
 // Load and validate
-const config = loadJSON("./config.json", ServerConfigSchema);
-const yamlConfig = loadYAML("./config.yaml", ServerConfigSchema);
+const config = loadJSON('./config.json', ServerConfigSchema);
+const yamlConfig = loadYAML('./config.yaml', ServerConfigSchema);
 ```
 
 ### Environment-Based Configuration
 
 ```typescript
-const env = process.env.NODE_ENV || "development";
+const env = process.env.NODE_ENV || 'development';
 const configPath = `./config/${env}.json`;
 
 const config = loadJSON(configPath, ConfigSchema);
@@ -792,13 +854,13 @@ const config = loadJSON(configPath, ConfigSchema);
 ### Configuration Validation Errors
 
 ```typescript
-import { ValidationError } from "@zacatl/error";
+import { ValidationError } from '@zacatl/error';
 
 try {
-  const config = loadJSON("./config.json", ServerConfigSchema);
+  const config = loadJSON('./config.json', ServerConfigSchema);
 } catch (error) {
   if (error instanceof ValidationError) {
-    console.error("Configuration validation failed:", error.metadata);
+    console.error('Configuration validation failed:', error.metadata);
     process.exit(1);
   }
   throw error;
@@ -813,19 +875,19 @@ try {
 
 ```typescript
 // ✅ Good — Use typed error classes
-import { BadRequestError, NotFoundError } from "@zacatl/error";
+import { BadRequestError, NotFoundError } from '@zacatl/error';
 
 if (!user) {
-  throw new NotFoundError({ message: "User not found", metadata: { userId } });
+  throw new NotFoundError({ message: 'User not found', metadata: { userId } });
 }
 
 if (!email) {
-  throw new BadRequestError({ message: "Email is required" });
+  throw new BadRequestError({ message: 'Email is required' });
 }
 
 // ❌ Avoid — Generic Error
-throw new Error("User not found");
-throw new Error("400: Bad Request");
+throw new Error('User not found');
+throw new Error('400: Bad Request');
 ```
 
 ### Async/Await
@@ -834,7 +896,7 @@ throw new Error("400: Bad Request");
 // ✅ Good — Explicit async/await
 async function getUser(id: string): Promise<User> {
   const user = await repository.findById(id);
-  if (!user) throw new NotFoundError({ message: "User not found" });
+  if (!user) throw new NotFoundError({ message: 'User not found' });
   return user;
 }
 
@@ -843,7 +905,7 @@ function getUser(id: string): Promise<User> {
   return repository
     .findById(id)
     .then((user) => {
-      if (!user) throw new NotFoundError({ message: "User not found" });
+      if (!user) throw new NotFoundError({ message: 'User not found' });
       return user;
     })
     .catch((err) => {
@@ -856,11 +918,11 @@ function getUser(id: string): Promise<User> {
 
 ```typescript
 // ✅ Good — Modern operators
-const userName = user?.profile?.name ?? "Anonymous";
+const userName = user?.profile?.name ?? 'Anonymous';
 const count = config?.maxItems ?? 10;
 
 // ❌ Avoid — Nested ternaries
-const userName = user ? (user.profile ? user.profile.name : "Anonymous") : "Anonymous";
+const userName = user ? (user.profile ? user.profile.name : 'Anonymous') : 'Anonymous';
 ```
 
 ### Type Narrowing
@@ -872,12 +934,12 @@ function isCustomError(error: unknown): error is CustomError {
 }
 
 if (isCustomError(error)) {
-  logger.error("Custom error occurred", { correlationId: error.correlationId });
+  logger.error('Custom error occurred', { correlationId: error.correlationId });
 }
 
 // ❌ Avoid — Type assertions
 const customError = error as CustomError;
-logger.error("Custom error occurred", { correlationId: customError.correlationId });
+logger.error('Custom error occurred', { correlationId: customError.correlationId });
 ```
 
 ---

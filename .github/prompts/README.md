@@ -4,12 +4,26 @@ Workspace prompt files live in `.github/prompts` and are available as slash comm
 
 This folder is for **manual** command-style prompts, not always-on rules.
 
+For a quick setup/health check after prompt or instruction edits, see the [Validation Checklist](../README.md#validation-checklist).
+
 ## Available Prompts
 
 - `changelog-entry`
 - `next-release-plan`
 - `changelog-from-selection`
 - `pre-release-guard`
+
+## Prompt Authoring Rules
+
+1. Keep prompts task-focused and minimal; avoid broad repository-wide instructions here.
+2. Put always-on behavior in `.github/instructions/*.instructions.md` or `.github/copilot-instructions.md`.
+3. Use stable template variables consistently:
+   - `${selection}` for selected text
+   - `${file}` for current file
+   - `${workspaceFolderBasename}` for workspace name
+   - `${input:*}` for user-provided arguments
+4. Reference only required files for each prompt to reduce context noise.
+5. Prefer explicit output requirements (format + scope + whether file edits are allowed).
 
 ## Verify Prompt Selection Works
 

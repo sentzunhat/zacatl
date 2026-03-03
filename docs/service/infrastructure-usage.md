@@ -1,9 +1,9 @@
 # Infrastructure Usage Guide
 
-> **📦 v0.0.21+ Import Shortcut:**
+> Import from the infrastructure subpath:
 >
 > ```typescript
-> import { BaseRepository, ORMType } from "@sentzunhat/zacatl/infrastructure";
+> import { BaseRepository, ORMType } from '@sentzunhat/zacatl/infrastructure';
 > ```
 
 ## Modular ORM System
@@ -100,8 +100,8 @@ interface ProductOutput {
 #### Option A: Using Mongoose (MongoDB)
 
 ```typescript
-import { BaseRepository, ORMType } from "@sentzunhat/zacatl/infrastructure";
-import { Schema } from "@sentzunhat/zacatl/third-party/mongoose";
+import { BaseRepository, ORMType } from '@sentzunhat/zacatl/infrastructure';
+import { Schema } from '@sentzunhat/zacatl/third-party/mongoose';
 
 const UserSchema = new Schema<UserDb>(
   {
@@ -116,7 +116,7 @@ export class UserRepository extends BaseRepository<UserDb, UserInput, UserOutput
   constructor() {
     super({
       type: ORMType.Mongoose,
-      name: "User",
+      name: 'User',
       schema: UserSchema,
     });
   }
@@ -129,16 +129,53 @@ export class UserRepository extends BaseRepository<UserDb, UserInput, UserOutput
 }
 ```
 
-#### Option B: Using Sequelize (PostgreSQL/MySQL/SQLite)
+#### Option B: Using Native SQLite (Node 24 — No External Package)
+
+Uses the built-in `node:sqlite` module. No external package needed.
+
+**Service config:**
 
 ```typescript
-import { BaseRepository, ORMType } from "@sentzunhat/zacatl/infrastructure";
-import { DataTypes, Model, Sequelize } from "@sentzunhat/zacatl/third-party/sequelize";
+import { DatabaseVendor } from '@sentzunhat/zacatl';
+
+databases: [{ vendor: DatabaseVendor.SQLITE, connectionString: 'app.db' }];
+// ':memory:' is also valid for in-memory databases
+```
+
+**Raw SQL access (inject `DatabaseServer`):**
+
+```typescript
+import { singleton, inject, DatabaseServer, DatabaseVendor } from '@sentzunhat/zacatl';
+import type { DatabaseSync } from 'node:sqlite';
+
+@singleton()
+export class ItemRepository {
+  private readonly db: DatabaseSync;
+
+  constructor(@inject(DatabaseServer) databaseServer: DatabaseServer) {
+    this.db = databaseServer.getAdapter(DatabaseVendor.SQLITE)!.getDatabase() as DatabaseSync;
+  }
+
+  findById(id: string) {
+    return this.db.prepare('SELECT * FROM items WHERE id = ?').get(id);
+  }
+}
+```
+
+> **Note:** Defensive mode is enabled by default. Always use prepared statements — never string-interpolate user input into SQL.
+
+---
+
+#### Option C: Using Sequelize (PostgreSQL/MySQL/SQLite via ORM)
+
+```typescript
+import { BaseRepository, ORMType } from '@sentzunhat/zacatl/infrastructure';
+import { DataTypes, Model, Sequelize } from '@sentzunhat/zacatl/third-party/sequelize';
 
 // Sequelize model definition
 class ProductModel extends Model {}
 
-const sequelize = new Sequelize("sqlite::memory:");
+const sequelize = new Sequelize('sqlite::memory:');
 
 ProductModel.init(
   {
@@ -147,7 +184,7 @@ ProductModel.init(
     price: { type: DataTypes.FLOAT, allowNull: false },
     stock: { type: DataTypes.INTEGER, allowNull: false },
   },
-  { sequelize, modelName: "Product", timestamps: true },
+  { sequelize, modelName: 'Product', timestamps: true },
 );
 
 export class ProductRepository extends BaseRepository<ProductModel, ProductInput, ProductOutput> {
@@ -171,9 +208,9 @@ export class ProductRepository extends BaseRepository<ProductModel, ProductInput
 ### 3. Register in Service
 
 ```typescript
-import { Service, ServiceType } from "@sentzunhat/zacatl";
-import { UserRepository } from "./repositories/user.repository";
-import { ProductRepository } from "./repositories/product.repository";
+import { Service, ServiceType } from '@sentzunhat/zacatl';
+import { UserRepository } from './repositories/user.repository';
+import { ProductRepository } from './repositories/product.repository';
 
 const service = new Service({
   type: ServiceType.SERVER,
@@ -193,9 +230,9 @@ await service.start();
 ### 4. Use in Your Application
 
 ```typescript
-import { container } from "tsyringe";
-import { UserRepository } from "./repositories/user.repository";
-import { ProductRepository } from "./repositories/product.repository";
+import { container } from 'tsyringe';
+import { UserRepository } from './repositories/user.repository';
+import { ProductRepository } from './repositories/product.repository';
 
 // Get repository instances from DI container
 const userRepo = container.resolve(UserRepository);
@@ -203,13 +240,13 @@ const productRepo = container.resolve(ProductRepository);
 
 // Use unified interface regardless of ORM
 const user = await userRepo.create({
-  username: "john",
-  email: "john@example.com",
-  password: "hashed",
+  username: 'john',
+  email: 'john@example.com',
+  password: 'hashed',
 });
 
 const product = await productRepo.create({
-  name: "Widget",
+  name: 'Widget',
   price: 29.99,
   stock: 100,
 });
@@ -222,7 +259,7 @@ const foundProduct = await productRepo.findById(product.id);
 ## Mix Multiple ORMs in One Service
 
 ```typescript
-import { Service, ServiceType } from "@sentzunhat/zacatl";
+import { Service, ServiceType } from '@sentzunhat/zacatl';
 
 const service = new Service({
   type: ServiceType.SERVER,

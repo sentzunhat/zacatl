@@ -1,21 +1,19 @@
-import { SequelizeRepository } from "@sentzunhat/zacatl";
-import type { ModelStatic } from "@sentzunhat/zacatl/third-party/sequelize";
-import { singleton } from "@sentzunhat/zacatl/third-party/tsyringe";
+import { BaseRepository, ORMType } from '@sentzunhat/zacatl';
+import type { ModelStatic } from '@sentzunhat/zacatl/third-party/sequelize';
+import { singleton } from '@sentzunhat/zacatl/third-party/tsyringe';
 
-import type {
-  CreateGreetingInput,
-  Greeting,
-} from "../../../../domain/models/greeting.js";
-import { GreetingModel } from "../../models/greeting.model";
-import type { GreetingRepositoryPort } from "./port";
+import type { CreateGreetingInput, Greeting } from '../../../../domain/models/greeting.js';
+import { GreetingModel } from '../../models/greeting.model';
+import type { GreetingRepositoryPort } from './port';
 
 @singleton()
 export class GreetingRepositoryAdapter
-  extends SequelizeRepository<GreetingModel, CreateGreetingInput, Greeting>
+  extends BaseRepository<GreetingModel, CreateGreetingInput, Greeting>
   implements GreetingRepositoryPort
 {
   constructor() {
     super({
+      type: ORMType.Sequelize,
       model: GreetingModel,
     });
   }
@@ -24,7 +22,7 @@ export class GreetingRepositoryAdapter
     const where = filter?.language ? { language: filter.language } : {};
     const models = await (this.model as ModelStatic<GreetingModel>).findAll({
       where,
-      order: [["createdAt", "DESC"]],
+      order: [['createdAt', 'DESC']],
     });
 
     return models

@@ -1,5 +1,5 @@
-import type { CustomError } from "@zacatl/error";
-import type { ZodError } from "@zacatl/third-party/zod";
+import type { CustomError } from '@zacatl/error';
+import type { ZodError } from '@zacatl/third-party/zod';
 
 /**
  * Type guard to check if `error` is a standard `Error` instance.
@@ -21,10 +21,10 @@ export const isError = (error: unknown): error is Error => {
 export const isZodError = (error: unknown): error is ZodError => {
   return (
     error !== null &&
-    typeof error === "object" &&
-    "name" in error &&
-    typeof (error as Record<string, unknown>)["name"] === "string" &&
-    (error as Record<string, unknown>)["name"] === "ZodError"
+    typeof error === 'object' &&
+    'name' in error &&
+    typeof (error as Record<string, unknown>)['name'] === 'string' &&
+    (error as Record<string, unknown>)['name'] === 'ZodError'
   );
 };
 
@@ -36,7 +36,7 @@ export const isZodError = (error: unknown): error is ZodError => {
  * @returns `true` when `error` is a `CustomError`.
  */
 export const isCustomError = (error: unknown): error is CustomError => {
-  return isError(error) && "code" in error;
+  return isError(error) && 'code' in error;
 };
 
 /**
@@ -47,7 +47,7 @@ export const isCustomError = (error: unknown): error is CustomError => {
  * @returns `true` when `error` is an Error with a `code` property.
  */
 export const isNodeError = (error: unknown): error is NodeError => {
-  return isError(error) && "code" in error;
+  return isError(error) && 'code' in error;
 };
 
 type NodeError = Error & {

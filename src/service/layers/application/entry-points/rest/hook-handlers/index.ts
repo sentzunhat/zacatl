@@ -1,1 +1,3 @@
-export * from "./hook-handler";
+// @barrel-generated — do not edit manually
+
+export * from './hook-handler';

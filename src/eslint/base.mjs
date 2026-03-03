@@ -15,53 +15,53 @@
  * ];
  */
 
-import tsEslintParser from "@typescript-eslint/parser";
-import tseslint from "typescript-eslint";
-import js from "@eslint/js";
+import tsEslintParser from '@typescript-eslint/parser';
+import tseslint from 'typescript-eslint';
+import js from '@eslint/js';
 
 const baseConfig = {
   ...js.configs.recommended,
 
-  files: ["src/**/*.ts", "!src/**/*.d.ts"],
+  files: ['src/**/*.ts', '!src/**/*.d.ts'],
   languageOptions: {
     parser: tsEslintParser,
     parserOptions: {
-      project: ["./tsconfig.json", "./test/tsconfig.json"],
+      project: ['./tsconfig.json'],
     },
     globals: {
-      __dirname: "readonly",
-      process: "readonly",
-      console: "readonly",
+      __dirname: 'readonly',
+      process: 'readonly',
+      console: 'readonly',
     },
   },
   plugins: {
-    "@typescript-eslint": tseslint.plugin,
+    '@typescript-eslint': tseslint.plugin,
   },
   rules: {
-    // TypeScript-specific rules
-    "@typescript-eslint/no-unused-vars": [
-      "warn",
+    // TypeScript-specific rules (core strict rules are provided by `strict.mjs`)
+    '@typescript-eslint/no-empty-object-type': [
+      'error',
       {
-        argsIgnorePattern: "^_",
-        varsIgnorePattern: "^_",
+        allowInterfaces: 'always', // Empty interfaces OK for ports
+        allowObjectTypes: 'never', // Disallow literal {} types
       },
     ],
-    "@typescript-eslint/no-empty-object-type": [
-      "error",
-      {
-        allowInterfaces: "always", // Empty interfaces OK for ports
-        allowObjectTypes: "never", // Disallow literal {} types
-      },
-    ],
-    "@typescript-eslint/explicit-function-return-type": [
-      "warn",
+    '@typescript-eslint/explicit-function-return-type': [
+      'warn',
       {
         allowExpressions: true,
         allowTypedFunctionExpressions: true,
         allowHigherOrderFunctions: true,
       },
     ],
-    "no-unused-vars": "off", // Use TypeScript-specific rule instead
+    // Prefer type-only imports where possible to avoid bundlers pulling runtime deps
+    '@typescript-eslint/consistent-type-imports': [
+      'error',
+      {
+        prefer: 'type-imports',
+      },
+    ],
+    'no-unused-vars': 'off', // Use TypeScript-specific rule instead
   },
 };
 

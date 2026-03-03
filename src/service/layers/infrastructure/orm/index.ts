@@ -1,3 +1,4 @@
-export * from "./mongoose-adapter";
-export * from "./sequelize-adapter";
-export * from "./adapter-loader";
+// @barrel-generated — do not edit manually
+
+export * from './mongoose';
+export * from './sequelize';

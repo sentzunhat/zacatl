@@ -1,6 +1,6 @@
-import { container } from "@zacatl/third-party/tsyringe";
+import { container } from '@zacatl/third-party/tsyringe';
 
-import type { ConfigDomain } from "./types";
+import type { ConfigDomain } from './types';
 
 export class Domain {
   protected config: ConfigDomain;

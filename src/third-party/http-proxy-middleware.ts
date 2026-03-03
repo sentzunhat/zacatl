@@ -7,4 +7,4 @@
 export {
   createProxyMiddleware,
   type RequestHandler as ProxyRequestHandler,
-} from "http-proxy-middleware";
+} from 'http-proxy-middleware';

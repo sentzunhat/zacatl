@@ -1,3 +1,6 @@
-export * from "./ports";
-export * from "./types";
-export * from "./domain";
+// @barrel-generated — do not edit manually
+
+export * from './domain';
+
+export * from './ports';
+export * from './types';

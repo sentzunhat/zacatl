@@ -1,4 +1,4 @@
-import type { LoggerOptions } from "@zacatl/third-party/pino";
+import type { LoggerOptions } from '@zacatl/third-party/pino';
 
 export interface PinoConfigOptions {
   env?: string;
@@ -52,12 +52,12 @@ export interface PinoConfigOptions {
  * @returns {LoggerOptions} Pino logger options ready to be passed to `pino()`
  */
 export const createPinoConfig = (options?: PinoConfigOptions): LoggerOptions => {
-  const env = options?.env ?? process.env["NODE_ENV"] ?? "development";
-  const isPretty = env !== "production";
+  const env = options?.env ?? process.env['NODE_ENV'] ?? 'development';
+  const isPretty = env !== 'production';
 
   const transport = isPretty
     ? {
-        target: "pino-pretty",
+        target: 'pino-pretty',
         options: {
           colorize: true,
         },
@@ -65,19 +65,19 @@ export const createPinoConfig = (options?: PinoConfigOptions): LoggerOptions => 
     : undefined;
 
   const baseConfig: LoggerOptions = {
-    level: process.env["LOG_LEVEL"] ?? "info",
+    level: process.env['LOG_LEVEL'] ?? 'info',
     ...(transport ? { transport } : {}),
     formatters: {
       bindings: (bindings) => {
         return {
-          pid: bindings["pid"],
-          service: options?.serviceName ?? process.env["SERVICE_NAME"] ?? "zacatl",
+          pid: bindings['pid'],
+          service: options?.serviceName ?? process.env['SERVICE_NAME'] ?? 'zacatl',
           environment: env,
           app: {
-            version: options?.appVersion ?? process.env["APP_VERSION"] ?? "0.0.0",
-            environment: options?.appEnv ?? process.env["APP_ENV"] ?? env,
+            version: options?.appVersion ?? process.env['APP_VERSION'] ?? '0.0.0',
+            environment: options?.appEnv ?? process.env['APP_ENV'] ?? env,
           },
-          host: bindings["hostname"],
+          host: bindings['hostname'],
         };
       },
       level: (label) => {

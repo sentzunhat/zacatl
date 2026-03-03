@@ -1,4 +1,4 @@
-import { AbstractRouteHandler } from "./abstract";
+import { AbstractRouteHandler } from './abstract';
 
 export interface DeleteRouteHandlerConstructor {
   url: string;
@@ -14,17 +14,11 @@ export abstract class DeleteRouteHandler<
   TResponse = void,
   TParams = void,
   THeaders = void,
-> extends AbstractRouteHandler<
-  TBody,
-  TQuerystring,
-  TResponse,
-  TParams,
-  THeaders
-> {
+> extends AbstractRouteHandler<TBody, TQuerystring, TResponse, TParams, THeaders> {
   constructor(args: DeleteRouteHandlerConstructor) {
     super({
       url: args.url,
-      method: "DELETE",
+      method: 'DELETE',
       schema: args.schema,
     });
   }

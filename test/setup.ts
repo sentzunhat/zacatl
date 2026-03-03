@@ -1,6 +1,6 @@
-import "@zacatl/third-party/reflect-metadata"; // required by tsyringe (use project shim)
-import * as diagnostics from "diagnostics_channel";
-import { createRequire } from "module";
+import '@zacatl/third-party/reflect-metadata'; // required by tsyringe (use project shim)
+import * as diagnostics from 'diagnostics_channel';
+import { createRequire } from 'module';
 
 // Node 24 changed diagnostics_channel API; libraries like fastify/pino call
 // `tracingChannel` which may not exist or may be non-callable in some
@@ -14,26 +14,26 @@ const fallback = () => ({
 function ensureTracingChannelOn(obj: any) {
   if (!obj) return;
   try {
-    if (typeof obj.tracingChannel === "function") return;
+    if (typeof obj.tracingChannel === 'function') return;
 
     // If property exists but is not a function, attempt to replace it.
     // Prefer direct assignment (works in most environments).
     obj.tracingChannel = () => fallback();
-    if (typeof obj.tracingChannel === "function") return;
-  } catch (err) {
+    if (typeof obj.tracingChannel === 'function') return;
+  } catch {
     // Assignment may fail for non-writable/non-configurable properties.
   }
 
   // Try to define the property via defineProperty (if allowed).
   try {
-    Object.defineProperty(obj, "tracingChannel", {
+    Object.defineProperty(obj, 'tracingChannel', {
       value: () => fallback(),
       writable: true,
       configurable: true,
       enumerable: false,
     });
     return;
-  } catch (err) {
+  } catch {
     // If all attempts fail, we cannot make it callable — tests will try to
     // proceed but some libraries may still call it. Best effort only.
   }
@@ -45,8 +45,8 @@ ensureTracingChannelOn(diagnostics as any);
 // Also patch CommonJS view used by some libraries (pino/fastify may use require())
 try {
   const requireC = createRequire(import.meta.url);
-  const diagC = requireC("diagnostics_channel");
+  const diagC = requireC('diagnostics_channel');
   ensureTracingChannelOn(diagC);
-} catch (err) {
+} catch {
   // If require/import fails for any reason, ignore — we've already tried ESM.
 }

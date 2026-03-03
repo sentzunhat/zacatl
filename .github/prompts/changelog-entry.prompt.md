@@ -1,8 +1,8 @@
 ---
-name: "changelog-entry"
-description: "Draft and apply a Zacatl changelog entry from branch changes"
-argument-hint: "version=<x.y.z> status=<Current release|Patch release> date=<YYYY-MM-DD>"
-agent: "agent"
+name: 'changelog-entry'
+description: 'Draft and apply a Zacatl changelog entry from branch changes'
+argument-hint: 'version=<x.y.z> status=<Current release|Patch release> date=<YYYY-MM-DD>'
+agent: 'agent'
 ---
 
 Create a new release-notes entry for Zacatl using the repository conventions.

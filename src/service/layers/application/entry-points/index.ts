@@ -1,1 +1,3 @@
-export * from "./rest";
+// @barrel-generated — do not edit manually
+
+export * from './rest';

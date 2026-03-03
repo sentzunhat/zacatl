@@ -4,9 +4,9 @@
  * This module defines structured error types with correlation IDs and
  * helper constructors used by higher-level error wrappers.
  */
-import { uuidv4 } from "@zacatl/third-party/uuid";
+import { uuidv4 } from '@zacatl/third-party/uuid';
 
-import type { Optional } from "../utils/optionals";
+import type { Optional } from '../utils/optionals';
 
 export type HttpStatusCode =
   | 200 // OK
@@ -21,7 +21,7 @@ export type HttpStatusCode =
   | 502 // Bad Gateway
   | 503; // Service Unavailable;
 
-export type StatusCodeString = "invalid";
+export type StatusCodeString = 'invalid';
 
 export type ErrorCode = Optional<HttpStatusCode | StatusCodeString>;
 
@@ -83,7 +83,7 @@ export class CustomError extends Error {
     this.component = component;
     this.operation = operation;
 
-    if (typeof Error.captureStackTrace === "function") {
+    if (typeof Error.captureStackTrace === 'function') {
       Error.captureStackTrace(this, this.constructor);
     }
   }
@@ -155,13 +155,13 @@ export class CustomError extends Error {
       this.message +
       `\nCorrelationId: ` +
       this.correlationId +
-      (this.code != null ? `\nCode: ${this.code}` : "") +
-      (this.component != null ? `\nComponent: ${this.component}` : "") +
-      (this.operation != null ? `\nOperation: ${this.operation}` : "") +
-      (this.reason != null ? `\nReason: ${this.reason}` : "") +
-      (this.metadata != null ? `\nMetadata: ${JSON.stringify(this.metadata, null, 2)}` : "") +
-      (this.error != null ? `\nCaused by: ${this.error.toString()}` : "") +
-      (this.stack != null ? `\nStack: ${this.stack}` : "")
+      (this.code != null ? `\nCode: ${this.code}` : '') +
+      (this.component != null ? `\nComponent: ${this.component}` : '') +
+      (this.operation != null ? `\nOperation: ${this.operation}` : '') +
+      (this.reason != null ? `\nReason: ${this.reason}` : '') +
+      (this.metadata != null ? `\nMetadata: ${JSON.stringify(this.metadata, null, 2)}` : '') +
+      (this.error != null ? `\nCaused by: ${this.error.toString()}` : '') +
+      (this.stack != null ? `\nStack: ${this.stack}` : '')
     );
   }
 }

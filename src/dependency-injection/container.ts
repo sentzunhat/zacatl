@@ -1,9 +1,9 @@
-import "../third-party/reflect-metadata";
-import { InternalServerError } from "@zacatl/error";
-import { container as tsyringeContainer } from "@zacatl/third-party/tsyringe";
-import type { InjectionToken } from "@zacatl/third-party/tsyringe";
+import '../third-party/reflect-metadata';
+import { InternalServerError } from '@zacatl/error';
+import { container as tsyringeContainer } from '@zacatl/third-party/tsyringe';
+import type { InjectionToken } from '@zacatl/third-party/tsyringe';
 
-import type { Constructor } from "../service/layers/types";
+import type { Constructor } from '../service/layers/types';
 
 export const getContainer = (): typeof tsyringeContainer => {
   return tsyringeContainer;
@@ -102,12 +102,12 @@ export const resolveDependencies = <T extends object>(dependencies: Array<Constr
       throw new InternalServerError({
         message: `Failed to resolve '${name}' from the DI container`,
         reason:
-          "Make sure the class is decorated with @injectable() (or @singleton()) " +
-          "and is registered before resolution. " +
+          'Make sure the class is decorated with @injectable() (or @singleton()) ' +
+          'and is registered before resolution. ' +
           "If this class is a repository, ensure it is listed under 'layers.infrastructure.repositories'. " +
           "If it is a domain service, ensure it is listed under 'layers.domain.providers'.",
-        component: "DIContainer",
-        operation: "resolveDependencies",
+        component: 'DIContainer',
+        operation: 'resolveDependencies',
         metadata: { dependencyName: name },
       });
     }
@@ -119,8 +119,8 @@ export const resolveDependencies = <T extends object>(dependencies: Array<Constr
       throw new InternalServerError({
         message: `Failed to resolve '${name}' from the DI container`,
         reason: err instanceof Error ? err.message : String(err),
-        component: "DIContainer",
-        operation: "resolveDependencies",
+        component: 'DIContainer',
+        operation: 'resolveDependencies',
         metadata: { dependencyName: name },
         error: err instanceof Error ? err : undefined,
       });

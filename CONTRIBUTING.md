@@ -168,6 +168,7 @@ git commit -m "refactor(di-container): simplify auto-registration"
    ```
 
 2. **Create PR on GitHub** with:
+
    - **Title:** Same format as commit message (e.g., "feat(error): add ForbiddenError class")
    - **Description:** Use the template below
 
@@ -239,9 +240,9 @@ export class ForbiddenError extends CustomError {
 
 ```typescript
 // test/unit/error/forbidden.test.ts
-describe("ForbiddenError", () => {
-  it("should set code to 403", () => {
-    const error = new ForbiddenError({ message: "Access denied" });
+describe('ForbiddenError', () => {
+  it('should set code to 403', () => {
+    const error = new ForbiddenError({ message: 'Access denied' });
     expect(error.code).toBe(403);
   });
 });

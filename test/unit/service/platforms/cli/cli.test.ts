@@ -1,0 +1,46 @@
+import { describe, it, expect } from 'vitest';
+
+import { InternalServerError } from '@zacatl/error';
+
+import { CLI } from '../../../../../src/service/platforms/cli/cli';
+
+describe('CLI.start() — not implemented', () => {
+  it('throws an InternalServerError with a clear message', async () => {
+    const cli = new CLI({ name: 'my-tool', version: '1.0.0' });
+
+    await expect(cli.start()).rejects.toBeInstanceOf(InternalServerError);
+  });
+
+  it('error message mentions the CLI platform name', async () => {
+    const cli = new CLI({ name: 'deploy-cli', version: '2.0.0' });
+
+    const err = await cli.start().catch((e) => e);
+    expect((err as Error).message).toMatch(/deploy-cli/);
+  });
+
+  it('error message hints at v0.1.0 timeline', async () => {
+    const cli = new CLI({ name: 'tool', version: '1.0.0' });
+    const err = await cli.start().catch((e) => e);
+    expect((err as any).reason).toMatch(/v0\.1\.0/);
+  });
+
+  it('stop() resolves without throwing', async () => {
+    const cli = new CLI({ name: 'tool', version: '1.0.0' });
+    await expect(cli.stop()).resolves.toBeUndefined();
+  });
+});
+
+describe('CLI.registerEntrypoints() — not implemented', () => {
+  it('throws an InternalServerError', async () => {
+    const cli = new CLI({ name: 'my-cli', version: '0.1.0' });
+
+    await expect(cli.registerEntrypoints({} as any)).rejects.toBeInstanceOf(InternalServerError);
+  });
+
+  it('error message mentions the CLI platform name', async () => {
+    const cli = new CLI({ name: 'my-cli', version: '0.1.0' });
+
+    const err = await cli.registerEntrypoints({} as any).catch((e) => e);
+    expect((err as Error).message).toMatch(/my-cli/);
+  });
+});

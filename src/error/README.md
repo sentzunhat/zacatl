@@ -11,6 +11,6 @@ BadRequestError, BadResourceError, CustomError, ForbiddenError, InternalServerEr
 ## Quick use
 
 ```typescript
-import { NotFoundError } from "@sentzunhat/zacatl/error";
-throw new NotFoundError("User not found");
+import { NotFoundError } from '@sentzunhat/zacatl/error';
+throw new NotFoundError('User not found');
 ```

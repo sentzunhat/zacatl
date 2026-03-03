@@ -16,8 +16,8 @@
 class UserRepository extends BaseRepository<User, CreateUser, UserDTO> {
   constructor() {
     super({
-      type: "mongoose",
-      name: "User",
+      type: 'mongoose',
+      name: 'User',
       schema: userSchema,
     });
   }
@@ -27,7 +27,7 @@ class UserRepository extends BaseRepository<User, CreateUser, UserDTO> {
 @injectable()
 class GetUsersHandler extends GetRouteHandler {
   constructor(private userRepo: UserRepository) {
-    super({ url: "/users" });
+    super({ url: '/users' });
   }
 
   async handle() {

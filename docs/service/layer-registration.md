@@ -13,7 +13,7 @@ Both `providers` and `services` are valid options in the domain layer configurat
 Use `providers` for domain logic classes that **provide functionality** to other layers:
 
 ```typescript
-import { Service } from "@sentzunhat/zacatl";
+import { Service } from '@sentzunhat/zacatl';
 
 const service = new Service({
   layers: {
@@ -38,7 +38,7 @@ const service = new Service({
 Use `services` for classes that represent executable services or workers:
 
 ```typescript
-import { Service } from "@sentzunhat/zacatl";
+import { Service } from '@sentzunhat/zacatl';
 
 const service = new Service({
   type: ServiceType.CLI,
@@ -84,11 +84,7 @@ domain: {
 All dependency injection uses three simple functions from one place:
 
 ```typescript
-import {
-  registerDependencies,
-  resolveDependencies,
-  registerAndResolve,
-} from "@sentzunhat/zacatl";
+import { registerDependencies, resolveDependencies, registerAndResolve } from '@sentzunhat/zacatl';
 ```
 
 ## Usage Pattern
@@ -141,16 +137,12 @@ const hooks = registerAndResolve([AuthHook, LoggingHook]);
 ## Example: Building a Service
 
 ```typescript
-import {
-  registerDependencies,
-  resolveDependencies,
-  Constructor,
-} from "@sentzunhat/zacatl";
+import { registerDependencies, resolveDependencies, Constructor } from '@sentzunhat/zacatl';
 
 // Infrastructure
 class UserRepository {
   findById(id: string) {
-    return { id, name: "John" };
+    return { id, name: 'John' };
   }
 }
 
@@ -179,14 +171,11 @@ class ProductService {
 
 // Application
 class ApiRoute {
-  constructor(
-    private userService: UserService,
-    private productService: ProductService,
-  ) {}
+  constructor(private userService: UserService, private productService: ProductService) {}
 
   async execute() {
-    const user = this.userService.getUser("1");
-    const product = this.productService.getProduct("1");
+    const user = this.userService.getUser('1');
+    const product = this.productService.getProduct('1');
     return { user, product };
   }
 }
@@ -216,7 +205,7 @@ Current pattern:
 
 ```typescript
 // ✅ NEW: Just use the functions
-import { registerDependencies } from "@sentzunhat/zacatl";
+import { registerDependencies } from '@sentzunhat/zacatl';
 
 class MyLayer {
   constructor(config) {
@@ -238,7 +227,7 @@ class MyLayer {
 Domain and Infrastructure layers use these functions internally:
 
 ```typescript
-import { Domain, Infrastructure } from "@sentzunhat/zacatl";
+import { Domain, Infrastructure } from '@sentzunhat/zacatl';
 
 // Infrastructure auto-uses registerDependencies
 const infra = new Infrastructure({

@@ -14,4 +14,4 @@ export {
   type InferCreationAttributes,
   type Options as SequelizeOptions,
   type ModelStatic,
-} from "sequelize";
+} from 'sequelize';

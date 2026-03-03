@@ -9,13 +9,27 @@ Zacatl provides **provider-specific handler exports** following the same pattern
 ### Fastify Handlers
 
 ```typescript
-import { AbstractRouteHandler, GetRouteHandler, PostRouteHandler, DeleteRouteHandler, PatchRouteHandler, PutRouteHandler } from "@sentzunhat/zacatl/handlers/fastify";
+import {
+  AbstractRouteHandler,
+  GetRouteHandler,
+  PostRouteHandler,
+  DeleteRouteHandler,
+  PatchRouteHandler,
+  PutRouteHandler,
+} from '@sentzunhat/zacatl/handlers/fastify';
 ```
 
 ### Express Handlers
 
 ```typescript
-import { AbstractRouteHandler, GetRouteHandler, PostRouteHandler, DeleteRouteHandler, PatchRouteHandler, PutRouteHandler } from "@sentzunhat/zacatl/handlers/express";
+import {
+  AbstractRouteHandler,
+  GetRouteHandler,
+  PostRouteHandler,
+  DeleteRouteHandler,
+  PatchRouteHandler,
+  PutRouteHandler,
+} from '@sentzunhat/zacatl/handlers/express';
 ```
 
 ## HTTP Method Coverage
@@ -36,13 +50,13 @@ Specify the HTTP method explicitly in the constructor:
 
 ```typescript
 // Fastify
-import { AbstractRouteHandler } from "@sentzunhat/zacatl/handlers/fastify";
+import { AbstractRouteHandler } from '@sentzunhat/zacatl/handlers/fastify';
 
 export class MyHandler extends AbstractRouteHandler<TBody, TQuery, TResponse> {
   constructor() {
     super({
-      url: "/my-route",
-      method: "GET", // Explicit method
+      url: '/my-route',
+      method: 'GET', // Explicit method
       schema: {},
     });
   }
@@ -51,13 +65,13 @@ export class MyHandler extends AbstractRouteHandler<TBody, TQuery, TResponse> {
 
 ```typescript
 // Express
-import { AbstractRouteHandler } from "@sentzunhat/zacatl/handlers/express";
+import { AbstractRouteHandler } from '@sentzunhat/zacatl/handlers/express';
 
 export class MyHandler extends AbstractRouteHandler<TBody, TQuery, TResponse> {
   constructor() {
     super({
-      url: "/my-route",
-      method: "GET", // Explicit method
+      url: '/my-route',
+      method: 'GET', // Explicit method
       schema: {},
     });
   }
@@ -70,12 +84,12 @@ The HTTP method is automatically set based on the class:
 
 ```typescript
 // Fastify
-import { GetRouteHandler } from "@sentzunhat/zacatl/handlers/fastify";
+import { GetRouteHandler } from '@sentzunhat/zacatl/handlers/fastify';
 
 export class GetUserHandler extends GetRouteHandler<void, void, UserResponse> {
   constructor() {
     super({
-      url: "/users/:id",
+      url: '/users/:id',
       schema: {}, // Method: "GET" is automatic
     });
   }
@@ -84,12 +98,12 @@ export class GetUserHandler extends GetRouteHandler<void, void, UserResponse> {
 
 ```typescript
 // Express
-import { PostRouteHandler } from "@sentzunhat/zacatl/handlers/express";
+import { PostRouteHandler } from '@sentzunhat/zacatl/handlers/express';
 
 export class CreateUserHandler extends PostRouteHandler<CreateUserBody, void, UserResponse> {
   constructor() {
     super({
-      url: "/users",
+      url: '/users',
       schema: {}, // Method: "POST" is automatic
     });
   }
@@ -117,10 +131,10 @@ Switching frameworks is as simple as changing the import path:
 
 ```typescript
 // Before (Fastify)
-import { AbstractRouteHandler } from "@sentzunhat/zacatl/handlers/fastify";
+import { AbstractRouteHandler } from '@sentzunhat/zacatl/handlers/fastify';
 
 // After (Express) - same implementation!
-import { AbstractRouteHandler } from "@sentzunhat/zacatl/handlers/express";
+import { AbstractRouteHandler } from '@sentzunhat/zacatl/handlers/express';
 ```
 
 ## Examples

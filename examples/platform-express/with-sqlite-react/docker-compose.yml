@@ -6,7 +6,7 @@ services:
     image: zacatl-express-sqlite
     container_name: express-sqlite-backend
     ports:
-      - "8181:8181"
+      - '8181:8181'
     environment:
       - NODE_ENV=production
       - PORT=8181
@@ -17,9 +17,9 @@ services:
     healthcheck:
       test:
         [
-          "CMD",
-          "node",
-          "-e",
+          'CMD',
+          'node',
+          '-e',
           "fetch('http://localhost:8181/greetings').catch(() => process.exit(1))",
         ]
       interval: 10s

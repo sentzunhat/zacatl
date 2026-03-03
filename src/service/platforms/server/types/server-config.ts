@@ -1,10 +1,10 @@
 export enum ServerVendor {
-  FASTIFY = "FASTIFY",
-  EXPRESS = "EXPRESS",
+  FASTIFY = 'FASTIFY',
+  EXPRESS = 'EXPRESS',
 }
 
 export interface HttpServerConfig {
-  type: ApiServerType;
+  type: ServerType;
   vendor: ServerVendor;
   instance: unknown;
   gateway?: GatewayService;
@@ -21,15 +21,10 @@ export interface PageServerConfig {
   apiPrefix?: string | undefined;
 }
 
-export enum ApiServerType {
-  SERVER = "SERVER",
-  GATEWAY = "GATEWAY",
+export enum ServerType {
+  SERVER = 'SERVER',
+  GATEWAY = 'GATEWAY',
 }
-/**
- * Type alias for ApiServerType - represents the type of server (API or Gateway)
- */
-// eslint-disable-next-line @typescript-eslint/naming-convention
-export const ServerType = ApiServerType;
 
 interface ProxyGateway {
   upstream: string;
@@ -38,4 +33,6 @@ interface ProxyGateway {
 
 type ProxiesGateway = Array<ProxyGateway>;
 
-interface GatewayService { proxies: ProxiesGateway }
+interface GatewayService {
+  proxies: ProxiesGateway;
+}

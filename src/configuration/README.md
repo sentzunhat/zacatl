@@ -11,6 +11,6 @@ loadJSON, loadYML, loadYAML
 ## Quick use
 
 ```typescript
-import { loadJSON, loadYML } from "@sentzunhat/zacatl/configuration";
-const config = loadJSON("./config.json");
+import { loadJSON, loadYML } from '@sentzunhat/zacatl/configuration';
+const config = loadJSON('./config.json');
 ```

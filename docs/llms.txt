@@ -1,0 +1,105 @@
+# Zacatl
+
+> Universal TypeScript framework for building CLI tools, desktop apps, APIs, and
+> distributed systems with layered architecture, dependency injection, and
+> pluggable ORM adapters.
+
+- [README](../README.md)
+- [Changelog](changelog.md)
+- [Framework Overview](guidelines/framework-overview.md)
+- [Code Style](guidelines/code-style.md)
+
+## Architecture
+
+Zacatl enforces four layers:
+
+```
+Application  — use-cases, handlers, commands
+Domain       — ports, contracts, domain services
+Infrastructure — repository implementations (Mongoose / Sequelize / SQLite)
+Platforms    — server (Fastify / Express), CLI, Desktop
+```
+
+Full architecture docs: [guidelines/architecture.md](guidelines/architecture.md)
+
+## Install
+
+```bash
+npm install @sentzunhat/zacatl
+```
+
+All supported ORMs and platforms (`mongoose`, `sequelize`, `express`, `fastify`,
+`better-sqlite3`) are **bundled as dependencies** — no extra installs required.
+Only SQL dialect drivers (e.g. `pg`, `mysql2`) need a separate install.
+
+## Core imports
+
+```typescript
+// Framework core
+import { Service, ServiceType } from "@sentzunhat/zacatl";
+
+// Dependency injection
+import { singleton, inject, resolveDependency } from "@sentzunhat/zacatl";
+
+// Structured errors
+import { NotFoundError, InternalServerError } from "@sentzunhat/zacatl";
+
+// ORM — subpath imports only (keeps main entry lean)
+import { mongoose, Schema } from "@sentzunhat/zacatl/third-party/mongoose";
+import { Sequelize, DataTypes } from "@sentzunhat/zacatl/third-party/sequelize";
+```
+
+## Key modules
+
+- [Service / Server setup](service/README.md)
+- [Dependency Injection](dependency-injection/README.md)
+- [Repositories / ORM adapters](service/repository.md)
+- [Error types](error/README.md)
+- [Logging](logs/README.md)
+- [Configuration (YAML/JSON)](configuration/README.md)
+- [Localization](localization/README.md)
+- [Third-party re-exports](third-party/README.md)
+- [Dependencies reference](third-party/dependencies-reference.md)
+
+## Working examples
+
+Ready-to-run examples live in [`examples/`](../examples/):
+
+| Example | Stack |
+|---|---|
+| [platform-fastify/with-sqlite](../examples/platform-fastify/with-sqlite/) | Fastify + SQLite |
+| [platform-fastify/with-mongodb](../examples/platform-fastify/with-mongodb/) | Fastify + MongoDB |
+| [platform-fastify/with-postgres-react](../examples/platform-fastify/with-postgres-react/) | Fastify + PostgreSQL + React |
+| [platform-fastify/with-sqlite-react](../examples/platform-fastify/with-sqlite-react/) | Fastify + SQLite + React |
+| [platform-express/with-mongodb-react](../examples/platform-express/with-mongodb-react/) | Express + MongoDB + React |
+| [platform-express/with-postgres-react](../examples/platform-express/with-postgres-react/) | Express + PostgreSQL + React |
+
+## ORM subpath pattern
+
+ORM and platform code is lazy-loaded via subpaths — the main entry never
+evaluates ORM or framework code unless explicitly imported:
+
+```typescript
+// ✅ Only loads Mongoose at runtime
+import { mongoose } from "@sentzunhat/zacatl/third-party/mongoose";
+
+// ✅ Only loads Sequelize at runtime
+import { Sequelize } from "@sentzunhat/zacatl/third-party/sequelize";
+```
+
+## Source layout
+
+```
+src/
+  index.ts               — main barrel (core only, no ORM)
+  configuration/         — YAML/JSON config loading
+  dependency-injection/  — tsyringe DI helpers
+  error/                 — structured error types
+  localization/          — i18n adapters
+  logs/                  — pino logger adapter
+  service/
+    layers/              — application / domain / infrastructure
+    platforms/           — server (Fastify + Express), CLI, desktop
+  third-party/           — thin re-export wrappers (mongoose, sequelize, etc.)
+  utils/                 — command runner, optionals, path aliases
+```

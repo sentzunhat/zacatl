@@ -1,9 +1,8 @@
-import { resolveDependencies } from "@zacatl/dependency-injection";
-import { InternalServerError } from "@zacatl/error";
+import { resolveDependencies } from '@zacatl/dependency-injection';
+import { InternalServerError } from '@zacatl/error';
 
-import type { ConfigApplication } from "./types";
-import { getContainer } from "../../../dependency-injection/container";
-
+import type { ConfigApplication } from './types';
+import { getContainer } from '../../../dependency-injection/container';
 
 export class Application {
   protected config: ConfigApplication;
@@ -60,10 +59,10 @@ export class Application {
       routes.length !== (restRoutes != null ? restRoutes.length : 0)
     ) {
       throw new InternalServerError({
-        message: "Failed to register all REST entry point dependencies",
-        reason: "Not all REST hooks and routes could be resolved from DI container",
-        component: "ApplicationLayer",
-        operation: "register",
+        message: 'Failed to register all REST entry point dependencies',
+        reason: 'Not all REST hooks and routes could be resolved from DI container',
+        component: 'ApplicationLayer',
+        operation: 'register',
         metadata: {
           expectedHooks: restHooks != null ? restHooks.length : 0,
           resolvedHooks: hooks.length,

@@ -2,6 +2,17 @@
 
 When helping in this repository, prefer minimal and practical changes aligned with existing docs and scripts.
 
+## Required Context Intake (Before Doing the Task)
+
+- Before implementing changes, review repository context in this order:
+  1. `README.md`
+  2. `docs/README.md`
+  3. `docs/guidelines/framework-overview.md`
+  4. Relevant standards in `docs/guidelines/` (at minimum: `code-style.md`, `documentation.md`, and `testing.md` when applicable)
+- Treat the `docs/` folder as source of truth for coding standards, architecture conventions, and documentation standards.
+- Use only the docs relevant to the user request, but always verify assumptions against `README.md` and `docs/guidelines/` before editing.
+- If guidance conflicts, prefer the most specific document for the files being changed, then align with repository defaults in this file.
+
 ## Repository Defaults
 
 - Use Node.js `24+` and npm scripts from `package.json`.

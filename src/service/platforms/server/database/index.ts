@@ -1,1 +1,2 @@
-export * from "./database-server";
+// @barrel-manual
+export * from './database-server';

@@ -7,21 +7,21 @@
  * - Self-documenting API contracts
  */
 
-import { z } from "zod";
+import { z } from 'zod';
 
 // ===== Request Schemas =====
 
 export const CreateGreetingBodySchema = z.object({
-  message: z.string().min(1, "Message is required"),
-  language: z.string().min(2, "Language code must be at least 2 characters"),
+  message: z.string().min(1, 'Message is required'),
+  language: z.string().min(2, 'Language code must be at least 2 characters'),
 });
 
 export const GreetingParamsSchema = z.object({
-  language: z.string().min(2, "Language code is required"),
+  language: z.string().min(2, 'Language code is required'),
 });
 
 export const GreetingIdParamsSchema = z.object({
-  id: z.string().min(1, "Greeting ID is required"),
+  id: z.string().min(1, 'Greeting ID is required'),
 });
 
 // ===== Response Schemas =====

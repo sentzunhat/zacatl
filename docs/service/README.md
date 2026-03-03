@@ -9,7 +9,7 @@ The server platform provides infrastructure for building web applications with R
 ## Import
 
 ```typescript
-import { ConfigServer, ServerVendor, ServerType, DatabaseVendor } from "@sentzunhat/zacatl";
+import { ConfigServer, ServerVendor, ServerType, DatabaseVendor } from '@sentzunhat/zacatl';
 ```
 
 ---
@@ -100,12 +100,12 @@ type PageServerConfig = {
 
 ### `DatabaseConfig`
 
-Database connection configuration supporting Mongoose (MongoDB) and Sequelize (SQL).
+Database connection configuration supporting Mongoose (MongoDB), Sequelize (SQL), and the Node 24 built-in SQLite.
 
 ```typescript
 type DatabaseConfig = {
-  vendor: DatabaseVendor; // "MONGOOSE" | "SEQUELIZE"
-  instance: DatabaseInstance; // Mongoose | Sequelize
+  vendor: DatabaseVendor; // "MONGOOSE" | "SEQUELIZE" | "SQLITE"
+  instance?: DatabaseInstance; // Mongoose | Sequelize — not required for SQLITE
   connectionString: string;
   onDatabaseConnected?: (dbInstance: DatabaseInstance) => Promise<void> | void;
 };
@@ -113,9 +113,9 @@ type DatabaseConfig = {
 
 **Properties:**
 
-- `vendor` - Database vendor: `MONGOOSE` or `SEQUELIZE`
-- `instance` - The Mongoose or Sequelize instance
-- `connectionString` - Database connection string (e.g., `sqlite:database.sqlite`, `mongodb://localhost:27017/mydb`)
+- `vendor` - Database vendor: `MONGOOSE`, `SEQUELIZE`, or `SQLITE`
+- `instance` - The Mongoose or Sequelize instance. **Not required for `SQLITE`** — the adapter opens the file internally.
+- `connectionString` - For SQLite: a file path (e.g. `'app.db'`) or `':memory:'`. For others: the full connection URI.
 - `onDatabaseConnected` - Optional callback invoked after successful connection (use for model initialization, syncing, etc.)
 
 ---
@@ -128,8 +128,8 @@ HTTP server framework vendor.
 
 ```typescript
 enum ServerVendor {
-  FASTIFY = "FASTIFY",
-  EXPRESS = "EXPRESS",
+  FASTIFY = 'FASTIFY',
+  EXPRESS = 'EXPRESS',
 }
 ```
 
@@ -141,8 +141,8 @@ Type of API server.
 
 ```typescript
 enum ServerType {
-  SERVER = "SERVER", // Standard REST API server
-  GATEWAY = "GATEWAY", // API Gateway with reverse proxy
+  SERVER = 'SERVER', // Standard REST API server
+  GATEWAY = 'GATEWAY', // API Gateway with reverse proxy
 }
 ```
 
@@ -154,10 +154,26 @@ Database vendor/ORM.
 
 ```typescript
 enum DatabaseVendor {
-  MONGOOSE = "MONGOOSE", // MongoDB via Mongoose
-  SEQUELIZE = "SEQUELIZE", // SQL databases via Sequelize
+  MONGOOSE = 'MONGOOSE', // MongoDB via Mongoose
+  SEQUELIZE = 'SEQUELIZE', // SQL databases via Sequelize
+  SQLITE = 'SQLITE', // SQLite via Node 24 built-in node:sqlite (no external package)
 }
 ```
+
+**SQLite example** (no `instance` needed):
+
+```typescript
+import { DatabaseVendor } from '@sentzunhat/zacatl';
+
+databases: [
+  {
+    vendor: DatabaseVendor.SQLITE,
+    connectionString: 'app.db', // or ':memory:'
+  },
+];
+```
+
+Access the underlying `DatabaseSync` instance via `DatabaseServer.getAdapter(DatabaseVendor.SQLITE)` for raw prepared statements.
 
 ---
 
@@ -259,7 +275,7 @@ interface DatabaseServerPort {
 REST API adapter for Fastify.
 
 ```typescript
-import { FastifyApiAdapter } from "@sentzunhat/zacatl/service/platforms/server/adapters";
+import { FastifyApiAdapter } from '@sentzunhat/zacatl/service/platforms/server/adapters';
 ```
 
 #### `FastifyPageAdapter`
@@ -267,7 +283,7 @@ import { FastifyApiAdapter } from "@sentzunhat/zacatl/service/platforms/server/a
 Page server adapter for Fastify.
 
 ```typescript
-import { FastifyPageAdapter } from "@sentzunhat/zacatl/service/platforms/server/adapters";
+import { FastifyPageAdapter } from '@sentzunhat/zacatl/service/platforms/server/adapters';
 ```
 
 ---
@@ -279,7 +295,7 @@ import { FastifyPageAdapter } from "@sentzunhat/zacatl/service/platforms/server/
 REST API adapter for Express.
 
 ```typescript
-import { ExpressApiAdapter } from "@sentzunhat/zacatl/service/platforms/server/adapters";
+import { ExpressApiAdapter } from '@sentzunhat/zacatl/service/platforms/server/adapters';
 ```
 
 #### `ExpressPageAdapter`
@@ -287,7 +303,7 @@ import { ExpressApiAdapter } from "@sentzunhat/zacatl/service/platforms/server/a
 Page server adapter for Express.
 
 ```typescript
-import { ExpressPageAdapter } from "@sentzunhat/zacatl/service/platforms/server/adapters";
+import { ExpressPageAdapter } from '@sentzunhat/zacatl/service/platforms/server/adapters';
 ```
 
 ---
@@ -299,34 +315,30 @@ import { ExpressPageAdapter } from "@sentzunhat/zacatl/service/platforms/server/
 Simple REST API server with Fastify.
 
 ```typescript
-import Fastify from "fastify";
-import { Service, ServerVendor, ApiServerType } from "@sentzunhat/zacatl";
-
-const fastify = Fastify();
-ServerType } from "@sentzunhat/zacatl";
+import Fastify from 'fastify';
+import { Service, ServiceType, ServerVendor, ServerType } from '@sentzunhat/zacatl';
 
 const fastify = Fastify();
 
 const service = new Service({
-  type: "SERVER",
-  platforms: {
-    server: {
-      name: "my-api",
-      port: 3000,
-      server: {
-        type:
-      databases: [],
-    },
-  },
+  type: ServiceType.SERVER,
   layers: {
     application: {
-      entryPoints: {
-        rest: {
-          routes: [
-            /* your route handlers */
-          ],
-        },
+      entryPoints: { rest: { hooks: [], routes: [] } },
+    },
+    domain: { services: [] },
+    infrastructure: { repositories: [] },
+  },
+  platforms: {
+    server: {
+      name: 'my-api',
+      port: 3000,
+      server: {
+        type: ServerType.SERVER,
+        vendor: ServerVendor.FASTIFY,
+        instance: fastify,
       },
+      databases: [],
     },
   },
 });
@@ -342,21 +354,21 @@ await service.start();
 Fastify server with Sequelize + SQLite.
 
 ```typescript
-import Fastify from "fastify";
-import { Sequelize } from "sequelize";
-import { Service, ServerVendor, ApiServerType, DatabaseVendor } from "@sentzunhat/zacatl";
+import Fastify from 'fastify';
+import { Sequelize } from 'sequelize';
+import { Service, ServerVendor, ServerType, DatabaseVendor } from '@sentzunhat/zacatl';
 
 const fastify = Fastify();
-const sequelize = new Sequelize("sqlite:database.sqlite");
+const sequelize = new Sequelize('sqlite:database.sqlite');
 
 const service = new Service({
-  type: "SERVER",
+  type: 'SERVER',
   platforms: {
     server: {
-      name: "fastify-sqlite",
+      name: 'fastify-sqlite',
       port: 3001,
       server: {
-        type: ApiServerType.SERVER,
+        type: ServerType.SERVER,
         vendor: ServerVendor.FASTIFY,
         instance: fastify,
       },
@@ -364,10 +376,10 @@ const service = new Service({
         {
           vendor: DatabaseVendor.SEQUELIZE,
           instance: sequelize,
-          connectionString: "sqlite:database.sqlite",
+          connectionString: 'sqlite:database.sqlite',
           onDatabaseConnected: async (db) => {
             await (db as Sequelize).sync({ alter: true });
-            console.log("Database synchronized");
+            console.log('Database synchronized');
           },
         },
       ],
@@ -406,19 +418,19 @@ await service.start();
 Simple Express REST API server.
 
 ```typescript
-import express from "express";
-import { Service, ServerVendor, ApiServerType } from "@sentzunhat/zacatl";
+import express from 'express';
+import { Service, ServerVendor, ServerType } from '@sentzunhat/zacatl';
 
 const app = express();
 
 const service = new Service({
-  type: "SERVER",
+  type: 'SERVER',
   platforms: {
     server: {
-      name: "express-api",
+      name: 'express-api',
       port: 8083,
       server: {
-        type: ApiServerType.SERVER,
+        type: ServerType.SERVER,
         vendor: ServerVendor.EXPRESS,
         instance: app,
       },
@@ -449,33 +461,33 @@ await service.start();
 Fastify server with React SPA + API + Database.
 
 ```typescript
-import Fastify from "fastify";
-import { Sequelize } from "sequelize";
-import { Service, ServerVendor, ApiServerType, DatabaseVendor } from "@sentzunhat/zacatl";
+import Fastify from 'fastify';
+import { Sequelize } from 'sequelize';
+import { Service, ServerVendor, ServerType, DatabaseVendor } from '@sentzunhat/zacatl';
 
 const fastify = Fastify();
-const sequelize = new Sequelize("sqlite:database.sqlite");
+const sequelize = new Sequelize('sqlite:database.sqlite');
 
 const service = new Service({
-  type: "SERVER",
+  type: 'SERVER',
   platforms: {
     server: {
-      name: "full-stack-app",
+      name: 'full-stack-app',
       port: 8081,
       server: {
-        type: ApiServerType.SERVER,
+        type: ServerType.SERVER,
         vendor: ServerVendor.FASTIFY,
         instance: fastify,
       },
       page: {
-        staticDir: "./dist/client", // Built React/Vue/Svelte app
-        apiPrefix: "/api", // API routes excluded from SPA fallback
+        staticDir: './dist/client', // Built React/Vue/Svelte app
+        apiPrefix: '/api', // API routes excluded from SPA fallback
       },
       databases: [
         {
           vendor: DatabaseVendor.SEQUELIZE,
           instance: sequelize,
-          connectionString: "sqlite:database.sqlite",
+          connectionString: 'sqlite:database.sqlite',
           onDatabaseConnected: async (db) => {
             await (db as Sequelize).sync();
           },
@@ -518,34 +530,34 @@ await service.start();
 Fastify gateway server that proxies requests to multiple backend services.
 
 ```typescript
-import Fastify from "fastify";
-import { Service, ServerVendor, ApiServerType } from "@sentzunhat/zacatl";
+import Fastify from 'fastify';
+import { Service, ServerVendor, ServerType } from '@sentzunhat/zacatl';
 
 const fastify = Fastify();
 
 const service = new Service({
-  type: "SERVER",
+  type: 'SERVER',
   platforms: {
     server: {
-      name: "api-gateway",
+      name: 'api-gateway',
       port: 9000,
       server: {
-        type: ApiServerType.GATEWAY,
+        type: ServerType.GATEWAY,
         vendor: ServerVendor.FASTIFY,
         instance: fastify,
         gateway: {
           proxies: [
             {
-              upstream: "http://localhost:3001",
-              prefix: "/users",
+              upstream: 'http://localhost:3001',
+              prefix: '/users',
             },
             {
-              upstream: "http://localhost:3002",
-              prefix: "/products",
+              upstream: 'http://localhost:3002',
+              prefix: '/products',
             },
             {
-              upstream: "http://localhost:3003",
-              prefix: "/orders",
+              upstream: 'http://localhost:3003',
+              prefix: '/orders',
             },
           ],
         },
@@ -569,22 +581,22 @@ await service.start();
 Server with both MongoDB (Mongoose) and PostgreSQL (Sequelize).
 
 ```typescript
-import Fastify from "fastify";
-import mongoose from "mongoose";
-import { Sequelize } from "sequelize";
-import { Service, ServerVendor, ApiServerType, DatabaseVendor } from "@sentzunhat/zacatl";
+import Fastify from 'fastify';
+import mongoose from 'mongoose';
+import { Sequelize } from 'sequelize';
+import { Service, ServerVendor, ServerType, DatabaseVendor } from '@sentzunhat/zacatl';
 
 const fastify = Fastify();
-const sequelize = new Sequelize("postgres://localhost:5432/mydb");
+const sequelize = new Sequelize('postgres://localhost:5432/mydb');
 
 const service = new Service({
-  type: "SERVER",
+  type: 'SERVER',
   platforms: {
     server: {
-      name: "multi-db-api",
+      name: 'multi-db-api',
       port: 4000,
       server: {
-        type: ApiServerType.SERVER,
+        type: ServerType.SERVER,
         vendor: ServerVendor.FASTIFY,
         instance: fastify,
       },
@@ -592,18 +604,18 @@ const service = new Service({
         {
           vendor: DatabaseVendor.MONGOOSE,
           instance: mongoose,
-          connectionString: "mongodb://localhost:27017/mydb",
+          connectionString: 'mongodb://localhost:27017/mydb',
           onDatabaseConnected: async () => {
-            console.log("MongoDB connected");
+            console.log('MongoDB connected');
           },
         },
         {
           vendor: DatabaseVendor.SEQUELIZE,
           instance: sequelize,
-          connectionString: "postgres://localhost:5432/mydb",
+          connectionString: 'postgres://localhost:5432/mydb',
           onDatabaseConnected: async (db) => {
             await (db as Sequelize).sync();
-            console.log("PostgreSQL connected");
+            console.log('PostgreSQL connected');
           },
         },
       ],
@@ -648,8 +660,8 @@ const service = new Service({
   platforms: {
     server: {
       page: {
-        devServerUrl: "http://localhost:5173", // Vite dev server
-        apiPrefix: "/api",
+        devServerUrl: 'http://localhost:5173', // Vite dev server
+        apiPrefix: '/api',
       },
       // ...
     },

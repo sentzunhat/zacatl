@@ -12,6 +12,8 @@ layered architecture, dependency injection, and adapter-driven integrations.
 - i18n support with pluggable adapters
 - ORM adapters for Sequelize and Mongoose
 - Server adapters for Express and Fastify
+- Built-in SQLite adapter via Node 24 `node:sqlite` (no external package)
+- Request context propagation via `AsyncLocalStorage` (opt-in Pino mixin included)
 
 ## When to Use It
 

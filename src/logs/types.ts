@@ -42,9 +42,9 @@ export interface LoggerPort {
  * @remarks
  * This is a type-only export and does not introduce runtime dependencies.
  */
-export type { LoggerOptions as PinoLoggerConfig } from "@zacatl/third-party/pino";
+export type { LoggerOptions as PinoLoggerConfig } from '@zacatl/third-party/pino';
 
 /**
  * Adapter type identifier for built-in adapters
  */
-export type LoggerAdapterType = "pino" | "console";
+export type LoggerAdapterType = 'pino' | 'console';

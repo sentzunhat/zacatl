@@ -7,7 +7,7 @@
  * The application layer only knows about this interface, not the specific implementation.
  */
 
-import type { Greeting, CreateGreetingInput } from "../../models/greeting";
+import type { Greeting, CreateGreetingInput } from '../../models/greeting';
 
 export interface GreetingServicePort {
   /**

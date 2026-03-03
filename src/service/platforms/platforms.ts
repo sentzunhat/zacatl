@@ -1,8 +1,8 @@
-import { CLI } from "./cli";
-import { Desktop } from "./desktop";
-import { Server } from "./server/server";
-import type { ConfigPlatforms } from "./types";
-import type { ApplicationEntryPoints } from "../layers/application/types";
+import { CLI } from './cli';
+import { Desktop } from './desktop';
+import { Server } from './server/server';
+import type { ConfigPlatforms } from './types';
+import type { ApplicationEntryPoints } from '../layers/application/types';
 
 /**
  * Platforms - Wraps server, cli, or desktop instances

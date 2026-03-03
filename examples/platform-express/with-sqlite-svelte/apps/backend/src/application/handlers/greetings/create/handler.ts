@@ -8,16 +8,16 @@
  * - Response serialization
  */
 
-import { inject, singleton } from "@sentzunhat/zacatl/third-party/tsyringe";
-import { AbstractRouteHandler, type Request } from "@sentzunhat/zacatl/service";
-import type { FastifyReply } from "@sentzunhat/zacatl/third-party/fastify";
-import { GreetingServiceAdapter } from "../../../../domain/greetings/service";
+import { inject, singleton } from '@sentzunhat/zacatl/third-party/tsyringe';
+import { AbstractRouteHandler, type Request } from '@sentzunhat/zacatl/service';
+import type { FastifyReply } from '@sentzunhat/zacatl/third-party/fastify';
+import { GreetingServiceAdapter } from '../../../../domain/greetings/service';
 import {
   CreateGreetingBodySchema,
   type CreateGreetingBody,
   type GreetingResponse,
-} from "../greeting.schema";
-import { toGreetingResponse } from "../greeting.serializer";
+} from '../greeting.schema';
+import { toGreetingResponse } from '../greeting.serializer';
 
 @singleton()
 export class CreateGreetingHandler extends AbstractRouteHandler<
@@ -30,18 +30,15 @@ export class CreateGreetingHandler extends AbstractRouteHandler<
     private readonly greetingService: GreetingServiceAdapter,
   ) {
     super({
-      url: "/greetings",
-      method: "POST",
+      url: '/greetings',
+      method: 'POST',
       schema: {
         body: CreateGreetingBodySchema,
       },
     });
   }
 
-  async handler(
-    request: Request<CreateGreetingBody>,
-  ): Promise<GreetingResponse> {
-
+  async handler(request: Request<CreateGreetingBody>): Promise<GreetingResponse> {
     const { message, language } = request.body;
 
     const greeting = await this.greetingService.createGreeting({

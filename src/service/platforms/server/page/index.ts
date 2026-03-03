@@ -1,1 +1,2 @@
-export * from "./page-server";
+// @barrel-manual
+export * from './page-server';

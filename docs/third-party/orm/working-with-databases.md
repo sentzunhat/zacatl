@@ -7,16 +7,17 @@ Connect to PostgreSQL, MongoDB, or any database.
 ### Setup
 
 ```bash
-npm install sequelize pg
+# sequelize is bundled — only install the dialect driver:
+npm install pg pg-hstore  # PostgreSQL
 ```
 
 ### Configuration
 
 ```typescript
-import { Sequelize } from "sequelize";
-import { Service, ServiceType, DatabaseVendor } from "@sentzunhat/zacatl";
+import { Sequelize } from 'sequelize';
+import { Service, ServiceType, DatabaseVendor } from '@sentzunhat/zacatl';
 
-const sequelize = new Sequelize("postgresql://user:pass@localhost:5432/mydb");
+const sequelize = new Sequelize('postgresql://user:pass@localhost:5432/mydb');
 
 const service = new Service({
   type: ServiceType.SERVER,
@@ -33,8 +34,8 @@ await service.start();
 ### Repository Example
 
 ```typescript
-import { IRepository } from "@sentzunhat/zacatl";
-import { DataTypes, Sequelize, Model } from "sequelize";
+import { IRepository } from '@sentzunhat/zacatl';
+import { DataTypes, Sequelize, Model } from 'sequelize';
 
 interface Product {
   id: string;
@@ -58,7 +59,7 @@ export class ProductRepository implements IRepository<Product> {
         name: { type: DataTypes.STRING, allowNull: false },
         price: { type: DataTypes.FLOAT, allowNull: false },
       },
-      { sequelize, modelName: "Product" },
+      { sequelize, modelName: 'Product' },
     );
     this.model = ProductModel;
   }
@@ -95,14 +96,14 @@ export class ProductRepository implements IRepository<Product> {
 ### Setup
 
 ```bash
-npm install mongoose
+# mongoose is bundled — no install needed.
 ```
 
 ### Configuration
 
 ```typescript
-import mongoose from "mongoose";
-import { Service, ServiceType, DatabaseVendor } from "@sentzunhat/zacatl";
+import mongoose from 'mongoose';
+import { Service, ServiceType, DatabaseVendor } from '@sentzunhat/zacatl';
 
 const service = new Service({
   type: ServiceType.SERVER,
@@ -112,7 +113,7 @@ const service = new Service({
         {
           vendor: DatabaseVendor.MONGOOSE,
           instance: mongoose,
-          connectionString: "mongodb://localhost:27017/mydb",
+          connectionString: 'mongodb://localhost:27017/mydb',
         },
       ],
     },
@@ -125,8 +126,8 @@ await service.start();
 ### Repository Example
 
 ```typescript
-import { IRepository } from "@sentzunhat/zacatl";
-import mongoose, { Schema, Document } from "mongoose";
+import { IRepository } from '@sentzunhat/zacatl';
+import mongoose, { Schema, Document } from 'mongoose';
 
 interface Article {
   id: string;
@@ -139,10 +140,7 @@ const ArticleSchema = new Schema({
   content: { type: String, required: true },
 });
 
-const ArticleModel = mongoose.model<Article & Document>(
-  "Article",
-  ArticleSchema,
-);
+const ArticleModel = mongoose.model<Article & Document>('Article', ArticleSchema);
 
 export class ArticleRepository implements IRepository<Article> {
   findById = async (id: string) => {
@@ -154,7 +152,7 @@ export class ArticleRepository implements IRepository<Article> {
     return ArticleModel.find(filter).lean() as Promise<Article[]>;
   };
 
-  create = async (data: Omit<Article, "id">) => {
+  create = async (data: Omit<Article, 'id'>) => {
     const doc = await ArticleModel.create(data);
     return doc.toObject() as Article;
   };
@@ -179,38 +177,31 @@ export class ArticleRepository implements IRepository<Article> {
 Implement `IRepository<T>` for any database:
 
 ```typescript
-import { IRepository } from "@sentzunhat/zacatl";
-import Database from "better-sqlite3";
+import { IRepository } from '@sentzunhat/zacatl';
+import Database from 'better-sqlite3';
 
 export class SQLiteRepository<T> implements IRepository<T> {
-  constructor(
-    private db: Database.Database,
-    private tableName: string,
-  ) {}
+  constructor(private db: Database.Database, private tableName: string) {}
 
   findById = async (id: string): Promise<T | null> => {
-    const stmt = this.db.prepare(
-      `SELECT * FROM ${this.tableName} WHERE id = ?`,
-    );
+    const stmt = this.db.prepare(`SELECT * FROM ${this.tableName} WHERE id = ?`);
     return stmt.get(id) as T | null;
   };
 
   findMany = async (filter: Record<string, unknown>): Promise<T[]> => {
     const keys = Object.keys(filter);
     const values = Object.values(filter);
-    const where = keys.map((k) => `${k} = ?`).join(" AND ");
-    const stmt = this.db.prepare(
-      `SELECT * FROM ${this.tableName} WHERE ${where}`,
-    );
+    const where = keys.map((k) => `${k} = ?`).join(' AND ');
+    const stmt = this.db.prepare(`SELECT * FROM ${this.tableName} WHERE ${where}`);
     return stmt.all(...values) as T[];
   };
 
   create = async (data: T): Promise<T> => {
     const keys = Object.keys(data as any);
     const values = Object.values(data as any);
-    const placeholders = keys.map(() => "?").join(",");
+    const placeholders = keys.map(() => '?').join(',');
     const stmt = this.db.prepare(
-      `INSERT INTO ${this.tableName} (${keys.join(",")}) VALUES (${placeholders})`,
+      `INSERT INTO ${this.tableName} (${keys.join(',')}) VALUES (${placeholders})`,
     );
     stmt.run(...values);
     return data;
@@ -219,10 +210,8 @@ export class SQLiteRepository<T> implements IRepository<T> {
   update = async (id: string, data: Partial<T>): Promise<void> => {
     const keys = Object.keys(data as any);
     const values = Object.values(data as any);
-    const set = keys.map((k) => `${k} = ?`).join(",");
-    const stmt = this.db.prepare(
-      `UPDATE ${this.tableName} SET ${set} WHERE id = ?`,
-    );
+    const set = keys.map((k) => `${k} = ?`).join(',');
+    const stmt = this.db.prepare(`UPDATE ${this.tableName} SET ${set} WHERE id = ?`);
     stmt.run(...values, id);
   };
 
@@ -232,9 +221,7 @@ export class SQLiteRepository<T> implements IRepository<T> {
   };
 
   exists = async (id: string): Promise<boolean> => {
-    const stmt = this.db.prepare(
-      `SELECT COUNT(*) as count FROM ${this.tableName} WHERE id = ?`,
-    );
+    const stmt = this.db.prepare(`SELECT COUNT(*) as count FROM ${this.tableName} WHERE id = ?`);
     const result = stmt.get(id) as { count: number };
     return result.count > 0;
   };

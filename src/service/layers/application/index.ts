@@ -1,3 +1,6 @@
-export * from "./entry-points";
-export * from "./application";
-export * from "./types";
+// @barrel-generated — do not edit manually
+
+export * from './application';
+
+export * from './entry-points';
+export * from './types';

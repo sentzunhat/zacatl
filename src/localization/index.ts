@@ -1,3 +1,4 @@
+// @barrel-manual
 /**
  * Localization module - i18n-node HTTP request localization
  * @module localization
@@ -8,11 +9,11 @@ export {
   loadCatalog,
   resolveBuiltInLocalesDir,
   mergeCatalogs,
-} from "./i18n-node";
+} from './i18n-node';
 
 export type {
   I18nCatalogType,
   ConfigureI18nInput,
   LoadCatalogInput,
   MergeCatalogsInput,
-} from "./i18n-node";
+} from './i18n-node';

@@ -1,10 +1,10 @@
-import { Schema } from "mongoose";
-import { singleton } from "tsyringe";
+import { Schema } from 'mongoose';
+import { singleton } from 'tsyringe';
 
-import { BaseRepository } from "../../../../../../src/service/layers/infrastructure/repositories/abstract";
-import { ORMType } from "../../../../../../src/service/layers/infrastructure/repositories/types";
-import type { MongooseModel } from "../../../../../../src/third-party/mongoose";
-import { connectToMongoServerAndRegisterDependency } from "../../../../helpers/database/mongo";
+import { BaseRepository } from '../../../../../../src/service/layers/infrastructure/repositories/abstract';
+import { ORMType } from '../../../../../../src/service/layers/infrastructure/repositories/types';
+import type { MongooseModel } from '../../../../../../src/third-party/mongoose';
+import { connectToMongoServerAndRegisterDependency } from '../../../../helpers/database/mongo';
 
 interface UserTest {
   name: string;
@@ -21,17 +21,13 @@ const schemaUserTest = new Schema<UserTest>({
 });
 
 @singleton()
-class UserRepository extends BaseRepository<
-  UserTest,
-  UserTest,
-  UserTestOutput
-> {
+class UserRepository extends BaseRepository<UserTest, UserTest, UserTestOutput> {
   constructor() {
-    super({ type: ORMType.Mongoose, name: "User", schema: schemaUserTest });
+    super({ type: ORMType.Mongoose, name: 'User', schema: schemaUserTest });
   }
 }
 
-describe("BaseRepository", () => {
+describe('BaseRepository', () => {
   let repository: UserRepository;
 
   beforeAll(async () => {
@@ -41,33 +37,31 @@ describe("BaseRepository", () => {
       repository = new UserRepository();
     } catch (error: any) {
       // If mongoose adapter can't be loaded (running from TS source), skip these tests
-      if (error.message?.includes("Mongoose is not installed")) {
-        console.log(
-          "Skipping BaseRepository tests - running from TypeScript source",
-        );
+      if (error.message?.includes('Mongoose is not installed')) {
+        console.log('Skipping BaseRepository tests - running from TypeScript source');
         return;
       }
       throw error;
     }
   });
 
-  it("should create a model using the provided name and schema", async () => {
+  it('should create a model using the provided name and schema', async () => {
     if (!repository) return; // Skip if repository couldn't be initialized
     // Initialize adapter by calling an async method first
-    await repository.create({ name: "test" });
+    await repository.create({ name: 'test' });
     const model = repository.model as MongooseModel<UserTest>;
-    expect(model.modelName).toBe("User");
+    expect(model.modelName).toBe('User');
     expect(model.schema).toBe(schemaUserTest);
   });
 
-  it("should call create() and return the created user document", async () => {
+  it('should call create() and return the created user document', async () => {
     if (!repository) return; // Skip if repository couldn't be initialized
-    const user = { name: "Alice" };
+    const user = { name: 'Alice' };
 
     // Initialize adapter first, then spy
-    await repository.create({ name: "init" });
+    await repository.create({ name: 'init' });
     const model = repository.model as MongooseModel<UserTest>;
-    const spyFunction = vi.spyOn(model, "create");
+    const spyFunction = vi.spyOn(model, 'create');
 
     const result = await repository.create(user);
 
@@ -75,25 +69,25 @@ describe("BaseRepository", () => {
     expect(result).toEqual(expect.objectContaining(user));
   });
 
-  it("should call findById() and return the user document", async () => {
+  it('should call findById() and return the user document', async () => {
     if (!repository) return; // Skip if repository couldn't be initialized
-    const user = await repository.create({ name: "Alice" });
+    const user = await repository.create({ name: 'Alice' });
     const model = repository.model as MongooseModel<UserTest>;
-    const spyFunction = vi.spyOn(model, "findById");
+    const spyFunction = vi.spyOn(model, 'findById');
     const result = await repository.findById(user.id);
     expect(spyFunction).toHaveBeenNthCalledWith(1, user.id);
     expect(result).toMatchObject({ name: user.name });
     expect(result?.id).toBe(user.id);
   });
 
-  it("should call update() and return the updated user document", async () => {
+  it('should call update() and return the updated user document', async () => {
     if (!repository) return; // Skip if repository couldn't be initialized
-    const user = await repository.create({ name: "Alice" });
+    const user = await repository.create({ name: 'Alice' });
 
-    const update = { name: "Alice Updated" };
+    const update = { name: 'Alice Updated' };
 
     const model = repository.model as MongooseModel<UserTest>;
-    const spyFunction = vi.spyOn(model, "findByIdAndUpdate");
+    const spyFunction = vi.spyOn(model, 'findByIdAndUpdate');
 
     const result = await repository.update(user.id, update);
 
@@ -103,11 +97,11 @@ describe("BaseRepository", () => {
     expect(result).toEqual(expect.objectContaining(update));
   });
 
-  it("should call delete() and return the deleted user document", async () => {
+  it('should call delete() and return the deleted user document', async () => {
     if (!repository) return; // Skip if repository couldn't be initialized
-    const user = await repository.create({ name: "Alice" });
+    const user = await repository.create({ name: 'Alice' });
     const model = repository.model as MongooseModel<UserTest>;
-    const spyFunction = vi.spyOn(model, "findByIdAndDelete");
+    const spyFunction = vi.spyOn(model, 'findByIdAndDelete');
     const result = await repository.delete(user.id);
     expect(spyFunction).toHaveBeenNthCalledWith(1, user.id);
     // Patch: allow for id only (ignore _id)

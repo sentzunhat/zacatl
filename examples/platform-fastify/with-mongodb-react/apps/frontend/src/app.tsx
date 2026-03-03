@@ -1,29 +1,26 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from 'react';
 import {
   createGreeting,
   deleteGreeting,
   getGreetings,
   getRandomGreeting,
   type Greeting,
-} from "./api";
+} from './api';
 
-const DEFAULT_LANGUAGE = "en";
+const DEFAULT_LANGUAGE = 'en';
 
 export default function App() {
   const [greetings, setGreetings] = useState<Greeting[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [filterLanguage, setFilterLanguage] = useState("");
-  const [newMessage, setNewMessage] = useState("");
+  const [filterLanguage, setFilterLanguage] = useState('');
+  const [newMessage, setNewMessage] = useState('');
   const [newLanguage, setNewLanguage] = useState(DEFAULT_LANGUAGE);
   const [randomLanguage, setRandomLanguage] = useState(DEFAULT_LANGUAGE);
   const [randomGreeting, setRandomGreeting] = useState<Greeting | null>(null);
 
   const subtitle = useMemo(
-    () =>
-      filterLanguage
-        ? `Showing greetings in "${filterLanguage}"`
-        : "Showing all greetings",
+    () => (filterLanguage ? `Showing greetings in "${filterLanguage}"` : 'Showing all greetings'),
     [filterLanguage],
   );
 
@@ -34,7 +31,7 @@ export default function App() {
       const data = await getGreetings(language);
       setGreetings(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to load greetings");
+      setError(err instanceof Error ? err.message : 'Failed to load greetings');
     } finally {
       setLoading(false);
     }
@@ -52,7 +49,7 @@ export default function App() {
       const language = newLanguage.trim();
 
       if (!message || !language) {
-        setError("Message and language are required.");
+        setError('Message and language are required.');
         return;
       }
 
@@ -61,11 +58,9 @@ export default function App() {
         language,
       });
       setGreetings((prev) => [created, ...prev]);
-      setNewMessage("");
+      setNewMessage('');
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Failed to create greeting",
-      );
+      setError(err instanceof Error ? err.message : 'Failed to create greeting');
     }
   }
 
@@ -77,9 +72,7 @@ export default function App() {
         setGreetings((prev) => prev.filter((item) => item.id !== id));
       }
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Failed to delete greeting",
-      );
+      setError(err instanceof Error ? err.message : 'Failed to delete greeting');
     }
   }
 
@@ -94,16 +87,14 @@ export default function App() {
     try {
       const language = randomLanguage.trim();
       if (!language) {
-        setError("Language is required for random greeting.");
+        setError('Language is required for random greeting.');
         return;
       }
 
       const data = await getRandomGreeting(language);
       setRandomGreeting(data);
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Failed to fetch random greeting",
-      );
+      setError(err instanceof Error ? err.message : 'Failed to fetch random greeting');
     }
   }
 
@@ -210,9 +201,7 @@ export default function App() {
           </button>
           {randomGreeting ? (
             <div className="mt-3 rounded-xl bg-slate-100 p-3">
-              <p className="text-sm font-semibold">
-                “{randomGreeting.message}”
-              </p>
+              <p className="text-sm font-semibold">“{randomGreeting.message}”</p>
               <span className="mt-2 inline-flex items-center rounded-full bg-sky-100 px-3 py-1 text-xs font-semibold text-sky-700">
                 {randomGreeting.language}
               </span>
@@ -231,9 +220,7 @@ export default function App() {
         {loading ? (
           <p className="text-sm text-slate-500">Loading…</p>
         ) : greetings.length === 0 ? (
-          <p className="text-sm text-slate-500">
-            No greetings yet. Create one to get started.
-          </p>
+          <p className="text-sm text-slate-500">No greetings yet. Create one to get started.</p>
         ) : (
           <ul className="flex flex-col gap-3">
             {greetings.map((greeting) => (

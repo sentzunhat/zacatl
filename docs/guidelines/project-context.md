@@ -5,7 +5,7 @@ Comprehensive reference for the zacatl repository structure, conventions, tech s
 ## stack
 
 - Languages: TypeScript (ESM), JavaScript/MJS (tooling), Markdown, YAML, JSON.
-- Runtime/build: Node.js 24+, npm, TypeScript compiler, tsc-alias, fix-esm.mjs.
+- Runtime/build: Node.js 24.14.0 LTS+, npm, TypeScript compiler, tsc-alias, fix-esm.ts.
 - Frameworks/libs: Fastify + Express adapters, tsyringe (DI), Zod, Sequelize, Mongoose, Pino, i18n, UUID, js-yaml.
 - Testing/linting: Vitest, ESLint (flat config).
 - Architecture: layered/hexagonal with ports/adapters, DI container, repositories, REST handlers.
@@ -30,13 +30,13 @@ Comprehensive reference for the zacatl repository structure, conventions, tech s
 
 ## quirks
 
-- ESM-only output; no bundler; build pipeline relies on tsc + tsc-alias + fix-esm.mjs.
+- ESM-only output; no bundler; build pipeline relies on tsc + tsc-alias + fix-esm.ts.
 - Dependency re-exports under @sentzunhat/zacatl/third-party/\* subpaths.
 
 ## files_src
 
 - src/index.ts
-- src/optionals.ts
+- src/utils/optionals.ts
 - src/configuration/index.ts
 - src/configuration/json.ts
 - src/configuration/yml.ts
@@ -111,10 +111,13 @@ Comprehensive reference for the zacatl repository structure, conventions, tech s
 - src/service/layers/index.ts
 - src/service/layers/infrastructure/index.ts
 - src/service/layers/infrastructure/infrastructure.ts
-- src/service/layers/infrastructure/orm/adapter-loader.ts
 - src/service/layers/infrastructure/orm/index.ts
-- src/service/layers/infrastructure/orm/mongoose-adapter.ts
-- src/service/layers/infrastructure/orm/sequelize-adapter.ts
+- src/service/layers/infrastructure/orm/mongoose/adapter-loader.ts
+- src/service/layers/infrastructure/orm/mongoose/adapter.ts
+- src/service/layers/infrastructure/orm/mongoose/index.ts
+- src/service/layers/infrastructure/orm/sequelize/adapter-loader.ts
+- src/service/layers/infrastructure/orm/sequelize/adapter.ts
+- src/service/layers/infrastructure/orm/sequelize/index.ts
 - src/service/layers/infrastructure/repositories/abstract.ts
 - src/service/layers/infrastructure/repositories/index.ts
 - src/service/layers/infrastructure/repositories/mongoose/index.ts
@@ -135,14 +138,23 @@ Comprehensive reference for the zacatl repository structure, conventions, tech s
 - src/service/platforms/desktop/types.ts
 - src/service/platforms/index.ts
 - src/service/platforms/platforms.ts
+- src/service/platforms/context/index.ts
+- src/service/platforms/context/request-context.ts
 - src/service/platforms/server/api/adapters.ts
 - src/service/platforms/server/api/api-server.ts
 - src/service/platforms/server/api/index.ts
 - src/service/platforms/server/api/port.ts
 - src/service/platforms/server/database/adapters.ts
+- src/service/platforms/server/database/adapters/index.ts
+- src/service/platforms/server/database/adapters/mongoose.ts
+- src/service/platforms/server/database/adapters/sequelize.ts
+- src/service/platforms/server/database/adapters/sqlite.ts
 - src/service/platforms/server/database/database-server.ts
 - src/service/platforms/server/database/index.ts
+- src/service/platforms/server/database/mongoose-adapter.ts
 - src/service/platforms/server/database/port.ts
+- src/service/platforms/server/database/sequelize-adapter.ts
+- src/service/platforms/server/database/sqlite-adapter.ts
 - src/service/platforms/server/index.ts
 - src/service/platforms/server/page/adapters.ts
 - src/service/platforms/server/page/index.ts

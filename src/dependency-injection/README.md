@@ -11,7 +11,7 @@ getContainer, registerDependency, registerSingleton, registerValue, resolveDepen
 ## Quick use
 
 ```typescript
-import { registerDependency, resolveDependency } from "@sentzunhat/zacatl/dependency-injection";
-registerDependency("MyService", { useClass: MyService });
-const svc = resolveDependency<MyService>("MyService");
+import { registerDependency, resolveDependency } from '@sentzunhat/zacatl/dependency-injection';
+registerDependency('MyService', { useClass: MyService });
+const svc = resolveDependency<MyService>('MyService');
 ```

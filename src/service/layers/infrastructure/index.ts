@@ -1,8 +1,9 @@
-export * from "./repositories";
-export * from "./infrastructure";
+// @barrel-manual
+export * from './repositories';
+export * from './infrastructure';
 export type {
   InfrastructureUnknownRepository,
   InfrastructureRepository,
   InfrastructureRepositories,
   ConfigInfrastructure,
-} from "./types";
+} from './types';

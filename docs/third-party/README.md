@@ -7,20 +7,20 @@ Zacatl re-exports commonly used third-party packages for convenience and provide
 ### tsyringe (Dependency Injection)
 
 ```typescript
-import { container, injectable, inject } from "@sentzunhat/zacatl/third-party";
+import { container, injectable, inject } from '@sentzunhat/zacatl/third-party';
 
 @injectable()
 class UserService {
   constructor(private userRepo: UserRepository) {}
 }
 
-container.register("UserService", { useClass: UserService });
+container.register('UserService', { useClass: UserService });
 ```
 
 ### Zod (Validation)
 
 ```typescript
-import { z } from "@sentzunhat/zacatl/third-party";
+import { z } from '@sentzunhat/zacatl/third-party';
 
 const UserSchema = z.object({
   name: z.string(),
@@ -32,37 +32,41 @@ const UserSchema = z.object({
 
 ## ORM Packages (Subpath Imports Only)
 
-ORM packages are **NOT** exported from the main package to keep bundle sizes small. Use subpath imports instead:
+ORM packages are bundled with Zacatl — no separate install needed.
+They are still accessed exclusively via subpath imports so the main entry stays lean:
 
 See [../third-party/orm/overview.md](../third-party/orm/overview.md) for full usage and examples.
 
 ## Why Subpath Imports for ORMs?
 
-**Tree-Shaking**: Only include ORMs you actually use
+**Lazy loading**: Only the ORM you actually use is evaluated at runtime
 
 ```typescript
-// ✅ This only bundles Mongoose
-import { mongoose } from "@sentzunhat/zacatl/third-party/mongoose";
+// ✅ Only evaluates Mongoose at runtime
+import { mongoose } from '@sentzunhat/zacatl/third-party/mongoose';
 
-// ❌ This would bundle ALL ORMs (if they were in main exports)
-import { mongoose, Sequelize } from "@sentzunhat/zacatl";
+// ❌ Would evaluate all ORMs at import time (main entry stays clean)
+import { mongoose, Sequelize } from '@sentzunhat/zacatl';
 ```
-
-**Bundle Size**:
-
-- Mongoose: ~500KB
-- Sequelize: ~300KB
-- Only include what you need!
 
 ## Package Structure
 
 ```
 src/third-party/
-├── index.ts          # Re-exports tsyringe, zod (in main package)
-├── mongoose.ts       # Mongoose re-export (subpath only)
-├── sequelize.ts      # Sequelize re-export (subpath only)
-├── tsyringe.ts       # DI container re-export
-└── zod.ts            # Validation re-export
+├── index.ts                  # Re-exports tsyringe, zod (in main package)
+├── eslint.ts                 # ESLint plugins re-export (subpath only)
+├── express.ts                # Express re-export (subpath only)
+├── fastify.ts                # Fastify + ZodTypeProvider + serializerCompiler/validatorCompiler
+├── http-proxy-middleware.ts  # HTTP proxy re-export (subpath only)
+├── i18n.ts                   # i18n re-export (subpath only)
+├── js-yaml.ts                # YAML parser re-export (subpath only)
+├── mongoose.ts               # Mongoose re-export (subpath only)
+├── pino.ts                   # Pino logger re-export (subpath only)
+├── reflect-metadata.ts       # reflect-metadata side-effect import
+├── sequelize.ts              # Sequelize re-export (subpath only)
+├── tsyringe.ts               # DI container re-export
+├── uuid.ts                   # UUID utilities re-export (subpath only)
+└── zod.ts                    # Validation re-export (subpath only)
 ```
 
 ## Version Compatibility
@@ -80,41 +84,34 @@ Zacatl uses these third-party versions:
 
 ```typescript
 // From main package - always available
-import { container, injectable } from "@sentzunhat/zacatl/third-party";
-import { z } from "@sentzunhat/zacatl/third-party";
+import { container, injectable } from '@sentzunhat/zacatl/third-party';
+import { z } from '@sentzunhat/zacatl/third-party';
 ```
 
 ### Subpath Imports
 
 ```typescript
-// From subpath - install peer dependency first
-import { mongoose } from "@sentzunhat/zacatl/third-party/mongoose";
-import { Sequelize } from "@sentzunhat/zacatl/third-party/sequelize";
+// From subpath — no separate install needed
+import { mongoose } from '@sentzunhat/zacatl/third-party/mongoose';
+import { Sequelize } from '@sentzunhat/zacatl/third-party/sequelize';
 ```
 
-## Installing Peer Dependencies
+## Database Drivers (still required for Sequelize)
 
 ```bash
-# For Mongoose
-npm install mongoose
-
-# For Sequelize
-npm install sequelize
-
-# For specific SQL dialect
+# Install the dialect package matching your SQL database
 npm install pg pg-hstore      # PostgreSQL
 npm install mysql2            # MySQL
 npm install sqlite3           # SQLite
 ```
 
-## Peer dependency policy (short)
+## Dependency policy
 
-- Zacatl treats ORMs and HTTP server runtimes as optional peers: we declare them in `peerDependencies` and mark them optional. This keeps installs small and lets apps choose versions.
-- For local development and CI in this repository we keep those runtimes in `devDependencies` so tests and examples work out of the box.
-- Install the runtimes your project needs (examples above). If you publish a consumer package, list required runtimes in your app's `dependencies` or `peerDependencies` as appropriate.
-- Install the runtimes your project needs (examples above). If you publish a consumer package, list required runtimes in your app's `dependencies` or `peerDependencies` as appropriate.
+- ORMs (`mongoose`, `sequelize`) and platforms (`express`, `fastify`, `better-sqlite3`) are bundled as `dependencies` — no separate install needed.
+- SQL dialect drivers (`pg`, `mysql2`, `sqlite3`, etc.) are **not** bundled; install the one matching your database.
+- If you publish a consumer package, list dialect drivers in your own `dependencies` as appropriate.
 
-Use `npm run check:peers` to detect mismatched or missing peer runtimes before publishing or releasing.
+Use `npm run check:peers` to validate your environment before publishing or releasing.
 
 ## Related
 

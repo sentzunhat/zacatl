@@ -5,6 +5,7 @@ This React (Vite) frontend talks to the Express + MongoDB example and uses Tailw
 ## Quick start
 
 1. Start the backend (from the repository root):
+
    - `cd examples/platform-express/with-mongodb-react`
    - `npm install`
    - `npm run dev`

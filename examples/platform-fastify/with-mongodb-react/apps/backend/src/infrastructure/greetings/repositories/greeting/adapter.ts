@@ -1,13 +1,10 @@
-import { MongooseRepository } from "@sentzunhat/zacatl";
-import type { MongooseModel } from "@sentzunhat/zacatl/third-party/mongoose";
-import { singleton } from "@sentzunhat/zacatl/third-party/tsyringe";
+import { MongooseRepository } from '@sentzunhat/zacatl';
+import type { MongooseModel } from '@sentzunhat/zacatl/third-party/mongoose';
+import { singleton } from '@sentzunhat/zacatl/third-party/tsyringe';
 
-import type {
-  CreateGreetingInput,
-  Greeting,
-} from "../../../../domain/models/greeting";
-import type { GreetingRepositoryPort } from "./port";
-import { greetingSchema } from "./schema";
+import type { CreateGreetingInput, Greeting } from '../../../../domain/models/greeting';
+import type { GreetingRepositoryPort } from './port';
+import { greetingSchema } from './schema';
 
 @singleton()
 export class GreetingRepositoryAdapter
@@ -16,7 +13,7 @@ export class GreetingRepositoryAdapter
 {
   constructor() {
     super({
-      name: "greeting",
+      name: 'greeting',
       schema: greetingSchema,
     });
   }
@@ -28,9 +25,7 @@ export class GreetingRepositoryAdapter
       .lean<Greeting[]>()
       .exec();
 
-    return docs
-      .map((doc) => this.toLean(doc))
-      .filter((item): item is Greeting => item !== null);
+    return docs.map((doc) => this.toLean(doc)).filter((item): item is Greeting => item !== null);
   }
 
   async findByLanguage(language: string): Promise<Greeting[]> {
@@ -40,9 +35,7 @@ export class GreetingRepositoryAdapter
       .lean<Greeting[]>()
       .exec();
 
-    return docs
-      .map((doc) => this.toLean(doc))
-      .filter((item): item is Greeting => item !== null);
+    return docs.map((doc) => this.toLean(doc)).filter((item): item is Greeting => item !== null);
   }
 
   async delete(id: string): Promise<Greeting | null> {

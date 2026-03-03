@@ -1,15 +1,19 @@
 {
-  "extends": "../tsconfig.cjs.json",
   "compilerOptions": {
-    "outDir": "../build-cjs/scripts",
+    "target": "ES2020",
+    "module": "ES2022",
+    "moduleResolution": "Node",
+    "outDir": "../build-scripts-cjs",
     "rootDir": ".",
-    "module": "CommonJS",
-    "moduleResolution": "node",
-    "target": "ES2022",
     "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+    "strict": false,
     "declaration": false,
-    "skipLibCheck": true
+    "resolveJsonModule": true,
+    "allowJs": false,
+    "lib": ["ES2020"]
   },
-  "include": ["*.ts"],
-  "exclude": ["fix-esm.ts", "update-coverage-readme.ts", "check-peers.ts"]
+  "include": ["**/*.ts", "**/*.js"],
+  "exclude": ["dev/parallel-runner.ts"]
 }

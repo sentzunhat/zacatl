@@ -1,7 +1,7 @@
-import fastifyStatic from "@fastify/static";
-import type { FastifyInstance } from "fastify";
+import fastifyStatic from '@fastify/static';
+import type { FastifyInstance } from 'fastify';
 
-import type { PageServerPort, StaticConfig } from "./port";
+import type { PageServerPort, StaticConfig } from './port';
 
 export class FastifyPageAdapter implements PageServerPort {
   constructor(private readonly server: FastifyInstance) {}
@@ -18,11 +18,11 @@ export class FastifyPageAdapter implements PageServerPort {
       if (request.raw.url != null && request.raw.url.startsWith(apiPrefix)) {
         reply.status(404).send({
           code: 404,
-          error: "Not Found",
+          error: 'Not Found',
           message: `Route ${request.method}:${request.url} not found`,
         });
       } else {
-        reply.sendFile("index.html", staticDir);
+        reply.sendFile('index.html', staticDir);
       }
     });
   }

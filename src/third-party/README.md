@@ -11,6 +11,6 @@ tsyringe, zod, uuid, i18n, js-yaml, fastify, express, http-proxy-middleware, ref
 ## Quick use
 
 ```typescript
-import { z } from "@sentzunhat/zacatl/third-party";
+import { z } from '@sentzunhat/zacatl/third-party';
 const schema = z.object({ name: z.string() });
 ```

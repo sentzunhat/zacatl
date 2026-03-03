@@ -2,7 +2,7 @@
 
 ## Overview
 
-Zacatl v0.0.39+ consolidates all third-party dependencies into **single point of control** via the main library package. This approach eliminates version conflicts, reduces bundle size in consuming applications, and ensures consistent behavior across your entire ecosystem.
+Zacatl consolidates all third-party dependencies into **single point of control** via the main library package. This approach eliminates version conflicts, reduces bundle size in consuming applications, and ensures consistent behavior across your entire ecosystem.
 
 ### Core Principle
 
@@ -35,46 +35,68 @@ Subpath exports avoid naming conflicts and provide tree-shakeable imports:
 
 ```typescript
 // Fastify
-import { Fastify, Router } from "@sentzunhat/zacatl/third-party/fastify";
+import {
+  Fastify,
+  FastifyInstance,
+  FastifyRequest,
+  FastifyReply,
+} from '@sentzunhat/zacatl/third-party/fastify';
+
+// Fastify + Zod type provider (runtime compilers)
+import {
+  serializerCompiler,
+  validatorCompiler,
+  type ZodTypeProvider,
+} from '@sentzunhat/zacatl/third-party/fastify';
 
 // Express
-import { express, Application, Router, Request, Response, NextFunction } from "@sentzunhat/zacatl/third-party/express";
+import {
+  express,
+  Application,
+  Router,
+  Request,
+  Response,
+  NextFunction,
+} from '@sentzunhat/zacatl/third-party/express';
 
 // HTTP Proxy Middleware (Express/Fastify)
-import { createProxyMiddleware, ProxyOptions } from "@sentzunhat/zacatl/third-party/http-proxy-middleware";
+import {
+  createProxyMiddleware,
+  ProxyOptions,
+} from '@sentzunhat/zacatl/third-party/http-proxy-middleware';
 ```
 
 #### ORMs
 
 ```typescript
 // Mongoose (MongoDB ODM)
-import { mongoose, Schema, Model, Document } from "@sentzunhat/zacatl/third-party/mongoose";
+import { mongoose, Schema, Model, Document } from '@sentzunhat/zacatl/third-party/mongoose';
 
 // Sequelize (SQL ORM)
-import { Sequelize, DataTypes, Op } from "@sentzunhat/zacatl/third-party/sequelize";
+import { Sequelize, DataTypes, Op } from '@sentzunhat/zacatl/third-party/sequelize';
 ```
 
 #### Utilities
 
 ```typescript
 // Dependency Injection
-import "@sentzunhat/zacatl/third-party/reflect-metadata";
-import { container } from "@sentzunhat/zacatl/dependency-injection";
+import '@sentzunhat/zacatl/third-party/reflect-metadata';
+import { container } from '@sentzunhat/zacatl/dependency-injection';
 
 // Validation
-import { z } from "@sentzunhat/zacatl/third-party/zod";
+import { z } from '@sentzunhat/zacatl/third-party/zod';
 
 // UUID Generation
-import { v4 as uuidv4 } from "@sentzunhat/zacatl/third-party/uuid";
+import { v4 as uuidv4 } from '@sentzunhat/zacatl/third-party/uuid';
 
 // Logging
-import pino from "@sentzunhat/zacatl/third-party/pino";
+import pino from '@sentzunhat/zacatl/third-party/pino';
 
 // i18n Localization
-import i18n from "@sentzunhat/zacatl/third-party/i18n";
+import i18n from '@sentzunhat/zacatl/third-party/i18n';
 
 // YAML Parsing
-import yaml from "@sentzunhat/zacatl/third-party/js-yaml";
+import yaml from '@sentzunhat/zacatl/third-party/js-yaml';
 ```
 
 ---
@@ -85,24 +107,24 @@ import yaml from "@sentzunhat/zacatl/third-party/js-yaml";
 
 ```typescript
 // ❌ Direct npm package imports
-import express from "express";
-import { Fastify } from "fastify";
-import mongoose from "mongoose";
-import { Sequelize } from "sequelize";
-import { v4 as uuidv4 } from "uuid";
-import { z } from "zod";
+import express from 'express';
+import { Fastify } from 'fastify';
+import mongoose from 'mongoose';
+import { Sequelize } from 'sequelize';
+import { v4 as uuidv4 } from 'uuid';
+import { z } from 'zod';
 ```
 
 ### After (✅ Recommended)
 
 ```typescript
 // ✅ Import from library
-import { express } from "@sentzunhat/zacatl/third-party/express";
-import { Fastify } from "@sentzunhat/zacatl/third-party/fastify";
-import { mongoose } from "@sentzunhat/zacatl/third-party/mongoose";
-import { Sequelize } from "@sentzunhat/zacatl/third-party/sequelize";
-import { v4 as uuidv4 } from "@sentzunhat/zacatl/third-party/uuid";
-import { z } from "@sentzunhat/zacatl/third-party/zod";
+import { express } from '@sentzunhat/zacatl/third-party/express';
+import { Fastify } from '@sentzunhat/zacatl/third-party/fastify';
+import { mongoose } from '@sentzunhat/zacatl/third-party/mongoose';
+import { Sequelize } from '@sentzunhat/zacatl/third-party/sequelize';
+import { v4 as uuidv4 } from '@sentzunhat/zacatl/third-party/uuid';
+import { z } from '@sentzunhat/zacatl/third-party/zod';
 ```
 
 ---
@@ -110,12 +132,12 @@ import { z } from "@sentzunhat/zacatl/third-party/zod";
 ## Complete Example: Express + MongoDB
 
 ```typescript
-import "@sentzunhat/zacatl/third-party/reflect-metadata";
-import { express, Application } from "@sentzunhat/zacatl/third-party/express";
-import { mongoose, Schema } from "@sentzunhat/zacatl/third-party/mongoose";
-import { z } from "@sentzunhat/zacatl/third-party/zod";
-import { v4 as uuidv4 } from "@sentzunhat/zacatl/third-party/uuid";
-import { Service } from "@sentzunhat/zacatl/service";
+import '@sentzunhat/zacatl/third-party/reflect-metadata';
+import { express, Application } from '@sentzunhat/zacatl/third-party/express';
+import { mongoose, Schema } from '@sentzunhat/zacatl/third-party/mongoose';
+import { z } from '@sentzunhat/zacatl/third-party/zod';
+import { v4 as uuidv4 } from '@sentzunhat/zacatl/third-party/uuid';
+import { Service } from '@sentzunhat/zacatl/service';
 
 // ✅ All dependencies flow through library exports
 const app: Application = express();
@@ -124,15 +146,15 @@ const db = mongoose;
 // Service configuration
 const service = new Service({
   handler: {
-    type: "express",
+    type: 'express',
     adapter: app,
     routes: [...routes],
   },
   handler: {
     db: {
-      type: "mongoose",
+      type: 'mongoose',
       adapter: db,
-      config: { uri: "mongodb://..." },
+      config: { uri: 'mongodb://...' },
     },
   },
 });
@@ -147,34 +169,19 @@ await service.start({ port: 4000 });
 
 ### Main Library (Maintained by Zacatl)
 
+The published package ships with a full `exports` map generated at build time, covering every
+subpath module. The local dev copy uses the same map (written to the root `package.json` by
+`scripts/dev/sync-local-exports.ts` after every build) so consuming examples resolve subpaths
+without any manual `paths` config.
+
+Each entry follows the three-condition format:
+
 ```json
 {
-  "name": "@sentzunhat/zacatl",
-  "version": "0.0.39",
-  "type": "module",
-  "dependencies": {
-    "fastify": "^5.7.4",
-    "express": "^5.2.1",
-    "mongoose": "^9.0.0",
-    "sequelize": "^6.0.0",
-    "sqlite3": "^5.1.7",
-    "pg": "^8.18.0",
-    "zod": "^4.3.6",
-    "uuid": "^13.0.0",
-    "pino": "^10.3.0",
-    "i18n": "^0.15.3",
-    "js-yaml": "^4.1.1",
-    "tsyringe": "^4.10.0",
-    "reflect-metadata": "^0.2.2",
-    "http-proxy-middleware": "^3.0.5"
-  },
-  "exports": {
-    ".": "./build/index.js",
-    "./service": "./build/service/index.js",
-    "./third-party/express": "./build/third-party/express.js",
-    "./third-party/fastify": "./build/third-party/fastify.js",
-    "./third-party/mongoose": "./build/third-party/mongoose.js",
-    "./third-party/sequelize": "./build/third-party/sequelize.js"
+  "./third-party/fastify": {
+    "types": "./build/esm/third-party/fastify.d.ts",
+    "import": "./build/esm/third-party/fastify.js",
+    "require": "./build/cjs/third-party/fastify.js"
   }
 }
 ```
@@ -187,7 +194,7 @@ await service.start({ port: 4000 });
   "version": "1.0.0",
   "type": "module",
   "dependencies": {
-    "@sentzunhat/zacatl": "^0.0.39",
+    "@sentzunhat/zacatl": "latest",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },
@@ -242,9 +249,9 @@ Zacatl exports all dependencies via subpaths:
 
 ```typescript
 // ✅ Library exports framework adapters
-export * from "./fastify";
-export * from "./express";
-export * from "./http-proxy-middleware";
+export * from './fastify';
+export * from './express';
+export * from './http-proxy-middleware';
 
 // ✅ ORM exports available via subpaths to avoid conflicts
 // @sentzunhat/zacatl/third-party/mongoose
@@ -285,14 +292,14 @@ Search and replace pattern across all source files:
 
 ```typescript
 // ❌ Before
-import express from "express";
-import { Fastify } from "fastify";
-import mongoose from "mongoose";
+import express from 'express';
+import { Fastify } from 'fastify';
+import mongoose from 'mongoose';
 
 // ✅ After
-import { express } from "@sentzunhat/zacatl/third-party/express";
-import { Fastify } from "@sentzunhat/zacatl/third-party/fastify";
-import { mongoose } from "@sentzunhat/zacatl/third-party/mongoose";
+import { express } from '@sentzunhat/zacatl/third-party/express';
+import { Fastify } from '@sentzunhat/zacatl/third-party/fastify';
+import { mongoose } from '@sentzunhat/zacatl/third-party/mongoose';
 ```
 
 ### Step 4: Run Integration Tests
@@ -352,10 +359,10 @@ When updating dependencies:
 
 ```typescript
 // ❌ Wrong
-import express from "express";
+import express from 'express';
 
 // ✅ Correct
-import { express } from "@sentzunhat/zacatl/third-party/express";
+import { express } from '@sentzunhat/zacatl/third-party/express';
 ```
 
 ### Issue: Duplicate dependencies in node_modules

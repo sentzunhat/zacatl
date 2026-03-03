@@ -17,9 +17,9 @@ This folder contains reusable coding standards and best practices extracted from
 ### Language & Tools
 
 - **Language**: TypeScript (strict mode)
-- **Runtime**: Node.js 24+
+- **Runtime**: Node.js 24.14.0 LTS+
 - **Package Manager**: npm 10.9.0+
-- **Build**: TypeScript compiler (tsc) + path alias resolution (tsc-alias) + ESM fixing (fix-esm.mjs)
+- **Build**: TypeScript compiler (tsc) + path alias resolution (tsc-alias) + ESM fixing (fix-esm.ts)
 - **Testing**: Vitest
 - **Linting**: ESLint (flat config)
 

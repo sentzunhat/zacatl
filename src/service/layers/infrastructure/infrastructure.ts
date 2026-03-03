@@ -1,9 +1,8 @@
-import { resolveDependencies } from "@zacatl/dependency-injection";
-import { InternalServerError } from "@zacatl/error";
+import { resolveDependencies } from '@zacatl/dependency-injection';
+import { InternalServerError } from '@zacatl/error';
 
-import type { ConfigInfrastructure, InfrastructureUnknownRepository } from "./types";
-import { getContainer } from "../../../dependency-injection/container";
-
+import type { ConfigInfrastructure, InfrastructureUnknownRepository } from './types';
+import { getContainer } from '../../../dependency-injection/container';
 
 export type { ConfigInfrastructure };
 
@@ -44,10 +43,10 @@ export class Infrastructure {
 
     if (resolvedRepositories.length !== this.config.repositories.length) {
       throw new InternalServerError({
-        message: "Failed to register all infrastructure repository dependencies",
-        reason: "Not all repositories could be resolved from DI container",
-        component: "InfrastructureLayer",
-        operation: "register",
+        message: 'Failed to register all infrastructure repository dependencies',
+        reason: 'Not all repositories could be resolved from DI container',
+        component: 'InfrastructureLayer',
+        operation: 'register',
         metadata: {
           expected: this.config.repositories.length,
           resolved: resolvedRepositories.length,

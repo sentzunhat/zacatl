@@ -1,4 +1,4 @@
-import { AbstractRouteHandler } from "./abstract";
+import { AbstractRouteHandler } from './abstract';
 
 export interface GetRouteHandlerConstructor {
   url: string;
@@ -14,17 +14,11 @@ export abstract class GetRouteHandler<
   TResponse = void,
   TParams = void,
   THeaders = void,
-> extends AbstractRouteHandler<
-  TBody,
-  TQuerystring,
-  TResponse,
-  TParams,
-  THeaders
-> {
+> extends AbstractRouteHandler<TBody, TQuerystring, TResponse, TParams, THeaders> {
   constructor(args: GetRouteHandlerConstructor) {
     super({
       url: args.url,
-      method: "GET",
+      method: 'GET',
       schema: args.schema,
     });
   }

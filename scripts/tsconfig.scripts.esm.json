@@ -1,15 +1,19 @@
 {
-  "extends": "../tsconfig.json",
   "compilerOptions": {
-    "outDir": "../build/scripts",
+    "target": "ES2020",
+    "module": "ES2022",
+    "moduleResolution": "Node",
+    "outDir": "../build-scripts-esm",
     "rootDir": ".",
-    "module": "nodenext",
-    "moduleResolution": "nodenext",
-    "target": "ES2022",
     "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+    "strict": false,
     "declaration": false,
-    "declarationMap": false,
-    "skipLibCheck": true
+    "resolveJsonModule": true,
+    "allowJs": false,
+    "lib": ["ES2020"]
   },
-  "include": ["*.ts"]
+  "include": ["**/*.ts", "**/*.js"],
+  "exclude": ["dev/parallel-runner.ts"]
 }

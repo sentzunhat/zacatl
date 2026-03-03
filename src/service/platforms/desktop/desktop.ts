@@ -1,7 +1,7 @@
-import { InternalServerError } from "@zacatl/error";
+import { InternalServerError } from '@zacatl/error';
 
-import type { ConfigDesktop } from "./types";
-import type { IpcApplicationEntryPoints } from "../../layers/application/types";
+import type { ConfigDesktop } from './types';
+import type { IpcApplicationEntryPoints } from '../../layers/application/types';
 
 /**
  * Desktop platform stub for ServiceType.DESKTOP execution.
@@ -13,8 +13,8 @@ import type { IpcApplicationEntryPoints } from "../../layers/application/types";
  * const desktop = new Desktop({ window: { title: "App" }, platform: "neutralino" });
  */
 export class Desktop {
-  private readonly window: ConfigDesktop["window"];
-  private readonly platform: ConfigDesktop["platform"];
+  private readonly window: ConfigDesktop['window'];
+  private readonly platform: ConfigDesktop['platform'];
 
   constructor(config: ConfigDesktop) {
     this.window = config.window;
@@ -25,10 +25,10 @@ export class Desktop {
     throw new InternalServerError({
       message: `Desktop IPC entrypoint registration for '${this.window.title}' is not yet implemented`,
       reason:
-        "ServiceType.DESKTOP IPC handler registration and event routing are not implemented. " +
-        "This feature is planned for v0.1.0. Use ServiceType.SERVER for HTTP-based services.",
-      component: "Desktop",
-      operation: "registerEntrypoints",
+        'ServiceType.DESKTOP IPC handler registration and event routing are not implemented. ' +
+        'This feature is planned for v0.1.0. Use ServiceType.SERVER for HTTP-based services.',
+      component: 'Desktop',
+      operation: 'registerEntrypoints',
       metadata: {
         platform: this.platform,
         window: { title: this.window.title },
@@ -40,10 +40,10 @@ export class Desktop {
     throw new InternalServerError({
       message: `Desktop platform '${this.window.title}' (${this.platform}) is not yet implemented`,
       reason:
-        "ServiceType.DESKTOP is declared but window initialization and IPC handler registration are not implemented. " +
-        "This feature is planned for v0.1.0. Use ServiceType.SERVER for HTTP-based services.",
-      component: "Desktop",
-      operation: "start",
+        'ServiceType.DESKTOP is declared but window initialization and IPC handler registration are not implemented. ' +
+        'This feature is planned for v0.1.0. Use ServiceType.SERVER for HTTP-based services.',
+      component: 'Desktop',
+      operation: 'start',
       metadata: {
         platform: this.platform,
         window: {

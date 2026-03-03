@@ -6,7 +6,7 @@ services:
     image: zacatl-fastify-sqlite
     container_name: fastify-sqlite-backend
     ports:
-      - "8081:8081"
+      - '8081:8081'
     environment:
       - NODE_ENV=production
       - PORT=8081
@@ -17,9 +17,9 @@ services:
     healthcheck:
       test:
         [
-          "CMD",
-          "node",
-          "-e",
+          'CMD',
+          'node',
+          '-e',
           "fetch('http://localhost:8081/greetings').catch(() => process.exit(1))",
         ]
       interval: 10s

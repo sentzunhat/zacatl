@@ -1,12 +1,12 @@
-db = db.getSiblingDB("appdb");
+db = db.getSiblingDB('appdb');
 
 db.createUser({
-  user: "local",
-  pwd: "local",
+  user: 'local',
+  pwd: 'local',
   roles: [
     {
-      role: "readWrite",
-      db: "appdb",
+      role: 'readWrite',
+      db: 'appdb',
     },
   ],
 });

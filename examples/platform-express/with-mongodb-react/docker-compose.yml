@@ -3,7 +3,7 @@ services:
     image: mongo:latest
     container_name: express-mongodb-db
     ports:
-      - "27017:27017"
+      - '27017:27017'
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: root
@@ -12,7 +12,7 @@ services:
       - mongo-data:/data/db
       - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
     healthcheck:
-      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      test: ['CMD', 'mongosh', '--eval', "db.adminCommand('ping')"]
       interval: 10s
       timeout: 5s
       retries: 3
@@ -26,7 +26,7 @@ services:
     image: zacatl-express-mongodb
     container_name: express-mongodb-backend
     ports:
-      - "8182:8182"
+      - '8182:8182'
     environment:
       - NODE_ENV=production
       - PORT=8182
@@ -37,9 +37,9 @@ services:
     healthcheck:
       test:
         [
-          "CMD",
-          "node",
-          "-e",
+          'CMD',
+          'node',
+          '-e',
           "fetch('http://localhost:8182/greetings').catch(() => process.exit(1))",
         ]
       interval: 10s

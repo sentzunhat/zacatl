@@ -14,7 +14,10 @@ export {
   type HTTPMethods,
   type FastifyServerOptions,
   type RawServerBase,
-} from "fastify";
+} from 'fastify';
 
 // Type provider for Zod schema validation at the type level
-export type { ZodTypeProvider } from "fastify-type-provider-zod";
+export type { ZodTypeProvider } from 'fastify-type-provider-zod';
+
+// Runtime compilers for Zod-based request validation and serialization
+export { serializerCompiler, validatorCompiler } from 'fastify-type-provider-zod';

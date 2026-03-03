@@ -154,30 +154,34 @@ Add new entry at the top (right after first `---`):
 - `🗺️` - Roadmap / In-progress work
 - `⚠️` - Breaking Changes (rare in patch)
 
-### 4. Build and Test
+### 4. Verify with Dry Run
 
-Verify the package builds and tests pass:
+Run the full publish pipeline in dry-run mode — this runs every guard (version check, barrels,
+tests, type-check, lint, build) and a `--dry-run` npm publish so you can inspect the tarball
+contents before committing to release:
 
 ```bash
-npm run clean
-npm run build
-npm run type:check
-npm run lint
-npm test
+npm run publish:dry
 ```
+
+All steps must pass before proceeding.
 
 ### 5. Commit Changes
 
 ```bash
 git add package.json docs/changelog.md
-git commit -m "chore: release v0.0.40"
+git commit -m "bump version to 0.0.40 and update changelog"
 git tag v0.0.40
 ```
 
 ### 6. Publish to npm
 
 ```bash
-npm publish
+# Standard publish (prompts for OTP if 2FA enabled)
+npm run publish:latest
+
+# If OTP is required inline
+npm run publish:otp
 ```
 
 ### 7. Push to GitHub
@@ -191,16 +195,13 @@ git push origin v0.0.40
 
 ## Pre-Publish Checklist
 
-Before running `npm publish`:
+Before running `npm run publish:latest`:
 
 - [ ] `package.json` version updated
 - [ ] `docs/changelog.md` has new entry with correct date
-- [ ] All tests pass (`npm test`)
-- [ ] Build succeeds (`npm run build`)
-- [ ] TypeScript checks pass (`npm run type:check`)
-- [ ] Linting passes (`npm run lint`)
-- [ ] Examples still work (spot-check at least one)
-- [ ] README.md version badge matches (if applicable)
+- [ ] `npm run publish:dry` passes end-to-end (no errors, no npm warnings)
+- [ ] Git is clean (all changes committed)
+- [ ] Tag created (`git tag vX.Y.Z`)
 
 ---
 
@@ -267,10 +268,10 @@ Examples in `/examples` folder:
 1. Check git log → Determine version bump (patch/minor/major)
 2. Update package.json version
 3. Add entry to docs/changelog.md (top, after first ---)
-4. Run build + tests
+4. npm run publish:dry  → full verification + tarball preview (must pass)
 5. Commit + tag
-6. npm publish
-7. Push to GitHub
+6. npm run publish:latest  → actual publish
+7. Push to GitHub (branch + tag)
 ```
 
 ---

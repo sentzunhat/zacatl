@@ -44,18 +44,28 @@
   "workbench.colorCustomizations": {
     "activityBar.background": "#385a44",
     "titleBar.activeBackground": "#307950",
-    "titleBar.activeForeground": "#FCFAFF"
+    "titleBar.activeForeground": "#FCFAFF",
+    "titleBar.inactiveBackground": "#1F3226",
+    "titleBar.inactiveForeground": "#F9FBFA",
+    "statusBar.background": "#1F3226",
+    "statusBar.foreground": "#F9FBFA",
+    "statusBar.debuggingBackground": "#1F3226",
+    "statusBar.debuggingForeground": "#F9FBFA",
+    "statusBar.noFolderBackground": "#1F3226",
+    "statusBar.noFolderForeground": "#F9FBFA"
   },
   "cSpell.words": [
-    "virtuals",
-    "tsyringe",
-    "zacatl",
-    "Zacatl",
     "hexagonal",
-    "sequelize",
+    "microframework",
     "mongoose",
     "pino",
-    "vitest"
+    "postbuild",
+    "sequelize",
+    "tsyringe",
+    "virtuals",
+    "vitest",
+    "zacatl",
+    "Zacatl"
   ],
   "cSpell.ignoreWords": ["peerDependencies"]
 }

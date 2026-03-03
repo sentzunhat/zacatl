@@ -1,5 +1,6 @@
-import type { Constructor } from "../../types";
-import type { ProviderPort, ServicePort } from "../ports";
+// @barrel-manual
+import type { Constructor } from '../../types';
+import type { ProviderPort, ServicePort } from '../ports';
 
 /**
  * Domain providers that implement business logic and domain services.

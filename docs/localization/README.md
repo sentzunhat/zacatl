@@ -17,20 +17,20 @@ src/localization/
 ## Quick Start (i18n-node)
 
 ```typescript
-import { configureI18nNode } from "@sentzunhat/zacatl";
-import i18n from "@sentzunhat/zacatl/third-party/i18n";
+import { configureI18nNode } from '@sentzunhat/zacatl';
+import i18n from '@sentzunhat/zacatl/third-party/i18n';
 
 configureI18nNode({
   locales: {
-    default: "en",
-    supported: ["en", "es", "fr"],
-    directories: ["./locales", "./custom-locales"],
+    default: 'en',
+    supported: ['en', 'es', 'fr'],
+    directories: ['./locales', './custom-locales'],
   },
   objectNotation: true, // Support nested keys like "errors.notFound"
   overrideBuiltIn: true, // Your translations override Zacatl's
 });
 
-const greeting = i18n.__("greeting");
+const greeting = i18n.__('greeting');
 console.log(greeting); // "Hello"
 ```
 
@@ -71,11 +71,11 @@ Create translation files in `src/localization/locales/`:
 ## With Interpolation
 
 ```typescript
-const message = i18n.__("greeting", { name: "John" });
+const message = i18n.__('greeting', { name: 'John' });
 console.log(message); // "Hello John"
 
-await i18n.setLocale("es");
-console.log(i18n.__("greeting", { name: "Juan" })); // "Hola Juan"
+await i18n.setLocale('es');
+console.log(i18n.__('greeting', { name: 'Juan' })); // "Hola Juan"
 ```
 
 ## Custom Adapter (for i18n-node)
@@ -83,23 +83,23 @@ console.log(i18n.__("greeting", { name: "Juan" })); // "Hola Juan"
 Extend i18n-node by loading translations from custom sources:
 
 ```typescript
-import { configureI18nNode } from "@sentzunhat/zacatl";
-import i18n from "@sentzunhat/zacatl/third-party/i18n";
+import { configureI18nNode } from '@sentzunhat/zacatl';
+import i18n from '@sentzunhat/zacatl/third-party/i18n';
 
 // Configure with custom locale directories
 configureI18nNode({
   locales: {
-    default: "en",
-    supported: ["en", "es", "fr"],
+    default: 'en',
+    supported: ['en', 'es', 'fr'],
     directories: [
-      "./locales",
-      "./custom-locales", // Your custom translations
+      './locales',
+      './custom-locales', // Your custom translations
     ],
   },
   objectNotation: true,
 });
 
-const greeting = i18n.__("greeting");
+const greeting = i18n.__('greeting');
 ```
 
 ## Testing with i18n-node
@@ -107,14 +107,14 @@ const greeting = i18n.__("greeting");
 For tests, use the same i18n instance:
 
 ```typescript
-import i18n from "@sentzunhat/zacatl/third-party/i18n";
+import i18n from '@sentzunhat/zacatl/third-party/i18n';
 
 // Set language for test
-i18n.setLocale("es");
-expect(i18n.__("greeting")).toBe("Hola");
+i18n.setLocale('es');
+expect(i18n.__('greeting')).toBe('Hola');
 
 // Reset for next test
-i18n.setLocale("en");
+i18n.setLocale('en');
 ```
 
 ## Getting Global i18n Instance
@@ -122,11 +122,11 @@ i18n.setLocale("en");
 Access i18n directly from the third-party export:
 
 ```typescript
-import i18n from "@sentzunhat/zacatl/third-party/i18n";
+import i18n from '@sentzunhat/zacatl/third-party/i18n';
 
 // Use after configureI18nNode() is called
-const message = i18n.__("greeting");
-const localized = i18n.__("greeting", { name: "John" });
+const message = i18n.__('greeting');
+const localized = i18n.__('greeting', { name: 'John' });
 ```
 
 ## Detect User Language

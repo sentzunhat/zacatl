@@ -1,5 +1,5 @@
-import { PinoLoggerAdapter } from "./adapters/pino";
-import type { Logger, LoggerPort, LoggerInput } from "./types";
+import { PinoLoggerAdapter } from './adapters/pino';
+import type { Logger, LoggerPort, LoggerInput } from './types';
 
 /**
  * Creates a logger instance with a specific adapter.
@@ -27,18 +27,12 @@ export const createLogger = (adapter?: LoggerPort): Logger => {
   const adapterInstance = adapter ?? new PinoLoggerAdapter();
 
   return {
-    log: (message: string, input?: LoggerInput) =>
-      adapterInstance.log(message, input),
-    info: (message: string, input?: LoggerInput) =>
-      adapterInstance.info(message, input),
-    trace: (message: string, input?: LoggerInput) =>
-      adapterInstance.trace(message, input),
-    warn: (message: string, input?: LoggerInput) =>
-      adapterInstance.warn(message, input),
-    error: (message: string, input?: LoggerInput) =>
-      adapterInstance.error(message, input),
-    fatal: (message: string, input?: LoggerInput) =>
-      adapterInstance.fatal(message, input),
+    log: (message: string, input?: LoggerInput) => adapterInstance.log(message, input),
+    info: (message: string, input?: LoggerInput) => adapterInstance.info(message, input),
+    trace: (message: string, input?: LoggerInput) => adapterInstance.trace(message, input),
+    warn: (message: string, input?: LoggerInput) => adapterInstance.warn(message, input),
+    error: (message: string, input?: LoggerInput) => adapterInstance.error(message, input),
+    fatal: (message: string, input?: LoggerInput) => adapterInstance.fatal(message, input),
   };
 };
 

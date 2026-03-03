@@ -12,6 +12,7 @@ Minimal React + Vite + Tailwind client for the Fastify + PostgreSQL example.
 ## 🚀 Quick Start
 
 1. Start the API server (from the example root):
+
    - Install dependencies
    - Run the Fastify dev server on http://localhost:3001
 

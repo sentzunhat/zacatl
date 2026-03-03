@@ -145,7 +145,7 @@ export class Repository<T extends BaseModel> {
    * @throws ValidationError if input is invalid
    * @throws InternalServerError if database operation fails
    */
-  async save(input: Omit<T, "id">): Promise<T> {
+  async save(input: Omit<T, 'id'>): Promise<T> {
     // ...
   }
 }
@@ -283,7 +283,7 @@ npm install @zacatl/module
 Minimal runnable example:
 
 ```typescript
-import { MyClass } from "@zacatl/module";
+import { MyClass } from '@zacatl/module';
 
 const instance = new MyClass();
 await instance.doSomething();
@@ -513,7 +513,7 @@ export abstract class Repository<TModel, TInput> {
  * - CLI: Command-line interface application
  * - DESKTOP: Desktop application (Electron, Tauri, etc.)
  */
-type ServiceType = "SERVER" | "CLI" | "DESKTOP";
+type ServiceType = 'SERVER' | 'CLI' | 'DESKTOP';
 
 /**
  * Merged configuration combining server settings and database options.

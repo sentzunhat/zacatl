@@ -8,10 +8,10 @@
  * as long as it implements the GreetingRepositoryPort interface.
  */
 
-import { inject, singleton } from "@sentzunhat/zacatl/third-party/tsyringe";
-import type { Greeting, CreateGreetingInput } from "../../models/greeting";
-import { GreetingRepositoryAdapter } from "../../../infrastructure/greetings/repositories/greeting/adapter";
-import type { GreetingServicePort } from "./port";
+import { inject, singleton } from '@sentzunhat/zacatl/third-party/tsyringe';
+import type { Greeting, CreateGreetingInput } from '../../models/greeting';
+import { GreetingRepositoryAdapter } from '../../../infrastructure/greetings/repositories/greeting/adapter';
+import type { GreetingServicePort } from './port';
 
 @singleton()
 export class GreetingServiceAdapter implements GreetingServicePort {
@@ -34,11 +34,11 @@ export class GreetingServiceAdapter implements GreetingServicePort {
 
   async createGreeting(input: CreateGreetingInput): Promise<Greeting> {
     if (!input.message || input.message.trim().length === 0) {
-      throw new Error("Greeting message cannot be empty");
+      throw new Error('Greeting message cannot be empty');
     }
 
     if (!input.language || input.language.trim().length === 0) {
-      throw new Error("Language is required");
+      throw new Error('Language is required');
     }
 
     const normalizedInput: CreateGreetingInput = {
@@ -60,9 +60,7 @@ export class GreetingServiceAdapter implements GreetingServicePort {
   }
 
   async getRandomGreeting(language: string): Promise<Greeting | null> {
-    const greetings = await this.greetingRepository.findByLanguage(
-      language.toLowerCase(),
-    );
+    const greetings = await this.greetingRepository.findByLanguage(language.toLowerCase());
 
     if (greetings.length === 0) {
       return null;

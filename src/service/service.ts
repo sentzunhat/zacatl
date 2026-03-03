@@ -1,14 +1,15 @@
-import { getContainer } from "@zacatl/dependency-injection";
-import { InternalServerError } from "@zacatl/error";
-import { configureI18nNode } from "@zacatl/localization";
-import { Mongoose } from "@zacatl/third-party/mongoose";
-import { Sequelize } from "@zacatl/third-party/sequelize";
+import { getContainer } from '@zacatl/dependency-injection';
+import { InternalServerError } from '@zacatl/error';
+import { configureI18nNode } from '@zacatl/localization';
+// Avoid importing heavy DB runtimes at module load. We register concrete
+// instance constructors at runtime so consumers that never use Sequelize
+// won't cause bundlers to traverse its deps.
 
-import { Layers } from "./layers";
-import { Platforms } from "./platforms/platforms";
-import { DatabaseVendor } from "./platforms/server/database/port";
-import { ServiceType } from "./types";
-import type { ConfigService } from "./types";
+import { Layers } from './layers';
+import { Platforms } from './platforms/platforms';
+import { DatabaseVendor } from './platforms/server/database/port';
+import { ServiceType } from './types';
+import type { ConfigService } from './types';
 
 export type { ConfigService };
 
@@ -45,14 +46,24 @@ export class Service {
     // This ensures repositories can resolve database instances in their constructors
     if (platforms?.server?.databases != null) {
       for (const dbConfig of platforms.server.databases) {
-        if (dbConfig.vendor === DatabaseVendor.MONGOOSE) {
-          getContainer().register(Mongoose, {
-            useValue: dbConfig.instance,
-          });
-        } else if (dbConfig.vendor === DatabaseVendor.SEQUELIZE) {
-          getContainer().register(Sequelize, {
-            useValue: dbConfig.instance,
-          });
+        if (dbConfig.vendor === DatabaseVendor.MONGOOSE && dbConfig.instance != null) {
+          // Register using the concrete instance constructor as the runtime
+          // token to avoid importing the Mongoose class at bundle time.
+          getContainer().register(
+            dbConfig.instance.constructor as unknown as new (...args: unknown[]) => unknown,
+            {
+              useValue: dbConfig.instance,
+            },
+          );
+        } else if (dbConfig.vendor === DatabaseVendor.SEQUELIZE && dbConfig.instance != null) {
+          // Register using the concrete instance constructor as the runtime
+          // token to avoid importing the Sequelize class at bundle time.
+          getContainer().register(
+            dbConfig.instance.constructor as unknown as new (...args: unknown[]) => unknown,
+            {
+              useValue: dbConfig.instance,
+            },
+          );
         }
       }
     }
@@ -68,10 +79,10 @@ export class Service {
     if (run?.auto === true) {
       this.start().catch((err) => {
         throw new InternalServerError({
-          message: "Failed to start service automatically",
-          reason: "Service auto-start encountered an error during initialization",
-          component: "Service",
-          operation: "constructor",
+          message: 'Failed to start service automatically',
+          reason: 'Service auto-start encountered an error during initialization',
+          component: 'Service',
+          operation: 'constructor',
           error: err instanceof Error ? err : undefined,
         });
       });
@@ -86,9 +97,9 @@ export class Service {
     if (configType == null) {
       throw new InternalServerError({
         message: "Service configuration must specify a 'type' field",
-        reason: "Missing service type",
-        component: "Service",
-        operation: "constructor",
+        reason: 'Missing service type',
+        component: 'Service',
+        operation: 'constructor',
       });
     }
 
@@ -97,9 +108,9 @@ export class Service {
         if (platforms?.server == null) {
           throw new InternalServerError({
             message: "ServiceType.SERVER requires 'platforms.server' configuration",
-            reason: "Server platform configuration is missing",
-            component: "Service",
-            operation: "validateConfig",
+            reason: 'Server platform configuration is missing',
+            component: 'Service',
+            operation: 'validateConfig',
             metadata: { serviceType: configType },
           });
         }
@@ -107,9 +118,9 @@ export class Service {
           throw new InternalServerError({
             message:
               "ServiceType.SERVER requires 'layers.application.entryPoints.rest' configuration",
-            reason: "REST entry points configuration is missing",
-            component: "Service",
-            operation: "validateConfig",
+            reason: 'REST entry points configuration is missing',
+            component: 'Service',
+            operation: 'validateConfig',
             metadata: { serviceType: configType },
           });
         }
@@ -119,18 +130,18 @@ export class Service {
         if (platforms?.cli == null) {
           throw new InternalServerError({
             message: "ServiceType.CLI requires 'platforms.cli' configuration",
-            reason: "CLI platform configuration is missing",
-            component: "Service",
-            operation: "validateConfig",
+            reason: 'CLI platform configuration is missing',
+            component: 'Service',
+            operation: 'validateConfig',
             metadata: { serviceType: configType },
           });
         }
         if (layers?.application == null || layers.application.entryPoints?.cli == null) {
           throw new InternalServerError({
             message: "ServiceType.CLI requires 'layers.application.entryPoints.cli' configuration",
-            reason: "CLI entry points configuration is missing",
-            component: "Service",
-            operation: "validateConfig",
+            reason: 'CLI entry points configuration is missing',
+            component: 'Service',
+            operation: 'validateConfig',
             metadata: { serviceType: configType },
           });
         }
@@ -140,9 +151,9 @@ export class Service {
         if (platforms?.desktop == null) {
           throw new InternalServerError({
             message: "ServiceType.DESKTOP requires 'platforms.desktop' configuration",
-            reason: "Desktop platform configuration is missing",
-            component: "Service",
-            operation: "validateConfig",
+            reason: 'Desktop platform configuration is missing',
+            component: 'Service',
+            operation: 'validateConfig',
             metadata: { serviceType: configType },
           });
         }
@@ -150,9 +161,9 @@ export class Service {
           throw new InternalServerError({
             message:
               "ServiceType.DESKTOP requires 'layers.application.entryPoints.ipc' configuration",
-            reason: "IPC entry points configuration is missing",
-            component: "Service",
-            operation: "validateConfig",
+            reason: 'IPC entry points configuration is missing',
+            component: 'Service',
+            operation: 'validateConfig',
             metadata: { serviceType: configType },
           });
         }

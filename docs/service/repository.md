@@ -36,9 +36,9 @@ export abstract class BaseRepository<D, I, O> {
 ## Sequelize Example
 
 ```typescript
-import { BaseRepository, ORMType } from "@sentzunhat/zacatl";
-import { ModelStatic } from "@sentzunhat/zacatl/third-party/sequelize";
-import { UserModel } from "./models/user.model";
+import { BaseRepository, ORMType } from '@sentzunhat/zacatl';
+import { ModelStatic } from '@sentzunhat/zacatl/third-party/sequelize';
+import { UserModel } from './models/user.model';
 
 interface User {
   id: string;
@@ -70,9 +70,9 @@ class UserRepository extends BaseRepository<UserModel, CreateUser, User> {
 ## Mongoose Example
 
 ```typescript
-import { BaseRepository, ORMType } from "@sentzunhat/zacatl";
-import { MongooseModel } from "@sentzunhat/zacatl/third-party/mongoose";
-import { Schema } from "mongoose";
+import { BaseRepository, ORMType } from '@sentzunhat/zacatl';
+import { MongooseModel } from '@sentzunhat/zacatl/third-party/mongoose';
+import { Schema } from 'mongoose';
 
 interface User {
   id: string;
@@ -92,7 +92,7 @@ class UserRepository extends BaseRepository<User, CreateUser, User> {
   constructor() {
     super({
       type: ORMType.Mongoose,
-      name: "User",
+      name: 'User',
       schema: userSchema,
     });
   }
@@ -136,8 +136,8 @@ type SequelizeRepositoryConfig<D extends object> = {
 ## Dependency Injection
 
 ```typescript
-import { service } from "@sentzunhat/zacatl";
-import { singleton } from "tsyringe";
+import { service } from '@sentzunhat/zacatl';
+import { singleton } from 'tsyringe';
 
 @singleton()
 @service()
@@ -146,7 +146,7 @@ class UserService {
 
   async getUser(id: string): Promise<User> {
     const user = await this.userRepo.findById(id);
-    if (!user) throw new NotFoundError({ message: "User not found" });
+    if (!user) throw new NotFoundError({ message: 'User not found' });
     return user;
   }
 }
@@ -168,12 +168,15 @@ async findAll(): Promise<User[]> {
 
 ```typescript
 // Sequelize
-const active = await (this.model as ModelStatic<UserModel>).findAll({
+const active = await(this.model as ModelStatic<UserModel>).findAll({
   where: { isActive: true },
 });
 
 // Mongoose
-const byRole = await (this.model as MongooseModel<User>).find({ role }).lean<User[]>().exec();
+const byRole = await(this.model as MongooseModel<User>)
+  .find({ role })
+  .lean<User[]>()
+  .exec();
 ```
 
 ---

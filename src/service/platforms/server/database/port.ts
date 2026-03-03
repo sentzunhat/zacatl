@@ -1,11 +1,12 @@
-import type { Mongoose } from "mongoose";
-import type { Sequelize } from "sequelize";
+import type { Mongoose } from 'mongoose';
+import type { Sequelize } from 'sequelize';
 
-import type { Optional } from "../../../../utils/optionals";
+import type { Optional } from '../../../../utils/optionals';
 
 export enum DatabaseVendor {
-  MONGOOSE = "MONGOOSE",
-  SEQUELIZE = "SEQUELIZE",
+  MONGOOSE = 'MONGOOSE',
+  SEQUELIZE = 'SEQUELIZE',
+  SQLITE = 'SQLITE',
 }
 
 export type DatabaseInstance = Mongoose | Sequelize;
@@ -16,7 +17,12 @@ export type OnDatabaseConnectedFunction = Optional<
 
 export interface DatabaseConfig {
   vendor: DatabaseVendor;
-  instance: DatabaseInstance;
+  /**
+   * The ORM/database instance (Mongoose or Sequelize).
+   * Not required for `SQLITE` — the adapter opens the file internally
+   * using `connectionString` as the file path (or `':memory:'`).
+   */
+  instance?: DatabaseInstance;
   connectionString: string;
   /**
    * Optional callback to be invoked after a successful DB connection.

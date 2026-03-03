@@ -24,7 +24,7 @@ import {
   Schema,
   Sequelize,
   DataTypes,
-} from "@sentzunhat/zacatl";
+} from '@sentzunhat/zacatl';
 ```
 
 **When to use:**
@@ -41,10 +41,10 @@ import {
 Import ORMs separately:
 
 ```typescript
-import { Service, BaseRepository } from "@sentzunhat/zacatl";
-import { mongoose, Schema } from "@sentzunhat/zacatl/third-party/mongoose";
+import { Service, BaseRepository } from '@sentzunhat/zacatl';
+import { mongoose, Schema } from '@sentzunhat/zacatl/third-party/mongoose';
 // OR
-import { Sequelize, DataTypes } from "@sentzunhat/zacatl/third-party/sequelize";
+import { Sequelize, DataTypes } from '@sentzunhat/zacatl/third-party/sequelize';
 ```
 
 **When to use:**
@@ -63,13 +63,7 @@ import { Sequelize, DataTypes } from "@sentzunhat/zacatl/third-party/sequelize";
 **Style 1 - Main Package:**
 
 ```typescript
-import {
-  Service,
-  BaseRepository,
-  ORMType,
-  mongoose,
-  Schema,
-} from "@sentzunhat/zacatl";
+import { Service, BaseRepository, ORMType, mongoose, Schema } from '@sentzunhat/zacatl';
 
 const UserSchema = new Schema({
   name: String,
@@ -80,7 +74,7 @@ class UserRepository extends BaseRepository {
   constructor() {
     super({
       type: ORMType.Mongoose,
-      name: "User",
+      name: 'User',
       schema: UserSchema,
     });
   }
@@ -90,8 +84,8 @@ class UserRepository extends BaseRepository {
 **Style 2 - Subpath (Minimal):**
 
 ```typescript
-import { Service, BaseRepository, ORMType } from "@sentzunhat/zacatl";
-import { mongoose, Schema } from "@sentzunhat/zacatl/third-party/mongoose";
+import { Service, BaseRepository, ORMType } from '@sentzunhat/zacatl';
+import { mongoose, Schema } from '@sentzunhat/zacatl/third-party/mongoose';
 
 const UserSchema = new Schema({
   name: String,
@@ -102,7 +96,7 @@ class UserRepository extends BaseRepository {
   constructor() {
     super({
       type: ORMType.Mongoose,
-      name: "User",
+      name: 'User',
       schema: UserSchema,
     });
   }
@@ -116,17 +110,11 @@ class UserRepository extends BaseRepository {
 **Style 1 - Main Package:**
 
 ```typescript
-import {
-  Service,
-  BaseRepository,
-  ORMType,
-  Sequelize,
-  DataTypes,
-} from "@sentzunhat/zacatl";
+import { Service, BaseRepository, ORMType, Sequelize, DataTypes } from '@sentzunhat/zacatl';
 
-const sequelize = new Sequelize("sqlite::memory:");
+const sequelize = new Sequelize('sqlite::memory:');
 
-const User = sequelize.define("User", {
+const User = sequelize.define('User', {
   name: DataTypes.STRING,
   email: DataTypes.STRING,
 });
@@ -144,12 +132,12 @@ class UserRepository extends BaseRepository {
 **Style 2 - Subpath (Minimal):**
 
 ```typescript
-import { Service, BaseRepository, ORMType } from "@sentzunhat/zacatl";
-import { Sequelize, DataTypes } from "@sentzunhat/zacatl/third-party/sequelize";
+import { Service, BaseRepository, ORMType } from '@sentzunhat/zacatl';
+import { Sequelize, DataTypes } from '@sentzunhat/zacatl/third-party/sequelize';
 
-const sequelize = new Sequelize("sqlite::memory:");
+const sequelize = new Sequelize('sqlite::memory:');
 
-const User = sequelize.define("User", {
+const User = sequelize.define('User', {
   name: DataTypes.STRING,
   email: DataTypes.STRING,
 });
@@ -172,11 +160,11 @@ If you were importing ORMs from zacatl, **no changes needed** - both styles work
 
 ```typescript
 // v0.0.22 and v0.0.23+ - Still works ✅
-import { Service, mongoose, Schema } from "@sentzunhat/zacatl";
+import { Service, mongoose, Schema } from '@sentzunhat/zacatl';
 
 // v0.0.23+ New option - Minimal bundle
-import { Service } from "@sentzunhat/zacatl";
-import { mongoose, Schema } from "@sentzunhat/zacatl/third-party/mongoose";
+import { Service } from '@sentzunhat/zacatl';
+import { mongoose, Schema } from '@sentzunhat/zacatl/third-party/mongoose';
 ```
 
 ---
@@ -195,7 +183,7 @@ import {
   connect,
   connection,
   MongooseModel, // Type only
-} from "@sentzunhat/zacatl/third-party/mongoose";
+} from '@sentzunhat/zacatl/third-party/mongoose';
 ```
 
 ### Sequelize
@@ -208,7 +196,7 @@ import {
   Op,
   ModelStatic, // Type only
   SequelizeOptions, // Type only
-} from "@sentzunhat/zacatl/third-party/sequelize";
+} from '@sentzunhat/zacatl/third-party/sequelize';
 ```
 
 ---

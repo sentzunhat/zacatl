@@ -1,8 +1,11 @@
 name: Peer install check
 
 on:
-  push: {}
-  pull_request: {}
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch: {}
 
 jobs:
   peer-install:
@@ -21,8 +24,7 @@ jobs:
         run: npm ci
 
       - name: Install peerDependencies declared in package.json
-        run: |
-          node -e "const p=require('./package.json').peerDependencies||{}; const pkgs=Object.keys(p).map(k=>`${k}@${p[k]}`).join(' '); if(pkgs){console.log('Installing peers:',pkgs); require('child_process').execSync('npm install --no-audit --no-fund -s '+pkgs,{stdio:'inherit'});} else console.log('No peers to install');"
+        run: npx tsx scripts/dev/install-peers.ts
 
       - name: Verify peers can be imported
-        run: npx tsx scripts/check-peers.ts
+        run: npx tsx scripts/dev/check-peers.ts

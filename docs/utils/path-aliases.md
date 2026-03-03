@@ -11,37 +11,37 @@ Zacatl uses TypeScript path aliases internally for cleaner imports during develo
 ### Core Modules
 
 ```typescript
-import { loadJSON } from "@zacatl/configuration";
-import { registerDependency, resolveDependency } from "@zacatl/dependency-injection";
-import { CustomError, BadRequestError } from "@zacatl/error";
-import { configureI18nNode } from "@zacatl/localization";
-import { logger } from "@zacatl/logs";
-import { Service } from "@zacatl/service";
-import { encode, generateHmac } from "@zacatl/utils";
+import { loadJSON } from '@zacatl/configuration';
+import { registerDependency, resolveDependency } from '@zacatl/dependency-injection';
+import { CustomError, BadRequestError } from '@zacatl/error';
+import { configureI18nNode } from '@zacatl/localization';
+import { logger } from '@zacatl/logs';
+import { Service } from '@zacatl/service';
+import { encode, generateHmac } from '@zacatl/utils';
 ```
 
 ### Architecture Layers
 
 ```typescript
-import { BaseRepository } from "@zacatl/infrastructure";
-import { Domain } from "@zacatl/domain";
-import { Application } from "@zacatl/application";
-import { Platforms } from "@zacatl/platform";
+import { BaseRepository } from '@zacatl/infrastructure';
+import { Domain } from '@zacatl/domain';
+import { Application } from '@zacatl/application';
+import { Platforms } from '@zacatl/platform';
 ```
 
 ### Third-Party Re-Exports
 
 ```typescript
-import { container, injectable } from "@zacatl/third-party";
-import { z } from "@zacatl/third-party";
+import { container, injectable } from '@zacatl/third-party';
+import { z } from '@zacatl/third-party';
 ```
 
 ### ORM (Subpath Imports Only)
 
 ```typescript
 // ORM packages are NOT in main exports - use subpath imports:
-import { mongoose, Schema } from "@sentzunhat/zacatl/third-party/mongoose";
-import { Sequelize, DataTypes } from "@sentzunhat/zacatl/third-party/sequelize";
+import { mongoose, Schema } from '@sentzunhat/zacatl/third-party/mongoose';
+import { Sequelize, DataTypes } from '@sentzunhat/zacatl/third-party/sequelize';
 ```
 
 ## How Users Should Import
@@ -50,13 +50,13 @@ If you're using Zacatl in your project, import from the published package:
 
 ```typescript
 // ✅ Correct - Public API imports
-import { Service, ServiceType, ServerVendor } from "@sentzunhat/zacatl";
-import { BaseRepository } from "@sentzunhat/zacatl/infrastructure";
-import { NotFoundError } from "@sentzunhat/zacatl/errors";
-import { mongoose } from "@sentzunhat/zacatl/third-party/mongoose";
+import { Service, ServiceType, ServerVendor } from '@sentzunhat/zacatl';
+import { BaseRepository } from '@sentzunhat/zacatl/infrastructure';
+import { NotFoundError } from '@sentzunhat/zacatl/errors';
+import { mongoose } from '@sentzunhat/zacatl/third-party/mongoose';
 
 // ❌ Wrong - Internal aliases don't work in user projects
-import { Service } from "@zacatl/service"; // This won't resolve
+import { Service } from '@zacatl/service'; // This won't resolve
 ```
 
 See the [main README](../../README.md) for complete import examples.
@@ -66,19 +66,19 @@ See the [main README](../../README.md) for complete import examples.
 ### Before (Relative Paths)
 
 ```typescript
-import { Service } from "../../../service/service";
-import { BaseRepository } from "../../service/layers/infrastructure/repositories/abstract";
-import { BadRequestError } from "../../../error/bad-request";
-import { logger } from "../../../logs";
+import { Service } from '../../../service/service';
+import { BaseRepository } from '../../service/layers/infrastructure/repositories/abstract';
+import { BadRequestError } from '../../../error/bad-request';
+import { logger } from '../../../logs';
 ```
 
 ### After (Path Aliases)
 
 ```typescript
-import { Service } from "@zacatl/service";
-import { BaseRepository } from "@zacatl/infrastructure";
-import { BadRequestError } from "@zacatl/error";
-import { logger } from "@zacatl/logs";
+import { Service } from '@zacatl/service';
+import { BaseRepository } from '@zacatl/infrastructure';
+import { BadRequestError } from '@zacatl/error';
+import { logger } from '@zacatl/logs';
 ```
 
 ## Complete Reference
@@ -93,11 +93,32 @@ import { logger } from "@zacatl/logs";
 | `@zacatl/service`              | `src/service/`                       | Service class              |
 | `@zacatl/utils`                | `src/utils/`                         | Utility functions          |
 | `@zacatl/third-party`          | `src/third-party/`                   | tsyringe, zod re-exports   |
-| `@zacatl/optionals`            | `src/optionals.ts`                   | Optional exports           |
+| `@zacatl/optionals`            | `src/utils/optionals.ts`             | Optional type helpers      |
 | `@zacatl/infrastructure`       | `src/service/layers/infrastructure/` | Infrastructure layer       |
 | `@zacatl/domain`               | `src/service/layers/domain/`         | Domain layer               |
 | `@zacatl/application`          | `src/service/layers/application/`    | Application layer          |
 | `@zacatl/platform`             | `src/service/platforms/`             | Platform layer             |
+
+## Native Subpath Imports (`#/*`)
+
+Node 24 native subpath imports are configured in `package.json` alongside the TypeScript path aliases:
+
+```json
+{
+  "imports": {
+    "#/*": "./src/*"
+  }
+}
+```
+
+This allows import resolution without any TypeScript config or bundler:
+
+```typescript
+import { UserService } from '#/application/user.service';
+import { requestContext } from '#/service/platforms/context';
+```
+
+> **Note:** `#/*` imports require Node 24.14.0+ and are for internal module use within the repository. They are not exported in the published package.
 
 ## Usage in Your Project
 

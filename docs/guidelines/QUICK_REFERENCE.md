@@ -110,14 +110,16 @@ docs/readme/add-examples
 
 ## Import Order
 
-1. External packages (Node, npm)
-2. Path aliases (`@zacatl/`)
+1. External packages (Node builtins, npm)
+2. Path aliases (`@zacatl/`), native subpath imports (`#/*`)
 3. Relative imports (`./`, `../`)
 
 ```typescript
-import { FastifyRequest } from "fastify";
-import { Service } from "@zacatl/service";
-import { handleRequest } from "./utils";
+import { AsyncLocalStorage } from 'node:async_hooks'; // Node built-in (node: prefix)
+import { FastifyRequest } from 'fastify'; // npm package
+import { Service } from '@zacatl/service'; // @zacatl/ alias
+import { requestContext } from '#/service/platforms/context'; // #/* native subpath
+import { handleRequest } from './utils'; // relative
 ```
 
 ---
@@ -126,9 +128,9 @@ import { handleRequest } from "./utils";
 
 ```typescript
 // ✅ Correct
-import { z } from "@zacatl/third-party/zod";
-import { v4 as uuidv4 } from "@zacatl/third-party/uuid";
-import { container } from "@zacatl/third-party/tsyringe";
+import { z } from '@zacatl/third-party/zod';
+import { v4 as uuidv4 } from '@zacatl/third-party/uuid';
+import { container } from '@zacatl/third-party/tsyringe';
 
 // ❌ Don't export from root
 ```
@@ -162,7 +164,7 @@ export function myFunction(arg1: string, arg2?: string): string {
 ## Test Template (AAA Pattern)
 
 ```typescript
-it("should [expected behavior] when [condition]", () => {
+it('should [expected behavior] when [condition]', () => {
   // Arrange: setup
   const input = {
     /* ... */
@@ -180,16 +182,18 @@ it("should [expected behavior] when [condition]", () => {
 
 ## npm Scripts
 
-| Command               | Purpose                |
-| --------------------- | ---------------------- |
-| `npm run build`       | Compile TypeScript     |
-| `npm run build:watch` | Watch mode compilation |
-| `npm test`            | Run all tests once     |
-| `npm run test:watch`  | Watch mode tests       |
-| `npm run lint`        | ESLint check           |
-| `npm run lint:fix`    | Auto-fix lint issues   |
-| `npm run type:check`  | TypeScript checking    |
-| `npm run clean:build` | Clean & rebuild        |
+| Command                    | Purpose                                    |
+| -------------------------- | ------------------------------------------ |
+| `npm run build`            | Compile TypeScript                         |
+| `npm run build:watch`      | Watch mode compilation                     |
+| `npm test`                 | Run all tests once                         |
+| `npm run test:watch`       | Watch mode tests                           |
+| `npm run lint`             | ESLint check                               |
+| `npm run lint:fix`         | Auto-fix lint issues                       |
+| `npm run type:check`       | TypeScript checking                        |
+| `npm run clean:build`      | Clean & rebuild                            |
+| `npm run barrels:generate` | Regenerate barrel `index.ts` files         |
+| `npm run barrels:verify`   | Verify barrels are up to date (used in CI) |
 
 ---
 
@@ -197,6 +201,7 @@ it("should [expected behavior] when [condition]", () => {
 
 - [ ] `npm run type:check` passes
 - [ ] `npm run lint` passes (or `npm run lint:fix`)
+- [ ] `npm run barrels:verify` passes (barrel `index.ts` files up to date)
 - [ ] `npm test` passes
 - [ ] Tests added for new features/fixes
 - [ ] JSDoc added for public APIs
