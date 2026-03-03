@@ -1,4 +1,4 @@
-// @barrel-manual
+// @barrel-generated
 export * from './server-config';
 export type { ApiServerPort, ProxyConfig } from '../api/port';
 export type { PageServerPort, StaticConfig } from '../page/port';

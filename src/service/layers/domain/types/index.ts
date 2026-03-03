@@ -1,4 +1,4 @@
-// @barrel-manual
+// @barrel-generated
 import type { Constructor } from '../../types';
 import type { ProviderPort, ServicePort } from '../ports';
 

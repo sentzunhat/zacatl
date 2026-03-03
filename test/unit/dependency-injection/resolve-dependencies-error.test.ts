@@ -14,14 +14,14 @@ import {
 
 // A class that is intentionally NOT decorated with @injectable
 class UnregisteredService {
-  doWork() {
+  doWork(): string {
     return 'work';
   }
 }
 
 // A class that IS decorated and will be manually registered
 class RegisteredService {
-  doWork() {
+  doWork(): string {
     return 'registered';
   }
 }

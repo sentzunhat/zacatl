@@ -68,7 +68,9 @@ const copyFirstExisting = (candidates: string[], dest: string): string | null =>
 
 const usedEsm = copyFirstExisting(esmCandidates, buildEsmDest);
 const usedCjs = copyFirstExisting(cjsCandidates, buildCjsDest);
+// eslint-disable-next-line no-console
 if (!usedEsm) console.warn('No ESM build source found in', esmCandidates);
+// eslint-disable-next-line no-console
 if (!usedCjs) console.warn('No CJS build source found in', cjsCandidates);
 
 const binDir = path.join(buildDest, 'bin');
@@ -96,6 +98,7 @@ for (const b of buildBinCandidates) {
       fs.cpSync(b, binDir, { recursive: true });
       copiedBin = true;
     } catch (err: unknown) {
+      // eslint-disable-next-line no-console
       console.warn(
         `Could not copy bin from ${b}:`,
         err instanceof Error ? err.message : String(err),
@@ -117,6 +120,7 @@ if (!copiedBin) {
           /* chmod failures are non-fatal on Windows */
         }
       } catch (err: unknown) {
+        // eslint-disable-next-line no-console
         console.warn(
           `Could not copy script ${cand}:`,
           err instanceof Error ? err.message : String(err),
@@ -135,6 +139,7 @@ const removeSourceMaps = (dir: string): void => {
       try {
         fs.rmSync(full);
       } catch (err: unknown) {
+        // eslint-disable-next-line no-console
         console.warn(
           `Could not remove source map ${full}:`,
           err instanceof Error ? err.message : String(err),
@@ -153,6 +158,7 @@ if (fs.existsSync(esmEslint) && !fs.existsSync(path.join(buildCjsDest, 'eslint')
   try {
     fs.cpSync(esmEslint, path.join(buildCjsDest, 'eslint'), { recursive: true });
   } catch (err: unknown) {
+    // eslint-disable-next-line no-console
     console.warn(
       'Could not copy eslint assets to CJS build:',
       err instanceof Error ? err.message : String(err),
@@ -163,6 +169,7 @@ if (fs.existsSync(esmLocalization) && !fs.existsSync(path.join(buildCjsDest, 'lo
   try {
     fs.cpSync(esmLocalization, path.join(buildCjsDest, 'localization'), { recursive: true });
   } catch (err: unknown) {
+    // eslint-disable-next-line no-console
     console.warn(
       'Could not copy localization assets to CJS build:',
       err instanceof Error ? err.message : String(err),
@@ -318,4 +325,5 @@ if (!(newPkg.bin as Record<string, string>)['zacatl-fix-esm']) {
 if (!newPkg['files']) newPkg['files'] = ['build', 'package.json'];
 
 fs.writeFileSync(publishPkgPath, JSON.stringify(newPkg, null, 2) + '\n');
+// eslint-disable-next-line no-console
 console.log('Wrote', publishPkgPath);

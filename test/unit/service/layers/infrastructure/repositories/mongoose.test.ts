@@ -1,6 +1,7 @@
-import { Schema } from 'mongoose';
-import { singleton } from 'tsyringe';
 import { describe, it, expect, vi, beforeAll } from 'vitest';
+
+import { Schema } from '@zacatl/third-party/mongoose';
+import { singleton } from '@zacatl/third-party/tsyringe';
 
 import {
   MongooseRepository,
@@ -37,14 +38,16 @@ class UserRepository extends MongooseRepository<UserTestDb, UserTestDb, UserTest
 describe('MongooseRepository', () => {
   let repository: UserRepository;
 
-  beforeAll(async () => {
+  beforeAll(async (): Promise<void> => {
     await connectToMongoServerAndRegisterDependency();
 
     try {
       repository = new UserRepository();
-    } catch (error: any) {
+    } catch (error: unknown) {
       // If mongoose can't be loaded (running from TS source), skip these tests
-      if (error.message?.includes('Mongoose is not installed')) {
+      const msg = error instanceof Error ? error.message : String(error);
+      if (msg?.includes('Mongoose is not installed')) {
+        // eslint-disable-next-line no-console
         console.log('Skipping MongooseRepository tests - running from TypeScript source');
         return;
       }

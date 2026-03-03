@@ -74,7 +74,7 @@ export abstract class AbstractRouteHandler<
   protected buildResponse(
     data: HandlerOutput<TResponse>,
   ): HandlerOutput<TResponse> | Record<string, unknown> {
-    return data as HandlerOutput<TResponse>;
+    return data;
   }
 
   public async execute(

@@ -1,6 +1,6 @@
+import { execSync } from 'child_process';
 import { promises as fs } from 'fs';
 import path from 'path';
-import { execSync } from 'child_process';
 
 const main = async (): Promise<number> => {
   try {
@@ -14,10 +14,12 @@ const main = async (): Promise<number> => {
       .join(' ');
 
     if (!pkgs) {
+      // eslint-disable-next-line no-console
       console.log('No peerDependencies to install.');
       return 0;
     }
 
+    // eslint-disable-next-line no-console
     console.log('Installing peers:', pkgs);
     execSync(`npm install --no-audit --no-fund -s ${pkgs}`, {
       stdio: 'inherit',
@@ -25,6 +27,7 @@ const main = async (): Promise<number> => {
 
     return 0;
   } catch (err: unknown) {
+    // eslint-disable-next-line no-console
     console.error('Failed to install peers:', err);
     return 1;
   }
@@ -33,6 +36,7 @@ const main = async (): Promise<number> => {
 void main()
   .then((code) => process.exit(code))
   .catch((err: unknown) => {
+    // eslint-disable-next-line no-console
     console.error(err);
     process.exit(1);
   });

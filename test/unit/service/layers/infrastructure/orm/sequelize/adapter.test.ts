@@ -4,8 +4,8 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 // Mock Sequelize before partial import
 vi.mock('sequelize', () => {
   class Model {
-    public static init() {}
-    public get(opts: any) {
+    public static init(): void {}
+    public get(opts: any): any {
       if (opts && opts.plain) return JSON.parse(JSON.stringify(this));
       return this;
     }
@@ -16,7 +16,7 @@ vi.mock('sequelize', () => {
   return { Model };
 });
 
-import { Model } from 'sequelize';
+import { SequelizeModel as Model } from '@zacatl/third-party/sequelize';
 
 import { SequelizeAdapter } from '../../../../../../../src/service/layers/infrastructure/orm/sequelize/adapter';
 

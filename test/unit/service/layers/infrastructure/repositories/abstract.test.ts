@@ -1,5 +1,5 @@
-import { Schema } from 'mongoose';
-import { singleton } from 'tsyringe';
+import { Schema } from '@zacatl/third-party/mongoose';
+import { singleton } from '@zacatl/third-party/tsyringe';
 
 import { BaseRepository } from '../../../../../../src/service/layers/infrastructure/repositories/abstract';
 import { ORMType } from '../../../../../../src/service/layers/infrastructure/repositories/types';

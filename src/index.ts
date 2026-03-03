@@ -1,4 +1,4 @@
-// @barrel-manual
+// @barrel-generated
 export * from './configuration';
 export * from './utils';
 export * from './error';

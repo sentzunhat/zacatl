@@ -1,4 +1,4 @@
-import type { FastifyRequest } from 'fastify';
+import type { FastifyRequest } from '@zacatl/third-party/fastify';
 
 export const createFakeFastifyRequest = (): Partial<FastifyRequest> => ({
   id: 'req-1',
@@ -19,11 +19,11 @@ export const createFakeFastifyRequest = (): Partial<FastifyRequest> => ({
 });
 
 // Create a fake FastifyReply object. It mocks the 'code' and 'send' methods.
-export const createFakeFastifyReply = () => {
-  const reply: any = {
-    code: vi.fn().mockImplementation(function (this: any, code: number) {
+export const createFakeFastifyReply = (): unknown => {
+  const reply: Record<string, unknown> = {
+    code: vi.fn().mockImplementation(function (this: Record<string, unknown>, code: number) {
       // Save the code for potential additional assertions.
-      this.calledCode = code;
+      this['calledCode'] = code;
       return this;
     }),
     send: vi.fn().mockResolvedValue(undefined),

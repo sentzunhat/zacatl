@@ -146,22 +146,16 @@ export class CustomError extends Error {
   }
 
   public override toString(): string {
-    return (
-      `[` +
-      this.time.toISOString() +
-      `] ` +
-      this.name +
-      `: ` +
-      this.message +
-      `\nCorrelationId: ` +
-      this.correlationId +
-      (this.code != null ? `\nCode: ${this.code}` : '') +
-      (this.component != null ? `\nComponent: ${this.component}` : '') +
-      (this.operation != null ? `\nOperation: ${this.operation}` : '') +
-      (this.reason != null ? `\nReason: ${this.reason}` : '') +
-      (this.metadata != null ? `\nMetadata: ${JSON.stringify(this.metadata, null, 2)}` : '') +
-      (this.error != null ? `\nCaused by: ${this.error.toString()}` : '') +
-      (this.stack != null ? `\nStack: ${this.stack}` : '')
-    );
+    return [
+      `[${this.time.toISOString()}] ${this.name}: ${this.message}`,
+      `\nCorrelationId: ${this.correlationId}`,
+      this.code != null ? `\nCode: ${this.code}` : '',
+      this.component != null ? `\nComponent: ${this.component}` : '',
+      this.operation != null ? `\nOperation: ${this.operation}` : '',
+      this.reason != null ? `\nReason: ${this.reason}` : '',
+      this.metadata != null ? `\nMetadata: ${JSON.stringify(this.metadata, null, 2)}` : '',
+      this.error != null ? `\nCaused by: ${this.error.toString()}` : '',
+      this.stack != null ? `\nStack: ${this.stack}` : '',
+    ].join('');
   }
 }

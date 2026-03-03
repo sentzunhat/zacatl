@@ -9,7 +9,7 @@ export type LoggerInput =
   | undefined;
 
 /**
- * Logger interface that wraps Pino with structured logging
+ * Logger interface for structured logging
  */
 export interface Logger {
   log: (message: string, input?: LoggerInput) => void;
@@ -32,17 +32,6 @@ export interface LoggerPort {
   error: (message: string, input?: LoggerInput) => void;
   fatal: (message: string, input?: LoggerInput) => void;
 }
-
-/**
- * Re-export Pino types for convenience
- */
-/**
- * Re-export Pino types for convenience
- *
- * @remarks
- * This is a type-only export and does not introduce runtime dependencies.
- */
-export type { LoggerOptions as PinoLoggerConfig } from '@zacatl/third-party/pino';
 
 /**
  * Adapter type identifier for built-in adapters

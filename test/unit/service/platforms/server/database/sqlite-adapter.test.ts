@@ -1,4 +1,4 @@
-import { describe, it, expect, afterEach } from 'vitest';
+import { describe, it, expect, afterEach, beforeAll } from 'vitest';
 
 import { CustomError } from '@zacatl/error';
 
@@ -6,10 +6,23 @@ import { SqliteAdapter } from '../../../../../../src/service/platforms/server/da
 
 describe('SqliteAdapter', () => {
   let adapter: SqliteAdapter;
+  let sqliteAvailable = false;
+
+  beforeAll(async () => {
+    // Check if node:sqlite is available before running tests
+    try {
+      await import('node:sqlite');
+      sqliteAvailable = true;
+    } catch {
+      sqliteAvailable = false;
+    }
+  });
 
   afterEach(async () => {
     // Ensure the DB is closed between tests
-    await adapter.disconnect();
+    if (adapter) {
+      await adapter.disconnect();
+    }
   });
 
   describe('connect()', () => {
@@ -22,6 +35,11 @@ describe('SqliteAdapter', () => {
     });
 
     it('opens an in-memory database when connectionString is :memory:', async () => {
+      if (!sqliteAvailable) {
+        // Skip test if node:sqlite is not available
+        return;
+      }
+
       adapter = new SqliteAdapter();
 
       await adapter.connect('TestService', {
@@ -41,6 +59,11 @@ describe('SqliteAdapter', () => {
 
   describe('disconnect()', () => {
     it('closes the database and sets it to undefined', async () => {
+      if (!sqliteAvailable) {
+        // Skip test if node:sqlite is not available
+        return;
+      }
+
       adapter = new SqliteAdapter();
 
       await adapter.connect('TestService', {
@@ -62,6 +85,11 @@ describe('SqliteAdapter', () => {
     });
 
     it('can be called multiple times without error', async () => {
+      if (!sqliteAvailable) {
+        // Skip test if node:sqlite is not available
+        return;
+      }
+
       adapter = new SqliteAdapter();
 
       await adapter.connect('TestService', {

@@ -1,4 +1,4 @@
-// @barrel-manual
+// @barrel-generated
 import type { Optional } from '../../../utils/optionals';
 import type { ConfigApplication } from '../application';
 import type { ConfigDomain, ProviderPort } from '../domain';

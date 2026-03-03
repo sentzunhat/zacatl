@@ -9,7 +9,9 @@ import { CustomError } from '@zacatl/error';
 
 import { SequelizeAdapter } from '../../../../../../src/service/platforms/server/database/sequelize-adapter';
 
-const makeSequelize = (overrides: Partial<{ authenticate: () => Promise<void> }> = {}) => ({
+const makeSequelize = (
+  overrides: Partial<{ authenticate: () => Promise<void> }> = {},
+): Record<string, unknown> => ({
   authenticate: vi.fn().mockResolvedValue(undefined),
   constructor: { name: 'Sequelize' },
   ...overrides,
@@ -52,7 +54,7 @@ describe('SequelizeAdapter', () => {
         instance: fakeSequelize as any,
       });
 
-      expect(fakeSequelize.authenticate).toHaveBeenCalledOnce();
+      expect((fakeSequelize as Record<string, any>)['authenticate']).toHaveBeenCalledOnce();
     });
 
     it('registers the instance in the DI container after connecting', async () => {

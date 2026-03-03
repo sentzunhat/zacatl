@@ -14,22 +14,36 @@ describe('measureExecutionTime()', () => {
   });
 
   it('executes the callback and logs start/end messages by default', async () => {
-    const callback = vi.fn(async () => {});
+    const fn = vi.fn(async () => {});
 
-    await measureExecutionTime('my-process', callback);
+    await measureExecutionTime({ name: 'my-process', fn });
 
-    expect(callback).toHaveBeenCalledOnce();
+    expect(fn).toHaveBeenCalledOnce();
     expect(infoMock).toHaveBeenCalledTimes(2);
-    expect(infoMock.mock.calls[0]![0]).toContain('my-process execution started');
-    expect(infoMock.mock.calls[1]![0]).toMatch(/my-process execution time: \d+\.\d{2} ms/);
+    expect(infoMock.mock.calls[0]![0]).toContain('[my-process] Started');
+    expect(infoMock.mock.calls[1]![0]).toMatch(/\[my-process\] Completed in \d+\.\d{2}ms/);
   });
 
-  it('skips all log output when skipOutput is true', async () => {
-    const callback = vi.fn(async () => {});
+  it('displays duration in seconds when >= 1000ms', async () => {
+    const fn = vi.fn(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 1100));
+    });
 
-    await measureExecutionTime('silent-process', callback, true);
+    await measureExecutionTime({ name: 'long-process', fn });
 
-    expect(callback).toHaveBeenCalledOnce();
+    expect(fn).toHaveBeenCalledOnce();
+    expect(infoMock).toHaveBeenCalledTimes(2);
+    expect(infoMock.mock.calls[1]![0]).toMatch(
+      /\[long-process\] Completed in \d+\.\d{3}s \(\d+\.\d{2}ms\)/,
+    );
+  });
+
+  it('skips all log output when silent is true', async () => {
+    const fn = vi.fn(async () => {});
+
+    await measureExecutionTime({ name: 'silent-process', fn, silent: true });
+
+    expect(fn).toHaveBeenCalledOnce();
     expect(infoMock).not.toHaveBeenCalled();
   });
 
@@ -37,8 +51,11 @@ describe('measureExecutionTime()', () => {
     const err = new Error('boom');
 
     await expect(
-      measureExecutionTime('failing-process', async () => {
-        throw err;
+      measureExecutionTime({
+        name: 'failing-process',
+        fn: async () => {
+          throw err;
+        },
       }),
     ).rejects.toThrow('boom');
   });

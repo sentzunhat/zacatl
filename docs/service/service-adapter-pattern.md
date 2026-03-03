@@ -243,8 +243,8 @@ When implementing a new service, verify:
 
 See these examples for full implementations:
 
-- `examples/platform-express/with-mongodb-react/apps/backend/src/index.ts`
-- `examples/platform-fastify/with-sqlite-react/apps/backend/src/index.ts`
-- `examples/platform-fastify/with-mongodb-react/apps/backend/src/index.ts`
+- `examples/express-mongodb-react/backend/src/index.ts`
+- `examples/fastify-sqlite-react/backend/src/index.ts`
+- `examples/fastify-mongodb-react/backend/src/index.ts`
 
 Each example follows this exact pattern - use them as reference templates.

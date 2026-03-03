@@ -1,4 +1,4 @@
-// @barrel-manual
+// @barrel-generated
 import type { Optional } from '../../../utils/optionals';
 import type { ConfigCLI } from '../cli/types';
 import type { ConfigDesktop } from '../desktop/types';

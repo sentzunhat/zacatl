@@ -10,21 +10,23 @@
  * Glob patterns are supported via Node 22+ built-in glob:
  *   npx tsx scripts/clean/rm.ts 'src/**\/*.js'
  */
+import { spawnSync } from 'child_process';
 import { rmSync, existsSync } from 'fs';
 import { glob } from 'fs/promises';
 import { resolve, relative } from 'path';
-import { spawnSync } from 'child_process';
 
 const root = process.cwd();
 
 const safeRm = (abs: string): void => {
   const rel = relative(root, abs);
   if (rel.startsWith('..') || !rel) {
+    // eslint-disable-next-line no-console
     console.warn('skipping path outside repo root:', abs);
     return;
   }
   if (!existsSync(abs)) return;
   rmSync(abs, { recursive: true, force: true });
+  // eslint-disable-next-line no-console
   console.log('removed', rel);
 };
 
@@ -35,6 +37,7 @@ const cleanGitignored = (): void => {
     { encoding: 'utf8', maxBuffer: 10 * 1024 * 1024, cwd: root },
   );
   if (result.error || result.status !== 0) {
+    // eslint-disable-next-line no-console
     console.error('git ls-files failed:', result.stderr);
     process.exit(1);
   }
@@ -44,6 +47,7 @@ const cleanGitignored = (): void => {
     .filter((p) => !p.startsWith('node_modules/') && p !== 'node_modules');
 
   if (files.length === 0) {
+    // eslint-disable-next-line no-console
     console.log('nothing to clean');
     return;
   }
@@ -59,6 +63,7 @@ const main = async (): Promise<void> => {
   }
 
   if (!args.length) {
+    // eslint-disable-next-line no-console
     console.error('usage: rm.ts <path|glob> [...] | --gitignored');
     process.exit(1);
   }
@@ -78,6 +83,7 @@ const main = async (): Promise<void> => {
 };
 
 void main().catch((err: unknown) => {
+  // eslint-disable-next-line no-console
   console.error(err);
   process.exit(1);
 });

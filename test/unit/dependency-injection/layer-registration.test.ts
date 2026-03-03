@@ -14,10 +14,10 @@ describe('Layer Registration Pattern', () => {
     clearContainer();
   });
 
-  it('should register and resolve dependencies in correct order', () => {
+  it('should register and resolve dependencies in correct order', (): void => {
     // Infrastructure layer
     class UserRepository {
-      getData() {
+      getData(): string {
         return 'user-data';
       }
     }
@@ -30,7 +30,7 @@ describe('Layer Registration Pattern', () => {
         this.repo = repo;
       }
 
-      getUser() {
+      getUser(): string {
         return this.repo.getData();
       }
     }
@@ -46,9 +46,9 @@ describe('Layer Registration Pattern', () => {
     expect(userService.getUser()).toBe('user-data');
   });
 
-  it('should support registerAndResolve convenience function', () => {
+  it('should support registerAndResolve convenience function', (): void => {
     class SimpleService {
-      getValue() {
+      getValue(): string {
         return 'simple';
       }
     }
@@ -60,7 +60,7 @@ describe('Layer Registration Pattern', () => {
     expect(service!.getValue()).toBe('simple');
   });
 
-  it('should handle multiple dependencies in single call', () => {
+  it('should handle multiple dependencies in single call', (): void => {
     class ServiceA {
       name = 'A';
     }
@@ -80,7 +80,7 @@ describe('Layer Registration Pattern', () => {
     expect(services[2]?.name).toBe('C');
   });
 
-  it('should maintain instance order', () => {
+  it('should maintain instance order', (): void => {
     class First {
       order = 1;
     }

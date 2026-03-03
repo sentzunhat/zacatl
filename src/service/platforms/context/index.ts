@@ -1,4 +1,4 @@
-// @barrel-manual
+// @barrel-generated
 /**
  * Request context module — AsyncLocalStorage-based request scoping for Node 24+.
  *

@@ -45,14 +45,21 @@ class HandlerWithManualReply extends AbstractRouteHandler<
     return { custom: 'value' };
   }
 
-  protected override buildResponse(data: { custom: string }) {
+  protected override buildResponse(data: { custom: string }): {
+    custom: string;
+    manually: boolean;
+  } {
     // Override buildResponse to customize response shape
     return { ...data, manually: true };
   }
 }
 
 class HandlerWithCustomEnvelope extends TestRouteHandler {
-  protected override buildResponse(data: { id: number; name: string }) {
+  protected override buildResponse(data: { id: number; name: string }): {
+    ok: boolean;
+    message: string;
+    data: { id: number; name: string };
+  } {
     return { ok: true, message: 'Success', data };
   }
 }

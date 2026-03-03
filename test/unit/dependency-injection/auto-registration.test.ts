@@ -5,8 +5,9 @@
  * can auto-register dependencies without needing Service orchestration.
  */
 
-import { container } from 'tsyringe';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
+
+import { container } from '@zacatl/third-party/tsyringe';
 
 import { clearContainer, resolveDependency } from '../../../src/dependency-injection';
 import { Domain } from '../../../src/service/layers/domain/domain';
@@ -19,9 +20,9 @@ describe('Auto-Registration Without Service', () => {
     clearContainer();
   });
 
-  it('should auto-register domain providers on construction', () => {
+  it('should auto-register domain providers on construction', (): void => {
     class MyService {
-      getName() {
+      getName(): string {
         return 'MyService';
       }
     }
@@ -37,11 +38,11 @@ describe('Auto-Registration Without Service', () => {
     expect(service.getName()).toBe('MyService');
   });
 
-  it('should auto-register on construction (new behavior)', () => {
+  it('should auto-register on construction (new behavior)', (): void => {
     const registerSpy = vi.spyOn(container, 'register');
 
     class AnotherService {
-      getName() {
+      getName(): string {
         return 'AnotherService';
       }
     }
@@ -62,9 +63,9 @@ describe('Auto-Registration Without Service', () => {
     expect(service.getName()).toBe('AnotherService');
   });
 
-  it('should work without Service - direct layer usage', () => {
+  it('should work without Service - direct layer usage', (): void => {
     class UserService {
-      getUser() {
+      getUser(): { id: number; name: string } {
         return { id: 1, name: 'John' };
       }
     }
@@ -102,7 +103,7 @@ describe('Auto-Registration Without Service', () => {
     }
 
     class UserRepository extends BaseTestRepository {
-      findUser() {
+      findUser(): { id: number; name: string } {
         return { id: 1, name: 'John' };
       }
     }
@@ -124,7 +125,7 @@ describe('Auto-Registration Without Service', () => {
     expect(userRepo.findUser()).toEqual({ id: 1, name: 'John' });
   });
 
-  it('should support DI injection between auto-registered layers', () => {
+  it('should support DI injection between auto-registered layers', (): void => {
     class DataService implements RepositoryPort<object> {
       public model = {} as RepositoryModel<object>;
 
@@ -132,7 +133,7 @@ describe('Auto-Registration Without Service', () => {
         return input ? (input as object) : null;
       }
 
-      getData() {
+      getData(): string {
         return 'data';
       }
 
@@ -168,7 +169,7 @@ describe('Auto-Registration Without Service', () => {
         this.dataService = resolveDependency(DataService);
       }
 
-      process() {
+      process(): string {
         return this.dataService.getData().toUpperCase();
       }
     }

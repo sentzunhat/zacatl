@@ -6,28 +6,38 @@ import { createRequire } from 'module';
 // `tracingChannel` which may not exist or may be non-callable in some
 // environments. Provide a robust fallback for both ESM and CommonJS views
 // so tests don't crash when libraries call `diagnostics.tracingChannel()`.
-const fallback = () => ({
-  publish: () => {},
-  subscribe: () => ({ unsubscribe: () => {} }),
+const fallback = (): {
+  publish: () => void;
+  subscribe: () => { unsubscribe: () => void };
+} => ({
+  publish: (): void => {},
+  subscribe: (): { unsubscribe: () => void } => ({ unsubscribe: (): void => {} }),
 });
 
-function ensureTracingChannelOn(obj: any) {
-  if (!obj) return;
+function ensureTracingChannelOn(obj: unknown): void {
+  if (!obj || typeof obj !== 'object') return;
+  const target = obj as Record<string, unknown>;
   try {
-    if (typeof obj.tracingChannel === 'function') return;
+    if (typeof target['tracingChannel'] === 'function') return;
 
     // If property exists but is not a function, attempt to replace it.
     // Prefer direct assignment (works in most environments).
-    obj.tracingChannel = () => fallback();
-    if (typeof obj.tracingChannel === 'function') return;
+    target['tracingChannel'] = (): {
+      publish: () => void;
+      subscribe: () => { unsubscribe: () => void };
+    } => fallback();
+    if (typeof target['tracingChannel'] === 'function') return;
   } catch {
     // Assignment may fail for non-writable/non-configurable properties.
   }
 
   // Try to define the property via defineProperty (if allowed).
   try {
-    Object.defineProperty(obj, 'tracingChannel', {
-      value: () => fallback(),
+    Object.defineProperty(target, 'tracingChannel', {
+      value: (): {
+        publish: () => void;
+        subscribe: () => { unsubscribe: () => void };
+      } => fallback(),
       writable: true,
       configurable: true,
       enumerable: false,
@@ -40,7 +50,7 @@ function ensureTracingChannelOn(obj: any) {
 }
 
 // Patch ESM namespace view
-ensureTracingChannelOn(diagnostics as any);
+ensureTracingChannelOn(diagnostics);
 
 // Also patch CommonJS view used by some libraries (pino/fastify may use require())
 try {

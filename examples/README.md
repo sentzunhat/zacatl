@@ -12,16 +12,16 @@ A catalog of standalone, production-ready server applications demonstrating diff
 
 **Choose your platform:**
 
-- **[platform-fastify/](./platform-fastify/)** ⭐ **RECOMMENDED** - Fastest & most polished
-  - `with-sqlite-react/` - Fastify + SQLite + React (Backend: 8081, Frontend: 5001, < 1s startup)
-  - `with-sqlite-svelte/` - Fastify + SQLite + Svelte (Backend: 8081, Frontend: 5001, < 1s startup)
-  - `with-mongodb-react/` - Fastify + MongoDB + React (Backend: 8082, Frontend: 5002, < 2s startup)
-  - `with-postgres-react/` - Fastify + PostgreSQL + React (Backend: 8083, Frontend: 5003, < 2s startup)
-- **[platform-express/](./platform-express/)** - Traditional Node.js patterns
-  - `with-sqlite-react/` - Express + SQLite + React (Backend: 8181, Frontend: 5001)
-  - `with-sqlite-svelte/` - Express + SQLite + Svelte (Backend: 8181, Frontend: 5001)
-  - `with-mongodb-react/` - Express + MongoDB + React (Backend: 8182, Frontend: 5002)
-  - `with-postgres-react/` - Express + PostgreSQL + React (Backend: 8183, Frontend: 5003)
+- **Fastify** ⭐ **RECOMMENDED** - Fastest & most polished
+  - `fastify-sqlite-react/` - Fastify + SQLite + React (Backend: 8081, < 1s startup)
+  - `fastify-sqlite-svelte/` - Fastify + SQLite + Svelte (Backend: 8081, < 1s startup)
+  - `fastify-mongodb-react/` - Fastify + MongoDB + React (Backend: 8082, < 2s startup)
+  - `fastify-postgres-react/` - Fastify + PostgreSQL + React (Backend: 8083, < 2s startup)
+- **Express** - Traditional Node.js patterns
+  - `express-sqlite-react/` - Express + SQLite + React (Backend: 8181)
+  - `express-sqlite-svelte/` - Express + SQLite + Svelte (Backend: 8181)
+  - `express-mongodb-react/` - Express + MongoDB + React (Backend: 8182)
+  - `express-postgres-react/` - Express + PostgreSQL + React (Backend: 8183)
 
 **All examples include:**
 
@@ -35,19 +35,34 @@ A catalog of standalone, production-ready server applications demonstrating diff
 
 ## 📦 Backend Examples - Production Patterns
 
-All tier 2 examples follow **identical architecture and endpoints** but use different HTTP frameworks (Express/Fastify) and database adapters (SQLite/MongoDB).
+All examples follow **identical architecture and endpoints** but use different HTTP frameworks (Express/Fastify) and database adapters (SQLite/MongoDB/PostgreSQL).
 
-#### Platform: Express
+**Simplified directory structure in each example:**
+
+```
+fastify-sqlite-react/
+├── backend/              # Backend source
+│   ├── src/
+│   ├── package.json
+│   └── tsconfig.json
+├── frontend/             # Frontend source
+│   ├── src/
+│   ├── package.json
+│   └── vite.config.ts
+├── package.json          # Monorepo root with workspaces
+├── docker-compose.yml
+└── README.md
+```
 
 **[platform-express/](./platform-express/README.md)** - Express.js backend examples
 
-##### with-sqlite
+##### express-sqlite-react
 
-**Stack:** Express + SQLite + Zacatl
-**Level:** Intermediate | **Setup:** < 1 minute (no external deps)
+**Stack:** Express + SQLite + React
+**Setup:** < 1 minute (no external deps)
 
 ```bash
-cd platform-express/with-sqlite-react && npm install && npm run dev
+cd express-sqlite-react && npm install && npm run dev
 # → http://localhost:8181
 ```
 
@@ -61,14 +76,14 @@ cd platform-express/with-sqlite-react && npm install && npm run dev
 - CRUD REST API
 - 🐳 Docker Compose support
 
-##### with-mongodb
+##### express-mongodb-react
 
-**Stack:** Express + MongoDB + Zacatl
-**Level:** Intermediate | **Setup:** 2 minutes (requires MongoDB)
+**Stack:** Express + MongoDB + React
+**Setup:** 2 minutes (requires MongoDB)
 
 ```bash
 docker run -d -p 27017:27017 --name mongo mongo:latest
-cd platform-express/with-mongodb-react && npm install && npm run dev
+cd express-mongodb-react && npm install && npm run dev
 # → http://localhost:8182
 ```
 
@@ -79,16 +94,16 @@ cd platform-express/with-mongodb-react && npm install && npm run dev
 - MongoDB document persistence
 - Identical API endpoints
 
-##### with-postgres
+##### express-postgres-react
 
-**Stack:** Express + PostgreSQL + Zacatl
-**Level:** Intermediate | **Setup:** 2 minutes (requires PostgreSQL)
+**Stack:** Express + PostgreSQL + React
+**Setup:** 2 minutes (requires PostgreSQL)
 
 ```bash
 docker run -d --name pg \
   -e POSTGRES_USER=local -e POSTGRES_PASSWORD=local \
   -e POSTGRES_DB=appdb -p 5432:5432 postgres:16
-cd platform-express/with-postgres-react && npm install && npm run dev
+cd express-postgres-react && npm install && npm run dev
 # → http://localhost:8183
 ```
 
@@ -98,41 +113,39 @@ cd platform-express/with-postgres-react && npm install && npm run dev
 - Sequelize ORM for SQL queries
 - Production-grade SQL patterns
 
----
-
 #### Platform: Fastify ⭐ RECOMMENDED
 
-**[platform-fastify/](./platform-fastify/README.md)** - Fastify backend examples with React frontends
+**[fastify-_-_](./fastify-sqlite-react/)** - Fastify backend examples with React/Svelte frontends
 
-**Why Fastify?** Fastest startup, native TypeScript, excellent performance, included React UIs.
+**Why Fastify?** Fastest startup, native TypeScript, excellent performance, full-stack examples.
 
-##### with-sqlite
+##### fastify-sqlite-react
 
 **Stack:** Fastify + SQLite + React + Tailwind
-**Level:** Intermediate | **Setup:** < 1 minute
+**Setup:** < 1 minute
 
 ```bash
-cd platform-fastify/with-sqlite-react && npm install && npm run dev
-# → http://localhost:8081 (full-stack with React UI)
+cd fastify-sqlite-react && npm install && npm run dev
+# → http://localhost:8081 (full-stack)
 ```
 
 **What it shows:**
 
-- Monorepo structure (apps/backend, apps/frontend, shared/)
+- Monorepo structure (backend/, frontend/)
 - Class-token DI with `@singleton()` and `@inject()`
 - React + Tailwind CSS frontend included
 - SQLite + Knex for persistence
 - Full-stack setup in one folder
 
-##### with-mongodb
+##### fastify-mongodb-react
 
 **Stack:** Fastify + MongoDB + React + Tailwind
-**Level:** Intermediate | **Setup:** 2 minutes (MongoDB required)
+**Setup:** 2 minutes (MongoDB required)
 
 ```bash
 docker run -d -p 27017:27017 --name mongo mongo:latest
-cd platform-fastify/with-mongodb-react && npm install && npm run dev
-# → http://localhost:8082 (full-stack with React UI)
+cd fastify-mongodb-react && npm install && npm run dev
+# → http://localhost:8082 (full-stack)
 ```
 
 **What it shows:**
@@ -244,24 +257,24 @@ Response: { "id": "uuid", "deleted": true }
 
 ---
 
-## � Quick Start
+## 🚀 Quick Start
 
 Pick one and run it:
 
 ```bash
 # Option 1: Express + SQLite (instant setup)
-cd platform-express/with-sqlite-react && npm install && npm run dev
+cd express-sqlite-react && npm install && npm run dev
 
 # Option 2: Express + MongoDB (with Docker)
 docker run -d -p 27017:27017 --name mongo mongo:latest
-cd platform-express/with-mongodb-react && npm install && npm run dev
+cd express-mongodb-react && npm install && npm run dev
 
 # Option 3: Fastify + SQLite (full-stack with React)
-cd platform-fastify/with-sqlite-react && npm install && npm run dev
+cd fastify-sqlite-react && npm install && npm run dev
 
 # Option 4: Fastify + MongoDB (full-stack with React)
 docker run -d -p 27017:27017 --name mongo mongo:latest
-cd platform-fastify/with-mongodb-react && npm install && npm run dev
+cd fastify-mongodb-react && npm install && npm run dev
 ```
 
 ---

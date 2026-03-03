@@ -1,19 +1,24 @@
 import path from 'path';
 import { fileURLToPath } from 'url';
-import tsPlugin from '@typescript-eslint/eslint-plugin';
-import tsParser from '@typescript-eslint/parser';
-import importPlugin from 'eslint-plugin-import';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Scripts-specific linting: support various script file extensions and allow dev deps
+/**
+ * Scripts-area overrides — applied on top of zacatlRecommended from the root config.
+ *
+ * Rules that are too strict for build/dev scripts are downgraded to 'warn'.
+ *
+ * Standalone use:
+ *   import { recommended } from '@sentzunhat/zacatl/eslint';
+ *   import scriptsOverrides from './scripts/eslint.config.mjs';
+ *   export default [...recommended, ...scriptsOverrides];
+ */
 export default [
   {
-    plugins: { '@typescript-eslint': tsPlugin, import: importPlugin },
     files: ['scripts/**/*.{ts,cts,mts,js,cjs,mjs}'],
     languageOptions: {
-      parser: tsParser,
+      // Scripts have their own tsconfig files — override the project reference only
       parserOptions: {
         project: ['./tsconfig.scripts.cjs.json', './tsconfig.scripts.esm.json', './tsconfig.json'],
         tsconfigRootDir: __dirname,
@@ -25,37 +30,43 @@ export default [
         __dirname: 'readonly',
       },
     },
-    settings: {
-      'import/resolver': { typescript: { project: './tsconfig.json' } },
-    },
     rules: {
-      '@typescript-eslint/no-empty-object-type': [
-        'warn',
-        { allowInterfaces: 'always', allowObjectTypes: 'never' },
-      ],
-      '@typescript-eslint/no-explicit-any': 'error',
-      '@typescript-eslint/strict-boolean-expressions': 'off',
-      '@typescript-eslint/no-floating-promises': 'off',
-      '@typescript-eslint/no-misused-promises': 'off',
-      '@typescript-eslint/explicit-module-boundary-types': [
-        'off',
-        { allowTypedFunctionExpressions: true },
-      ],
-      '@typescript-eslint/consistent-type-definitions': ['warn', 'interface'],
-      '@typescript-eslint/no-unused-vars': [
-        'error',
-        { argsIgnorePattern: '^_', varsIgnorePattern: '^_', caughtErrorsIgnorePattern: '^_' },
-      ],
-      'no-console': 'off',
-      'prefer-const': 'warn',
-      'no-throw-literal': 'warn',
-      'consistent-return': 'warn',
+      // Scripts are not public API — explicit boundary types add no value
+      '@typescript-eslint/explicit-module-boundary-types': 'warn',
+      // Build scripts use dynamic patterns that require boolean coercion
+      '@typescript-eslint/strict-boolean-expressions': 'warn',
+      // Async handling in scripts is less critical to enforce strictly
+      '@typescript-eslint/no-floating-promises': 'warn',
+      '@typescript-eslint/no-misused-promises': 'warn',
+      // Scripts may legitimately use any for CLI arg / dynamic config parsing
+      '@typescript-eslint/no-explicit-any': 'warn',
+      // Scripts use console for progress and diagnostic output
+      'no-console': 'warn',
+      // Single-class-per-file is nice-to-have in scripts
       'max-classes-per-file': ['warn', 1],
-      'import/no-default-export': 'off',
+      // Scripts may use default exports for CJS compatibility
+      'import/no-default-export': 'warn',
+      // Scripts can import devDependencies
       'import/no-extraneous-dependencies': [
         'error',
         { devDependencies: true, optionalDependencies: false, peerDependencies: true },
       ],
+    },
+  },
+  // .mjs/.cjs files in scripts/ are not in any tsconfig — disable project-based parsing
+  // and all type-aware rules (they require parserOptions.project) for these files
+  {
+    files: ['scripts/**/*.mjs', 'scripts/**/*.cjs'],
+    languageOptions: {
+      parserOptions: { project: false },
+    },
+    rules: {
+      '@typescript-eslint/strict-boolean-expressions': 'off',
+      '@typescript-eslint/no-floating-promises': 'off',
+      '@typescript-eslint/no-misused-promises': 'off',
+      '@typescript-eslint/no-unnecessary-type-assertion': 'off',
+      '@typescript-eslint/prefer-readonly': 'off',
+      '@typescript-eslint/return-await': 'off',
     },
   },
 ];

@@ -22,8 +22,9 @@
  *   --timeout=<ms>      Per-command timeout in milliseconds (default: 120 000)
  */
 
-import { executeCommands } from '../../src/utils/command-runner/index.js';
-import type { CommandSpec, RunnerPolicy } from '../../src/utils/command-runner/index.js';
+import { applyPolicyDefaults, executeCommands } from '../utils/index.js';
+import { measureTime } from '../utils/index.js';
+import type { CommandSpec } from '../utils/index.js';
 
 const USAGE = [
   'Usage:',
@@ -65,86 +66,109 @@ const getFlag = (argv: string[], flag: string): string | undefined => {
   return undefined;
 };
 
-const main = async (): Promise<void> => {
-  const argv = process.argv.slice(2);
+const main = async (): Promise<number> => {
+  let exitCode = 0;
 
-  // Positional: first non-flag argument is the comma-separated command string.
-  const commandsArg = argv.find((a) => !a.startsWith('--'));
+  await measureTime({
+    name: 'parallel-runner',
+    fn: async () => {
+      const argv = process.argv.slice(2);
 
-  if (!commandsArg) {
-    console.error('Error: no commands provided.\n');
-    console.error(USAGE);
-    process.exit(1);
-  }
+      // Positional: first non-flag argument is the comma-separated command string.
+      const commandsArg = argv.find((a) => !a.startsWith('--'));
 
-  const specs: CommandSpec[] = commandsArg
-    .split(',')
-    .map((entry) => entry.trim())
-    .filter(Boolean)
-    .map(parseCommandSpec);
-
-  if (specs.length === 0) {
-    console.error('Error: command list is empty after parsing.\n');
-    console.error(USAGE);
-    process.exit(1);
-  }
-
-  const concurrencyFlag = getFlag(argv, 'concurrency');
-  const timeoutFlag = getFlag(argv, 'timeout');
-
-  const policy: Partial<RunnerPolicy> = {
-    maxConcurrency: concurrencyFlag ? parseInt(concurrencyFlag, 10) : specs.length,
-    timeoutMs: timeoutFlag ? parseInt(timeoutFlag, 10) : 120_000,
-    maxOutputBytes: 2_097_152,
-    inheritEnv: true,
-  };
-
-  console.log(
-    `\n  parallel-runner — ${specs.length} command(s), concurrency ${policy.maxConcurrency}\n`,
-  );
-  for (const s of specs) {
-    console.log(`    > ${[s.cmd, ...s.args].join(' ')}`);
-  }
-  console.log();
-
-  const startMs = Date.now();
-  const results = await executeCommands(specs, policy);
-  const totalMs = Date.now() - startMs;
-
-  let failures = 0;
-
-  for (const result of results) {
-    const label = [result.cmd, ...result.args].join(' ');
-    const status = result.timedOut
-      ? 'TIMEOUT'
-      : result.exitCode === 0
-      ? 'OK'
-      : `EXIT(${result.exitCode ?? 'null'})`;
-
-    if (result.exitCode !== 0 || result.timedOut) failures++;
-
-    console.log(`  [${status.padEnd(10)}] ${String(result.durationMs).padStart(6)} ms  ${label}`);
-
-    if (result.stdout.trim()) {
-      const lines = result.stdout.trim().split('\n');
-      for (const line of lines) {
-        console.log(`               out: ${line}`);
+      if (!commandsArg) {
+        // eslint-disable-next-line no-console
+        console.error('Error: no commands provided.\n');
+        // eslint-disable-next-line no-console
+        console.error(USAGE);
+        exitCode = 1;
+        return;
       }
-    }
-    if (result.stderr.trim()) {
-      const lines = result.stderr.trim().split('\n');
-      for (const line of lines) {
-        console.error(`               err: ${line}`);
+
+      const specs: CommandSpec[] = commandsArg
+        .split(',')
+        .map((entry) => entry.trim())
+        .filter(Boolean)
+        .map(parseCommandSpec);
+
+      if (specs.length === 0) {
+        // eslint-disable-next-line no-console
+        console.error('Error: command list is empty after parsing.\n');
+        // eslint-disable-next-line no-console
+        console.error(USAGE);
+        exitCode = 1;
+        return;
       }
-    }
-  }
 
-  console.log(`\n  wall-clock: ${totalMs} ms  |  failures: ${failures} / ${results.length}\n`);
+      const concurrencyFlag = getFlag(argv, 'concurrency');
+      const timeoutFlag = getFlag(argv, 'timeout');
 
-  process.exit(failures > 0 ? 1 : 0);
+      const policy = applyPolicyDefaults({
+        maxConcurrency: concurrencyFlag ? parseInt(concurrencyFlag, 10) : specs.length,
+        timeoutMs: timeoutFlag ? parseInt(timeoutFlag, 10) : 120_000,
+        maxOutputBytes: 2_097_152,
+        inheritEnv: true,
+      });
+
+      // eslint-disable-next-line no-console
+      console.log(
+        `\n  parallel-runner — ${specs.length} command(s), concurrency ${policy.maxConcurrency}\n`,
+      );
+      for (const s of specs) {
+        // eslint-disable-next-line no-console
+        console.log(`    > ${[s.cmd, ...s.args].join(' ')}`);
+      }
+      // eslint-disable-next-line no-console
+      console.log();
+
+      const results = await executeCommands(specs, policy);
+
+      let failures = 0;
+
+      for (const result of results) {
+        const label = [result.cmd, ...result.args].join(' ');
+        const status = result.timedOut
+          ? 'TIMEOUT'
+          : result.exitCode === 0
+          ? 'OK'
+          : `EXIT(${result.exitCode ?? 'null'})`;
+
+        if (result.exitCode !== 0 || result.timedOut) failures++;
+
+        // eslint-disable-next-line no-console
+        console.log(
+          `  [${status.padEnd(10)}] ${String(result.durationMs).padStart(6)} ms  ${label}`,
+        );
+
+        if (result.stdout.trim()) {
+          const lines = result.stdout.trim().split('\n');
+          for (const line of lines) {
+            // eslint-disable-next-line no-console
+            console.log(`               out: ${line}`);
+          }
+        }
+        if (result.stderr.trim()) {
+          const lines = result.stderr.trim().split('\n');
+          for (const line of lines) {
+            // eslint-disable-next-line no-console
+            console.error(`               err: ${line}`);
+          }
+        }
+      }
+
+      // eslint-disable-next-line no-console
+      console.log(`\n  failures: ${failures} / ${results.length}\n`);
+
+      exitCode = failures > 0 ? 1 : 0;
+    },
+  });
+
+  process.exit(exitCode);
 };
 
 void main().catch((err: unknown) => {
+  // eslint-disable-next-line no-console
   console.error(err);
   process.exit(1);
 });

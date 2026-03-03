@@ -2,6 +2,57 @@
 
 ---
 
+## [0.0.48] - Unreleased
+
+**Status**: Pending release
+
+### ✨ Features
+
+- **Node:sqlite ORM adapter** — Added complete ORM implementation for Node.js built-in sqlite module (Node 24+). Includes `NodeSqliteAdapter`, lazy-loading factory, type-safe repository class, and comprehensive unit tests. Follows same architecture as Mongoose and Sequelize adapters with prepared statements and defensive mode security.
+
+### 🔧 Improvements
+
+- **Barrel auto-generation** — Converted all 49 index.ts files in src/ to auto-generated pattern using recursive directory walking with per-directory opt-in headers. Maintains explicit dependency declarations while eliminating manual maintenance.
+
+- **ORM dependency isolation** — Refined orm/ layer barrel to export only adapter factory functions (`createMongooseAdapter`, `createSequelizeAdapter`, `createNodeSqliteAdapter`), preventing mongoose, sequelize, and node:sqlite packages from leaking into library exports. Dependencies remain isolable via third-party subpaths.
+
+- **Examples restructuring** — Flattened examples directory structure from nested folders (`platform-express/with-mongodb-react/apps/backend`) to simplified layout (`express-mongodb-react/backend`). Removed redundant platform-level nesting to reduce directory depth and improve discoverability.
+
+- **ESLint config simplification** — Refactored root ESLint configuration to use Zacatl's recommended config directly, reducing complexity and improving maintainability. Removed manual config normalization logic.
+
+- **Node 24.14.0 LTS** — Updated `.nvmrc` to Node 24.14.0 (latest LTS point release) and bumped npm requirement to 11.0.0+ in documentation.
+
+### 📚 Documentation
+
+- Updated all documentation references to reflect simplified examples layout (`examples/<framework>-<db>-<ui>/backend|frontend`).
+- Aligned service module, QA guide, and testing roadmap snippets with current example paths and route-handler locations.
+
+---
+
+## [0.0.47] - 2026-03-03
+
+**Status**: Released
+
+### 📚 Documentation
+
+- **Repository pattern guide enhancements** — Clarified output type requirements for all repository
+  methods (`create`, `findById`, `update`, `delete`, `findMany`). All output types must include
+  `id`, `createdAt`, and `updatedAt` fields as they are automatically normalized by `toLean()`.
+
+- **Base type examples** — Added clear examples showing how to use `LeanWithMeta<T>` (Mongoose)
+  and `LeanDocument<T>` (Sequelize) to enforce output type contracts in consuming code.
+
+- **API reference improvements** — Updated BaseRepository API signature to include all methods:
+  `findMany()` and `exists()` were missing from the documented interface.
+
+### 🔧 Improvements
+
+- **LeanDocument export** — Exported `LeanDocument<T>` type from main library entrypoint
+  (`@sentzunhat/zacatl`) for symmetric access with `LeanWithMeta<T>`. Both types now available
+  at library root for convenience.
+
+---
+
 ## [0.0.46] - Unreleased
 
 **Status**: Pending release

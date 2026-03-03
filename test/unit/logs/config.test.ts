@@ -1,6 +1,6 @@
 import { describe, it, expect, afterEach } from 'vitest';
 
-import { createPinoConfig } from '../../../src/logs/config';
+import { createPinoConfig } from '../../../src/logs/pino/config';
 
 describe('createPinoConfig', () => {
   const originalEnv = process.env['NODE_ENV'];

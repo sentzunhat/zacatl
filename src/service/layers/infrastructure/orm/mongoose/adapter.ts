@@ -61,15 +61,15 @@ export class MongooseAdapter<D, I, O> implements ORMPort<MongooseRepositoryModel
       input != null &&
       typeof input === 'object' &&
       'toObject' in input &&
-      typeof (input as unknown as Record<string, unknown>)['toObject'] === 'function'
+      typeof (input as Record<string, unknown>)['toObject'] === 'function'
     ) {
       base = (
-        input as unknown as {
+        input as {
           toObject: (opt: Record<string, unknown>) => LeanWithMeta<O>;
         }
       ).toObject({
         virtuals: true,
-      }) as LeanWithMeta<O>;
+      });
     } else {
       base = input as LeanWithMeta<O>;
     }
@@ -77,8 +77,8 @@ export class MongooseAdapter<D, I, O> implements ORMPort<MongooseRepositoryModel
     const baseRec = base as unknown as Record<string, unknown>;
 
     const idVal = (() => {
-      if (typeof baseRec['id'] === 'string') return baseRec['id'] as string;
-      if (typeof baseRec['_id'] === 'string') return baseRec['_id'] as string;
+      if (typeof baseRec['id'] === 'string') return baseRec['id'];
+      if (typeof baseRec['_id'] === 'string') return baseRec['_id'];
       if (baseRec['_id'] !== undefined && baseRec['_id'] !== null) return String(baseRec['_id']);
       return '';
     })();
@@ -115,10 +115,10 @@ export class MongooseAdapter<D, I, O> implements ORMPort<MongooseRepositoryModel
   }
 
   async findMany(filter: Record<string, unknown> = {}): Promise<O[]> {
-    const entities = (await this.model
+    const entities = await this.model
       .find(filter)
       .lean<LeanWithMeta<O>[]>({ virtuals: true })
-      .exec()) as LeanWithMeta<O>[];
+      .exec();
 
     return entities
       .map((entity) => this.toLean(entity))

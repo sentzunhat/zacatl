@@ -1,5 +1,6 @@
-import { Schema } from 'mongoose';
 import { describe, expect, it, beforeAll } from 'vitest';
+
+import { Schema } from '@zacatl/third-party/mongoose';
 
 import { BaseRepository } from '../../../../../../src/service/layers/infrastructure/repositories/abstract';
 import { ORMType } from '../../../../../../src/service/layers/infrastructure/repositories/types';

@@ -1,5 +1,6 @@
 import type { MongooseBaseRepositoryConfig, MongooseRepositoryModel } from './mongoose/types';
 import type { SequelizeBaseRepositoryConfig, SequelizeRepositoryModel } from './sequelize/types';
+import type { NodeSqliteRepositoryModel } from './nodesqlite/types';
 
 export type BaseRepositoryConfig<D extends object = object> =
   | MongooseBaseRepositoryConfig<D>
@@ -43,11 +44,19 @@ export type {
   SequelizeBaseRepositoryConfig,
   SequelizeRepositoryConfig,
   SequelizeRepositoryModel,
+  LeanDocument,
 } from './sequelize/types';
+export type {
+  NodeSqliteBaseRepositoryConfig,
+  NodeSqliteRepositoryConfig,
+  NodeSqliteRepositoryModel,
+  NodeSqliteLean,
+} from './nodesqlite/types';
 
 /** Union of all supported model types */
 export type RepositoryModel<D extends object = object> =
   | MongooseRepositoryModel<D>
-  | SequelizeRepositoryModel<D>;
+  | SequelizeRepositoryModel<D>
+  | NodeSqliteRepositoryModel;
 
 export { ORMType } from './mongoose/types';

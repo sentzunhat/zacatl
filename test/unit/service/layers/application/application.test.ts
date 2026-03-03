@@ -1,6 +1,7 @@
-import type { FastifyRequest } from 'fastify';
-import { container } from 'tsyringe';
 import { describe, it, expect, vi } from 'vitest';
+
+import type { FastifyRequest } from '@zacatl/third-party/fastify';
+import { container } from '@zacatl/third-party/tsyringe';
 
 import { Application } from '../../../../../src/service/layers/application';
 import type {

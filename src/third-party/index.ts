@@ -1,4 +1,4 @@
-// @barrel-manual
+// @barrel-generated
 export * from './tsyringe';
 export * from './zod';
 export * from './uuid';

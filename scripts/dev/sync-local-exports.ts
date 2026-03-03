@@ -24,12 +24,15 @@
 import fs from 'fs';
 import path from 'path';
 
+import { measureTime } from '../utils/index.js';
+
 const root = process.cwd();
 const buildEsmDir = path.join(root, 'build-src-esm');
 const buildCjsDir = path.join(root, 'build-src-cjs');
 const pkgPath = path.join(root, 'package.json');
 
 if (!fs.existsSync(buildEsmDir)) {
+  // eslint-disable-next-line no-console
   console.error(`✗ build-src-esm not found — run "npm run build" first`);
   process.exit(1);
 }
@@ -77,19 +80,29 @@ const walk = (dir: string): void => {
   }
 };
 
-walk(buildEsmDir);
-exportsMap['./package.json'] = './package.json';
+const main = async (): Promise<void> => {
+  await measureTime({
+    name: 'sync-exports',
+    fn: async () => {
+      walk(buildEsmDir);
+      exportsMap['./package.json'] = './package.json';
 
-// Sort: "." first, then alphabetically
-const sorted: Record<string, unknown> = {};
-const keys = Object.keys(exportsMap).sort((a, b) => {
-  if (a === '.') return -1;
-  if (b === '.') return 1;
-  return a.localeCompare(b);
-});
-for (const k of keys) sorted[k] = exportsMap[k];
+      // Sort: "." first, then alphabetically
+      const sorted: Record<string, unknown> = {};
+      const keys = Object.keys(exportsMap).sort((a, b) => {
+        if (a === '.') return -1;
+        if (b === '.') return 1;
+        return a.localeCompare(b);
+      });
+      for (const k of keys) sorted[k] = exportsMap[k];
 
-pkg['exports'] = sorted;
+      pkg['exports'] = sorted;
 
-fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + '\n');
-console.log(`✓ Synced ${keys.length} export(s) → package.json`);
+      fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + '\n');
+      // eslint-disable-next-line no-console
+      console.log(`✓ Synced ${keys.length} export(s) → package.json`);
+    },
+  });
+};
+
+void main();

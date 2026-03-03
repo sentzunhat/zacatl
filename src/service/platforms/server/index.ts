@@ -1,4 +1,4 @@
-// @barrel-manual
+// @barrel-generated
 export * from './server';
 export * from './api';
 export * from './page';

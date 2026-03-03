@@ -22,9 +22,11 @@ export abstract class BaseRepository<D, I, O> {
 
   // CRUD operations
   findById(id: string): Promise<O | null>;
+  findMany(filter?: Record<string, unknown>): Promise<O[]>;
   create(entity: I): Promise<O>;
   update(id: string, update: Partial<I>): Promise<O | null>;
   delete(id: string): Promise<O | null>;
+  exists(id: string): Promise<boolean>;
 
   // Utilities
   toLean(input: unknown): O | null;
@@ -36,15 +38,14 @@ export abstract class BaseRepository<D, I, O> {
 ## Sequelize Example
 
 ```typescript
-import { BaseRepository, ORMType } from '@sentzunhat/zacatl';
+import { BaseRepository, ORMType, LeanDocument } from '@sentzunhat/zacatl';
 import { ModelStatic } from '@sentzunhat/zacatl/third-party/sequelize';
 import { UserModel } from './models/user.model';
 
-interface User {
-  id: string;
-  email: string;
-  createdAt: Date;
-}
+interface User
+  extends LeanDocument<{
+    email: string;
+  }> {}
 
 interface CreateUser {
   email: string;
@@ -70,15 +71,14 @@ class UserRepository extends BaseRepository<UserModel, CreateUser, User> {
 ## Mongoose Example
 
 ```typescript
-import { BaseRepository, ORMType } from '@sentzunhat/zacatl';
+import { BaseRepository, ORMType, LeanWithMeta } from '@sentzunhat/zacatl';
 import { MongooseModel } from '@sentzunhat/zacatl/third-party/mongoose';
 import { Schema } from 'mongoose';
 
-interface User {
-  id: string;
-  email: string;
-  createdAt: Date;
-}
+interface User
+  extends LeanWithMeta<{
+    email: string;
+  }> {}
 
 interface CreateUser {
   email: string;
@@ -112,6 +112,49 @@ class UserRepository extends BaseRepository<User, CreateUser, User> {
 | `I`       | Input type for create/update operations                           |
 | `O`       | Output type for query results (after toLean normalization)        |
 
+## Output Type Requirements
+
+All repository methods (`create`, `findById`, `update`, `delete`, `findMany`) return normalized lean documents. **Output types must always include these fields**, as they are automatically added by `toLean()`:
+
+```typescript
+interface OutputType {
+  id: string; // ← Required: normalized from database id/_id
+  createdAt: Date; // ← Required: ISO string converted to Date
+  updatedAt: Date; // ← Required: ISO string converted to Date
+  // ... your custom fields
+}
+```
+
+### Using Base Types (Recommended)
+
+Use the library's base types to enforce this contract:
+
+**Mongoose:**
+
+```typescript
+import { LeanWithMeta } from '@sentzunhat/zacatl';
+
+type User = LeanWithMeta<{
+  email: string;
+  role: string;
+}>;
+```
+
+**Sequelize:**
+
+```typescript
+import { LeanDocument } from '@sentzunhat/zacatl';
+
+type User = LeanDocument<{
+  email: string;
+  role: string;
+}>;
+```
+
+These base types automatically include `id`, `createdAt`, and `updatedAt` with correct types.
+
+> **Note**: These types are re-exported from `@sentzunhat/zacatl` for convenience. They're defined in the repository layer but available at the top level of the library.
+
 ## Configuration
 
 ### Mongoose Config
@@ -136,7 +179,7 @@ type SequelizeRepositoryConfig<D extends object> = {
 ## Dependency Injection
 
 ```typescript
-import { service } from '@sentzunhat/zacatl';
+import { service, NotFoundError } from '@sentzunhat/zacatl';
 import { singleton } from 'tsyringe';
 
 @singleton()
@@ -154,13 +197,22 @@ class UserService {
 
 ## Model Access Patterns
 
-### Standard Queries (toLean)
+### Standard Repository Queries
 
 ```typescript
-async findAll(): Promise<User[]> {
-  return (await this.adapter.findAll())
-    .map(e => this.toLean(e))
-    .filter((item): item is User => item !== null);
+// Find all documents
+async getAllUsers(): Promise<User[]> {
+  return this.userRepo.findMany();
+}
+
+// Find with filter
+async getActiveUsers(): Promise<User[]> {
+  return this.userRepo.findMany({ isActive: true });
+}
+
+// Find by ID
+async getUserById(id: string): Promise<User | null> {
+  return this.userRepo.findById(id);
 }
 ```
 

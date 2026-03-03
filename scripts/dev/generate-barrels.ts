@@ -11,7 +11,7 @@
  * |-------------------------|--------------------------------------------|
  * | `// @barrel-generated`  | Owned by this script — always overwritten  |
  * | `// @barrel-manual`     | Not touched — maintained by hand           |
- * | (no header)             | Skipped silently (treated as manual)       |
+ * | (no header)             | Skipped silently (treated as manual)        |
  *
  * ## Exclusions
  *
@@ -28,6 +28,8 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { fileURLToPath } from 'node:url';
+
+import { measureTime } from '../utils/index.js';
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -154,6 +156,7 @@ const processDirectory = (dirPath: string, relDir: string): number => {
   if (current === desired) return 0; // already up-to-date — idempotent
 
   fs.writeFileSync(indexPath, desired, 'utf-8');
+  // eslint-disable-next-line no-console
   console.log(`  updated  src/${relDir}/index.ts`);
   return 1;
 };
@@ -176,14 +179,21 @@ const walkDirectory = (dirPath: string, relDir: string): number => {
 // Entry point
 // ---------------------------------------------------------------------------
 
-const main = (): void => {
-  const total = walkDirectory(SRC_DIR, '');
+const main = async (): Promise<void> => {
+  await measureTime({
+    name: 'barrels:generate',
+    fn: async () => {
+      const total = walkDirectory(SRC_DIR, '');
 
-  if (total === 0) {
-    console.log('barrels:generate — all barrel files are up to date ✓');
-  } else {
-    console.log(`\nbarrels:generate — ${total} barrel file(s) updated`);
-  }
+      if (total === 0) {
+        // eslint-disable-next-line no-console
+        console.log('All barrel files are up to date ✓');
+      } else {
+        // eslint-disable-next-line no-console
+        console.log(`${total} barrel file(s) updated`);
+      }
+    },
+  });
 };
 
-main();
+void main();

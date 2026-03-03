@@ -1,4 +1,4 @@
-// @barrel-manual
+// @barrel-generated
 import type { ConfigLayers } from '../layers/types';
 import type { ConfigPlatforms } from '../platforms/types';
 

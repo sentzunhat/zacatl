@@ -1,6 +1,7 @@
 import { MongoMemoryServer } from 'mongodb-memory-server';
-import mongoose from 'mongoose';
 import { beforeEach, afterEach, describe, expect, it } from 'vitest';
+
+import { mongoose } from '@zacatl/third-party/mongoose';
 
 describe('Mongoose + mongodb-memory-server extended operations', () => {
   let mongod: MongoMemoryServer;

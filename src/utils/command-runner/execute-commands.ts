@@ -51,6 +51,8 @@ export const executeCommands = (
         const capturedIndex = nextIndex++;
         active++;
 
+        // capturedIndex is always < commands.length (guarded by the while condition above)
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         runCommand(commands[capturedIndex]!, policy)
           .then((result) => {
             results[capturedIndex] = result;

@@ -25,12 +25,13 @@ describe('PostRouteHandler', () => {
     const testHandler = new TestPostRouteHandler();
 
     const fakeRequest = createFakeFastifyRequest() as Request<{}, {}, {}>;
-    const fakeReply = createFakeFastifyReply();
+    const fakeReply = createFakeFastifyReply() as unknown;
 
-    await testHandler.execute(fakeRequest, fakeReply);
+    await testHandler.execute(fakeRequest, fakeReply as any);
 
-    expect(fakeReply.code).toHaveBeenCalledWith(200);
+    const mockReply = fakeReply as Record<string, any>;
+    expect(mockReply['code']).toHaveBeenCalledWith(200);
     // Default behavior: raw data sent, no forced envelope
-    expect(fakeReply.send).toHaveBeenCalledWith({ id: 1 });
+    expect(mockReply['send']).toHaveBeenCalledWith({ id: 1 });
   });
 });

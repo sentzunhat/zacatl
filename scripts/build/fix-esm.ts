@@ -1,8 +1,10 @@
 #!/usr/bin/env node
 import fs from 'fs';
 import path from 'path';
-import { fileURLToPath } from 'url';
 import { dirname } from 'path';
+import { fileURLToPath } from 'url';
+
+import { measureTime } from '../utils/index.js';
 
 const findRepoRoot = (startDir: string): string => {
   let cur = startDir;
@@ -46,6 +48,7 @@ if (path.isAbsolute(targetDir)) {
 }
 
 if (!fs.existsSync(distDir)) {
+  // eslint-disable-next-line no-console
   console.error(`✗ Directory not found: ${distDir}`);
   process.exit(1);
 }
@@ -96,18 +99,24 @@ const fixFile = (filePath: string): boolean => {
   return false;
 };
 
-const main = (): void => {
-  try {
-    const files = walkDir(distDir);
-    let fixed = 0;
-    for (const file of files) if (fixFile(file)) fixed++;
-    console.log(`✓ Fixed ESM exports: ${fixed} file(s) updated`);
-    process.exit(0);
-  } catch (error: unknown) {
-    const msg = error instanceof Error ? error.message : String(error);
-    console.error(`✗ Error fixing ESM exports: ${msg}`);
-    process.exit(1);
-  }
+const main = async (): Promise<void> => {
+  await measureTime({
+    name: 'fix-esm',
+    fn: async () => {
+      try {
+        const files = walkDir(distDir);
+        let fixed = 0;
+        for (const file of files) if (fixFile(file)) fixed++;
+        // eslint-disable-next-line no-console
+        console.log(`✓ Fixed ESM exports: ${fixed} file(s) updated`);
+      } catch (error: unknown) {
+        const msg = error instanceof Error ? error.message : String(error);
+        // eslint-disable-next-line no-console
+        console.error(`✗ Error fixing ESM exports: ${msg}`);
+        process.exit(1);
+      }
+    },
+  });
 };
 
-main();
+void main();

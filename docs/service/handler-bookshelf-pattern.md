@@ -141,8 +141,8 @@ import { AbstractRouteHandler } from '@sentzunhat/zacatl/handlers/express';
 
 See working examples in:
 
-- `examples/platform-fastify/with-*-react/apps/backend/src/application/handlers/`
-- `examples/platform-express/with-*-react/apps/backend/src/application/handlers/`
+- `examples/fastify-*/backend/src/application/route-handlers/`
+- `examples/express-*/backend/src/application/route-handlers/`
 
 Each example demonstrates:
 

@@ -1,7 +1,8 @@
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import type { Connection } from 'mongoose';
-import { connect, Mongoose } from 'mongoose';
-import { container } from 'tsyringe';
+
+import { connect, Mongoose } from '@zacatl/third-party/mongoose';
+import { container } from '@zacatl/third-party/tsyringe';
 
 const dbName = 'sentzunhat-zacatl';
 const dbVersion = '8.0.0';
@@ -35,7 +36,7 @@ export const startMongoServerAndSetEnvConnectionString = async (): Promise<void>
   //   );
 };
 
-export const connectToMongoServerAndRegisterDependency = async () => {
+export const connectToMongoServerAndRegisterDependency = async (): Promise<void> => {
   const connectionString = process.env['MONGO_DB_CONNECTION_STRING'] ?? '';
   const dbName = 'sentzunhat-zacatl';
 

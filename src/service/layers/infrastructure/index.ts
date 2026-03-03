@@ -1,4 +1,4 @@
-// @barrel-manual
+// @barrel-generated
 export * from './repositories';
 export * from './infrastructure';
 export type {

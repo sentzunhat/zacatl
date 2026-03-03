@@ -10,15 +10,18 @@ const skipGuard = process.env['SKIP_PREPUBLISH_GUARD'] === '1';
 const skipGuardReason = (process.env['SKIP_PREPUBLISH_GUARD_REASON'] || '').trim();
 
 const fail = (message: string): void => {
+  // eslint-disable-next-line no-console
   console.error(`❌ prepublish guard failed: ${message}`);
   process.exit(1);
 };
 
 const warn = (message: string): void => {
+  // eslint-disable-next-line no-console
   console.warn(`⚠️  prepublish guard warning: ${message}`);
 };
 
 const pass = (message: string): void => {
+  // eslint-disable-next-line no-console
   console.log(`✅ ${message}`);
 };
 

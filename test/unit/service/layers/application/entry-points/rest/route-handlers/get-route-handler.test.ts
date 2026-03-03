@@ -21,12 +21,13 @@ describe('GetRouteHandler', () => {
     });
 
     const fakeRequest = createFakeFastifyRequest() as Request<unknown, string>;
-    const fakeReply = createFakeFastifyReply();
+    const fakeReply = createFakeFastifyReply() as unknown;
 
-    await testHandler.execute(fakeRequest, fakeReply);
+    await testHandler.execute(fakeRequest, fakeReply as any);
 
-    expect(fakeReply.code).toHaveBeenCalledWith(200);
+    const mockReply = fakeReply as Record<string, any>;
+    expect(mockReply['code']).toHaveBeenCalledWith(200);
     // Default behavior: raw data sent, no forced envelope
-    expect(fakeReply.send).toHaveBeenCalledWith('Test GET response');
+    expect(mockReply['send']).toHaveBeenCalledWith('Test GET response');
   });
 });

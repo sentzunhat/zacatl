@@ -1,4 +1,4 @@
-// @barrel-manual
+// @barrel-generated
 import type { Constructor } from '../../types';
 import type { RepositoryPort as BaseRepositoryPort } from '../repositories/types';
 

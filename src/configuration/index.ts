@@ -1,4 +1,4 @@
-// @barrel-manual
+// @barrel-generated
 /**
  * Simple JSON and YAML configuration loader with Zod schema validation
  *

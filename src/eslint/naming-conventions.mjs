@@ -7,20 +7,11 @@
  * import { namingConventions } from "@sentzunhat/zacatl/eslint";
  */
 
-import tsEslintParser from '@typescript-eslint/parser';
-import tsEslintPlugin from '@typescript-eslint/eslint-plugin';
+// parser, plugins, and project are all provided by baseConfig (tseslint.configs.recommended).
+// naming-convention is an AST-based rule; it does not need type information.
 
 const namingConventionsConfig = {
-  files: ['src/**/*.ts', '!src/**/*.d.ts'],
-  languageOptions: {
-    parser: tsEslintParser,
-    parserOptions: {
-      project: './tsconfig.json',
-    },
-  },
-  plugins: {
-    '@typescript-eslint': tsEslintPlugin,
-  },
+  files: ['src/**/*.ts'],
   rules: {
     '@typescript-eslint/naming-convention': [
       'warn',

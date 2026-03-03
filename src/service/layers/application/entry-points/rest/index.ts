@@ -1,4 +1,4 @@
-// @barrel-manual
+// @barrel-generated
 // Re-export common types and hook handlers
 export * from './common';
 export * from './hook-handlers';

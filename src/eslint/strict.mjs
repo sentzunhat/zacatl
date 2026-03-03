@@ -1,15 +1,9 @@
-import tsEslintParser from '@typescript-eslint/parser';
-import tsEslintPlugin from '@typescript-eslint/eslint-plugin';
+// parser, plugins, and project are all provided by baseConfig (tseslint.configs.recommended).
+// strict.mjs rules are AST-based; they don't need type information.
 
 const strictConfig = {
-  files: ['src/**/*.ts', '!src/**/*.d.ts'],
-  languageOptions: {
-    parser: tsEslintParser,
-    parserOptions: {
-      project: './tsconfig.json',
-    },
-  },
-  plugins: { '@typescript-eslint': tsEslintPlugin },
+  // Apply to all TypeScript files — _-prefix ignore pattern should be universal
+  files: ['**/*.ts'],
   rules: {
     '@typescript-eslint/no-unused-vars': [
       'error',

@@ -1,4 +1,4 @@
-// @barrel-manual
+// @barrel-generated
 /**
  * Localization module - i18n-node HTTP request localization
  * @module localization

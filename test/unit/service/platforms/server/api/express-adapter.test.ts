@@ -1,6 +1,6 @@
 /* eslint-disable import/order */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { z } from 'zod';
+import { z } from '@zacatl/third-party/zod';
 
 import type { RouteHandler } from '../../../../../../src/service/layers/application';
 import { ExpressApiAdapter } from '../../../../../../src/service/platforms/server/api/adapters';

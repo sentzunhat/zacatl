@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { z } from 'zod';
+
+import { z } from '@zacatl/third-party/zod';
 
 import type { RouteHandler, HookHandler } from '../../../../../../src/service/layers/application';
 import { FastifyApiAdapter } from '../../../../../../src/service/platforms/server/api/adapters';

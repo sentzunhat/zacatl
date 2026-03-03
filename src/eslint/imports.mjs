@@ -23,6 +23,14 @@ import importPlugin from 'eslint-plugin-import';
 const importsConfig = {
   ...importPlugin.flatConfigs.recommended,
   settings: {
+    // TypeScript resolver — understands tsconfig paths and package.json exports
+    'import/resolver': {
+      typescript: {
+        alwaysTryTypes: true,
+        project: './tsconfig.json',
+      },
+      node: true,
+    },
     // Teach the import resolver about Node 24 built-in modules that use the
     // `node:` scheme and aren't yet listed in older resolver versions.
     'import/core-modules': [
@@ -73,7 +81,7 @@ const importsConfig = {
       },
     ],
     // Disable rules that may conflict with TypeScript
-    'import/no-unresolved': 'off',
+    'import/no-unresolved': 'error',
     'import/named': 'off',
     'import/namespace': 'off',
     'import/default': 'off',

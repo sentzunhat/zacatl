@@ -1,2 +1,2 @@
-// @barrel-manual
+// @barrel-generated
 export * from './page-server';

@@ -36,9 +36,32 @@ import { recommended } from '@sentzunhat/zacatl/eslint';
 
 export default [
   {
-    ignores: ['build/**', 'node_modules/**', 'coverage/**', '*.config.js', '*.config.mjs'],
+    ignores: ['build/**', 'node_modules/**', 'coverage/**'],
   },
   ...recommended,
+];
+```
+
+> **You do NOT need to add `@typescript-eslint/parser`, `@typescript-eslint/eslint-plugin`, or `eslint-plugin-import` yourself.** > `recommended` already spreads `tseslint.configs.recommended` (parser + plugin) via `baseConfig` and `importPlugin.flatConfigs.recommended` (resolver + ordering) via `importsConfig`.
+> Any manual re-declaration of those in your config will duplicate rules.
+
+To add project-specific overrides, append them after `...recommended`:
+
+```javascript
+// eslint.config.mjs
+import { recommended } from '@sentzunhat/zacatl/eslint';
+
+export default [
+  { ignores: ['build/**', 'node_modules/**', 'coverage/**'] },
+  ...recommended,
+  // ↓ your overrides — these run after recommended so they take priority
+  {
+    files: ['test/**/*.ts'],
+    rules: {
+      '@typescript-eslint/no-explicit-any': 'warn',
+      '@typescript-eslint/explicit-function-return-type': 'off',
+    },
+  },
 ];
 ```
 
@@ -61,11 +84,11 @@ npm run lint
 
 ## Available Configurations
 
-Zacatl provides five modular ESLint configurations:
+Zacatl provides eight modular ESLint configurations, all composed into `recommended`:
 
-### 1. `recommended` (All configs combined)
+### 1. `recommended` (all configs combined)
 
-The easiest way to get started with all Zacatl ESLint rules.
+The easiest way to get started — spreads all eight configs in the correct order.
 
 ```javascript
 import { recommended } from '@sentzunhat/zacatl/eslint';
@@ -73,25 +96,80 @@ import { recommended } from '@sentzunhat/zacatl/eslint';
 export default [...recommended];
 ```
 
-### 2. `baseConfig` (Core TypeScript rules)
+### 2. `baseConfig` (core TypeScript rules)
 
-Fundamental TypeScript linting rules.
+Foundation layer: `@eslint/js` recommended + `typescript-eslint` recommended + project-level overrides. Exported as an array so `tseslint.configs.recommended` is spread correctly.
 
 ```javascript
 import { baseConfig } from '@sentzunhat/zacatl/eslint';
 
-export default [baseConfig];
+export default [...baseConfig];
 ```
 
 **Includes:**
 
-- TypeScript parser configuration
-- Unused variable warnings
-- Empty interface support (for Ports)
-- Function return type warnings
-- Standard Node.js globals
+- `no-empty-object-type` — allow interfaces for Port extension points
+- `explicit-function-return-type` — warn on missing return types
+- `consistent-type-imports: error` — enforce `import type` for type-only imports
+- `.mjs/.cjs/.js` override to disable project-based parsing for config files
 
-### 3. `namingConventions` (Hexagonal Architecture patterns)
+### 3. `strictConfig` (no-any, no-unused-vars)
+
+Applies to all `**/*.ts` files so the `_`-prefix ignore pattern works in both `src/` and `test/`.
+
+```javascript
+import { strictConfig } from '@sentzunhat/zacatl/eslint';
+
+export default [strictConfig];
+```
+
+**Includes:**
+
+- `no-explicit-any: error`
+- `no-unused-vars: error` (vars, args with `_`-prefix ignore, caughtErrors)
+
+### 4. `typeSafetyConfig` (TypeScript type-checking rules)
+
+Requires `parserOptions.project` — uses type information at lint time.
+
+```javascript
+import { typeSafetyConfig } from '@sentzunhat/zacatl/eslint';
+
+export default [typeSafetyConfig];
+```
+
+**Includes:**
+
+- `no-floating-promises: error` — all async operations must be awaited or handled
+- `no-misused-promises: error` — async functions can't be passed where `void` is expected
+- `strict-boolean-expressions: error` — no implicit truthiness from `""` / `0` / `null`
+- `prefer-readonly: error` — mark immutable class properties as `readonly`
+- `no-unnecessary-type-assertion: error` — remove assertions TypeScript already knows
+- `no-non-null-assertion: warn` — prefer optional chaining over `!`
+- `return-await: error` — require `await` inside try-catch so errors stay catchable
+- `explicit-module-boundary-types: warn` — public API must declare return types
+- `consistent-type-definitions: warn` — prefer `interface` over `type` for object shapes
+
+### 5. `bestPracticesConfig` (general code quality)
+
+```javascript
+import { bestPracticesConfig } from '@sentzunhat/zacatl/eslint';
+
+export default [bestPracticesConfig];
+```
+
+**Includes:**
+
+- `no-console: warn` (allows `warn`/`error`)
+- `prefer-const: error`, `no-var: error`
+- `no-throw-literal: error` — only throw `Error` instances
+- `eqeqeq: error` — always use `===`
+- `prefer-template: warn` — use template literals instead of string concatenation
+- `object-shorthand: error` — `{ foo }` instead of `{ foo: foo }`
+- `no-param-reassign: error`
+- `prefer-arrow-callback: error`
+
+### 6. `namingConventions` (Hexagonal Architecture patterns)
 
 Enforces Port-Adapter naming conventions.
 
@@ -107,11 +185,9 @@ export default [namingConventions];
 - Classes: `*Adapter` suffix for implementations
 - Type aliases: `Input`, `Output`, `Config`, `Document`, `Type` suffixes
 - Error classes: `*Error` suffix
-- Methods: camelCase with verb+noun patterns
+- Methods: camelCase with verb+noun patterns### 7. `importsConfig` (import organization)
 
-### 4. `importsConfig` (Import organization)
-
-Automatically organizes and sorts imports.
+Automatically organizes and sorts imports. Uses `eslint-import-resolver-typescript` so path aliases in `tsconfig.json` are resolved correctly.
 
 ```javascript
 import { importsConfig } from '@sentzunhat/zacatl/eslint';
@@ -125,8 +201,9 @@ export default [importsConfig];
 - Alphabetical sorting within groups
 - Newlines between import groups
 - Works with TypeScript path aliases
+- `import/no-unresolved: error` with TypeScript resolver
 
-### 5. `solidConfig` (SOLID design rules)
+### 8. `solidConfig` (SOLID design rules)
 
 Enforces SOLID-principle constraints for class design.
 
@@ -138,7 +215,10 @@ export default [...solidConfig];
 
 **Includes:**
 
-- `max-classes-per-file: 1` — One class per file; if two related classes are needed, split them into separate files and re-export via a barrel (e.g. `orm/mongoose/` and `orm/sequelize/` each own their adapter class)
+- `max-classes-per-file: 1` (SRP) — one class per file
+- `import/no-default-export` (ISP) — named exports only
+- `import/no-cycle` (DIP) — no circular imports
+- `import/no-extraneous-dependencies` — no undeclared package imports
 
 ## Customization Examples
 

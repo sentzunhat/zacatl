@@ -309,7 +309,9 @@ describe('loadJSON', () => {
 
 **Files:**
 
-- `test/unit/logs/logger.test.ts` — Adapter interface
+- `test/unit/logs/pino-adapter.test.ts` — Pino adapter interface
+- `test/unit/logs/console-adapter.test.ts` — Console adapter interface
+- `test/unit/logs/config.test.ts` — Pino config factory
 - `test/unit/localization/` — i18n adapter contracts
 
 ---

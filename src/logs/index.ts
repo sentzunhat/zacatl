@@ -1,11 +1,28 @@
-// @barrel-manual
+// @barrel-generated
 /**
  * Logs module - Pluggable structured logging
  * @module logs
  */
 
-export { logger, createLogger } from './logger';
-export type { Logger, LoggerPort, LoggerInput, LoggerAdapterType, PinoLoggerConfig } from './types';
-export { createPinoConfig, type PinoConfigOptions } from './config';
-export { ConsoleLoggerAdapter } from './adapters/console';
-export { PinoLoggerAdapter } from './adapters/pino';
+// Logger factory and default instance (from Pino provider)
+export { createLogger, pinoLogger as logger } from './pino';
+
+// Core types
+export type { Logger, LoggerPort, LoggerInput, LoggerAdapterType } from './types';
+
+// Console logger exports
+export {
+  ConsoleLoggerAdapter,
+  createConsoleConfig,
+  consoleLogger,
+  type ConsoleLoggerOptions,
+} from './console';
+
+// Pino logger exports
+export {
+  PinoLoggerAdapter,
+  createPinoConfig,
+  pinoLogger,
+  type PinoLoggerConfig,
+  type PinoConfigOptions,
+} from './pino';

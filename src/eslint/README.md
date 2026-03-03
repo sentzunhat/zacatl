@@ -1,12 +1,12 @@
 # eslint
 
-Flat ESLint config with naming, imports, and conventions rules.
+Flat ESLint config with type safety, best practices, naming, imports, and SOLID rules.
 
 → Full docs: [../../docs/eslint/README.md](../../docs/eslint/README.md)
 
 ## Exports
 
-recommended, baseConfig, importsConfig, namingConventions, fileNamingRules
+`recommended`, `baseConfig`, `strictConfig`, `typeSafetyConfig`, `bestPracticesConfig`, `importsConfig`, `namingConventions`, `fileNamingRules`, `solidConfig`
 
 ## Quick use
 
@@ -14,6 +14,19 @@ recommended, baseConfig, importsConfig, namingConventions, fileNamingRules
 import { recommended } from '@sentzunhat/zacatl/eslint';
 export default [...recommended];
 ```
+
+## Composition order in `recommended`
+
+| #   | Config                | Rules                                                                                                      |
+| --- | --------------------- | ---------------------------------------------------------------------------------------------------------- |
+| 1   | `baseConfig`          | `js.recommended` + `tseslint.recommended` + core overrides                                                 |
+| 2   | `strictConfig`        | `no-explicit-any`, `no-unused-vars`                                                                        |
+| 3   | `typeSafetyConfig`    | `no-floating-promises`, `strict-boolean-expressions`, `prefer-readonly`, `no-unnecessary-type-assertion` … |
+| 4   | `bestPracticesConfig` | `prefer-const`, `no-var`, `eqeqeq`, `prefer-template`, `object-shorthand` …                                |
+| 5   | `importsConfig`       | `import/order`, `import/no-unresolved`, TypeScript path resolver                                           |
+| 6   | `namingConventions`   | PascalCase classes, camelCase methods, `*Port`/`*Adapter` suffixes                                         |
+| 7   | `fileNamingRules`     | kebab-case files, `-port.ts` / `-adapter.ts` suffix enforcement                                            |
+| 8   | `solidConfig`         | `max-classes-per-file: 1`, `no-default-export`, `no-cycle`                                                 |
 
 ---
 

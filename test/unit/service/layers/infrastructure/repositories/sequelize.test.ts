@@ -1,12 +1,17 @@
-import { DataTypes, Sequelize } from 'sequelize';
-import { singleton } from 'tsyringe';
 import { describe, it, expect, vi, beforeAll } from 'vitest';
+
+import {
+  DataTypes,
+  Sequelize,
+  SequelizeModel as Model,
+  ModelStatic,
+} from '@zacatl/third-party/sequelize';
+import { singleton } from '@zacatl/third-party/tsyringe';
 
 import {
   SequelizeRepository,
   ORMType,
 } from '../../../../../../src/service/layers/infrastructure/repositories/sequelize';
-import { SequelizeModel as Model, ModelStatic } from '../../../../../../src/third-party/sequelize';
 
 interface UserTestDb extends Model {
   id: string;
@@ -17,7 +22,7 @@ interface UserTestDb extends Model {
 
 let UserModel: ModelStatic<UserTestDb>;
 
-const initializeSequelizeModel = async () => {
+const initializeSequelizeModel = async (): Promise<Sequelize> => {
   const sequelize = new Sequelize('sqlite::memory:');
 
   UserModel = sequelize.define(
@@ -64,13 +69,15 @@ describe('SequelizeRepository', () => {
   let repository: UserTestRepository;
   let sequelize: Sequelize;
 
-  beforeAll(async () => {
+  beforeAll(async (): Promise<void> => {
     sequelize = await initializeSequelizeModel();
     try {
       await sequelize.sync({ force: true });
       repository = new UserTestRepository();
-    } catch (error: any) {
-      if (error.message?.includes('Sequelize is not installed')) {
+    } catch (error: unknown) {
+      const msg = error instanceof Error ? error.message : String(error);
+      if (msg?.includes('Sequelize is not installed')) {
+        // eslint-disable-next-line no-console
         console.log('Skipping SequelizeRepository tests - running from TypeScript source');
         return;
       }

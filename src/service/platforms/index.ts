@@ -1,4 +1,4 @@
-// @barrel-manual
+// @barrel-generated
 export * from './server';
 export type { ConfigServer } from './server/server';
 export { Platforms } from './platforms';

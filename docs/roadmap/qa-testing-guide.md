@@ -268,17 +268,13 @@ grep -r "\[.*\](.*\.md)" docs/ examples/ | head -20
 #!/bin/bash
 
 # Fastify examples (SQLite instant)
-cd examples/platform-fastify/with-sqlite
-npm install && npm run build
-timeout 3 npm run dev 2>&1 | head -20
+(cd examples/fastify-sqlite-react && npm install && npm run build && timeout 3 npm run dev 2>&1 | head -20)
 
 # Express examples (SQLite instant)
-cd examples/platform-express/with-sqlite
-npm install && npm run build
-timeout 3 npm run dev 2>&1 | head -20
+(cd examples/express-sqlite-react && npm install && npm run build && timeout 3 npm run dev 2>&1 | head -20)
 
 # Port validation
-grep -h "PORT\|port" */with-*/apps/backend/src/config.ts | grep -E ":\s*[0-9]{4}"
+grep -h "PORT\|port" examples/*/backend/src/config.ts | grep -E ":\s*[0-9]{4}"
 ```
 
 ### Documentation Verification Checklist

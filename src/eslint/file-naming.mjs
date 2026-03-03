@@ -20,7 +20,7 @@
  * Custom rule implementation for ESLint
  */
 const fileNamingRules = {
-  files: ['src/**/*.ts', '!src/**/*.d.ts'],
+  files: ['src/**/*.ts'],
   rules: {
     /**
      * Enforce: Files containing Port interface/type must end with -port.ts

@@ -36,8 +36,8 @@ describe('Service (unit)', () => {
 
     // Replace the internal platforms with a failing stub to exercise start error path
     (svc as any).platforms = {
-      registerEntrypoints: async () => {},
-      start: async () => {
+      registerEntrypoints: async (): Promise<void> => {},
+      start: async (): Promise<void> => {
         throw new Error('start-failure');
       },
     };

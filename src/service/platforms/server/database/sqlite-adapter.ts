@@ -1,4 +1,4 @@
-import { DatabaseSync } from 'node:sqlite';
+import type { DatabaseSync } from 'node:sqlite';
 
 import { CustomError } from '@zacatl/error';
 
@@ -42,6 +42,9 @@ export class SqliteAdapter implements DatabaseServerPort {
     }
 
     try {
+      // DatabaseSync is a class exported by node:sqlite — PascalCase is intentional
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      const { DatabaseSync } = await import('node:sqlite');
       // DatabaseSync opens the connection synchronously.
       // defensive: true is the default in Node 24 — explicitly set for clarity.
       this.db = new DatabaseSync(connectionString, { defensive: true });

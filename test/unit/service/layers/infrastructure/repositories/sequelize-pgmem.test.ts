@@ -1,6 +1,7 @@
 import { newDb } from 'pg-mem';
-import { Sequelize, DataTypes } from 'sequelize';
 import { describe, it, expect, beforeAll } from 'vitest';
+
+import { Sequelize, DataTypes } from '@zacatl/third-party/sequelize';
 
 describe('SequelizeRepository (pg-mem)', () => {
   let sequelize: Sequelize;

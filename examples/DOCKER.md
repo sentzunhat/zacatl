@@ -36,18 +36,18 @@ Comprehensive guide to deploying Zacatl examples with Docker.
 
 ```bash
 # SQLite examples (no database container needed)
-cd examples/platform-express/with-sqlite-react && docker compose up -d
-cd examples/platform-fastify/with-sqlite-react && docker compose up -d
-cd examples/platform-express/with-sqlite-svelte && docker compose up -d
-cd examples/platform-fastify/with-sqlite-svelte && docker compose up -d
+cd examples/express-sqlite-react && docker compose up -d
+cd examples/fastify-sqlite-react && docker compose up -d
+cd examples/express-sqlite-svelte && docker compose up -d
+cd examples/fastify-sqlite-svelte && docker compose up -d
 
 # MongoDB examples (includes MongoDB container)
-cd examples/platform-express/with-mongodb-react && docker compose up -d
-cd examples/platform-fastify/with-mongodb-react && docker compose up -d
+cd examples/express-mongodb-react && docker compose up -d
+cd examples/fastify-mongodb-react && docker compose up -d
 
 # PostgreSQL examples (includes PostgreSQL container)
-cd examples/platform-express/with-postgres-react && docker compose up -d
-cd examples/platform-fastify/with-postgres-react && docker compose up -d
+cd examples/express-postgres-react && docker compose up -d
+cd examples/fastify-postgres-react && docker compose up -d
 ```
 
 ### Test Endpoints
@@ -78,23 +78,22 @@ curl http://localhost:8183/greetings
 
 curl http://localhost:8083/greetings
 
-```
+````
 
 ---
 
 ## 📁 File Structure
 
-Each example includes:{react|svelte}/
+Each example includes:
+
+```text
+{framework}-{database}-{ui}/
 ├── Dockerfile              # Multi-stage build
 ├── docker-compose.yml      # Single service definition
 ├── .dockerignore          # Build optimization
-├── apps/
-│   ├── backend/           # API server
-│   └── frontend/          # React or Svelte optimization
-├── apps/
-│   ├── backend/           # API server
-│   └── frontend/          # React app (compiled to static)
-```
+├── backend/               # API server
+└── frontend/              # React or Svelte app (compiled to static)
+````
 
 ---
 
@@ -121,7 +120,7 @@ Each example includes:{react|svelte}/
 **⚠️ IMPORTANT**: The backend build script **MUST** include `dist` argument:
 
 ```json
-// apps/backend/package.json
+// backend/package.json
 {
   "scripts": {
     "build": "tsc && node ../../node_modules/@sentzunhat/zacatl/scripts/fix-esm.mjs dist"
@@ -151,14 +150,14 @@ RUN npm rebuild sqlite3
 
 ## 🌐 Port Configuration
 
-| Framework | Database   | Backend Port | Container Name           | Example Path                           |
-| --------- | ---------- | ------------ | ------------------------ | -------------------------------------- |
-| Fastify   | SQLite     | 8081         | fastify-sqlite-backend   | `platform-fastify/with-sqlite-react`   |
-| Express   | SQLite     | 8181         | express-sqlite-backend   | `platform-express/with-sqlite-react`   |
-| Fastify   | MongoDB    | 8082         | fastify-mongodb-backend  | `platform-fastify/with-mongodb-react`  |
-| Express   | MongoDB    | 8182         | express-mongodb-backend  | `platform-express/with-mongodb-react`  |
-| Fastify   | PostgreSQL | 8083         | fastify-postgres-backend | `platform-fastify/with-postgres-react` |
-| Express   | PostgreSQL | 8183         | express-postgres-backend | `platform-express/with-postgres-react` |
+| Framework | Database   | Backend Port | Container Name           | Example Path             |
+| --------- | ---------- | ------------ | ------------------------ | ------------------------ |
+| Fastify   | SQLite     | 8081         | fastify-sqlite-backend   | `fastify-sqlite-react`   |
+| Express   | SQLite     | 8181         | express-sqlite-backend   | `express-sqlite-react`   |
+| Fastify   | MongoDB    | 8082         | fastify-mongodb-backend  | `fastify-mongodb-react`  |
+| Express   | MongoDB    | 8182         | express-mongodb-backend  | `express-mongodb-react`  |
+| Fastify   | PostgreSQL | 8083         | fastify-postgres-backend | `fastify-postgres-react` |
+| Express   | PostgreSQL | 8183         | express-postgres-backend | `express-postgres-react` |
 
 **Database Container Ports:**
 
@@ -176,7 +175,7 @@ services:
   backend:  # Name is "backend" but includes frontend too
     build:
       context: ../../..  # Repository root
-      dockerfile: examples/platform-{framework}/with-{database}-react/Dockerfile
+      dockerfile: examples/{framework}-{database}-react/Dockerfile
     image: zacatl-{framework}-{database}
     container_name: {framework}-{database}-backend
     ports:
@@ -303,11 +302,11 @@ cd dev-env
 docker compose up -d
 
 # Run examples locally (they connect to localhost:27017 and localhost:5432)
-cd ../examples/platform-express/with-mongodb
+cd ../examples/express-mongodb-react
 npm install
 npm run dev  # Connects to localhost:27017
 
-cd ../examples/platform-fastify/with-postgres
+cd ../examples/fastify-postgres-react
 npm install
 npm run dev  # Connects to localhost:5432
 ```
@@ -337,7 +336,7 @@ npm run dev  # Connects to localhost:5432
 **Solution**: Check backend build script includes `dist`:
 
 ```bash
-grep "fix-esm.mjs" apps/backend/package.json
+grep "fix-esm.mjs" backend/package.json
 # Should output: "build": "tsc && node ../../node_modules/@sentzunhat/zacatl/scripts/fix-esm.mjs dist"
 ```
 

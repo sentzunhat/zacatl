@@ -1,3 +1,4 @@
+// @barrel-generated
 export { MongooseAdapter } from './mongoose';
 export { SequelizeAdapter } from './sequelize';
 export { SqliteAdapter } from './sqlite';

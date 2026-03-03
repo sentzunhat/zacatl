@@ -1,23 +1,47 @@
 # Logging API
 
-Structured, high-performance logging with Pino adapter.
+Structured, high-performance logging with pluggable adapters.
 
 ## Import
 
 ```typescript
-import { createLogger, logger } from '@sentzunhat/zacatl/logs';
+// Default logger (Pino) and factory
+import { logger, createLogger } from '@sentzunhat/zacatl/logs';
+
+// Adapters
 import { PinoLoggerAdapter, ConsoleLoggerAdapter } from '@sentzunhat/zacatl/logs';
-import { createPinoConfig } from '@sentzunhat/zacatl/logs';
+
+// Configuration factories
+import { createPinoConfig, createConsoleConfig } from '@sentzunhat/zacatl/logs';
+
+// Default instances
+import { pinoLogger, consoleLogger } from '@sentzunhat/zacatl/logs';
 ```
 
 ## Quick Start
 
 ### Use Default Logger
 
+The default `logger` alias uses Pino for production-ready structured logging:
+
 ```typescript
 import { logger } from '@sentzunhat/zacatl/logs';
 
 logger.info('Server started', { data: { port: 3000 } });
+```
+
+### Use Provider-Specific Default Loggers
+
+Choose between Pino (production) or Console (CLI/development) default instances:
+
+```typescript
+// Pino logger (same as default logger)
+import { pinoLogger } from '@sentzunhat/zacatl/logs';
+pinoLogger.info('Production-ready structured logging');
+
+// Console logger (for CLI tools and scripts)
+import { consoleLogger } from '@sentzunhat/zacatl/logs';
+consoleLogger.info('Simple console output');
 ```
 
 ### Create Custom Logger
@@ -55,7 +79,14 @@ logger.info('User created', {
 });
 ```
 
-## Adapters
+## Module Structure
+
+Each logger provider lives in its own folder with complete isolation:
+
+- **`logs/pino/`** — Pino adapter, config factory, and default instance
+- **`logs/console/`** — Console adapter, config factory, and default instance
+
+All providers export the same `Logger` interface, making them interchangeable.
 
 ### Pino Adapter (Production)
 
@@ -68,6 +99,14 @@ const logger = createLogger(new PinoLoggerAdapter());
 // Auto-detects: pretty in dev, JSON in production
 ```
 
+Or use the default Pino logger:
+
+```typescript
+import { pinoLogger } from '@sentzunhat/zacatl/logs';
+
+pinoLogger.info('Using default Pino instance');
+```
+
 ### Console Adapter (CLI/Desktop)
 
 Simple console output for CLI tools and desktop apps:
@@ -78,11 +117,32 @@ import { createLogger, ConsoleLoggerAdapter } from '@sentzunhat/zacatl/logs';
 const logger = createLogger(new ConsoleLoggerAdapter());
 ```
 
-## Configuration
-
-### Basic Configuration
+Or use the default Console logger:
 
 ```typescript
+import { consoleLogger } from '@sentzunhat/zacatl/logs';
+
+consoleLogger.info('Using default Console instance');
+```
+
+## Configuration
+
+### Console Logger Configuration
+
+```typescript
+import { ConsoleLoggerAdapter, createConsoleConfig } from '@sentzunhat/zacatl/logs';
+
+const adapter = new ConsoleLoggerAdapter(
+  createConsoleConfig({
+    colors: true, // Enable ANSI color codes (default: true)
+    timestamps: true, // Include ISO timestamps (default: true)
+  }),
+);
+```
+
+### Pino Basic Configuration
+
+```typescript (Pino)
 import { createLogger, PinoLoggerAdapter, createPinoConfig } from '@sentzunhat/zacatl/logs';
 
 const logger = createLogger(
@@ -105,7 +165,7 @@ const fileDestination = pino.destination('/var/log/app/app.log');
 const logger = createLogger(new PinoLoggerAdapter(createPinoConfig(), fileDestination));
 ```
 
-### Multi-Transport (Console + File)
+### Multi-Transport (Console + File - Pino)
 
 No spread operator needed - use `pinoConfig` option:
 
@@ -128,7 +188,7 @@ const logger = createLogger(
 );
 ```
 
-### Third-Party Services (Prometheus, Grafana, etc.)
+### Third-Party Services (Prometheus, Grafana, etc. - Pino)
 
 ```typescript
 import { createLogger, PinoLoggerAdapter, createPinoConfig } from '@sentzunhat/zacatl/logs';
@@ -154,7 +214,7 @@ const logger = createLogger(
 );
 ```
 
-## Environment-Aware Defaults
+## Environment-Aware Defaults (Pino)
 
 `createPinoConfig()` automatically detects environment:
 
@@ -260,6 +320,8 @@ import type {
   LoggerInput,
   LoggerAdapterType,
   PinoLoggerConfig,
+  PinoConfigOptions,
+  ConsoleLoggerOptions,
 } from '@sentzunhat/zacatl/logs';
 
 // LoggerInput structure
