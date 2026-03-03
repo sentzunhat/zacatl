@@ -1,6 +1,6 @@
 import type { MongooseBaseRepositoryConfig, MongooseRepositoryModel } from './mongoose/types';
-import type { SequelizeBaseRepositoryConfig, SequelizeRepositoryModel } from './sequelize/types';
 import type { NodeSqliteRepositoryModel } from './nodesqlite/types';
+import type { SequelizeBaseRepositoryConfig, SequelizeRepositoryModel } from './sequelize/types';
 
 export type BaseRepositoryConfig<D extends object = object> =
   | MongooseBaseRepositoryConfig<D>
