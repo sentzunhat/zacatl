@@ -7,7 +7,7 @@
 [![Node.js 24+](https://img.shields.io/badge/Node.js-24%2B-brightgreen.svg)](https://nodejs.org/)
 [![Build](https://github.com/sentzunhat/zacatl/actions/workflows/publish-dry.yml/badge.svg)](https://github.com/sentzunhat/zacatl/actions/workflows/publish-dry.yml)
 [![Tests: 425](https://img.shields.io/badge/Tests-425-blue.svg)](#tests)
-[![Coverage: 72.45%](https://img.shields.io/badge/Coverage-72.45%25-orange.svg)](https://img.shields.io/badge/Coverage-72.45%25-orange.svg)
+[![Coverage: 72.16%](https://img.shields.io/badge/Coverage-72.16%25-orange.svg)](https://img.shields.io/badge/Coverage-72.16%25-orange.svg)
 
 **Universal TypeScript framework for building CLI tools, desktop apps, APIs, and distributed systems.**
 
@@ -20,7 +20,7 @@ Zacatl enforces clean, layered architecture with dependency injection, validatio
 - **💉 Dependency Injection** - Built-in DI container using `tsyringe`
 - **✅ Type-Safe Validation** - Full Zod schema support (with planned Yup and optional validation)
 - **🛡️ Structured Error Handling** - 7 custom error types with correlation IDs
-- **🗄️ Pluggable ORM Adapters** - Sequelize, Mongoose, or build your own
+- **🗄️ Pluggable ORM Adapters** - Sequelize, Mongoose, built-in SQLite (Node 24+), or build your own
 - **🌐 Multi-Language Support** - Pluggable i18n with filesystem/memory adapters
 - **🔌 Adapter Pattern** - Easy integration with any database or service
 - **🧪 Comprehensive Testing** - See the badges above for the current test count and coverage; Vitest

@@ -96,7 +96,21 @@ databases: [
 ];
 ```
 
-**When to use:** Lightweight SQLite storage without an ORM or native bindings.
+**SQLite ORM Support:** Full ORM integration via `createNodeSqliteAdapter()` factory with `BaseRepository` for type-safe CRUD operations.
+
+```typescript
+import { createNodeSqliteAdapter } from '@sentzunhat/zacatl';
+import type { DatabaseSync } from 'node:sqlite';
+
+const adapter = createNodeSqliteAdapter<InputModel, OutputModel>({
+  database: dbInstance as DatabaseSync,
+  tableName: 'users',
+});
+```
+
+**Performance Optimization:** The `node:sqlite` module is dynamically imported only when a connection is first initiated, avoiding startup overhead for projects that don't use SQLite.
+
+**When to use:** Lightweight embedded SQLite storage, development/testing databases, or edge server runtime environments.
 
 ---
 

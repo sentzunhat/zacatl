@@ -34,13 +34,23 @@ const cleanGitignored = (): void => {
   const result = spawnSync(
     'git',
     ['ls-files', '--others', '-i', '--exclude-from=.gitignore', '-z'],
-    { encoding: 'utf8', maxBuffer: 10 * 1024 * 1024, cwd: root },
+    { encoding: 'utf8', maxBuffer: 100 * 1024 * 1024, cwd: root, stdio: 'pipe', timeout: 5000 },
   );
-  if (result.error || result.status !== 0) {
+
+  if (result.error) {
     // eslint-disable-next-line no-console
-    console.error('git ls-files failed:', result.stderr);
-    process.exit(1);
+    console.warn(`git ls-files warning (skipping gitignored cleanup): ${result.error.message}`);
+    return;
   }
+
+  if (result.status !== 0) {
+    // eslint-disable-next-line no-console
+    console.warn(
+      `git ls-files warning (skipping gitignored cleanup): exited with code ${result.status}${result.stderr ? ': ' + result.stderr : ''}`,
+    );
+    return;
+  }
+
   const files = (result.stdout ?? '')
     .split('\0')
     .filter(Boolean)
@@ -48,7 +58,7 @@ const cleanGitignored = (): void => {
 
   if (files.length === 0) {
     // eslint-disable-next-line no-console
-    console.log('nothing to clean');
+    console.log('nothing to clean from gitignored');
     return;
   }
   files.map((f) => resolve(root, f)).forEach(safeRm);

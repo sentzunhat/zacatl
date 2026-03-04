@@ -8,16 +8,19 @@ graph TD
     B -->|uses| C[ORMAdapter]
     C -->|implements| D[MongooseAdapter]
     C -->|implements| E[SequelizeAdapter]
-    C -->|implements| F[YourAdapter]
-    D --> G[(MongoDB)]
-    E --> H[(PostgreSQL/MySQL)]
-    F --> I[(Your DB)]
+    C -->|implements| F[NodeSqliteAdapter]
+    C -->|implements| G[YourAdapter]
+    D --> H[(MongoDB)]
+    E --> I[(PostgreSQL/MySQL)]
+    F --> J[(SQLite)]
+    G --> K[(Your DB)]
 ```
 
 ## Built-in ORMs
 
 - Mongoose (MongoDB)
-- Sequelize (PostgreSQL, MySQL, SQLite)
+- Sequelize (PostgreSQL, MySQL, SQLite via `sequelize` package)
+- Node.js SQLite (`node:sqlite` module — Node 24+ only, no external package required)
 
 ## Mongoose Example
 
@@ -63,6 +66,30 @@ class ProductRepository extends BaseRepository<ProductModel, CreateProduct, Prod
 }
 ```
 
+## Node.js SQLite Example
+
+```typescript
+import { BaseRepository } from '@sentzunhat/zacatl';
+
+interface User {
+  id: string;
+  name: string;
+  email: string;
+}
+
+class UserRepository extends BaseRepository<User, CreateUser, UserDTO> {
+  constructor(database: DatabaseSync) {
+    super({
+      type: 'nodesqlite',
+      database,
+      tableName: 'users',
+    });
+  }
+}
+```
+
+````
+
 ## Custom Adapter
 
 ```typescript
@@ -87,11 +114,11 @@ class MyAdapter<D, I, O> implements ORMAdapter<D, I, O> {
     /* ... */
   }
 }
-```
+````
 
 ## BaseRepository API
 
-```typescript
+````typescript
 // CRUD
 await repo.findById(id);
 await repo.create(data);
@@ -105,4 +132,5 @@ repo.isSequelize();
 // Use model directly with type assertion:
 // (repo.model as MongooseModel<T>) for Mongoose
 // (repo.model as ModelStatic<T>) for Sequelize
-```
+// (repo.model as DatabaseSync) for Node.js SQLite```
+````

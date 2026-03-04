@@ -2,9 +2,35 @@
 
 ---
 
-## [0.0.49] - Unreleased
+## [0.0.50] - 2026-03-04
 
 **Status**: Pending release
+
+### ✨ Features
+
+- **Built-in SQLite ORM adapter** — Added Node.js built-in sqlite module adapter (Node 24+) with dynamic module loading. Eliminates experimental warnings through lazy-loading pattern, provides zero external dependencies, and offers type-safe repository operations. Matches feature parity with Mongoose and Sequelize adapters.
+
+### 🔧 Improvements
+
+- **Dynamic module loading for optional features** — Deferred import of optional ORM modules (node:sqlite) until first use to eliminate startup overhead and experimental warnings. Implemented static module caching pattern to prevent repeated imports while maintaining lazy-loading benefits.
+
+- **Build system resilience** — Increased git command buffer from 10MB to 100MB and added 5-second timeout to handle large gitignored file lists. Improved error handling from fatal failures to graceful warnings, ensuring cleanup operations complete even with large projects.
+
+- **Comprehensive cleanup targets** — Updated clean:build task to remove coverage and publish directories alongside build artifacts and compiled files, ensuring complete build directory cleanup.
+
+### 🐛 Fixes
+
+- **`zacatl-fix-esm` publish bin resolution** — Fixed `prepare-publish` packaging order to prioritize ESM-ready script artifacts and include required script utilities under `publish/build/utils`, preventing runtime module resolution errors when running `npx zacatl-fix-esm` from installed packages.
+
+### 📚 Documentation
+
+- **SQLite integration guide** — Updated README.md and docs/third-party/orm/overview.md to document built-in SQLite support and dynamic import optimization. Added usage examples and explain lazy-loading benefits for non-SQLite projects.
+
+---
+
+## [0.0.49] - 2026-03-03
+
+**Status**: Released
 
 ### 🔧 Improvements
 

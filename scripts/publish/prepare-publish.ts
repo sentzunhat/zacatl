@@ -77,11 +77,16 @@ const binDir = path.join(buildDest, 'bin');
 fs.mkdirSync(binDir, { recursive: true });
 
 const scriptsCandidates = [
-  path.join(root, 'build-scripts-cjs', 'fix-esm.js'),
   path.join(root, 'build-scripts-esm', 'fix-esm.js'),
+  path.join(root, 'build-scripts-cjs', 'fix-esm.js'),
   // also accept compiled helpers under a `build` subfolder
-  path.join(root, 'build-scripts-cjs', 'build', 'fix-esm.js'),
   path.join(root, 'build-scripts-esm', 'build', 'fix-esm.js'),
+  path.join(root, 'build-scripts-cjs', 'build', 'fix-esm.js'),
+];
+
+const scriptsUtilsCandidates = [
+  path.join(root, 'build-scripts-esm', 'utils'),
+  path.join(root, 'build-scripts-cjs', 'utils'),
 ];
 
 const buildBinCandidates = [
@@ -128,6 +133,50 @@ if (!copiedBin) {
       }
     }
   }
+}
+
+for (const cand of scriptsCandidates) {
+  if (fs.existsSync(cand)) {
+    try {
+      const dest = path.join(binDir, 'fix-esm.js');
+      fs.copyFileSync(cand, dest);
+      try {
+        fs.chmodSync(dest, 0o755);
+      } catch (_) {
+        /* chmod failures are non-fatal on Windows */
+      }
+    } catch (err: unknown) {
+      // eslint-disable-next-line no-console
+      console.warn(
+        `Could not copy script ${cand} to fix-esm.js:`,
+        err instanceof Error ? err.message : String(err),
+      );
+    }
+    break;
+  }
+}
+
+const buildUtilsDest = path.join(buildDest, 'utils');
+let copiedScriptUtils = false;
+for (const utilsDir of scriptsUtilsCandidates) {
+  if (fs.existsSync(utilsDir)) {
+    try {
+      fs.cpSync(utilsDir, buildUtilsDest, { recursive: true });
+      copiedScriptUtils = true;
+    } catch (err: unknown) {
+      // eslint-disable-next-line no-console
+      console.warn(
+        `Could not copy script utils from ${utilsDir}:`,
+        err instanceof Error ? err.message : String(err),
+      );
+    }
+    break;
+  }
+}
+
+if (!copiedScriptUtils) {
+  // eslint-disable-next-line no-console
+  console.warn('No compiled script utils found in', scriptsUtilsCandidates);
 }
 
 const removeSourceMaps = (dir: string): void => {
