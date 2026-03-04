@@ -140,6 +140,15 @@ for (const cand of scriptsCandidates) {
     try {
       const dest = path.join(binDir, 'fix-esm.js');
       fs.copyFileSync(cand, dest);
+
+      // Rewrite import to make it self-contained (imports from ./utils instead of ../utils)
+      let content = fs.readFileSync(dest, 'utf-8');
+      content = content.replace(
+        /from\s+['"]\.\.\/utils\/index\.js['"]/g,
+        "from './utils/index.js'",
+      );
+      fs.writeFileSync(dest, content, 'utf-8');
+
       try {
         fs.chmodSync(dest, 0o755);
       } catch (_) {
@@ -156,12 +165,13 @@ for (const cand of scriptsCandidates) {
   }
 }
 
-const buildUtilsDest = path.join(buildDest, 'utils');
+// Copy utils into bin/ to make fix-esm.js self-contained
+const binUtilsDest = path.join(binDir, 'utils');
 let copiedScriptUtils = false;
 for (const utilsDir of scriptsUtilsCandidates) {
   if (fs.existsSync(utilsDir)) {
     try {
-      fs.cpSync(utilsDir, buildUtilsDest, { recursive: true });
+      fs.cpSync(utilsDir, binUtilsDest, { recursive: true });
       copiedScriptUtils = true;
     } catch (err: unknown) {
       // eslint-disable-next-line no-console
@@ -231,6 +241,7 @@ interface PublishPkg {
   version?: string | undefined;
   description?: string | undefined;
   license?: string | undefined;
+  type?: string | undefined;
   keywords?: string[] | unknown;
   repository?: unknown;
   bugs?: unknown;
@@ -251,6 +262,7 @@ const newPkg: PublishPkg = {
   version: typeof pkg['version'] === 'string' ? (pkg['version'] as string) : undefined,
   description: typeof pkg['description'] === 'string' ? (pkg['description'] as string) : undefined,
   license: typeof pkg['license'] === 'string' ? (pkg['license'] as string) : undefined,
+  type: 'module',
   keywords: Array.isArray(pkg['keywords']) ? (pkg['keywords'] as string[]) : undefined,
   bugs: pkg['bugs'],
   author: pkg['author'],

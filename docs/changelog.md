@@ -2,6 +2,18 @@
 
 ---
 
+## [0.0.51] - 2026-03-04
+
+**Status**: Pending release
+
+### 🐛 Fixes
+
+- **`zacatl-fix-esm` self-contained bin layout** — Updated publish packaging so script utilities are placed under `publish/build/bin/utils` and `fix-esm.js` resolves `./utils/index.js`, preventing runtime module resolution issues when running `npx zacatl-fix-esm`.
+
+### 🔧 Improvements
+
+- **Publish script cleanup** — Simplified `prepare-publish` flow by copying the bin script first and then rewriting imports in place, keeping the publish output consistent and easier to reason about.
+
 ## [0.0.50] - 2026-03-04
 
 **Status**: Pending release
