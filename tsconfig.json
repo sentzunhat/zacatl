@@ -87,5 +87,5 @@
     }
   },
   "include": ["src/**/*.ts", "src/**/*.js"],
-  "exclude": ["node_modules", "build-src-esm", "build-src-cjs", "coverage", "test", "examples"]
+  "exclude": ["node_modules", "build-*-esm", "build-*-cjs", "coverage", "test", "examples"]
 }

@@ -2,9 +2,27 @@
 
 ---
 
-## [0.0.48] - Unreleased
+## [0.0.49] - Unreleased
 
 **Status**: Pending release
+
+### 🔧 Improvements
+
+- **Simplified handler responses** — Streamlined `AbstractRouteHandler` for both Express and Fastify by removing response shaping logic. Handlers now return data directly without any default envelope or status code injection. Added `handleError()` method that automatically maps Zacatl error types (NotFoundError→404, BadRequestError→400, ValidationError→422, UnauthorizedError→401, ForbiddenError→403, InternalServerError→500) to appropriate HTTP status codes. The `execute()` pipeline wraps handler execution in try-catch, sending handler results directly on success and calling `handleError()` on failure. Custom status codes and response envelopes can be implemented within handler logic using framework-native reply methods.
+
+### 🧪 Tests
+
+- **Express handler parity tests** — Added comprehensive test suite (15 tests) for Express handlers ensuring feature parity with Fastify implementations. Tests cover auto-mapping of Zacatl error types to status codes, custom error handling via `handleError()` override, handler metadata, and Express-specific request/response handling.
+
+### 📚 Documentation
+
+- **Handler best practices guide** — New comprehensive guide (`docs/service/handler-best-practices.md`) covering REST handler patterns, error handling strategies, real-world examples (pagination, filtering, updates), hook/middleware patterns, and testing. Includes both Fastify and Express examples with detailed explanations of the simplified response approach.
+
+---
+
+## [0.0.48] - 2026-03-03
+
+**Status**: Released
 
 ### ✨ Features
 

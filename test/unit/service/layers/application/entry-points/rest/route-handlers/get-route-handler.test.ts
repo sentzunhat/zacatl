@@ -26,8 +26,7 @@ describe('GetRouteHandler', () => {
     await testHandler.execute(fakeRequest, fakeReply as any);
 
     const mockReply = fakeReply as Record<string, any>;
-    expect(mockReply['code']).toHaveBeenCalledWith(200);
-    // Default behavior: raw data sent, no forced envelope
+    // Handler sends raw data directly without status code manipulation
     expect(mockReply['send']).toHaveBeenCalledWith('Test GET response');
   });
 });

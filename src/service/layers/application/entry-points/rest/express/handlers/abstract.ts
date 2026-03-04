@@ -1,5 +1,14 @@
 import type { Request as ExpressRequest, Response } from 'express';
 
+import {
+  BadRequestError,
+  BadResourceError,
+  ForbiddenError,
+  InternalServerError,
+  NotFoundError,
+  UnauthorizedError,
+  ValidationError,
+} from '@zacatl/error';
 import type { z } from '@zacatl/third-party/zod';
 
 import type { HTTPMethod } from '../../common/http-methods';
@@ -68,42 +77,109 @@ export abstract class AbstractRouteHandler<
   ): Promise<HandlerOutput<TResponse>> | HandlerOutput<TResponse>;
 
   /**
-   * Wraps the handler response before sending to the client.
+   * Handle errors and format error responses with appropriate status codes.
    *
-   * Override this method to customize the response shape (e.g., add an envelope,
-   * change the status code, or return raw data).
+   * Override this method to customize error handling and response format.
+   * Maps common Zacatl error types to appropriate HTTP status codes automatically.
+   * Returns the error message directly with statusCode, without a hardcoded envelope.
    *
-   * @default Returns the handler result as-is; use `buildResponse()` to wrap it
-   *
-   * @example
-   * // Add standard envelope:
-   * protected buildResponse(data: TResponse) {
-   *   return { ok: true, message: "Success", data };
-   * }
+   * @default Maps NotFoundError→404, BadRequestError→400, ValidationError→422,
+   *          UnauthorizedError→401, ForbiddenError→403, others→500
    *
    * @example
-   * // Return raw data:
-   * protected buildResponse(data: TResponse) {
-   *   return data;
+   * // Custom error handling:
+   * protected handleError(error: Error) {
+   *   if (error instanceof NotFoundError) {
+   *     return { type: 'NOT_FOUND', message: error.message, statusCode: 404 };
+   *   }
+   *   return { type: 'ERROR', message: 'Something went wrong', statusCode: 500 };
    * }
    */
-  protected buildResponse(
-    data: HandlerOutput<TResponse>,
-  ): HandlerOutput<TResponse> | Record<string, unknown> {
-    return data;
+  protected handleError(error: Error): {
+    statusCode: number;
+    [key: string]: unknown;
+  } {
+    if (error instanceof NotFoundError) {
+      return {
+        message: error.message,
+        statusCode: 404,
+      };
+    }
+    if (error instanceof BadRequestError || error instanceof BadResourceError) {
+      return {
+        message: error.message,
+        statusCode: 400,
+      };
+    }
+    if (error instanceof ValidationError) {
+      return {
+        message: error.message,
+        statusCode: 422,
+      };
+    }
+    if (error instanceof UnauthorizedError) {
+      return {
+        message: error.message,
+        statusCode: 401,
+      };
+    }
+    if (error instanceof ForbiddenError) {
+      return {
+        message: error.message,
+        statusCode: 403,
+      };
+    }
+    if (error instanceof InternalServerError) {
+      return {
+        message: error.message,
+        statusCode: 500,
+      };
+    }
+    return {
+      message: 'Something went wrong',
+      statusCode: 500,
+    };
   }
 
   public async execute(
     request: ExpressRequest<TParams, TResponse, TBody, TQuerystring>,
     reply: Response,
   ): Promise<HandlerOutput<TResponse>> {
-    const response = await this.handler(request);
+    try {
+      const result = await this.handler(request);
 
-    // Only auto-send if the handler has not already sent the reply
-    if (!reply.headersSent) {
-      reply.status(200).send(this.buildResponse(response));
+      // Only auto-send if the handler has not already sent the reply
+      if (!reply.headersSent) {
+        reply.send(result);
+      }
+
+      return result;
+    } catch (error) {
+      // Only auto-send error if the handler has not already sent the reply
+      if (!reply.headersSent) {
+        const errorResponse = this.handleError(error as Error);
+        const statusCode =
+          typeof errorResponse === 'object' &&
+          errorResponse !== null &&
+          'statusCode' in errorResponse
+            ? errorResponse.statusCode || 500
+            : 500;
+
+        let body: { [key: string]: unknown } = errorResponse;
+        if (
+          typeof errorResponse === 'object' &&
+          errorResponse !== null &&
+          'statusCode' in errorResponse
+        ) {
+          // eslint-disable-next-line @typescript-eslint/naming-convention
+          const { statusCode: _, ...rest } = errorResponse;
+          body = rest;
+        }
+
+        reply.status(statusCode).send(body);
+      }
+
+      throw error;
     }
-
-    return response;
   }
 }

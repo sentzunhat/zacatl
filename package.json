@@ -1,7 +1,7 @@
 {
   "name": "@sentzunhat/zacatl",
   "type": "module",
-  "version": "0.0.48",
+  "version": "0.0.49",
   "packageManager": "npm@11.9.0",
   "repository": {
     "type": "git",
@@ -67,8 +67,8 @@
     "build:scripts:esm": "npx tsc -p scripts/tsconfig.scripts.esm.json && npx tsc-alias -p scripts/tsconfig.scripts.esm.json && npx tsx scripts/build/fix-esm.ts build-scripts-esm",
     "build:scripts:cjs": "npx tsc -p scripts/tsconfig.scripts.cjs.json",
     "build:scripts": "npm run parallel -- \"npm run build:scripts:esm,npm run build:scripts:cjs\"",
-    "build:src:esm": "npm run build:scripts:esm && npx tsc -p tsconfig.json && npx tsc-alias -p tsconfig.json && npx tsx scripts/build/fix-esm.ts esm",
-    "build:src:cjs": "npm run build:scripts:cjs && npx tsc -p tsconfig.cjs.json && npx tsc-alias -p tsconfig.cjs.json",
+    "build:src:esm": "npx tsc -p tsconfig.json && npx tsc-alias -p tsconfig.json && npx tsx scripts/build/fix-esm.ts build-src-esm",
+    "build:src:cjs": "npx tsc -p tsconfig.cjs.json && npx tsc-alias -p tsconfig.cjs.json",
     "build:src": "npm run parallel -- \"npm run build:src:esm,npm run build:src:cjs\"",
     "build": "npm run build:src && npm run build:scripts",
     "build:watch": "npx tsc --project tsconfig.json --watch",

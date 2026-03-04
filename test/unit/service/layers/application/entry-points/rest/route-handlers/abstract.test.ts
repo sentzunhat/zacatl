@@ -1,5 +1,12 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect } from 'vitest';
 
+import {
+  BadRequestError,
+  ForbiddenError,
+  NotFoundError,
+  UnauthorizedError,
+  ValidationError,
+} from '../../../../../../../../src/error';
 import type { Request } from '../../../../../../../../src/service/layers/application/entry-points/rest/fastify/handlers/abstract';
 import { AbstractRouteHandler } from '../../../../../../../../src/service/layers/application/entry-points/rest/fastify/handlers/abstract';
 import {
@@ -29,43 +36,46 @@ class TestRouteHandler extends AbstractRouteHandler<
   }
 }
 
-class HandlerWithManualReply extends AbstractRouteHandler<
-  void,
-  void,
-  { custom: string },
-  void,
-  void
-> {
-  constructor() {
-    super({ url: '/manual', schema: {}, method: 'POST' });
-  }
-
-  async handler(_: Request<void, void, void>): Promise<{ custom: string }> {
-    // Handler just returns data - buildResponse can customize the envelope
-    return { custom: 'value' };
-  }
-
-  protected override buildResponse(data: { custom: string }): {
-    custom: string;
-    manually: boolean;
-  } {
-    // Override buildResponse to customize response shape
-    return { ...data, manually: true };
+class HandlerThatThrowsNotFound extends TestRouteHandler {
+  override async handler(_: Request<void, Record<string, string>, void>): Promise<{
+    id: number;
+    name: string;
+  }> {
+    throw new NotFoundError({
+      message: 'Resource not found',
+      reason: 'test',
+    });
   }
 }
 
-class HandlerWithCustomEnvelope extends TestRouteHandler {
-  protected override buildResponse(data: { id: number; name: string }): {
-    ok: boolean;
-    message: string;
-    data: { id: number; name: string };
+class HandlerWithCustomErrorHandling extends TestRouteHandler {
+  override async handler(_: Request<void, Record<string, string>, void>): Promise<{
+    id: number;
+    name: string;
+  }> {
+    throw new BadRequestError({
+      message: 'Invalid input',
+      reason: 'test',
+    });
+  }
+
+  protected override handleError(error: Error): {
+    statusCode: number;
+    [key: string]: unknown;
   } {
-    return { ok: true, message: 'Success', data };
+    if (error instanceof BadRequestError) {
+      return {
+        type: 'CUSTOM_ERROR',
+        message: 'Custom message',
+        statusCode: 418, // I'm a teapot
+      };
+    }
+    return { type: 'UNKNOWN', message: 'Unknown error', statusCode: 500 };
   }
 }
 
 describe('AbstractRouteHandler', () => {
-  it('auto-sends the raw handler return value with status 200', async () => {
+  it('auto-sends the handler response data directly', async () => {
     const fakeRequest = createFakeFastifyRequest() as Request<void, Record<string, string>, void>;
     const fakeReply: any = createFakeFastifyReply();
 
@@ -73,46 +83,137 @@ describe('AbstractRouteHandler', () => {
     const result = await handler.execute(fakeRequest, fakeReply);
 
     expect(result).toEqual({ id: 1, name: 'Test' });
-    expect(fakeReply.code).toHaveBeenCalledWith(200);
     expect(fakeReply.send).toHaveBeenCalledWith({ id: 1, name: 'Test' });
   });
 
-  it('allows overriding buildResponse to customize response shape', async () => {
-    const fakeRequest = createFakeFastifyRequest() as any;
-    const fakeReply: any = {
-      sent: false,
-      code: vi.fn().mockReturnThis(),
-      send: vi.fn().mockImplementation(function (this: any) {
-        this.sent = true;
-        return this;
-      }),
-    };
-
-    const handler = new HandlerWithManualReply();
-    const result = await handler.execute(fakeRequest, fakeReply);
-
-    // Handler returns { custom: "value" }
-    // buildResponse adds { manually: true }
-    expect(fakeReply.code).toHaveBeenCalledWith(200);
-    expect(fakeReply.send).toHaveBeenCalledWith({
-      custom: 'value',
-      manually: true,
-    });
-
-    expect(result).toEqual({ custom: 'value' });
-  });
-
-  it('allows overriding buildResponse to wrap the data', async () => {
+  it('handles NotFoundError with 404 status', async () => {
     const fakeRequest = createFakeFastifyRequest() as Request<void, Record<string, string>, void>;
     const fakeReply: any = createFakeFastifyReply();
 
-    const handler = new HandlerWithCustomEnvelope();
-    await handler.execute(fakeRequest, fakeReply);
+    const handler = new HandlerThatThrowsNotFound();
 
+    await expect(handler.execute(fakeRequest, fakeReply)).rejects.toThrow(NotFoundError);
+
+    expect(fakeReply.code).toHaveBeenCalledWith(404);
     expect(fakeReply.send).toHaveBeenCalledWith({
-      ok: true,
-      message: 'Success',
-      data: { id: 1, name: 'Test' },
+      message: 'Resource not found',
+    });
+  });
+
+  it('handles BadRequestError with 400 status', async () => {
+    const fakeRequest = createFakeFastifyRequest() as Request<void, Record<string, string>, void>;
+    const fakeReply: any = createFakeFastifyReply();
+
+    const handler = new (class extends TestRouteHandler {
+      override async handler(): Promise<{ id: number; name: string }> {
+        throw new BadRequestError({
+          message: 'Invalid request',
+          reason: 'test',
+        });
+      }
+    })();
+
+    await expect(handler.execute(fakeRequest, fakeReply)).rejects.toThrow(BadRequestError);
+
+    expect(fakeReply.code).toHaveBeenCalledWith(400);
+    expect(fakeReply.send).toHaveBeenCalledWith({
+      message: 'Invalid request',
+    });
+  });
+
+  it('handles ValidationError with 422 status', async () => {
+    const fakeRequest = createFakeFastifyRequest() as Request<void, Record<string, string>, void>;
+    const fakeReply: any = createFakeFastifyReply();
+
+    const handler = new (class extends TestRouteHandler {
+      override async handler(): Promise<{ id: number; name: string }> {
+        throw new ValidationError({
+          message: 'Validation failed',
+          reason: 'test',
+        });
+      }
+    })();
+
+    await expect(handler.execute(fakeRequest, fakeReply)).rejects.toThrow(ValidationError);
+
+    expect(fakeReply.code).toHaveBeenCalledWith(422);
+    expect(fakeReply.send).toHaveBeenCalledWith({
+      message: 'Validation failed',
+    });
+  });
+
+  it('handles UnauthorizedError with 401 status', async () => {
+    const fakeRequest = createFakeFastifyRequest() as Request<void, Record<string, string>, void>;
+    const fakeReply: any = createFakeFastifyReply();
+
+    const handler = new (class extends TestRouteHandler {
+      override async handler(): Promise<{ id: number; name: string }> {
+        throw new UnauthorizedError({
+          message: 'Unauthorized',
+          reason: 'test',
+        });
+      }
+    })();
+
+    await expect(handler.execute(fakeRequest, fakeReply)).rejects.toThrow(UnauthorizedError);
+
+    expect(fakeReply.code).toHaveBeenCalledWith(401);
+    expect(fakeReply.send).toHaveBeenCalledWith({
+      message: 'Unauthorized',
+    });
+  });
+
+  it('handles ForbiddenError with 403 status', async () => {
+    const fakeRequest = createFakeFastifyRequest() as Request<void, Record<string, string>, void>;
+    const fakeReply: any = createFakeFastifyReply();
+
+    const handler = new (class extends TestRouteHandler {
+      override async handler(): Promise<{ id: number; name: string }> {
+        throw new ForbiddenError({
+          message: 'Forbidden',
+          reason: 'test',
+        });
+      }
+    })();
+
+    await expect(handler.execute(fakeRequest, fakeReply)).rejects.toThrow(ForbiddenError);
+
+    expect(fakeReply.code).toHaveBeenCalledWith(403);
+    expect(fakeReply.send).toHaveBeenCalledWith({
+      message: 'Forbidden',
+    });
+  });
+
+  it('handles unknown errors with 500 status', async () => {
+    const fakeRequest = createFakeFastifyRequest() as Request<void, Record<string, string>, void>;
+    const fakeReply: any = createFakeFastifyReply();
+
+    const handler = new (class extends TestRouteHandler {
+      override async handler(): Promise<{ id: number; name: string }> {
+        throw new Error('Unexpected error');
+      }
+    })();
+
+    await expect(handler.execute(fakeRequest, fakeReply)).rejects.toThrow('Unexpected error');
+
+    expect(fakeReply.code).toHaveBeenCalledWith(500);
+    expect(fakeReply.send).toHaveBeenCalledWith({
+      message: 'Something went wrong',
+    });
+  });
+
+  it('allows overriding handleError() for custom error handling', async () => {
+    const fakeRequest = createFakeFastifyRequest() as Request<void, Record<string, string>, void>;
+    const fakeReply: any = createFakeFastifyReply();
+
+    const handler = new HandlerWithCustomErrorHandling();
+
+    await expect(handler.execute(fakeRequest, fakeReply)).rejects.toThrow(BadRequestError);
+
+    expect(fakeReply.code).toHaveBeenCalledWith(418);
+    expect(fakeReply.send).toHaveBeenCalledWith({
+      type: 'CUSTOM_ERROR',
+      message: 'Custom message',
     });
   });
 });
