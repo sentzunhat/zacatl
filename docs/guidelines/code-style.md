@@ -36,7 +36,7 @@ This guide covers formatting, naming conventions, and language-specific rules fo
     "exactOptionalPropertyTypes": true,
     "declaration": true,
     "sourceMap": true,
-    "outDir": "./build",
+    "outDir": "./build-src-esm",
     "rootDir": "./src",
     "removeComments": true
   }
@@ -55,26 +55,26 @@ This guide covers formatting, naming conventions, and language-specific rules fo
 ### Runtime Requirements
 
 - **Node.js**: 24.14.0 LTS+ (minimum required — enables `node:sqlite`, `AsyncLocalStorage` improvements, and native subpath imports)
-- **Package Manager**: npm 10.0.0+
-- **Module System**: ES Modules (ESM) only — no CommonJS
+- **Package Manager**: npm 11.0.0+
+- **Module System**: ESM source with dual ESM/CJS build outputs for distribution
 
 > **Upgrade note**: run `nvm install 24.14.0 && nvm use 24.14.0` (or equivalent) if your local Node is below 24.14.0.
 
 ### Build Process
 
-**Pipeline**: TypeScript Compiler → Path Alias Resolution → ESM Fixing
+**Pipeline**: TypeScript Compiler (ESM + CJS) → Path Alias Resolution → ESM Fixing
 
 ```bash
 # Development
 npm run build:watch       # Watch mode compilation
 
 # Production build
-npm run build            # tsc + tsc-alias + fix-esm.ts
+npm run build            # build:src (esm+cjs) + build:scripts (esm+cjs)
 
 # Steps:
-# 1. tsc compiles TS to JS (ESNext target)
-# 2. tsc-alias resolves path aliases
-# 3. fix-esm.ts fixes ESM module exports for Node.js
+# 1. build:src:esm compiles TS + resolves aliases + runs fix-esm.ts
+# 2. build:src:cjs compiles TS CommonJS output
+# 3. build:scripts compiles script outputs for esm+cjs
 ```
 
 **No bundler** (Vite, esbuild, Rollup) — direct TypeScript compilation for cleaner, more transparent output.
@@ -238,7 +238,7 @@ const items = ['item1', 'item2', 'item3']; // Missing trailing comma
 
 ### Quotes
 
-- **Strings**: Double quotes (`"`)
+- **Strings**: Single quotes (`'`) (matches `.prettierrc.json`)
 - **Template Literals**: Backticks (`` ` ``) for interpolation
 
 ```typescript
@@ -246,10 +246,12 @@ const items = ['item1', 'item2', 'item3']; // Missing trailing comma
 const message = 'Hello, world!';
 const greeting = `Hello, ${name}!`;
 const path = 'src/services/index.ts';
+```
 
+```text
 // ❌ Avoid
-const message = 'Hello, world!'; // Single quotes
-const path = 'src/services/index.ts';
+const message = "Hello, world!"; // Uses double quotes instead of single quotes
+const path = "src/services/index.ts";
 ```
 
 ### Semicolons
@@ -261,10 +263,12 @@ const path = 'src/services/index.ts';
 const x = 5;
 function doSomething() {}
 export { MyClass };
+```
 
+```text
 // ❌ Avoid
-const x = 5; // Missing semicolon
-function doSomething() {}
+const x = 5 // Missing semicolon
+export { MyClass }
 ```
 
 ### Arrow Functions
@@ -328,7 +332,7 @@ const items: Array<number> = [1, 2, 3]; // Unnecessary annotation
 
 ```typescript
 // ✅ Good — imports from root and subpaths
-import { Service } from '@zacatl/zacatl';
+import { Service } from '@sentzunhat/zacatl';
 import { BadRequestError } from '@zacatl/error';
 import { GetRouteHandler } from '@zacatl/service';
 
@@ -342,9 +346,9 @@ import FastifyClass from '@zacatl/third-party/fastify';
 import * as utils from './utils';
 const result = utils.encode(input);
 
-// ✅ Good — default export (for single primary export)
-export default class Service {}
-import Service from './service';
+// ✅ Good — named exports for application/library modules
+export class Service {}
+import { Service } from './service';
 
 // ❌ Avoid
 const { GetRouteHandler } = require('./handlers'); // CommonJS
@@ -371,20 +375,24 @@ All third-party dependencies (frameworks, ORMs, utilities) are exported via libr
 {
   "exports": {
     "./third-party/express": {
-      "types": "./build/third-party/express.d.ts",
-      "import": "./build/third-party/express.js"
+      "types": "./build-src-esm/third-party/express.d.ts",
+      "import": "./build-src-esm/third-party/express.js",
+      "require": "./build-src-cjs/third-party/express.js"
     },
     "./third-party/mongoose": {
-      "types": "./build/third-party/mongoose.d.ts",
-      "import": "./build/third-party/mongoose.js"
+      "types": "./build-src-esm/third-party/mongoose.d.ts",
+      "import": "./build-src-esm/third-party/mongoose.js",
+      "require": "./build-src-cjs/third-party/mongoose.js"
     },
     "./third-party/zod": {
-      "types": "./build/third-party/zod.d.ts",
-      "import": "./build/third-party/zod.js"
+      "types": "./build-src-esm/third-party/zod.d.ts",
+      "import": "./build-src-esm/third-party/zod.js",
+      "require": "./build-src-cjs/third-party/zod.js"
     },
     "./third-party/uuid": {
-      "types": "./build/third-party/uuid.d.ts",
-      "import": "./build/third-party/uuid.js"
+      "types": "./build-src-esm/third-party/uuid.d.ts",
+      "import": "./build-src-esm/third-party/uuid.js",
+      "require": "./build-src-cjs/third-party/uuid.js"
     }
   }
 }
@@ -639,8 +647,8 @@ Add `.prettierrc.json` or `prettier` key in `package.json`:
 ```json
 {
   "semi": true,
-  "singleQuote": false,
-  "trailingComma": "es5",
+  "singleQuote": true,
+  "trailingComma": "all",
   "printWidth": 100,
   "tabWidth": 2,
   "useTabs": false
@@ -652,11 +660,10 @@ Add `.prettierrc.json` or `prettier` key in `package.json`:
 ```json
 {
   "scripts": {
-    "lint": "eslint src/ test/",
-    "lint:fix": "eslint src/ test/ --fix",
+    "lint": "npm run parallel -- \"npm run lint:src,npm run lint:test,npm run lint:scripts\"",
+    "lint:fix": "npm run parallel -- \"npm run lint:src:fix,npm run lint:test:fix,npm run lint:scripts:fix\"",
     "format": "prettier --write .",
-    "type:check": "tsc --noEmit",
-    "validate": "npm run type:check && npm run lint"
+    "type:check": "npm run parallel -- \"npm run type:check:src,npm run type:check:test,npm run type:check:scripts\""
   }
 }
 ```
@@ -691,47 +698,44 @@ The build process follows three stages:
 
 ```bash
 npm run build
-# Executes: tsc → tsc-alias → fix-esm.ts → clean:src
+# Executes: build:src (esm+cjs) + build:scripts (esm+cjs)
 ```
 
-**Stage 1: TypeScript Compilation**
+**Stage 1: Source ESM compilation and alias fixing**
 
 ```bash
-tsc --project tsconfig.json
+npx tsc -p tsconfig.json && npx tsc-alias -p tsconfig.json && npx tsx scripts/build/fix-esm.ts build-src-esm
 ```
 
 - Compiles `.ts` → `.js` and generates `.d.ts` declaration files
 - Target: ESNext (no transpilation, modern Node.js features preserved)
-- Output: `build/` directory
+- Output: `build-src-esm/` directory
 
-**Stage 2: Path Alias Resolution**
-
-```bash
-tsc-alias -p tsconfig.json
-```
-
-- Resolves TypeScript path aliases (`@zacatl/*`) to relative paths
-- Converts imports like `@zacatl/error` to `../../error/index.js`
-- Required because TypeScript doesn't resolve aliases at runtime
-
-**Stage 3: ESM Module Fixing**
+**Stage 2: Source CJS compilation**
 
 ```bash
-npx tsx scripts/build/fix-esm.ts
+npx tsc -p tsconfig.cjs.json && npx tsc-alias -p tsconfig.cjs.json
 ```
 
-- Adds `.js` extensions to relative imports (Node.js ESM requirement)
-- Fixes default/namespace imports for CommonJS interop
-- Ensures proper Node.js ESM compatibility
+- Produces CommonJS-compatible output for `require` consumers
+- Output: `build-src-cjs/` directory
 
-**Stage 4: Cleanup**
+**Stage 3: Script build outputs**
+
+```bash
+npm run build:scripts
+```
+
+- Builds tooling scripts into both `build-scripts-esm/` and `build-scripts-cjs/`
+
+**Stage 4: Optional cleanup (when needed)**
 
 ```bash
 npm run clean:src
 ```
 
 - Removes intermediate build artifacts from `src/`
-- Keeps only final output in `build/`
+- Keeps only final output in `build-src-esm/` and `build-src-cjs/`
 
 ### Why No Bundler?
 
@@ -946,15 +950,15 @@ logger.error('Custom error occurred', { correlationId: customError.correlationId
 
 ## Summary
 
-| Aspect           | Rule           |
-| ---------------- | -------------- |
-| Classes          | `PascalCase`   |
-| Functions        | `camelCase`    |
-| Interfaces/Types | `PascalCase`   |
-| Files/Folders    | `kebab-case`   |
-| Indentation      | 2 spaces       |
-| Line Length      | 80–100 chars   |
-| Quotes           | Double (`"`)   |
-| Semicolons       | Always         |
-| Type Safety      | `strict: true` |
-| Modules          | ESM only       |
+| Aspect           | Rule                    |
+| ---------------- | ----------------------- |
+| Classes          | `PascalCase`            |
+| Functions        | `camelCase`             |
+| Interfaces/Types | `PascalCase`            |
+| Files/Folders    | `kebab-case`            |
+| Indentation      | 2 spaces                |
+| Line Length      | 80–100 chars            |
+| Quotes           | Single (`'`)            |
+| Semicolons       | Always                  |
+| Type Safety      | `strict: true`          |
+| Modules          | ESM + CJS build outputs |

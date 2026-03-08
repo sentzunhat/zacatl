@@ -329,13 +329,13 @@ Description of function...
 
 ## Related Modules
 
-- [Module A](../module-a) — Related functionality
-- [Module B](../module-b) — Alternative approach
+- [Service Module](../service/README.md) — Related functionality
+- [Dependency Injection](../dependency-injection/README.md) — Alternative approach
 
 ## See Also
 
 - [Architecture Guide](./framework-overview.md)
-- [Code Style](../code-style.md)
+- [Code Style](./code-style.md)
 
 ````
 

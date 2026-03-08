@@ -137,7 +137,13 @@ import { express, Application } from '@sentzunhat/zacatl/third-party/express';
 import { mongoose, Schema } from '@sentzunhat/zacatl/third-party/mongoose';
 import { z } from '@sentzunhat/zacatl/third-party/zod';
 import { v4 as uuidv4 } from '@sentzunhat/zacatl/third-party/uuid';
-import { Service } from '@sentzunhat/zacatl/service';
+import {
+  DatabaseVendor,
+  Service,
+  ServiceType,
+  ServerType,
+  ServerVendor,
+} from '@sentzunhat/zacatl/service';
 
 // ✅ All dependencies flow through library exports
 const app: Application = express();
@@ -145,16 +151,28 @@ const db = mongoose;
 
 // Service configuration
 const service = new Service({
-  handler: {
-    type: 'express',
-    adapter: app,
-    routes: [...routes],
+  type: ServiceType.SERVER,
+  layers: {
+    application: { entryPoints: { rest: { routes: [] } } },
+    domain: { services: [] },
+    infrastructure: { repositories: [] },
   },
-  handler: {
-    db: {
-      type: 'mongoose',
-      adapter: db,
-      config: { uri: 'mongodb://...' },
+  platforms: {
+    server: {
+      name: 'example-service',
+      server: {
+        type: ServerType.SERVER,
+        vendor: ServerVendor.EXPRESS,
+        instance: app,
+      },
+      databases: [
+        {
+          vendor: DatabaseVendor.MONGOOSE,
+          instance: db,
+          connectionString: 'mongodb://localhost/example',
+        },
+      ],
+      port: 4000,
     },
   },
 });
@@ -383,7 +401,7 @@ import { express } from '@sentzunhat/zacatl/third-party/express';
 
 ```bash
 # Verify build includes all exports
-ls build/third-party/
+ls build/esm/third-party/
 # Should show: express.js, fastify.js, mongoose.js, sequelize.js, etc.
 ```
 

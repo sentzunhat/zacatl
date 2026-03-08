@@ -416,7 +416,7 @@ src/
 ### Building
 
 ```bash
-npm run build      # Compile TypeScript to build/
+npm run build      # Compile TypeScript to build-src-esm/ and build-src-cjs/
 npm run build:watch # Watch mode
 ```
 
@@ -429,7 +429,7 @@ npm run type:check # TypeScript checking
 
 ## 📋 Requirements
 
-- **Node.js**: 24.0.0 or higher (LTS)
+- **Node.js**: 24.14.0 or higher (LTS)
 - **npm**: 11.0.0 or higher (bundled with Node 24)
 - **TypeScript**: 5.9+ (we use 5.9.3)
 

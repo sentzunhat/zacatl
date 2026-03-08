@@ -6,8 +6,8 @@ I appreciate your interest in contributing! This guide will help you get started
 
 ### Prerequisites
 
-- **Node.js**: 24+
-- **npm**: 10.9.0+
+- **Node.js**: 24.14.0+
+- **npm**: 11.0.0+
 - **Git**: latest stable
 
 ### Setup
@@ -143,17 +143,9 @@ Follow [Conventional Commits](https://www.conventionalcommits.org/) format:
 **Examples:**
 
 ```bash
-git commit -m "feat(error): add ForbiddenError class
-
-Introduces 403 Forbidden error for permission-denied scenarios.
-Extends CustomError with code 403 and provides metadata support.
-
-Fixes #42
-
+git commit -m "feat(error): add ForbiddenError class"
 git commit -m "fix(service): handle null database connections"
-
 git commit -m "docs(readme): add examples section"
-
 git commit -m "refactor(di-container): simplify auto-registration"
 ```
 
@@ -385,7 +377,7 @@ Maintainers handle releases. For reference, see [git-workflow.md](./docs/guideli
 
 ```bash
 # Clean and reinstall
-rm -rf node_modules build dist
+rm -rf node_modules build-src-esm build-src-cjs build-scripts-esm build-scripts-cjs coverage publish
 npm install
 npm test
 ```
@@ -412,7 +404,8 @@ npm run clean:build  # remove old artifacts
 npm run build        # fresh build
 ```
 
-The published package only includes `build/`. Source files under `src/` stay local.
+The publish staging directory is `publish/`; the packed runtime files are emitted under `publish/build/`.
+Source files under `src/` stay local.
 
 ---
 
@@ -432,15 +425,15 @@ Keep releases simple and reproducible:
 - Build & verify before publishing:
 
   ```bash
-  npm run build        # creates build/ and copies assets
-  npm run prepare-publish  # generates build/package.json
-  npm run publish:dry  # dry-run publish from ./build
-  npm run publish:otp  # publish (npm will ask for OTP)
+  npm run build            # builds build-src-* and build-scripts-*
+  npm run prepare-publish  # creates the publish/ staging directory
+  npm run publish:dry      # dry-run publish from ./publish
+  npm run publish:otp      # publish (npm will ask for OTP)
   ```
 
-- Note: we publish `./build` as the package root. `prepare-publish` writes a trimmed `package.json` into `build/` so consumers see built files at the package root.
+- Note: we publish `./publish` as the package root. `prepare-publish` writes a trimmed `package.json` into `publish/` and places built assets under `publish/build/`.
 
-That's it — keep branches tied to issues and publish from `build/` for a lean package.
+That's it — keep branches tied to issues and publish from `publish/` for a lean package.
 
 ```bash
 npm run clean:build  # Remove old artifacts

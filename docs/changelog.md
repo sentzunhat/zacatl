@@ -2,6 +2,16 @@
 
 ---
 
+## [0.0.52] - 2026-03-08
+
+**Status**: Pending release
+
+### 🐛 Fixes
+
+- **Mongoose third-party exports** — Added missing `Types` and `PipelineStage` exports to `src/third-party/mongoose.ts` to support downstream projects using Zacatl's Mongoose wrapper as single source of truth. Prevents version conflicts when framework consumers need `Types.ObjectId` and aggregation pipeline types.
+
+---
+
 ## [0.0.51] - 2026-03-04
 
 **Status**: Pending release

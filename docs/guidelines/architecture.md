@@ -61,7 +61,9 @@ test/
 │   ├── service/
 │   ├── error/
 │   └── ...matching src/ structure
-└── helpers/                    # Test utilities
+├── setup.ts                    # Shared test bootstrap
+├── tsconfig.json               # Test type-check config
+└── unit/helpers/               # Test utilities
 
 docs/
 ├── changelog.md                # Release notes
@@ -71,7 +73,7 @@ docs/
 ├── skills/                     # Procedures (versioning, etc.)
 └── <feature>/README.md         # Per-module documentation
 
-build/                          # Compiled output (generated)
+build-src-esm/, build-src-cjs/, build-scripts-*/  # Compiled output (generated)
 ```
 
 ### Semantic Folder Naming
@@ -543,16 +545,19 @@ import { logger } from '@zacatl/logs';
 {
   "exports": {
     ".": {
-      "types": "./build/index.d.ts",
-      "import": "./build/index.js"
+      "types": "./build/esm/index.d.ts",
+      "import": "./build/esm/index.js",
+      "require": "./build/cjs/index.js"
     },
     "./third-party/fastify": {
-      "types": "./build/third-party/fastify.d.ts",
-      "import": "./build/third-party/fastify.js"
+      "types": "./build/esm/third-party/fastify.d.ts",
+      "import": "./build/esm/third-party/fastify.js",
+      "require": "./build/cjs/third-party/fastify.js"
     },
     "./error": {
-      "types": "./build/error/index.d.ts",
-      "import": "./build/error/index.js"
+      "types": "./build/esm/error/index.d.ts",
+      "import": "./build/esm/error/index.js",
+      "require": "./build/cjs/error/index.js"
     }
   }
 }
@@ -565,7 +570,7 @@ import { logger } from '@zacatl/logs';
 import { FastifyInstance } from '@zacatl/third-party/fastify';
 
 // ✅ Core library imports
-import { Service } from '@zacatl/zacatl';
+import { Service } from '@sentzunhat/zacatl';
 import { BadRequestError } from '@zacatl/error';
 ```
 

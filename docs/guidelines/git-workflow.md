@@ -532,7 +532,7 @@ chmod +x .git/hooks/*
 # Or use a tool like husky
 npm install husky --save-dev
 npx husky install
-npx husky add .husky/pre-commit "npm run validate"
+npx husky add .husky/pre-commit "npm run type:check && npm run lint:silent && npm test"
 ```
 
 ---

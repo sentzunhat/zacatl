@@ -14,7 +14,7 @@ Comprehensive reference for the zacatl repository structure, conventions, tech s
 
 - Naming: PascalCase for classes/interfaces/types/enums; camelCase for functions/variables; UPPER_SNAKE_CASE for constants; kebab-case for files/folders; enum values UPPER_SNAKE_CASE.
 - Patterns: port-adapter naming (Adapter/Port/Repository/Service), DI with decorators, repository pattern for ORM integration.
-- Module style: ESM only; barrel exports via index.ts; path aliases resolved at build.
+- Module style: ESM source with dual ESM/CJS build outputs; barrel exports via index.ts; path aliases resolved at build.
 
 ## doc_style
 
@@ -30,7 +30,7 @@ Comprehensive reference for the zacatl repository structure, conventions, tech s
 
 ## quirks
 
-- ESM-only output; no bundler; build pipeline relies on tsc + tsc-alias + fix-esm.ts.
+- No bundler; build pipeline relies on tsc + tsc-alias + fix-esm.ts and emits dual ESM/CJS outputs.
 - Dependency re-exports under @sentzunhat/zacatl/third-party/\* subpaths.
 
 ## files_src

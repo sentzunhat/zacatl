@@ -42,15 +42,15 @@ test/unit/                     # Tests mirroring src/
 
 ## Code Style Essentials
 
-| Rule          | Standard           |
-| ------------- | ------------------ |
-| Indentation   | 2 spaces           |
-| Line length   | 80–100 chars       |
-| Quotes        | Double (`"`)       |
-| Semicolons    | Always required    |
-| Imports       | Alphabetical order |
-| TypeScript    | `strict: true`     |
-| Module System | ESM only           |
+| Rule          | Standard                         |
+| ------------- | -------------------------------- |
+| Indentation   | 2 spaces                         |
+| Line length   | 80–100 chars                     |
+| Quotes        | Single (`'`)                     |
+| Semicolons    | Always required                  |
+| Imports       | Alphabetical order               |
+| TypeScript    | `strict: true`                   |
+| Module System | ESM source + dual ESM/CJS builds |
 
 ---
 
@@ -58,7 +58,7 @@ test/unit/                     # Tests mirroring src/
 
 - **Pattern**: `<module>.test.ts`
 - **Location**: `test/unit/` mirroring `src/`
-- **Example**: `test/unit/error/bad-request.test.ts` tests `src/error/bad-request.ts`
+- **Example**: `test/unit/error/custom.test.ts` tests `src/error/custom.ts`
 
 ---
 

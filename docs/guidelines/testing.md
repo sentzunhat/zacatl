@@ -36,10 +36,14 @@ export default defineConfig({
     globals: true, // Enable describe, it, expect without imports
     include: ['test/**/*.test.ts'],
     environment: 'node', // Test in Node.js environment
+    globalSetup: './test/unit/lib/global-setup.ts',
+    setupFiles: ['./test/setup.ts', './test/unit/lib/setup-files.ts'],
     coverage: {
       provider: 'istanbul',
       reporter: ['text', 'lcov'],
-      exclude: ['node_modules/', 'test/'],
+      all: true,
+      include: ['src/**/*.ts'],
+      exclude: ['**/*.d.ts', '**/.DS_Store'],
     },
   },
 });
@@ -73,20 +77,21 @@ npm run test:coverage # With coverage report
 
 ```
 test/
-├── unit/                    # Unit tests (majority)
-│   ├── configuration/       # mirrors src/configuration/
-│   ├── dependency-injection/ # mirrors src/dependency-injection/
-│   ├── error/               # mirrors src/error/
-│   ├── localization/        # mirrors src/localization/
-│   ├── logs/                # mirrors src/logs/
-│   ├── service/             # mirrors src/service/
-│   │   ├── layers/          # application, domain, infrastructure
-│   │   └── platforms/       # cli, desktop, server
-│   ├── third-party/         # mirrors src/third-party/
-│   └── utils/               # mirrors src/utils/
-├── helpers/                 # Shared test helpers (not mirrored)
-│   └── common/
-└── lib/                     # Vitest global setup / teardown
+├── setup.ts                 # Shared bootstrap loaded for all tests
+├── tsconfig.json            # Test-specific TypeScript config
+└── unit/                    # Unit tests (majority)
+    ├── configuration/       # mirrors src/configuration/
+    ├── dependency-injection/ # mirrors src/dependency-injection/
+    ├── error/               # mirrors src/error/
+    ├── helpers/             # Shared test helpers
+    ├── lib/                 # Vitest global setup / teardown
+    ├── localization/        # mirrors src/localization/
+    ├── logs/                # mirrors src/logs/
+    ├── service/             # mirrors src/service/
+    │   ├── layers/          # application, domain, infrastructure
+    │   └── platforms/       # cli, desktop, server
+    ├── third-party/         # mirrors src/third-party/
+    └── utils/               # mirrors src/utils/
 ```
 
 **Mirrored Structure:** Test folders must mirror `src/` structure for easy navigation.
@@ -455,7 +460,7 @@ it('should call repository.findAll() once', async () => {
 Use helper functions for repeated test setup:
 
 ```typescript
-// test/helpers/test-data.ts
+// test/unit/helpers/test-data.ts
 export function createTestGreeting(overrides?: Partial<Greeting>): Greeting {
   return {
     id: 'test-id',

@@ -37,14 +37,12 @@ FROM gcr.io/distroless/nodejs24-debian12:nonroot
 WORKDIR /app
 ENV NODE_ENV=production
 
-# Copy example node_modules and built apps
-COPY --from=builder /app/examples/express-sqlite-svelte
-COPY --from=builder /app/examples/express-sqlite-svelte
-COPY --from=builder /app/examples/express-sqlite-svelte
-COPY --from=builder /app/examples/express-sqlite-svelte
+# Copy example workspace (backend/frontend/node_modules/dist)
+COPY --from=builder /app/examples/express-sqlite-svelte/ ./
 
 # Copy framework files into node_modules/@sentzunhat/zacatl
-COPY --from=builder /app/build ./node_modules/@sentzunhat/zacatl/build
+COPY --from=builder /app/build-src-esm ./node_modules/@sentzunhat/zacatl/build-src-esm
+COPY --from=builder /app/build-src-cjs ./node_modules/@sentzunhat/zacatl/build-src-cjs
 COPY --from=builder /app/package.json ./node_modules/@sentzunhat/zacatl/package.json
 COPY --from=builder /app/node_modules ./node_modules/@sentzunhat/zacatl/node_modules
 COPY --from=builder /app/src/localization/locales ./node_modules/@sentzunhat/zacatl/src/localization/locales

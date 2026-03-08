@@ -5,7 +5,7 @@
 Zacatl standardizes on **Node.js 24.14.0 LTS+** with **npm**:
 
 - **Node.js 24.14.0+** (minimum): Required for stable `node:sqlite`, improved `AsyncLocalStorage`, and native subpath imports
-- **npm 10+**: Deterministic installs using `package-lock.json`
+- **npm 11+**: Deterministic installs using `package-lock.json`
 
 > Upgrade: `nvm install 24.14.0 && nvm use 24.14.0`
 
@@ -327,7 +327,7 @@ import { Service, singleton, resolveDependency } from '@sentzunhat/zacatl';
 | ------------ | ------------ |
 | `typescript` | ^5.9.3       |
 | `node`       | 24.14.0 LTS+ |
-| `npm`        | 10.0.0+      |
+| `npm`        | 11.0.0+      |
 
 ---
 

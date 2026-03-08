@@ -42,7 +42,7 @@ export default [
 ];
 ```
 
-> **You do NOT need to add `@typescript-eslint/parser`, `@typescript-eslint/eslint-plugin`, or `eslint-plugin-import` yourself.** > `recommended` already spreads `tseslint.configs.recommended` (parser + plugin) via `baseConfig` and `importPlugin.flatConfigs.recommended` (resolver + ordering) via `importsConfig`.
+> **You do NOT need to add `@typescript-eslint/parser`, `@typescript-eslint/eslint-plugin`, or `eslint-plugin-import` yourself.** `recommended` already spreads `tseslint.configs.recommended` (parser + plugin) via `baseConfig` and `importPlugin.flatConfigs.recommended` (resolver + ordering) via `importsConfig`.
 > Any manual re-declaration of those in your config will duplicate rules.
 
 To add project-specific overrides, append them after `...recommended`:
@@ -262,7 +262,7 @@ export default [
 import { baseConfig, importsConfig } from '@sentzunhat/zacatl/eslint';
 
 export default [
-  baseConfig,
+  ...baseConfig,
   importsConfig,
   // Skip naming conventions if not using Hexagonal Architecture
   {
