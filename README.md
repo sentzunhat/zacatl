@@ -33,7 +33,10 @@ Build **CLI tools**, **Desktop apps**, and **HTTP servers** with the same archit
 > **Platform availability:** CLI and Desktop platform adapters are planned; the HTTP server platform is the primary supported runtime. See [Service Module](./docs/service/README.md) for platform status and availability.
 
 ```typescript
-import { Service, ServiceType } from "@sentzunhat/zacatl";
+import Fastify from 'fastify';
+import { Service, ServiceType, ServerType, ServerVendor } from '@sentzunhat/zacatl';
+
+const fastify = Fastify();
 
 // CLI Application
 const cli = new Service({
@@ -44,7 +47,7 @@ const cli = new Service({
     infrastructure: { repositories: [...] },
   },
   platforms: {
-    cli: { name: "my-tool", version: "1.0.0" },
+    cli: { name: 'my-tool', version: '1.0.0' },
   },
 });
 
@@ -57,7 +60,7 @@ const desktop = new Service({
     infrastructure: { repositories: [...] },
   },
   platforms: {
-    desktop: { window: { title: "My App", width: 1024, height: 768 }, platform: "neutralino" },
+    desktop: { window: { title: 'My App', width: 1024, height: 768 }, platform: 'neutralino' },
   },
 });
 
@@ -71,7 +74,7 @@ const server = new Service({
   },
   platforms: {
     server: {
-      name: "my-service",
+      name: 'my-service',
       server: { type: ServerType.SERVER, vendor: ServerVendor.FASTIFY, instance: fastify }
     },
   },
@@ -157,7 +160,7 @@ npm run check:peers
 
 ```typescript
 import Fastify from 'fastify';
-import { Service } from '@sentzunhat/zacatl';
+import { Service, ServiceType, ServerType, ServerVendor } from '@sentzunhat/zacatl';
 
 const fastify = Fastify();
 

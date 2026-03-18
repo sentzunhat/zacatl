@@ -26,7 +26,7 @@
     "clean": "rm -rf apps/*/dist apps/*/node_modules"
   },
   "dependencies": {
-    "@sentzunhat/zacatl": "file:../../..",
+    "@sentzunhat/zacatl": "file:../../",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },

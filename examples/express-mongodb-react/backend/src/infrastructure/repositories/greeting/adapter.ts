@@ -1,8 +1,8 @@
-import { MongooseRepository } from '@sentzunhat/zacatl';
+import { MongooseRepository } from '@sentzunhat/zacatl/service/layers/infrastructure/repositories/mongoose';
 import type { MongooseModel } from '@sentzunhat/zacatl/third-party/mongoose';
 import { singleton } from '@sentzunhat/zacatl/third-party/tsyringe';
 
-import type { CreateGreetingInput, Greeting } from '../../../../domain/entities/greeting';
+import type { CreateGreetingInput, Greeting } from '../../../domain/entities/greeting';
 import type { GreetingRepositoryPort } from './port';
 import { greetingSchema } from './schema';
 

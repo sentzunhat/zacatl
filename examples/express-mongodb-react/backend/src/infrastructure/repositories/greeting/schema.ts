@@ -1,6 +1,6 @@
 import { Schema } from 'mongoose';
 
-import type { Greeting } from '../../../../domain/entities/greeting';
+import type { Greeting } from '../../../domain/entities/greeting';
 
 const greetingSchemaFactory = (): Schema<Greeting> => {
   const schema = new Schema<Greeting>(

@@ -2,7 +2,7 @@ import { BaseRepository, ORMType } from '@sentzunhat/zacatl';
 import type { ModelStatic } from '@sentzunhat/zacatl/third-party/sequelize';
 import { singleton } from '@sentzunhat/zacatl/third-party/tsyringe';
 
-import type { CreateGreetingInput, Greeting } from '../../../../domain/entities/greeting.js';
+import type { CreateGreetingInput, Greeting } from '../../../domain/entities/greeting.js';
 import { GreetingModel } from '../../models/greeting.model';
 import type { GreetingRepositoryPort } from './port';
 

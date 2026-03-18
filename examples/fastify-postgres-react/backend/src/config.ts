@@ -4,7 +4,7 @@
  */
 
 import type { FastifyInstance } from '@sentzunhat/zacatl/third-party/fastify';
-import type { Sequelize } from 'sequelize';
+import type { Sequelize } from '@sentzunhat/zacatl/third-party/sequelize';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import { ServiceType, ServerType, ServerVendor, DatabaseVendor } from '@sentzunhat/zacatl';

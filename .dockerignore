@@ -7,5 +7,7 @@
 **/.DS_Store
 **/*.log
 **/build
+!scripts/build
+!scripts/build/fix-esm.ts
 !build
 !build/**

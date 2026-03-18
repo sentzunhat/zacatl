@@ -92,7 +92,7 @@ describe('BaseRepository', () => {
     const result = await repository.update(user.id, update);
 
     expect(spyFunction).toHaveBeenNthCalledWith(1, user.id, update, {
-      new: true,
+      returnDocument: 'after',
     });
     expect(result).toEqual(expect.objectContaining(update));
   });

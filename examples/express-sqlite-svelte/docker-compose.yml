@@ -1,7 +1,7 @@
 services:
   backend:
     build:
-      context: ../../..
+      context: ../..
       dockerfile: examples/express-sqlite-svelte/Dockerfile
     image: zacatl-express-sqlite-svelte
     container_name: express-sqlite-svelte-backend
@@ -18,7 +18,7 @@ services:
       test:
         [
           'CMD',
-          'node',
+          '/nodejs/bin/node',
           '-e',
           "fetch('http://localhost:8181/greetings').catch(() => process.exit(1))",
         ]
@@ -30,7 +30,7 @@ services:
 
   # frontend:
   #   build:
-  #     context: ../../..
+  #     context: ../..
   #     dockerfile: examples/express-sqlite-svelte/Dockerfile
   #   image: zacatl-express-sqlite-svelte-frontend
   #   container_name: express-sqlite-svelte-frontend
