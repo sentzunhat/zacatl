@@ -16,7 +16,7 @@ npm run dev
 
 - **Storage**: SQLite file at `backend/database.sqlite`
 - **Auto-init**: Schema is created on app start
-- **Connection**: `backend/src/infrastructure/database/connection.ts`
+- **Connection**: `backend/src/config.ts`
 
 ## What's Included
 
@@ -83,13 +83,13 @@ docker compose up -d
 - ✅ Native module support (sqlite3 rebuilt in container)
 - ✅ Distroless base image (production-ready)
 - ✅ Health checks included
-- ⚠️ `fix-esm.mjs dist` required in build script (see package.json)
+- ⚠️ `npx tsx ../../../scripts/build/fix-esm.ts dist` required in build script (see `backend/package.json`)
 
 ## Documentation
 
-- **Production Patterns**: [../docs/production-patterns.md](../docs/production-patterns.md)
-- **Quick Start Guide**: [../docs/quick-start.md](../docs/quick-start.md)
-- **Framework Database Guide**: [../../../docs/third-party/orm/database-setup.md](../../../docs/third-party/orm/database-setup.md)
+- **Framework Database Guide**: [../../docs/third-party/orm/database-setup.md](../../docs/third-party/orm/database-setup.md)
+- **Service Module**: [../../docs/service/README.md](../../docs/service/README.md)
+- **Framework Overview**: [../../docs/guidelines/framework-overview.md](../../docs/guidelines/framework-overview.md)
 
 ## Why SQLite?
 
@@ -99,10 +99,10 @@ docker compose up -d
 
 ⚠️ Single connection limit - not ideal for high concurrency
 
-Compare with [MongoDB example](../with-mongodb-react/) for scalable alternative.
+Compare with [Fastify + MongoDB + React](../fastify-mongodb-react/) for scalable alternative.
 
 ## Next Steps
 
-- Read [production patterns](../docs/production-patterns.md) to understand the architecture
-- Review the [framework database guide](../../../docs/third-party/orm/database-setup.md) for shared ORM patterns
-- Add features using the [extension guide](../docs/production-patterns.md#adding-new-features)
+- Review the [framework database guide](../../docs/third-party/orm/database-setup.md) for shared ORM patterns
+- Explore the [service module docs](../../docs/service/README.md) for platform wiring
+- Compare this baseline with [Fastify + PostgreSQL + React](../fastify-postgres-react/)

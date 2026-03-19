@@ -44,4 +44,25 @@ describe('Service (unit)', () => {
 
     await expect(svc.start()).rejects.toThrow('start-failure');
   });
+
+  it('accepts builtInLocalesDir in localization config', () => {
+    const cfg = {
+      type: ServiceType.SERVER,
+      layers: { application: { entryPoints: { rest: {} } } },
+      platforms: {
+        server: {
+          name: 'test',
+          server: { type: 'SERVER', vendor: 'EXPRESS', instance: {} },
+          databases: [],
+          port: 0,
+        },
+      },
+      localization: {
+        builtInLocalesDir: '/tmp/zacatl-locales',
+      },
+      run: { auto: false },
+    } as any;
+
+    expect(() => new Service(cfg)).not.toThrow();
+  });
 });

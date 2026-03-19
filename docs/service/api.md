@@ -107,6 +107,7 @@ interface ConfigService {
       supported?: string[];
       directories?: string[];
     };
+    builtInLocalesDir?: string;
     objectNotation?: boolean;
     overrideBuiltIn?: boolean;
   };

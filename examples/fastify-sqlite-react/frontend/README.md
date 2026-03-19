@@ -18,7 +18,7 @@ Minimal React + Vite + Tailwind client for the Fastify + SQLite example.
 
 2. Start the frontend (from this folder):
    - Install dependencies
-   - Run Vite dev server on http://localhost:5173
+   - Run Vite dev server on http://localhost:5001
 
 ## Environment
 

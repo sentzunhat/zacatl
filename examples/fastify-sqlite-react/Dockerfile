@@ -37,5 +37,5 @@ COPY --from=builder /app/node_modules ./node_modules/@sentzunhat/zacatl/node_mod
 COPY --from=builder /app/src/localization/locales ./node_modules/@sentzunhat/zacatl/src/localization/locales
 COPY --from=builder /app/src/eslint ./node_modules/@sentzunhat/zacatl/src/eslint
 
-EXPOSE 8084
+EXPOSE 8081
 CMD ["/app/backend/dist/index.js"]

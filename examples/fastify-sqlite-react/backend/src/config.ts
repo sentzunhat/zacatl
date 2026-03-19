@@ -44,7 +44,7 @@ export function createServiceConfig(fastify: FastifyInstance, sequelize: Sequeli
           instance: fastify,
         },
         page: {
-          staticDir: join(rootDir, 'apps/frontend/dist'),
+          staticDir: join(rootDir, 'frontend/dist'),
           apiPrefix: '/greetings',
         },
         databases: [

@@ -26,6 +26,7 @@ configureI18nNode({
     supported: ['en', 'es', 'fr'],
     directories: ['./locales', './custom-locales'],
   },
+  builtInLocalesDir: './node_modules/@sentzunhat/zacatl/build-src-esm/localization/locales',
   objectNotation: true, // Support nested keys like "errors.notFound"
   overrideBuiltIn: true, // Your translations override Zacatl's
 });
@@ -33,6 +34,10 @@ configureI18nNode({
 const greeting = i18n.__('greeting');
 console.log(greeting); // "Hello"
 ```
+
+Use `builtInLocalesDir` when your runtime working directory does not match
+Zacatl's built-in path probes, such as ESM consumers resolving the package from
+their own app entrypoint.
 
 ## Translation Files
 

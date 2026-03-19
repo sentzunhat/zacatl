@@ -20,9 +20,9 @@ npm start
 The build is simple and transparent:
 
 1. **TypeScript compilation**: `tsc` compiles your code
-2. **ESM fix**: Framework's built-in `zacatl-fix-esm` adds `.js` extensions for Node.js ESM compatibility
+2. **ESM fix**: `npx tsx ../../../scripts/build/fix-esm.ts dist` adds `.js` extensions for Node.js ESM compatibility
 
-That's it! No bundlers, no complex tooling. The ESM fix script is included in the framework package - no copying scripts needed!
+That's it! No bundlers and no extra transpilation layers.
 
 ## What's Happening Behind the Scenes
 
@@ -31,9 +31,7 @@ Node.js ESM requires explicit file extensions in imports:
 - ❌ `import { thing } from "./file"`
 - ✅ `import { thing } from "./file.js"`
 
-The framework's `zacatl-fix-esm` utility automatically adds these extensions after TypeScript compilation, so you can write clean TypeScript without manual `.js` extensions everywhere.
-
-The script is included in `@sentzunhat/zacatl` - no manual setup required!
+The repository uses `scripts/build/fix-esm.ts` to add these extensions after TypeScript compilation, so you can write clean TypeScript without manual `.js` extensions everywhere.
 
 ## Project Structure
 

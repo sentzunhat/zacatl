@@ -12,6 +12,7 @@ export interface ConfigureI18nInput {
     supported?: string[];
     directories?: string[];
   };
+  builtInLocalesDir?: string;
   objectNotation?: boolean;
   overrideBuiltIn?: boolean;
 }
@@ -189,7 +190,7 @@ export const configureI18nNode = (input: ConfigureI18nInput = {}): typeof i18n =
   const objectNotation = input.objectNotation ?? true;
   const overrideBuiltIn = input.overrideBuiltIn ?? true;
 
-  const builtInLocalesDir = resolveBuiltInLocalesDir();
+  const builtInLocalesDir = input.builtInLocalesDir ?? resolveBuiltInLocalesDir();
   const builtInCatalog = loadCatalog({
     localesDir: builtInLocalesDir,
     supportedLocales,

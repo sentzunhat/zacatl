@@ -10,6 +10,12 @@
 
 - **Mongoose third-party exports** — Added missing `Types` and `PipelineStage` exports to `src/third-party/mongoose.ts` to support downstream projects using Zacatl's Mongoose wrapper as single source of truth. Prevents version conflicts when framework consumers need `Types.ObjectId` and aggregation pipeline types.
 
+- **Configurable built-in localization path** — Added `localization.builtInLocalesDir` to `Service` and `configureI18nNode()` so consumers can override Zacatl's built-in locale discovery when their runtime working directory does not match the package's default path probes.
+
+### 🔧 Improvements
+
+- **SQLite audit remediation** — Removed the unused direct `sqlite3` dependency from Zacatl's published package so consumers no longer inherit the vulnerable `node-gyp` and `tar` toolchain through the framework itself. SQLite dialect drivers remain consumer-installed dependencies.
+
 ---
 
 ## [0.0.51] - 2026-03-04
