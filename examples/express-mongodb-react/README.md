@@ -96,9 +96,11 @@ docker compose up -d
 
 ## Documentation
 
-- **Framework Database Guide**: [../../../docs/third-party/orm/database-setup.md](../../../docs/third-party/orm/database-setup.md)
-- **Main Framework Docs**: [../../../docs/service/README.md](../../../docs/service/README.md)
-- **Architecture Patterns**: [../../../docs/guidelines/framework-overview.md](../../../docs/guidelines/framework-overview.md)
+- **Examples Catalog**: [../README.md](../README.md)
+- **Start Here**: [../../START_HERE.md](../../START_HERE.md)
+- **Framework Overview**: [../../docs/guidelines/framework-overview.md](../../docs/guidelines/framework-overview.md)
+- **Framework Database Guide**: [../../docs/third-party/orm/database-setup.md](../../docs/third-party/orm/database-setup.md)
+- **Service Module**: [../../docs/service/README.md](../../docs/service/README.md)
 
 ## Why MongoDB?
 
@@ -109,10 +111,10 @@ docker compose up -d
 
 ⚠️ Requires MongoDB server (but Docker makes it easy)
 
-Compare with [SQLite example](../with-sqlite-react/) for zero-config alternative.
+Compare with [Express + SQLite + React](../express-sqlite-react/) for zero-config alternative.
 
 ## Next Steps
 
-- Review the [framework database guide](../../../docs/third-party/orm/database-setup.md) for ORM patterns
-- Explore the [Zacatl architecture](../../../docs/guidelines/framework-overview.md) to understand the layered design
-- Compare with [SQLite example](../with-sqlite-react/) for zero-config alternative
+- Start from [Fastify + SQLite + React](../fastify-sqlite-react/) as the minimal baseline
+- Review the [framework database guide](../../docs/third-party/orm/database-setup.md) for shared ORM patterns
+- Use the [service module docs](../../docs/service/README.md) when extending platform wiring

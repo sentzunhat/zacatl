@@ -8,15 +8,19 @@
  */
 
 import { inject, singleton } from '@sentzunhat/zacatl/third-party/tsyringe';
-import { AbstractRouteHandler, type Request } from '@sentzunhat/zacatl/service';
+import { FastifyGetRouteHandler, type Request } from '@sentzunhat/zacatl/service';
 import { GreetingServiceAdapter } from '../../../../domain/greetings/service';
-import { type GreetingListResponse } from '../greeting.schema';
+import {
+  GreetingFilterQuerySchema,
+  type GreetingFilterQuery,
+  type GreetingListResponse,
+} from '../greeting.schema';
 import { toGreetingListResponse } from '../greeting.serializer';
 
 @singleton()
-export class GetAllGreetingsHandler extends AbstractRouteHandler<
+export class GetAllGreetingsHandler extends FastifyGetRouteHandler<
   void,
-  { language?: string },
+  GreetingFilterQuery,
   GreetingListResponse
 > {
   constructor(
@@ -25,13 +29,14 @@ export class GetAllGreetingsHandler extends AbstractRouteHandler<
   ) {
     super({
       url: '/greetings',
-      method: 'GET',
-      schema: {},
+      schema: {
+        querystring: GreetingFilterQuerySchema,
+      },
     });
   }
 
-  async handler(request: Request<void, { language?: string }>): Promise<GreetingListResponse> {
-    const language = request.query?.language as string | undefined;
+  async handler(request: Request<void, GreetingFilterQuery>): Promise<GreetingListResponse> {
+    const language = request.query?.language;
 
     const greetings = await this.greetingService.getAllGreetings(language);
 

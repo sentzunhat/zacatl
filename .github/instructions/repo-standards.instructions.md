@@ -1,4 +1,6 @@
 ---
+name: 'Repository Standards Intake'
+description: 'Always-on docs-first context intake and standards precedence for this repository'
 applyTo: '**'
 ---
 

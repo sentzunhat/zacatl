@@ -14,9 +14,9 @@ npm run dev
 
 ## Database Setup
 
-- **Storage**: SQLite file at `backend/database.sqlite`
+- **Storage**: SQLite file at `database.sqlite` (example root)
 - **Auto-init**: Schema is created on app start
-- **Connection**: `backend/src/infrastructure/database/connection.ts`
+- **Connection**: `backend/src/config.ts`
 
 ## What's Included
 
@@ -31,6 +31,7 @@ npm run dev
 
 ```
 backend/              # Fastify API
+├── locales/          # Backend locale overrides
 └── src/
   ├── application/    # Handlers, schemas
   ├── domain/         # Services, models, ports
@@ -40,20 +41,20 @@ frontend/             # React + Vite
 
 ## API Endpoints
 
-- `GET /greetings` - All greetings (optional `?language=en`)
-- `GET /greetings/:id` - Single greeting
-- `GET /greetings/random/:language` - Random greeting
-- `POST /greetings` - Create: `{"message": "...", "language": "..."}`
-- `DELETE /greetings/:id` - Delete greeting
+- `GET /api/greetings` - All greetings (optional `?language=en`)
+- `GET /api/greetings/:id` - Single greeting
+- `GET /api/greetings/random/:language` - Random greeting
+- `POST /api/greetings` - Create: `{"message": "...", "language": "..."}`
+- `DELETE /api/greetings/:id` - Delete greeting
 
 ## Test It
 
 ```bash
-curl -X POST http://localhost:8081/greetings \
+curl -X POST http://localhost:8081/api/greetings \
   -H "Content-Type: application/json" \
   -d '{"message": "Hello World", "language": "en"}'
 
-curl http://localhost:8081/greetings
+curl http://localhost:8081/api/greetings
 ```
 
 ## 🐳 Docker Deployment
@@ -66,30 +67,36 @@ curl http://localhost:8081/greetings
 # From repository root
 docker build -f examples/fastify-sqlite-react/Dockerfile \
   -t zacatl-fastify-sqlite .
-
-# Or use docker-compose
-cd examples/fastify-sqlite-react
-docker compose up -d
 ```
+
+The Docker build is self-contained: it compiles required Zacatl framework artifacts in-container.
 
 ### Access
 
-- **Backend API**: http://localhost:8081/greetings
+- **Backend API**: http://localhost:8081/api/greetings
 - **Frontend**: Served by backend (static files)
 
 ### Architecture Notes
 
 - ✅ One image = backend + compiled frontend
-- ✅ Native module support (sqlite3 rebuilt in container)
+- ✅ Native module support via `sqlite3` workspace dependency
 - ✅ Distroless base image (production-ready)
-- ✅ Health checks included
-- ⚠️ `fix-esm.mjs dist` required in build script (see package.json)
+- ✅ Backend runs from `backend/`, so `backend/locales/` is discovered in dev and Docker
+- ⚠️ `npx tsx ../../../scripts/build/fix-esm.ts dist` required in build script (see `backend/package.json`)
+
+### Localization
+
+- Backend server locale files live in `backend/locales/`
+- Zacatl built-in locales remain packaged with the library
+- Add project-specific locale files in `backend/locales/` and they are picked up automatically when the backend runs
 
 ## Documentation
 
-- **Production Patterns**: [../docs/production-patterns.md](../docs/production-patterns.md)
-- **Quick Start Guide**: [../docs/quick-start.md](../docs/quick-start.md)
-- **Framework Database Guide**: [../../../docs/third-party/orm/database-setup.md](../../../docs/third-party/orm/database-setup.md)
+- **Examples Catalog**: [../README.md](../README.md)
+- **Start Here**: [../../START_HERE.md](../../START_HERE.md)
+- **Framework Overview**: [../../docs/guidelines/framework-overview.md](../../docs/guidelines/framework-overview.md)
+- **Framework Database Guide**: [../../docs/third-party/orm/database-setup.md](../../docs/third-party/orm/database-setup.md)
+- **Service Module**: [../../docs/service/README.md](../../docs/service/README.md)
 
 ## Why SQLite?
 
@@ -99,10 +106,10 @@ docker compose up -d
 
 ⚠️ Single connection limit - not ideal for high concurrency
 
-Compare with [MongoDB example](../with-mongodb-react/) for scalable alternative.
+Compare with [Fastify + MongoDB + React](../fastify-mongodb-react/) for scalable alternative.
 
 ## Next Steps
 
-- Read [production patterns](../docs/production-patterns.md) to understand the architecture
-- Review the [framework database guide](../../../docs/third-party/orm/database-setup.md) for shared ORM patterns
-- Add features using the [extension guide](../docs/production-patterns.md#adding-new-features)
+- Use this as the baseline minimal example for release cleanup and onboarding
+- Compare with [Fastify + MongoDB + React](../fastify-mongodb-react/) for scalable persistence
+- Review the [service module docs](../../docs/service/README.md) for platform wiring

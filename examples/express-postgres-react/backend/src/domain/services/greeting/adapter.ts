@@ -9,7 +9,7 @@
  */
 
 import { inject, singleton } from '@sentzunhat/zacatl/third-party/tsyringe';
-import type { Greeting, CreateGreetingInput } from '../entities/greeting';
+import type { Greeting, CreateGreetingInput } from '../../entities/greeting';
 import { GreetingRepositoryAdapter } from '../../../infrastructure/repositories/greeting/adapter';
 import type { GreetingServicePort } from './port';
 

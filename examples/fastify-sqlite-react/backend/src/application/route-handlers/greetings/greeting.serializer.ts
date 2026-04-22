@@ -2,7 +2,7 @@ import type { Greeting } from '../../../domain/entities/greeting';
 import type { GreetingListResponse, GreetingResponse } from './greeting.schema';
 
 export const toGreetingResponse = (greeting: Greeting): GreetingResponse => ({
-  id: greeting.id,
+  id: String(greeting.id),
   message: greeting.message,
   language: greeting.language,
   createdAt: greeting.createdAt.toISOString(),

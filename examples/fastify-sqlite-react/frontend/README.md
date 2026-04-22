@@ -1,30 +1,35 @@
 # Fastify + SQLite React Frontend
 
-Minimal React + Vite + Tailwind client for the Fastify + SQLite example.
+Minimal React + Vite frontend for the Fastify + SQLite + React example.
 
-## ✅ Features
+## Quick Start
 
-- Create, list, filter, delete greetings
-- Fetch a random greeting by language
-- Tailwind UI with a simple single-page layout
-- Vite proxy to avoid CORS in development
+```bash
+npm install
+npm run dev
+```
 
-## 🚀 Quick Start
-
-1. Start the API server (from the example root):
-
-   - Install dependencies
-   - Run the Fastify dev server on http://localhost:8081
-
-2. Start the frontend (from this folder):
-   - Install dependencies
-   - Run Vite dev server on http://localhost:5173
+- Frontend: http://localhost:5001
+- Backend proxy target: http://localhost:8081
 
 ## Environment
 
-- `VITE_API_BASE` (optional) set a full API base URL for production builds.
+- Uses Vite dev proxy for /api routes.
+- Frontend app source files live in `src/`.
+- HTML entry and static assets served as-is live in `public/`.
+- Example favicon is `public/favicon.svg` and can be replaced later.
+- `public/src` is a symlink to `../src` so `/src/main.tsx` resolves with `root: 'public'`.
+- See [vite.config.ts](./vite.config.ts) for current proxy and port settings.
 
-## Notes
+## Documentation
 
-- File names are lowercase to match repository conventions.
-- Proxy rule forwards `/api/*` and `/greetings` to http://localhost:8081.
+- Example Root: [../README.md](../README.md)
+- Examples Catalog: [../../README.md](../../README.md)
+- Start Here: [../../../START_HERE.md](../../../START_HERE.md)
+- Service Module: [../../../docs/service/README.md](../../../docs/service/README.md)
+
+## Next Steps
+
+- Keep this example with Fastify + SQLite as the baseline minimal flow
+- Compare with [Fastify + MongoDB + React](../../fastify-mongodb-react/)
+- Update proxy/API wiring in vite.config.ts when changing backend ports

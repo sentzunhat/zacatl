@@ -352,7 +352,7 @@ If adding a **third framework** (e.g., Hono, Elysia, etc.):
   run: |
     npm run build
     # Try starting each example with timeout
-    for example in examples/platform-{fastify,express}/with-*-react/; do
+    for example in examples/{fastify,express}-*-react/; do
       timeout 3 npm run dev --prefix "$example" 2>&1 | head -10
     done
 
@@ -367,5 +367,5 @@ If adding a **third framework** (e.g., Hono, Elysia, etc.):
 
 - [Express Integration Guide](../service/express.md) - Framework-specific details
 - [Service Architecture](../service/api-overview.md) - Adapter patterns
-- [examples/platform-express](../../examples/platform-express/README.md) - Working examples
-- [examples/platform-fastify](../../examples/platform-fastify/README.md) - Reference implementation
+- [Fastify SQLite React Example](../../examples/fastify-sqlite-react/) - Recommended baseline
+- [Express SQLite React Example](../../examples/express-sqlite-react/) - Express parity reference

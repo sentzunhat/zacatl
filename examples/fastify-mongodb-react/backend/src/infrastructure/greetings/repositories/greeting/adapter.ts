@@ -1,4 +1,4 @@
-import { MongooseRepository } from '@sentzunhat/zacatl';
+import { MongooseRepository } from '@sentzunhat/zacatl/service/layers/infrastructure/repositories/mongoose';
 import type { MongooseModel } from '@sentzunhat/zacatl/third-party/mongoose';
 import { singleton } from '@sentzunhat/zacatl/third-party/tsyringe';
 

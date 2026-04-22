@@ -10,7 +10,7 @@ npm install
 npm run dev
 ```
 
-**Ports**: Backend: 8082, Frontend: 5001
+**Ports**: Backend: 8181, Frontend: 5001
 
 ## Database Setup
 
@@ -49,11 +49,11 @@ frontend/             # React + Vite
 ## Test It
 
 ```bash
-curl -X POST http://localhost:8082/greetings \
+curl -X POST http://localhost:8181/greetings \
   -H "Content-Type: application/json" \
   -d '{"message": "Hello World", "language": "en"}'
 
-curl http://localhost:8082/greetings
+curl http://localhost:8181/greetings
 ```
 
 ## 🐳 Docker Deployment
@@ -74,7 +74,7 @@ docker compose up -d
 
 ### Access
 
-- **Backend API**: http://localhost:8082/greetings
+- **Backend API**: http://localhost:8181/greetings
 - **Frontend**: Served by backend (static files)
 
 ### Architecture Notes
@@ -87,9 +87,11 @@ docker compose up -d
 
 ## Documentation
 
-- **Framework Database Guide**: [../../../docs/third-party/orm/database-setup.md](../../../docs/third-party/orm/database-setup.md)
-- **Main Framework Docs**: [../../../docs/service/README.md](../../../docs/service/README.md)
-- **Architecture Patterns**: [../../../docs/guidelines/framework-overview.md](../../../docs/guidelines/framework-overview.md)
+- **Examples Catalog**: [../README.md](../README.md)
+- **Start Here**: [../../START_HERE.md](../../START_HERE.md)
+- **Framework Overview**: [../../docs/guidelines/framework-overview.md](../../docs/guidelines/framework-overview.md)
+- **Framework Database Guide**: [../../docs/third-party/orm/database-setup.md](../../docs/third-party/orm/database-setup.md)
+- **Service Module**: [../../docs/service/README.md](../../docs/service/README.md)
 
 ## Why SQLite?
 
@@ -99,10 +101,10 @@ docker compose up -d
 
 ⚠️ Single connection limit - not ideal for high concurrency
 
-Compare with [MongoDB example](../with-mongodb-react/) for scalable alternative.
+Compare with [Express + MongoDB + React](../express-mongodb-react/) for scalable alternative.
 
 ## Next Steps
 
-- Review the [framework database guide](../../../docs/third-party/orm/database-setup.md) for ORM patterns
-- Explore the [Zacatl architecture](../../../docs/guidelines/framework-overview.md) to understand the layered design
-- Compare with [MongoDB example](../with-mongodb-react/) for scalable databases
+- Start from [Fastify + SQLite + React](../fastify-sqlite-react/) as the minimal baseline
+- Review the [framework database guide](../../docs/third-party/orm/database-setup.md) for shared ORM patterns
+- Use the [service module docs](../../docs/service/README.md) when extending platform wiring

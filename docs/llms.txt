@@ -67,12 +67,12 @@ Ready-to-run examples live in [`examples/`](../examples/):
 
 | Example | Stack |
 |---|---|
-| [platform-fastify/with-sqlite](../examples/platform-fastify/with-sqlite/) | Fastify + SQLite |
-| [platform-fastify/with-mongodb](../examples/platform-fastify/with-mongodb/) | Fastify + MongoDB |
-| [platform-fastify/with-postgres-react](../examples/platform-fastify/with-postgres-react/) | Fastify + PostgreSQL + React |
-| [platform-fastify/with-sqlite-react](../examples/platform-fastify/with-sqlite-react/) | Fastify + SQLite + React |
-| [platform-express/with-mongodb-react](../examples/platform-express/with-mongodb-react/) | Express + MongoDB + React |
-| [platform-express/with-postgres-react](../examples/platform-express/with-postgres-react/) | Express + PostgreSQL + React |
+| [fastify-sqlite-react](../examples/fastify-sqlite-react/) | Fastify + SQLite + React |
+| [fastify-mongodb-react](../examples/fastify-mongodb-react/) | Fastify + MongoDB + React |
+| [fastify-postgres-react](../examples/fastify-postgres-react/) | Fastify + PostgreSQL + React |
+| [express-sqlite-react](../examples/express-sqlite-react/) | Express + SQLite + React |
+| [express-mongodb-react](../examples/express-mongodb-react/) | Express + MongoDB + React |
+| [express-postgres-react](../examples/express-postgres-react/) | Express + PostgreSQL + React |
 
 ## ORM subpath pattern
 

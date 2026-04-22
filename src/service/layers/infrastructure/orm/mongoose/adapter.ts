@@ -145,7 +145,7 @@ export class MongooseAdapter<D, I, O> implements ORMPort<MongooseRepositoryModel
   async update(id: string, update: Partial<I>): Promise<O | null> {
     try {
       const entity = await this.model
-        .findByIdAndUpdate(id, update as unknown as Partial<D>, { new: true })
+        .findByIdAndUpdate(id, update as unknown as Partial<D>, { returnDocument: 'after' })
         .lean<O>({ virtuals: true })
         .exec();
 

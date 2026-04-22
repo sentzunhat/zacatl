@@ -67,16 +67,18 @@ export class Server {
     api: ApiServerPort;
     page: PageServerPort;
   } {
+    const apiPrefix = config.apiPrefix ?? '';
+
     if (config.vendor === ServerVendor.FASTIFY) {
       const instance = config.instance as FastifyInstance;
       return {
-        api: new FastifyApiAdapter(instance),
+        api: new FastifyApiAdapter(instance, apiPrefix),
         page: new FastifyPageAdapter(instance),
       };
     } else if (config.vendor === ServerVendor.EXPRESS) {
       const instance = config.instance as Express;
       return {
-        api: new ExpressApiAdapter(instance),
+        api: new ExpressApiAdapter(instance, apiPrefix),
         page: new ExpressPageAdapter(instance),
       };
     } else {

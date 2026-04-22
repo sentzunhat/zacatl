@@ -12,7 +12,7 @@ This repository intentionally uses **both** folders:
 
 ## Agent Startup Expectations
 
-- On task start, agents should first review `README.md` and relevant guidance in `docs/`, especially `docs/guidelines/`.
+- On task start, agents should first review `START_HERE.md` for setup and workflow orientation, then `README.md` and relevant guidance in `docs/`, especially `docs/guidelines/`.
 - Treat documentation standards and coding standards in `docs/` as project source-of-truth before making changes.
 
 ## Current Files
@@ -20,6 +20,7 @@ This repository intentionally uses **both** folders:
 - `.github/copilot-instructions.md` (repository-wide baseline guidance)
 - `.github/instructions/repo-standards.instructions.md` (always-on docs-first context intake)
 - `.github/instructions/changelog.instructions.md` (path-specific release-note rules)
+- `.github/instructions/docs-drift.instructions.md` (docs/README drift guardrails)
 - `.github/prompts/*.prompt.md` (release workflow prompt commands)
 
 ## Publishing Guard

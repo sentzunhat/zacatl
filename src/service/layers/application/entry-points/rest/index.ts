@@ -10,6 +10,22 @@ export type { RouteHandler } from './fastify/handlers/route-handler';
 // Projects using this import path get Fastify handlers (existing behavior)
 export * from './fastify/handlers';
 
+// Fastify-prefixed aliases for clearer, vendor-explicit imports.
+export {
+  AbstractRouteHandler as AbstractFastifyRouteHandler,
+  AbstractRouteHandler as FastifyAbstractRouteHandler,
+  DeleteRouteHandler as DeleteFastifyRouteHandler,
+  DeleteRouteHandler as FastifyDeleteRouteHandler,
+  GetRouteHandler as GetFastifyRouteHandler,
+  GetRouteHandler as FastifyGetRouteHandler,
+  PatchRouteHandler as PatchFastifyRouteHandler,
+  PatchRouteHandler as FastifyPatchRouteHandler,
+  PostRouteHandler as PostFastifyRouteHandler,
+  PostRouteHandler as FastifyPostRouteHandler,
+  PutRouteHandler as PutFastifyRouteHandler,
+  PutRouteHandler as FastifyPutRouteHandler,
+} from './fastify/handlers';
+
 // Note: Provider-specific imports are available for explicit framework selection:
 // - @sentzunhat/zacatl/handlers/fastify (Fastify-specific handlers)
 // - @sentzunhat/zacatl/handlers/express (Express-specific handlers)

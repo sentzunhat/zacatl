@@ -512,6 +512,6 @@ docker compose down -v
 ## 📚 Related Documentation
 
 - [Examples README](./README.md) - Overview of all examples
-- [Platform Fastify](./platform-fastify/README.md) - Fastify-specific patterns
-- [Platform Express](./platform-express/README.md) - Express-specific patterns
+- [Fastify SQLite React](./fastify-sqlite-react/README.md) - Fastify baseline example
+- [Express SQLite React](./express-sqlite-react/README.md) - Express parity example
 - [Main Framework Docs](../docs/service/README.md) - Zacatl service framework

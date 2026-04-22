@@ -45,7 +45,7 @@ import {
 ### Configuration
 
 ```typescript
-import { loadConfig } from '@sentzunhat/zacatl/configuration';
+import { loadJSON, loadYML } from '@sentzunhat/zacatl/configuration';
 ```
 
 ### Infrastructure

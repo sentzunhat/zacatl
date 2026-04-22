@@ -54,9 +54,9 @@ export default defineConfig({
 ```json
 {
   "scripts": {
-    "test": "vitest run",
-    "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage"
+    "test": "NODE_ENV=test ENV=test vitest run",
+    "test:watch": "NODE_ENV=test ENV=test vitest",
+    "test:coverage": "NODE_ENV=test ENV=test npx vitest run --coverage --reporter verbose --reporter json --outputFile.json=test-results.json && npm run update:readme-coverage"
   }
 }
 ```
@@ -782,8 +782,8 @@ export default defineConfig({
 ```bash
 npm run test:coverage
 
-# Coverage HTML report at ./coverage/index.html
-open coverage/index.html
+# Coverage HTML report at ./coverage/lcov-report/index.html
+open coverage/lcov-report/index.html
 ```
 
 ### Excluding Code from Coverage

@@ -88,9 +88,11 @@ docker compose up -d
 
 ## Documentation
 
-- **Production Patterns**: [../docs/production-patterns.md](../docs/production-patterns.md)
-- **Quick Start Guide**: [../docs/quick-start.md](../docs/quick-start.md)
-- **Framework Database Guide**: [../../../docs/third-party/orm/database-setup.md](../../../docs/third-party/orm/database-setup.md)
+- **Examples Catalog**: [../README.md](../README.md)
+- **Start Here**: [../../START_HERE.md](../../START_HERE.md)
+- **Framework Overview**: [../../docs/guidelines/framework-overview.md](../../docs/guidelines/framework-overview.md)
+- **Framework Database Guide**: [../../docs/third-party/orm/database-setup.md](../../docs/third-party/orm/database-setup.md)
+- **Service Module**: [../../docs/service/README.md](../../docs/service/README.md)
 
 ## Why SQLite?
 
@@ -100,10 +102,10 @@ docker compose up -d
 
 ⚠️ Single connection limit - not ideal for high concurrency
 
-Compare with the [React version](../with-sqlite-react/) or [MongoDB example](../with-mongodb-react/) for alternatives.
+Compare with the [React version](../fastify-sqlite-react/) or [MongoDB example](../fastify-mongodb-react/) for alternatives.
 
 ## Next Steps
 
-- Read [production patterns](../docs/production-patterns.md) to understand the architecture
-- Review the [framework database guide](../../../docs/third-party/orm/database-setup.md) for shared ORM patterns
-- Add features using the [extension guide](../docs/production-patterns.md#adding-new-features)
+- Start from [Fastify + SQLite + React](../fastify-sqlite-react/) as the minimal baseline
+- Review the [framework database guide](../../docs/third-party/orm/database-setup.md) for shared ORM patterns
+- Use the [service module docs](../../docs/service/README.md) when extending platform wiring

@@ -4,10 +4,25 @@
 
 @layer base {
   :root {
+    --font-display: 'Playfair Display';
+    --font-body: 'Inter';
+    --font-sans: 'Inter';
     color-scheme: light;
   }
 
+  html {
+    @apply bg-slate-100;
+  }
+
+  html.dark {
+    color-scheme: dark;
+  }
+
   body {
-    @apply bg-slate-50 text-slate-900 antialiased;
+    @apply bg-slate-50 text-slate-900 antialiased font-body;
+  }
+
+  html.dark body {
+    @apply bg-slate-900 text-slate-100;
   }
 }

@@ -50,9 +50,13 @@ If you're using Zacatl in your project, import from the published package:
 
 ```typescript
 // ✅ Correct - Public API imports
-import { Service, ServiceType, ServerVendor } from '@sentzunhat/zacatl';
-import { BaseRepository } from '@sentzunhat/zacatl/infrastructure';
-import { NotFoundError } from '@sentzunhat/zacatl/errors';
+import {
+  Service,
+  ServiceType,
+  ServerVendor,
+  BaseRepository,
+  NotFoundError,
+} from '@sentzunhat/zacatl';
 import { mongoose } from '@sentzunhat/zacatl/third-party/mongoose';
 
 // ❌ Wrong - Internal aliases don't work in user projects

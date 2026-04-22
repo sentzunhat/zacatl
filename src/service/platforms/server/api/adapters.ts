@@ -1,2 +1,2 @@
-export { FastifyApiAdapter } from './fastify-adapter';
-export { ExpressApiAdapter } from './express-adapter';
+export { FastifyApiAdapter } from './adapters/fastify';
+export { ExpressApiAdapter } from './adapters/express';

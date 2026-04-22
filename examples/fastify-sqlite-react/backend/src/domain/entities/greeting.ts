@@ -7,7 +7,7 @@
  */
 
 export interface Greeting {
-  id: string;
+  id: number;
   message: string;
   language: string;
   createdAt: Date;

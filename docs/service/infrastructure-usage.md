@@ -3,7 +3,7 @@
 > Import from the infrastructure subpath:
 >
 > ```typescript
-> import { BaseRepository, ORMType } from '@sentzunhat/zacatl/infrastructure';
+> import { BaseRepository, ORMType } from '@sentzunhat/zacatl';
 > ```
 
 ## Modular ORM System
@@ -100,7 +100,7 @@ interface ProductOutput {
 #### Option A: Using Mongoose (MongoDB)
 
 ```typescript
-import { BaseRepository, ORMType } from '@sentzunhat/zacatl/infrastructure';
+import { BaseRepository, ORMType } from '@sentzunhat/zacatl';
 import { Schema } from '@sentzunhat/zacatl/third-party/mongoose';
 
 const UserSchema = new Schema<UserDb>(
@@ -169,7 +169,7 @@ export class ItemRepository {
 #### Option C: Using Sequelize (PostgreSQL/MySQL/SQLite via ORM)
 
 ```typescript
-import { BaseRepository, ORMType } from '@sentzunhat/zacatl/infrastructure';
+import { BaseRepository, ORMType } from '@sentzunhat/zacatl';
 import { DataTypes, Model, Sequelize } from '@sentzunhat/zacatl/third-party/sequelize';
 
 // Sequelize model definition

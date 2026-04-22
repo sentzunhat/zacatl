@@ -2,14 +2,19 @@
 
 All project documentation is organized here.
 
+If you are new to this repository, start with [START_HERE.md](../START_HERE.md).
+
 > **AI agents / LLMs:** start with [`llms.txt`](./llms.txt) for a compact
 > machine-readable project summary, import patterns, and module index.
+
+> **For AI agents:** This repository is configured with Copilot instructions including workflow setup, standards, and context-intake rules. See [.github/copilot-instructions.md](../.github/copilot-instructions.md) and [.github/instructions/](../.github/instructions/).
 
 ## Guides
 
 - [Guidelines & Standards](guidelines/README.md) — code style, architecture, testing, git workflow
 - [Framework Overview](guidelines/framework-overview.md)
 - [Quick Reference](guidelines/QUICK_REFERENCE.md)
+- [AI Context Pack](context/README.md)
 
 ## Module Docs
 

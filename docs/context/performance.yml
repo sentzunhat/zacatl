@@ -1,0 +1,19 @@
+build_performance:
+  strategy:
+    - 'Use targeted checks first (type, lint, test, build)'
+    - 'Keep source and scripts compilation separate'
+
+runtime_performance:
+  architecture:
+    - 'Layered modules minimize unnecessary coupling'
+    - 'Adapters isolate expensive integrations'
+
+developer_performance:
+  workflow:
+    - 'Use build:watch and test:watch while iterating'
+    - 'Prefer focused test file runs for regressions'
+
+docs_performance:
+  guidance:
+    - 'Keep context docs concise'
+    - 'Link to deeper module docs instead of duplicating content'

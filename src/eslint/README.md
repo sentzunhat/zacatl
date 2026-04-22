@@ -385,7 +385,7 @@ Check that your `tsconfig.json` paths match the import configuration. Adjust `pa
 
 ## License
 
-MIT
+Apache-2.0
 
 ## Contributing
 

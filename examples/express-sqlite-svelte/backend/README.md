@@ -1,55 +1,33 @@
-# Zacatl Fastify + SQLite Backend Example
+# Zacatl Express + SQLite Backend
 
-Simple, clean Node.js ESM backend using the Zacatl framework.
+Minimal Express backend for the Express + SQLite + Svelte example.
 
 ## Quick Start
 
 ```bash
-# Development (hot reload)
+npm install
 npm run dev
-
-# Production build
-npm run build
-
-# Run production build
-npm start
 ```
 
-## Build Process
+- API: http://localhost:8181
+- Default DB: sqlite:database.sqlite
 
-The build is simple and transparent:
+## Environment
 
-1. **TypeScript compilation**: `tsc` compiles your code
-2. **ESM fix**: Framework's built-in `zacatl-fix-esm` adds `.js` extensions for Node.js ESM compatibility
+- PORT (default: 8181)
+- DATABASE_URL (default: sqlite:database.sqlite)
 
-That's it! No bundlers, no complex tooling. The ESM fix script is included in the framework package - no copying scripts needed!
+## Documentation
 
-## What's Happening Behind the Scenes
+- Example Root: [../README.md](../README.md)
+- Examples Catalog: [../../README.md](../../README.md)
+- Start Here: [../../../START_HERE.md](../../../START_HERE.md)
+- Framework Overview: [../../../docs/guidelines/framework-overview.md](../../../docs/guidelines/framework-overview.md)
+- ORM Setup: [../../../docs/third-party/orm/database-setup.md](../../../docs/third-party/orm/database-setup.md)
+- Service Module: [../../../docs/service/README.md](../../../docs/service/README.md)
 
-Node.js ESM requires explicit file extensions in imports:
+## Next Steps
 
-- ❌ `import { thing } from "./file"`
-- ✅ `import { thing } from "./file.js"`
-
-The framework's `zacatl-fix-esm` utility automatically adds these extensions after TypeScript compilation, so you can write clean TypeScript without manual `.js` extensions everywhere.
-
-The script is included in `@sentzunhat/zacatl` - no manual setup required!
-
-## Project Structure
-
-```
-src/
-├── application/      # HTTP handlers (entry points)
-├── domain/          # Business logic
-├── infrastructure/  # Database models & repos
-├── config.ts        # Configuration
-└── index.ts         # App entry point
-```
-
-## Developer Experience
-
-- ✅ Write clean TypeScript (no `.js` in imports)
-- ✅ One command to build: `npm run build`
-- ✅ Fast development with `tsx watch`
-- ✅ Production-ready output in `dist/`
-- ✅ Works in Docker (distroless images)
+- Start from [Fastify + SQLite + React](../../fastify-sqlite-react/) as baseline
+- Compare React and Svelte frontend variants
+- Extend routes and services following the service docs

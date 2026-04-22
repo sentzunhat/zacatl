@@ -1,4 +1,6 @@
 ---
+name: 'Changelog Version Guardrails'
+description: 'Version and changelog consistency rules for release metadata updates'
 applyTo: 'docs/changelog.md,package.json'
 ---
 

@@ -1,40 +1,33 @@
-# Zacatl Fastify + MongoDB Backend Example
+# Zacatl Express + MongoDB Backend
 
-Enterprise-grade Node.js ESM backend using the Zacatl framework with Mongoose.
+Minimal Express backend for the Express + MongoDB + React example.
 
-## ✅ Features
-
-- Fastify server platform
-- MongoDB database via Mongoose
-- Clean ESM build with automatic `.js` extension fixing
-- Hexagonal/layered architecture
-- Type-safe dependency injection
-- Zod schema validation
-- DI with class-token injection using `tsyringe` and `@singleton()`
-- 5 REST endpoints
-
-## 🚀 Quick Start
+## Quick Start
 
 ```bash
 npm install
 npm run dev
-# http://localhost:8082
 ```
 
-## API Endpoints
-
-- `GET /greetings`
-- `GET /greetings/:id`
-- `POST /greetings`
-- `DELETE /greetings/:id`
-- `GET /greetings/random/:language`
+- API: http://localhost:8182
+- Default Mongo URI: mongodb://local:local@localhost:27017/appdb
 
 ## Environment
 
-- `PORT` (default: 8082)
-- `MONGODB_URI` (default: mongodb://localhost:27017/zacatl-fastify-02)
+- PORT (default: 8182)
+- MONGO_URI (default: mongodb://local:local@localhost:27017/appdb)
 
-## Notes
+## Documentation
 
-- The React frontend will be added from `examples/shared/frontend`.
-- Uses framework source during dev via `tsconfig.dev.json`.
+- Example Root: [../README.md](../README.md)
+- Examples Catalog: [../../README.md](../../README.md)
+- Start Here: [../../../START_HERE.md](../../../START_HERE.md)
+- Framework Overview: [../../../docs/guidelines/framework-overview.md](../../../docs/guidelines/framework-overview.md)
+- ORM Setup: [../../../docs/third-party/orm/database-setup.md](../../../docs/third-party/orm/database-setup.md)
+- Service Module: [../../../docs/service/README.md](../../../docs/service/README.md)
+
+## Next Steps
+
+- Start from [Fastify + SQLite + React](../../fastify-sqlite-react/) as baseline
+- Compare Express and Fastify platform setup
+- Extend routes and services following the service docs

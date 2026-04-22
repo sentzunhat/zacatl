@@ -26,7 +26,7 @@ export class Desktop {
       message: `Desktop IPC entrypoint registration for '${this.window.title}' is not yet implemented`,
       reason:
         'ServiceType.DESKTOP IPC handler registration and event routing are not implemented. ' +
-        'This feature is planned for v0.1.0. Use ServiceType.SERVER for HTTP-based services.',
+        'Keep ServiceType.DESKTOP for contract shape only and use ServiceType.SERVER for runnable services.',
       component: 'Desktop',
       operation: 'registerEntrypoints',
       metadata: {
@@ -41,7 +41,7 @@ export class Desktop {
       message: `Desktop platform '${this.window.title}' (${this.platform}) is not yet implemented`,
       reason:
         'ServiceType.DESKTOP is declared but window initialization and IPC handler registration are not implemented. ' +
-        'This feature is planned for v0.1.0. Use ServiceType.SERVER for HTTP-based services.',
+        'Keep ServiceType.DESKTOP for contract shape only and use ServiceType.SERVER for runnable services.',
       component: 'Desktop',
       operation: 'start',
       metadata: {

@@ -3,7 +3,7 @@
  */
 
 import mongoose, { type Document } from 'mongoose';
-import type { Greeting } from '../../../domain/entities/greeting';
+import type { Greeting } from '../../domain/entities/greeting';
 import { greetingSchema } from '../repositories/greeting/schema';
 
 export interface GreetingDocument extends Document, Greeting {

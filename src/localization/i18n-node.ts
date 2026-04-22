@@ -12,6 +12,7 @@ export interface ConfigureI18nInput {
     supported?: string[];
     directories?: string[];
   };
+  builtInLocalesDir?: string;
   objectNotation?: boolean;
   overrideBuiltIn?: boolean;
 }
@@ -104,8 +105,10 @@ export const loadCatalog = (input: LoadCatalogInput): I18nCatalogType => {
 };
 
 const getHere = (): string => {
+  // CommonJS: __dirname is available
   if (typeof __dirname !== 'undefined') return __dirname;
-  // Be explicit about the shape/value checks to satisfy strict-boolean-expressions
+
+  // Fallback: Try to extract from process.argv[1]
   if (
     typeof process !== 'undefined' &&
     Array.isArray(process.argv) &&
@@ -114,6 +117,7 @@ const getHere = (): string => {
   ) {
     return path.dirname(process.argv[1]);
   }
+
   return process.cwd();
 };
 
@@ -130,6 +134,15 @@ export const resolveBuiltInLocalesDir = (): string => {
     path.resolve(here, '../../build/localization/locales'),
     // Fallback to source layout relative to package root
     path.resolve(here, '../../src/localization/locales'),
+    // When installed as a package: look in node_modules/@sentzunhat/zacatl
+    path.resolve(
+      process.cwd(),
+      'node_modules/@sentzunhat/zacatl/build-src-esm/localization/locales',
+    ),
+    path.resolve(
+      process.cwd(),
+      'node_modules/@sentzunhat/zacatl/build-src-cjs/localization/locales',
+    ),
     // Project workspace source locales (when running from project root)
     path.resolve(process.cwd(), 'src/localization/locales'),
     // Generic localization folders in project root
@@ -189,7 +202,7 @@ export const configureI18nNode = (input: ConfigureI18nInput = {}): typeof i18n =
   const objectNotation = input.objectNotation ?? true;
   const overrideBuiltIn = input.overrideBuiltIn ?? true;
 
-  const builtInLocalesDir = resolveBuiltInLocalesDir();
+  const builtInLocalesDir = input.builtInLocalesDir ?? resolveBuiltInLocalesDir();
   const builtInCatalog = loadCatalog({
     localesDir: builtInLocalesDir,
     supportedLocales,

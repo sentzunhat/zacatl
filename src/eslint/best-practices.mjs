@@ -54,6 +54,9 @@ const bestPracticesConfig = {
 
     // Arrow functions for callbacks — lexical `this` and cleaner syntax
     'prefer-arrow-callback': ['error', { allowNamedFunctions: false }],
+
+    // Prefer arrow-style function expressions over function declarations
+    'func-style': ['warn', 'expression', { allowArrowFunctions: true }],
   },
 };
 

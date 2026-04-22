@@ -1,0 +1,30 @@
+coding:
+  language: 'TypeScript strict mode'
+  style:
+    - 'Prefer concise, typed code'
+    - 'Prefer arrow function expressions for declarations'
+    - 'Use kebab-case file names'
+
+validation_workflow:
+  order:
+    - 'npm run type:check'
+    - 'npm run lint'
+    - 'npm test'
+    - 'npm run build'
+
+documentation:
+  source_of_truth: 'docs/guidelines/'
+  expectations:
+    - 'Keep docs factual and concise'
+    - 'Update docs when behavior changes'
+
+testing:
+  framework: 'Vitest'
+  structure: 'test/unit mirrors src modules'
+  practice:
+    - 'Prefer focused regression tests for changed behavior'
+
+examples:
+  practice:
+    - 'Update package manifests and lockfiles together'
+    - 'Run lockfile-only audits during security passes'

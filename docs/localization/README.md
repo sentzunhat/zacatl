@@ -34,6 +34,27 @@ const greeting = i18n.__('greeting');
 console.log(greeting); // "Hello"
 ```
 
+### Locales Resolution
+
+The localization module automatically detects the built-in locales directory at runtime. Resolution checks:
+
+1. **Development**: Locales in `src/localization/locales/` (when running via `tsx`)
+2. **Built Packages**: Locales in `build-src-esm/localization/locales/` or `build-src-cjs/localization/locales/`
+3. **Installed Packages**: Locales in `node_modules/@sentzunhat/zacatl/build-src-esm/localization/locales/` (ESM) or `build-src-cjs/localization/locales/` (CommonJS)
+4. **Project Source**: Fallback to `src/localization/locales/` in the current working directory
+
+If automatic detection fails (rare cases), explicitly configure `builtInLocalesDir`:
+
+```typescript
+configureI18nNode({
+  builtInLocalesDir: './node_modules/@sentzunhat/zacatl/build-src-esm/localization/locales',
+  locales: {
+    default: 'en',
+    supported: ['en', 'es'],
+  },
+});
+```
+
 ## Translation Files
 
 Create translation files in `src/localization/locales/`:

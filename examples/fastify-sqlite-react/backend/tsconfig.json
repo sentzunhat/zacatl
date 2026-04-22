@@ -5,14 +5,18 @@
     "lib": ["ES2022"],
     "moduleResolution": "bundler",
     "outDir": "dist",
-    "baseUrl": "src",
+    "baseUrl": ".",
     "strict": true,
     "skipLibCheck": true,
     "resolveJsonModule": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "declaration": true,
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "paths": {
+      "@sentzunhat/zacatl": ["../../../build-src-esm/index.d.ts"],
+      "@sentzunhat/zacatl/*": ["../../../build-src-esm/*"]
+    }
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"]

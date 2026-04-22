@@ -1,27 +1,31 @@
-# Fastify + MongoDB Frontend
+# Fastify + MongoDB React Frontend
 
-This React (Vite) frontend talks to the Fastify + MongoDB example and uses Tailwind CSS.
+Minimal React + Vite frontend for the Fastify + MongoDB + React example.
 
-## Quick start
+## Quick Start
 
-1. Start the backend (from the repository root):
+```bash
+npm install
+npm run dev
+```
 
-   - `cd examples/fastify-mongodb-react`
-   - `npm install`
-   - `npm run dev`
-
-2. Start the frontend (from this folder):
-   - `npm install`
-   - `npm run dev`
-
-The dev server proxies `/greetings` to `http://localhost:8082`.
+- Frontend: http://localhost:5002
+- Backend proxy target: http://localhost:8082
 
 ## Environment
 
-If you want to point at a different backend, set:
+- Uses Vite dev proxy for /api and /greetings routes.
+- See [vite.config.ts](./vite.config.ts) for current proxy and port settings.
 
-```
-VITE_API_URL=http://localhost:8082
-```
+## Documentation
 
-When `VITE_API_URL` is unset, the frontend uses relative `/greetings` paths (or `/api/*` routes) and relies on the Vite proxy to http://localhost:8082.
+- Example Root: [../README.md](../README.md)
+- Examples Catalog: [../../README.md](../../README.md)
+- Start Here: [../../../START_HERE.md](../../../START_HERE.md)
+- Service Module: [../../../docs/service/README.md](../../../docs/service/README.md)
+
+## Next Steps
+
+- Start from [Fastify + SQLite + React](../../fastify-sqlite-react/) as baseline
+- Validate MongoDB flow against backend and proxy target
+- Update proxy/API wiring in vite.config.ts when changing backend ports

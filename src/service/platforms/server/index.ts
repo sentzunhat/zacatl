@@ -7,7 +7,6 @@ export {
   ServerVendor,
   ServerType,
   DatabaseVendor,
-  type ApiServerConfig,
   type ApiServerPort,
   type PageServerPort,
   type ProxyConfig,

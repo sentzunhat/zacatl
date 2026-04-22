@@ -7,11 +7,8 @@ export interface HttpServerConfig {
   type: ServerType;
   vendor: ServerVendor;
   instance: unknown;
+  apiPrefix?: string;
   gateway?: GatewayService;
-}
-
-export interface ApiServerConfig {
-  httpServer: HttpServerConfig;
 }
 
 export interface PageServerConfig {

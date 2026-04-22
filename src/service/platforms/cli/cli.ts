@@ -26,7 +26,7 @@ export class CLI {
       message: `CLI entrypoint registration for '${this.name}' is not yet implemented`,
       reason:
         'ServiceType.CLI command registration and routing are not implemented. ' +
-        'This feature is planned for v0.1.0. Use ServiceType.SERVER for HTTP-based services.',
+        'Keep ServiceType.CLI for contract shape only and use ServiceType.SERVER for runnable services.',
       component: 'CLI',
       operation: 'registerEntrypoints',
       metadata: { name: this.name, version: this.version },
@@ -38,7 +38,7 @@ export class CLI {
       message: `CLI platform '${this.name}' is not yet implemented`,
       reason:
         'ServiceType.CLI is declared but CLI command routing and argument parsing are not implemented. ' +
-        'This feature is planned for v0.1.0. Use ServiceType.SERVER for HTTP-based services.',
+        'Keep ServiceType.CLI for contract shape only and use ServiceType.SERVER for runnable services.',
       component: 'CLI',
       operation: 'start',
       metadata: { name: this.name, version: this.version },

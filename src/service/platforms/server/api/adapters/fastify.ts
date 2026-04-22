@@ -10,11 +10,23 @@ import type { ApiServerPort, ProxyConfig } from '../port';
  * FastifyApiAdapter - Implements ApiServerPort for Fastify framework
  */
 export class FastifyApiAdapter implements ApiServerPort {
-  constructor(private readonly server: FastifyInstance) {}
+  constructor(private readonly server: FastifyInstance, private readonly apiPrefix = '') {}
+
+  private getRouteUrl(url: string): string {
+    if (this.apiPrefix === '' || this.apiPrefix === '/') {
+      return url;
+    }
+
+    const normalizedPrefix = this.apiPrefix.startsWith('/') ? this.apiPrefix : `/${this.apiPrefix}`;
+
+    const normalizedUrl = url.startsWith('/') ? url : `/${url}`;
+
+    return `${normalizedPrefix}${normalizedUrl}`;
+  }
 
   registerRoute(handler: RouteHandler): void {
     this.server.withTypeProvider<ZodTypeProvider>().route({
-      url: handler.url,
+      url: this.getRouteUrl(handler.url),
       method: handler.method,
       schema: handler.schema,
       handler: handler.execute.bind(handler),

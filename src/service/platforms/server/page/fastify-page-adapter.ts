@@ -15,13 +15,18 @@ export class FastifyPageAdapter implements PageServerPort {
 
   registerSpaFallback(apiPrefix: string, staticDir: string): void {
     this.server.setNotFoundHandler(async (request, reply) => {
-      if (request.raw.url != null && request.raw.url.startsWith(apiPrefix)) {
+      const url = request.raw.url ?? '';
+
+      if (url.startsWith(apiPrefix)) {
         reply.status(404).send({
           code: 404,
           error: 'Not Found',
           message: `Route ${request.method}:${request.url} not found`,
         });
+      } else if (url.startsWith('/assets/')) {
+        reply.sendFile(url.slice(1), staticDir);
       } else {
+        reply.type('text/html; charset=utf-8');
         reply.sendFile('index.html', staticDir);
       }
     });

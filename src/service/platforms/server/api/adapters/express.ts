@@ -11,11 +11,23 @@ import { applyZodSchema } from '../schema-helper';
  * ExpressApiAdapter - Implements ApiServerPort for Express framework
  */
 export class ExpressApiAdapter implements ApiServerPort {
-  constructor(private readonly server: Express) {}
+  constructor(private readonly server: Express, private readonly apiPrefix = '') {}
+
+  private getRouteUrl(url: string): string {
+    if (this.apiPrefix === '' || this.apiPrefix === '/') {
+      return url;
+    }
+
+    const normalizedPrefix = this.apiPrefix.startsWith('/') ? this.apiPrefix : `/${this.apiPrefix}`;
+
+    const normalizedUrl = url.startsWith('/') ? url : `/${url}`;
+
+    return `${normalizedPrefix}${normalizedUrl}`;
+  }
 
   registerRoute(handler: RouteHandler): void {
     const method = handler.method.toLowerCase();
-    const url = handler.url;
+    const url = this.getRouteUrl(handler.url);
 
     const register = (
       this.server as unknown as Record<

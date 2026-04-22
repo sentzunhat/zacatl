@@ -31,6 +31,17 @@ A catalog of standalone, production-ready server applications demonstrating diff
 - TypeScript with strict type checking
 - 🐳 Docker Compose support (single image = backend + frontend)
 
+### Example Security Maintenance
+
+After dependency updates in any example, refresh lockfiles and run lockfile-only
+audits from each example root to keep vulnerability drift visible and small.
+
+```bash
+cd examples/<example-name>
+npm install --package-lock-only
+npm audit --package-lock-only
+```
+
 ---
 
 ## 📦 Backend Examples - Production Patterns
@@ -54,7 +65,7 @@ fastify-sqlite-react/
 └── README.md
 ```
 
-**[platform-express/](./platform-express/README.md)** - Express.js backend examples
+**Express examples** - Express.js backend examples
 
 ##### express-sqlite-react
 
@@ -115,7 +126,9 @@ cd express-postgres-react && npm install && npm run dev
 
 #### Platform: Fastify ⭐ RECOMMENDED
 
-**[fastify-_-_](./fastify-sqlite-react/)** - Fastify backend examples with React/Svelte frontends
+**Release baseline (minimal): [fastify-sqlite-react](./fastify-sqlite-react/)**
+
+Use this as the primary example for release cleanup and onboarding. It has zero external database setup and the fastest path to a working full-stack flow.
 
 **Why Fastify?** Fastest startup, native TypeScript, excellent performance, full-stack examples.
 
@@ -262,19 +275,19 @@ Response: { "id": "uuid", "deleted": true }
 Pick one and run it:
 
 ```bash
-# Option 1: Express + SQLite (instant setup)
-cd express-sqlite-react && npm install && npm run dev
-
-# Option 2: Express + MongoDB (with Docker)
-docker run -d -p 27017:27017 --name mongo mongo:latest
-cd express-mongodb-react && npm install && npm run dev
-
-# Option 3: Fastify + SQLite (full-stack with React)
+# Option 1: Fastify + SQLite + React (recommended minimal baseline)
 cd fastify-sqlite-react && npm install && npm run dev
 
-# Option 4: Fastify + MongoDB (full-stack with React)
+# Option 2: Fastify + MongoDB + React (scale-up path)
 docker run -d -p 27017:27017 --name mongo mongo:latest
 cd fastify-mongodb-react && npm install && npm run dev
+
+# Option 3: Express + SQLite + React
+cd express-sqlite-react && npm install && npm run dev
+
+# Option 4: Express + MongoDB + React
+docker run -d -p 27017:27017 --name mongo mongo:latest
+cd express-mongodb-react && npm install && npm run dev
 ```
 
 ---

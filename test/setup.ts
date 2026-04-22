@@ -14,7 +14,7 @@ const fallback = (): {
   subscribe: (): { unsubscribe: () => void } => ({ unsubscribe: (): void => {} }),
 });
 
-function ensureTracingChannelOn(obj: unknown): void {
+const ensureTracingChannelOn = (obj: unknown): void => {
   if (!obj || typeof obj !== 'object') return;
   const target = obj as Record<string, unknown>;
   try {
@@ -47,7 +47,7 @@ function ensureTracingChannelOn(obj: unknown): void {
     // If all attempts fail, we cannot make it callable — tests will try to
     // proceed but some libraries may still call it. Best effort only.
   }
-}
+};
 
 // Patch ESM namespace view
 ensureTracingChannelOn(diagnostics);

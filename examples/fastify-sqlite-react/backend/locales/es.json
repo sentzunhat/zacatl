@@ -1,0 +1,7 @@
+{
+  "GREETINGS": {
+    "CREATED": "Saludo creado exitosamente",
+    "DELETED": "Saludo eliminado exitosamente",
+    "NOT_FOUND": "Saludo no encontrado"
+  }
+}

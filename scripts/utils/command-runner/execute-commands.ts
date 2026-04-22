@@ -46,7 +46,7 @@ export const executeCommands = (
         active++;
 
         // capturedIndex is always < commands.length (guarded by the while condition above)
-         
+
         runCommand(commands[capturedIndex]!, policy)
           .then((result) => {
             results[capturedIndex] = result;

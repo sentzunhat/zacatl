@@ -33,6 +33,7 @@ export enum ServiceType {
  * - `locales.default` — default locale code (e.g. "en").
  * - `locales.supported` — list of supported locale codes.
  * - `locales.directories` — directories to load locale files from.
+ * - `builtInLocalesDir` — override the built-in locale directory lookup.
  * - `objectNotation` — enable nested key access using dot notation.
  * - `overrideBuiltIn` — allow overriding built-in translations.
  */
@@ -42,6 +43,7 @@ export interface ConfigLocalization {
     supported?: string[];
     directories?: string[];
   };
+  builtInLocalesDir?: string;
   objectNotation?: boolean;
   overrideBuiltIn?: boolean;
 }

@@ -3,7 +3,7 @@ services:
     image: mongo:latest
     container_name: express-mongodb-db
     ports:
-      - '27017:27017'
+      - '27018:27017'
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: root
@@ -21,7 +21,7 @@ services:
 
   backend:
     build:
-      context: ../../..
+      context: ../..
       dockerfile: examples/express-mongodb-react/Dockerfile
     image: zacatl-express-mongodb
     container_name: express-mongodb-backend
@@ -38,7 +38,7 @@ services:
       test:
         [
           'CMD',
-          'node',
+          '/nodejs/bin/node',
           '-e',
           "fetch('http://localhost:8182/greetings').catch(() => process.exit(1))",
         ]

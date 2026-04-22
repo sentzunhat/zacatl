@@ -47,12 +47,15 @@ export const loadStaticCatalog = (input: LoadStaticCatalogInput): I18nStaticCata
  *
  * Works in:
  * - Development via `tsx` (src/..)
- * - Compiled output (build/..) where package ships `src/` in npm
+ * - Compiled output (build/..) where package ships `src/` in npm (both CJS and ESM)
  *
  * @throws {Error} If the locales directory cannot be found
  */
 const getHere = (): string => {
+  // CommonJS: __dirname is available
   if (typeof __dirname !== 'undefined') return __dirname;
+
+  // Fallback: Try to extract from process.argv[1]
   if (
     typeof process !== 'undefined' &&
     Array.isArray(process.argv) &&
@@ -61,6 +64,7 @@ const getHere = (): string => {
   ) {
     return path.dirname(process.argv[1]);
   }
+
   return process.cwd();
 };
 
@@ -70,6 +74,15 @@ export const resolveBuiltInLocalesDir = (): string => {
   const candidates = [
     path.resolve(here, '../locales'),
     path.resolve(here, '../../../src/localization/locales'),
+    // When installed as a package: look in node_modules/@sentzunhat/zacatl
+    path.resolve(
+      process.cwd(),
+      'node_modules/@sentzunhat/zacatl/build-src-esm/localization/locales',
+    ),
+    path.resolve(
+      process.cwd(),
+      'node_modules/@sentzunhat/zacatl/build-src-cjs/localization/locales',
+    ),
     path.resolve(process.cwd(), 'src/localization/locales'),
   ];
 

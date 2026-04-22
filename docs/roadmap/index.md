@@ -7,7 +7,7 @@
 - ESM import fixing for Node.js compatibility
 - Multi-database support (SQLite, MongoDB, PostgreSQL)
 - Fastify as primary HTTP server framework
-- Express HTTP adapter shipped (`AbstractExpressRouteHandler`, `ExpressApiAdapter`)
+- Express HTTP adapter shipped (`AbstractRouteHandler` for Express handlers, `ExpressApiAdapter`)
 - Hexagonal architecture with dependency injection
 - Docker-ready examples (Fastify + SQLite, Express + SQLite, Express + MongoDB, Express + PostgreSQL)
 
@@ -22,139 +22,50 @@
 
 ### Handler & Response Flexibility
 
-🔧 **Simplified Handler Lifecycle with Sensible Defaults**
+🔧 **Conservative separation of shipped behavior vs planned enhancements**
 
-**Goal**: Simple method overrides with robust default implementations. Users only override what they need.
+This section intentionally distinguishes what is available now from what may be added later.
 
-**Core Pattern**: Keep `execute()` for business logic, add `response()` and `handleError()` with defaults in abstract.
+**Current behavior (shipped):**
 
-**Default Behavior** (in AbstractRouteHandler):
+- Handlers implement `handler(request)` for business logic.
+- `execute(request, reply)` in `AbstractRouteHandler` orchestrates invocation and auto-sends returned values if a reply was not already sent.
+- `handleError(error)` is available and maps Zacatl error types to HTTP status codes.
+- There is no built-in `response()` hook in current `AbstractRouteHandler` implementations.
 
-```typescript
-// Default: returns { ok: true, data } with statusCode 200
-// Can be overridden to return { ok, data, statusCode } for custom status
-protected response(data: T): any {
-  return { ok: true, data, statusCode: 200 };
-}
-
-// Default: handles common error types automatically with correct status codes
-protected handleError(error: Error): { error: string; message: string; statusCode: number } {
-  if (error instanceof NotFoundError) {
-    return { error: 'NOT_FOUND', message: error.message, statusCode: 404 };
-  }
-  if (error instanceof BadRequestError) {
-    return { error: 'BAD_REQUEST', message: error.message, statusCode: 400 };
-  }
-  if (error instanceof ValidationError) {
-    return { error: 'VALIDATION_ERROR', message: error.message, statusCode: 422 };
-  }
-  if (error instanceof UnauthorizedError) {
-    return { error: 'UNAUTHORIZED', message: error.message, statusCode: 401 };
-  }
-  if (error instanceof ForbiddenError) {
-    return { error: 'FORBIDDEN', message: error.message, statusCode: 403 };
-  }
-  return { error: 'INTERNAL_ERROR', message: 'Something went wrong', statusCode: 500 };
-}
-```
-
-**User Handler** (simple case — no overrides needed):
+**Current execution flow (shipped):**
 
 ```typescript
-class UserGetHandler extends GetRouteHandler<User> {
-  async execute(request, reply) {
-    const user = await this.repository.findById(request.params.id);
-    if (!user) throw new NotFoundError('User not found');
-    return user;
-  }
-  // Automatic: response() wraps in { ok: true, data }
-  // Automatic: handleError() handles errors with sensible defaults
-}
-```
-
-**User Handler** (custom envelope and status — override what you need):
-
-```typescript
-class UserCreateHandler extends PostRouteHandler<User, CreateUserInput, User> {
-  async execute(request, reply) {
-    const newUser = await this.repository.create(request.body);
-    return newUser;
-  }
-
-  // Override response shape and status code
-  protected response(user: User) {
-    return {
-      success: true,
-      data: { id: user.id, name: user.name, email: user.email },
-      statusCode: 201, // Created — API respects this status code
-    };
-  }
-
-  // Override error shape with custom status code
-  protected handleError(error: Error) {
-    if (error instanceof BadRequestError) {
-      return {
-        success: false,
-        error: 'INVALID_INPUT',
-        message: error.message,
-        statusCode: 400, // Bad Request
-      };
-    }
-    if (error instanceof ValidationError) {
-      return {
-        success: false,
-        error: 'VALIDATION_FAILED',
-        message: error.message,
-        statusCode: 422, // Unprocessable Entity
-      };
-    }
-    return {
-      success: false,
-      error: 'SERVER_ERROR',
-      statusCode: 500,
-    };
-  }
-}
-```
-
-**Execute() Pipeline** (in AbstractRouteHandler):
-
-The framework orchestrates the handler lifecycle automatically:
-
-```typescript
-// Pseudocode: how execute() manages the flow
 public async execute(request, reply) {
   try {
-    // 1. Call handler's business logic
-    const result = await this.handler(request, reply);
+    const result = await this.handler(request);
 
-    // 2. Format success response via response() override (or default)
-    const { statusCode, ...body } = this.response(result);
+    const replyAlreadySent = 'sent' in reply ? reply.sent : reply.headersSent;
+    if (!replyAlreadySent) {
+      // Fastify: reply.send(result)
+      // Express: reply.send(result)
+    }
 
-    // 3. Send response with correct HTTP status
-    reply.code(statusCode).send(body);
-
+    return result;
   } catch (error) {
-    // 4. Format error response via handleError() override (or default)
-    const { statusCode, ...body } = this.handleError(error);
-
-    // 5. Send error with correct HTTP status
-    reply.code(statusCode).send(body);
-
-    // If step 4 or 5 throws unexpectedly, global error handler catches it
+    const errorResponse = this.handleError(error as Error);
+    // Adapter/handler sends mapped status + body when reply is still open
+    throw error;
   }
 }
 ```
 
-**Three tiers of error handling:**
+**Planned enhancements (proposal):**
 
-1. **Handler `handleError()` override** — per-handler customization, knows business logic
-2. **Handler default `handleError()`** — automatic mapping of Zacatl error types to status codes
-3. **Global error handler** — catches unhandled errors, schema validation failures, serialization errors, fallback for unexpected errors
+- Evaluate an optional `response()` hook for per-handler success envelope/status customization.
+- Keep `handleError()` override support for per-handler error shaping.
+- Preserve compatibility with a global error-handler-first deployment style.
 
-**4. Global Error Handler (Fastify & Express)**
+**Status**: Planned
 
-Handlers simply **throw errors**. A global error handler catches everything and normalizes responses.
+**Global Error Handler Pattern (Fastify & Express)**
+
+Handlers can throw errors; a global error handler can normalize responses consistently.
 
 **Fastify Setup** (real-world example):
 
@@ -254,16 +165,6 @@ export class UserGetHandler extends GetRouteHandler<User> {
 
     return user;
   }
-
-  // Optional: customize response shape only
-  protected response(user: User) {
-    return {
-      ok: true,
-      data: { id: user.id, name: user.name },
-    };
-  }
-
-  // No need for handleError() — global handler takes care of it
 }
 ```
 
@@ -316,14 +217,13 @@ export function setupExpressServer(app: Express): void {
 }
 ```
 
-**Execution Flow:**
+**Execution Flow (current + global handler option):**
 
-1. Handler `execute()` calls `handler()` → executes business logic
-2. Handler throws error (any error type)
-3. Global error handler **catches it**
-4. Handler's `response()` method wraps the response (optional)
-5. Global handler formats error response based on error type
-6. Reply is sent with correct status code
+1. `execute()` calls `handler()` for business logic.
+2. On success, the adapter auto-sends the returned value when the reply is still open.
+3. On error, `handleError()` maps known error types to a status/body shape.
+4. The handler rethrows, allowing an optional global error handler to add centralized logging/normalization.
+5. Reply is finalized with the mapped status and response body.
 
 **Key Pattern:**
 
@@ -335,7 +235,7 @@ class UserCreateHandler extends PostRouteHandler<User> {
       throw new BadRequestError('Email is required'); // statusCode 400 from CustomError
     }
     const user = await this.repository.create(request.body);
-    return user; // Global or handler response() wraps it
+    return user; // Returned value is auto-sent when reply is still open
   }
 }
 
@@ -352,9 +252,7 @@ class UserCreateHandler extends PostRouteHandler<User> {
 - **Works for both Fastify & Express** — same pattern, same error classes
 - **Testable** — mock errors, verify global handler response
 - **Extensible** — add error tracking (Sentry), metrics, logging in one place
-- **Per-handler customization still possible** — override `response()` if needed, but not necessary
-
-**Status**: Planned
+- **Per-handler customization still possible** — override `handleError()` if needed
 
 ---
 

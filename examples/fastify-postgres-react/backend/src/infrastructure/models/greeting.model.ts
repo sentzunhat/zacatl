@@ -2,10 +2,14 @@
  * Sequelize Model for Greeting Entity
  */
 
-import { DataTypes, Model, type Sequelize } from 'sequelize';
-import type { Greeting } from '../../../domain/entities/greeting';
+import {
+  DataTypes,
+  SequelizeModel,
+  type Sequelize,
+} from '@sentzunhat/zacatl/third-party/sequelize';
+import type { Greeting } from '../../domain/entities/greeting';
 
-export class GreetingModel extends Model implements Omit<Greeting, 'id'> {
+export class GreetingModel extends SequelizeModel implements Omit<Greeting, 'id'> {
   declare id: string;
   declare message: string;
   declare language: string;

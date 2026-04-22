@@ -7,7 +7,7 @@
  * The domain layer only knows about this interface, not the specific implementation.
  */
 
-import type { Greeting, CreateGreetingInput } from '../../../../domain/entities/greeting';
+import type { Greeting, CreateGreetingInput } from '../../../domain/entities/greeting';
 
 export interface GreetingRepositoryPort {
   /**

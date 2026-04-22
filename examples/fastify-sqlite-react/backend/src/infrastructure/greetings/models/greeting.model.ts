@@ -10,7 +10,7 @@ import {
 import type { Greeting } from '../../../domain/entities/greeting';
 
 export class GreetingModel extends Model implements Omit<Greeting, 'id'> {
-  declare id: string;
+  declare id: number;
   declare message: string;
   declare language: string;
   declare createdAt: Date;

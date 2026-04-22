@@ -1,0 +1,30 @@
+public_surface:
+  package: '@sentzunhat/zacatl'
+  modules:
+    - configuration
+    - dependency-injection
+    - service
+    - error
+    - logs
+    - localization
+    - third-party/*
+
+auth_and_runtime_notes:
+  service_type:
+    server: 'runnable'
+    cli: 'declared/stub'
+    desktop: 'declared/stub'
+
+integration_patterns:
+  service_bootstrap:
+    - 'Create Service config with layers + platforms'
+    - 'Use SERVER runtime for production orchestration'
+
+  localization:
+    - 'Built-in locale resolution supports multiple runtime layouts'
+    - 'Project locale directories can override built-ins'
+
+api_quality:
+  guidance:
+    - 'Preserve stable exports'
+    - 'Prefer additive, backward-compatible changes'

@@ -73,10 +73,25 @@ src/third-party/
 
 Zacatl uses these third-party versions:
 
+### Bundled Dependencies (included with Zacatl)
+
 - **tsyringe**: ^4.10.0
 - **zod**: ^4.3.6
-- **mongoose**: ^9.0.0 (peer dependency)
-- **sequelize**: ^6.0.0 (peer dependency)
+- **mongoose**: ^9.0.0
+- **sequelize**: ^6.0.0
+- **express**: ^5.2.1
+- **fastify**: ^5.7.4
+- **better-sqlite3**: ^12.6.2
+- **pino**: ^10.3.0
+- All other utilities (uuid, i18n, js-yaml, http-proxy-middleware, reflect-metadata)
+
+### Not Bundled (install for your database choice)
+
+- **pg**: PostgreSQL driver
+- **mysql2**: MySQL driver
+- **sqlite3**: SQLite driver (optional; Node.js 24+ has built-in sqlite)
+
+All bundled dependencies are automatically available via `@sentzunhat/zacatl/third-party/*` subpath imports. No separate `npm install` is required for any of them.
 
 ## Import Patterns
 

@@ -12,6 +12,7 @@ For a quick setup/health check after prompt or instruction edits, see the [Valid
 - `next-release-plan`
 - `changelog-from-selection`
 - `pre-release-guard`
+- `docs-drift-check`
 
 ## Prompt Authoring Rules
 

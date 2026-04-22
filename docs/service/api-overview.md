@@ -30,8 +30,8 @@ Complete Zacatl API documentation.
 import { Service } from '@sentzunhat/zacatl';
 
 // Subpath imports
-import { BaseRepository, ORMType } from '@sentzunhat/zacatl/infrastructure';
-import { NotFoundError, BadRequestError } from '@sentzunhat/zacatl/errors';
+import { BaseRepository, ORMType } from '@sentzunhat/zacatl';
+import { NotFoundError, BadRequestError } from '@sentzunhat/zacatl/error';
 import { loadJSON, loadYML } from '@sentzunhat/zacatl/configuration';
 
 // Full paths (still supported)

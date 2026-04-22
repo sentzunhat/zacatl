@@ -1,8 +1,8 @@
-import { SequelizeRepository } from '@sentzunhat/zacatl';
+import { SequelizeRepository } from '@sentzunhat/zacatl/service/layers/infrastructure/repositories/sequelize';
 import type { ModelStatic } from '@sentzunhat/zacatl/third-party/sequelize';
 import { singleton } from '@sentzunhat/zacatl/third-party/tsyringe';
 
-import type { CreateGreetingInput, Greeting } from '../../../../domain/entities/greeting';
+import type { CreateGreetingInput, Greeting } from '../../../domain/entities/greeting';
 import { GreetingModel } from '../../models/greeting.model';
 import type { GreetingRepositoryPort } from './port';
 

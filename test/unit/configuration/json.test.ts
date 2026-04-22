@@ -4,7 +4,6 @@ import { join } from 'path';
 
 import { describe, it, expect, afterEach } from 'vitest';
 
-
 import { loadJSON } from '@zacatl/configuration';
 import { BadRequestError, NotFoundError, ValidationError } from '@zacatl/error';
 import { z } from '@zacatl/third-party/zod';

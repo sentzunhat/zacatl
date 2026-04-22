@@ -1,7 +1,7 @@
 {
   "name": "@sentzunhat/zacatl",
   "type": "module",
-  "version": "0.0.52",
+  "version": "0.0.53",
   "packageManager": "npm@11.9.0",
   "repository": {
     "type": "git",
@@ -92,7 +92,7 @@
     "lint:fix:silent": "npm run parallel -- \"npm run lint:src:fix,npm run lint:test:fix,npm run lint:scripts:fix\"",
     "clean:src": "npx tsx scripts/clean/rm.ts src/**/*.js src/**/*.d.ts src/**/*.js.map src/**/*.d.ts.map",
     "clean:build": "npx tsx scripts/clean/rm.ts build-src-esm build-src-cjs build-scripts-esm build-scripts-cjs coverage publish",
-    "clean:examples": "npx tsx scripts/clean/rm.ts examples/platform-express/node_modules examples/platform-express/dist examples/platform-fastify/node_modules examples/platform-fastify/dist",
+    "clean:examples": "npx tsx scripts/clean/rm.ts examples/*/node_modules examples/*/backend/node_modules examples/*/frontend/node_modules examples/*/backend/dist examples/*/frontend/dist examples/*/dist",
     "clean:modules": "npx tsx scripts/clean/rm.ts node_modules",
     "clean:gitignored": "npx tsx scripts/clean/rm.ts --gitignored",
     "clean": "npm run clean:all",
@@ -143,7 +143,7 @@
     "vite": "^7.3.1",
     "vitest": "^4.0.18"
   },
-  "license": "MIT",
+  "license": "Apache-2.0",
   "dependencies": {
     "@fastify/http-proxy": "^11.4.1",
     "@fastify/static": "^9.0.0",
@@ -160,7 +160,6 @@
     "pino-pretty": "^13.1.3",
     "reflect-metadata": "^0.2.2",
     "sequelize": "^6.0.0",
-    "sqlite3": "^5.1.7",
     "tsyringe": "^4.10.0",
     "uuid": "^13.0.0",
     "zod": "^4.3.6"

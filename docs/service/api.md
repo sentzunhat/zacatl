@@ -80,7 +80,8 @@ interface ConfigService {
       };
     };
     domain?: {
-      providers: Array<Constructor<ProviderPort>>;
+      providers?: Array<Constructor<ProviderPort>>;
+      services?: Array<Constructor<ServicePort>>;
     };
     infrastructure?: {
       repositories: Array<Constructor<Repository>>;
@@ -102,11 +103,17 @@ interface ConfigService {
   };
 
   localization?: {
+      run?: {
+        auto?: boolean; // Automatically start the service after configuration
+      };
+
+      localization?: {
     locales?: {
       default?: string;
       supported?: string[];
       directories?: string[];
     };
+    builtInLocalesDir?: string;
     objectNotation?: boolean;
     overrideBuiltIn?: boolean;
   };

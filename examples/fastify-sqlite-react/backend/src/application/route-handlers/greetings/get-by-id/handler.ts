@@ -8,13 +8,13 @@
  */
 
 import { inject, singleton } from '@sentzunhat/zacatl/third-party/tsyringe';
-import { AbstractRouteHandler, type Request } from '@sentzunhat/zacatl/service';
+import { FastifyGetRouteHandler, type Request } from '@sentzunhat/zacatl/service';
 import { GreetingServiceAdapter } from '../../../../domain/greetings/service';
 import { type GreetingIdParams, type GreetingResponse } from '../greeting.schema';
 import { toGreetingResponse } from '../greeting.serializer';
 
 @singleton()
-export class GetGreetingByIdHandler extends AbstractRouteHandler<
+export class GetGreetingByIdHandler extends FastifyGetRouteHandler<
   void,
   void,
   GreetingResponse | null,
@@ -26,7 +26,6 @@ export class GetGreetingByIdHandler extends AbstractRouteHandler<
   ) {
     super({
       url: '/greetings/:id',
-      method: 'GET',
       schema: {},
     });
   }

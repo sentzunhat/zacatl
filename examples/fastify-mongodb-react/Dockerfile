@@ -1,40 +1,40 @@
-# Build from repository root: docker build -f examples/fastify-mongodb-react
+# Build from repository root: docker build -f examples/fastify-mongodb-react/Dockerfile .
+# Prerequisites:
+#   1. npm run build (framework)
+#   2. npm run local:exports (generate exports map)
+#   3. cd examples/fastify-mongodb-react && npm install && npm run build
 FROM node:24-slim AS builder
 WORKDIR /app
 
-# Build framework first
-COPY package.json package-lock.json tsconfig.json ./
-COPY src ./src
-COPY scripts ./scripts
-RUN npm install --ignore-scripts
-RUN npm run build
+COPY build-src-esm ./build-src-esm
+COPY build-src-cjs ./build-src-cjs
+COPY package.json ./
+COPY src/localization/locales ./src/localization/locales
+COPY src/eslint ./src/eslint
 
-# Build example - copy entire structure to maintain file:../../.. reference
-COPY examples/fastify-mongodb-react
-WORKDIR /app/examples/fastify-mongodb-react
+# Copy only the built example (no source compilation in Docker)
+COPY examples/fastify-mongodb-react/backend/dist ./examples/fastify-mongodb-react/backend/dist
+COPY examples/fastify-mongodb-react/frontend/dist ./examples/fastify-mongodb-react/frontend/dist
+COPY examples/fastify-mongodb-react/backend/package.json ./examples/fastify-mongodb-react/backend/package.json
+COPY examples/fastify-mongodb-react/frontend/package.json ./examples/fastify-mongodb-react/frontend/package.json
+COPY examples/fastify-mongodb-react/package.json ./examples/fastify-mongodb-react/package.json
 
-# Install dependencies (this will use file:../../.. which points back to /app)
-RUN npm install --ignore-scripts
-
-# Build the backend and frontend apps
-RUN npm run build
-
-# Prune dev dependencies at the root level (framework dependencies)
+# Install production dependencies only
 WORKDIR /app
-RUN npm prune --omit=dev
+RUN npm install --omit=dev
 
-# Prune example dependencies
 WORKDIR /app/examples/fastify-mongodb-react
+RUN npm install --omit=dev --workspaces
+
+RUN npm prune --omit=dev
+WORKDIR /app
 RUN npm prune --omit=dev
 
 FROM gcr.io/distroless/nodejs24-debian12:nonroot
 WORKDIR /app
 ENV NODE_ENV=production
 
-# Copy example workspace (backend/frontend/node_modules/dist)
 COPY --from=builder /app/examples/fastify-mongodb-react/ ./
-
-# Copy framework files into node_modules/@sentzunhat/zacatl
 COPY --from=builder /app/build-src-esm ./node_modules/@sentzunhat/zacatl/build-src-esm
 COPY --from=builder /app/build-src-cjs ./node_modules/@sentzunhat/zacatl/build-src-cjs
 COPY --from=builder /app/package.json ./node_modules/@sentzunhat/zacatl/package.json

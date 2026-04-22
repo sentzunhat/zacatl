@@ -14,31 +14,33 @@
     "frontend"
   ],
   "scripts": {
+    "stop:dev": "(lsof -ti :8081; lsof -ti :5001; lsof -ti :5002) | sort -u | xargs -n 1 kill -9 2>/dev/null || true",
     "backend:dev": "npm --prefix backend run dev",
     "backend:start": "npm --prefix backend run start",
     "backend:build": "npm --prefix backend run build",
     "frontend:dev": "npm --prefix frontend run dev",
     "frontend:build": "npm --prefix frontend run build",
     "frontend:preview": "npm --prefix frontend run preview",
-    "dev": "npm run backend:dev & npm run frontend:dev",
+    "dev": "npm run stop:dev && (npm run backend:dev & npm run frontend:dev)",
     "build": "npm run backend:build && npm run frontend:build",
     "start": "npm run backend:start",
-    "clean": "rm -rf apps/*/dist apps/*/node_modules"
+    "clean": "rm -rf backend/dist frontend/dist backend/node_modules frontend/node_modules node_modules"
   },
   "dependencies": {
-    "@sentzunhat/zacatl": "file:../../..",
+    "@sentzunhat/zacatl": "file:../../",
     "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "react-dom": "^18.3.1",
+    "sqlite3": "^6.0.1"
   },
   "devDependencies": {
     "@types/node": "^20.11.16",
     "@types/react": "^18.2.66",
     "@types/react-dom": "^18.2.22",
-    "@vitejs/plugin-react": "^4.2.0",
+    "@vitejs/plugin-react": "^6.0.1",
     "autoprefixer": "^10.4.19",
     "postcss": "^8.4.38",
     "tailwindcss": "^3.4.4",
     "typescript": "^5.3.3",
-    "vite": "^5.2.0"
+    "vite": "^8.0.9"
   }
 }

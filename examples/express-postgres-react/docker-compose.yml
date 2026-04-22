@@ -3,7 +3,7 @@ services:
     image: postgres:16
     container_name: express-postgres-db
     ports:
-      - '5432:5432'
+      - '5434:5432'
     environment:
       - POSTGRES_USER=local
       - POSTGRES_PASSWORD=local
@@ -20,7 +20,7 @@ services:
 
   backend:
     build:
-      context: ../../..
+      context: ../..
       dockerfile: examples/express-postgres-react/Dockerfile
     image: zacatl-express-postgres
     container_name: express-postgres-backend
@@ -37,7 +37,7 @@ services:
       test:
         [
           'CMD',
-          'node',
+          '/nodejs/bin/node',
           '-e',
           "fetch('http://localhost:8183/greetings').catch(() => process.exit(1))",
         ]

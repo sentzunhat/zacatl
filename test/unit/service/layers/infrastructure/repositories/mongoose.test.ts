@@ -268,7 +268,11 @@ describe('MongooseRepository', () => {
 
       await repository.update(created.id, { name: 'Michelle' });
 
-      expect(spyUpdate).toHaveBeenCalledWith(created.id, { name: 'Michelle' }, { new: true });
+      expect(spyUpdate).toHaveBeenCalledWith(
+        created.id,
+        { name: 'Michelle' },
+        { returnDocument: 'after' },
+      );
     });
 
     it('should return lean document with updated timestamp', async () => {

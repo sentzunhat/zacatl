@@ -3,6 +3,7 @@ name: 'pre-release-guard'
 description: 'Validate version + changelog consistency and block already-published npm versions'
 argument-hint: 'version=<x.y.z>'
 agent: 'agent'
+tools: ['search', 'terminal']
 ---
 
 Run a pre-release guard for Zacatl and report pass/fail checks.

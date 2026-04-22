@@ -1,40 +1,32 @@
-# Build from repository root: docker build -f examples/fastify-postgres-react
+# Build from repository root: docker build -f examples/fastify-postgres-react/Dockerfile .
+# Note: Requires `npm run build` to be run locally first
 FROM node:24-slim AS builder
 WORKDIR /app
 
-# Build framework first
-COPY package.json package-lock.json tsconfig.json ./
-COPY src ./src
-COPY scripts ./scripts
-RUN npm install --ignore-scripts
-RUN npm run build
+COPY build-src-esm ./build-src-esm
+COPY build-src-cjs ./build-src-cjs
+COPY package.json package-lock.json ./
+COPY src/localization/locales ./src/localization/locales
+COPY src/eslint ./src/eslint
+COPY scripts/build/fix-esm.ts ./scripts/build/fix-esm.ts
+COPY scripts/utils ./scripts/utils
 
-# Build example - copy entire structure to maintain file:../../.. reference
-COPY examples/fastify-postgres-react
+RUN npm install --omit=dev
+
+COPY examples/fastify-postgres-react ./examples/fastify-postgres-react
 WORKDIR /app/examples/fastify-postgres-react
+RUN npm install && npm run build
 
-# Install dependencies (this will use file:../../.. which points back to /app)
-RUN npm install --ignore-scripts
-
-# Build the backend and frontend apps
-RUN npm run build
-
-# Prune dev dependencies at the root level (framework dependencies)
-WORKDIR /app
 RUN npm prune --omit=dev
-
-# Prune example dependencies
-WORKDIR /app/examples/fastify-postgres-react
+WORKDIR /app
 RUN npm prune --omit=dev
 
 FROM gcr.io/distroless/nodejs24-debian12:nonroot
 WORKDIR /app
 ENV NODE_ENV=production
 
-# Copy example workspace (backend/frontend/node_modules/dist)
 COPY --from=builder /app/examples/fastify-postgres-react/ ./
-
-# Copy framework files into node_modules/@sentzunhat/zacatl
+COPY --from=builder /app/src/localization/locales ./src/localization/locales
 COPY --from=builder /app/build-src-esm ./node_modules/@sentzunhat/zacatl/build-src-esm
 COPY --from=builder /app/build-src-cjs ./node_modules/@sentzunhat/zacatl/build-src-cjs
 COPY --from=builder /app/package.json ./node_modules/@sentzunhat/zacatl/package.json

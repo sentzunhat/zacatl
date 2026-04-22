@@ -1,0 +1,28 @@
+architecture_patterns:
+  layered_design:
+    why:
+      - 'Clear separation of application/domain/infrastructure'
+      - 'Improves testability and composability'
+
+  adapter_strategy:
+    why:
+      - 'Supports multiple server and database vendors'
+      - 'Keeps business logic independent from framework details'
+
+  dependency_injection:
+    why:
+      - 'Enables explicit wiring and swappable implementations'
+      - 'Reduces coupling between layers'
+
+operational_patterns:
+  dual_build_outputs:
+    why:
+      - 'Ship both ESM and CJS consumers'
+
+  docs_first_changes:
+    why:
+      - 'Keeps architecture and public behavior discoverable'
+
+  examples_as_contract:
+    why:
+      - 'Examples serve as executable integration references'

@@ -35,19 +35,22 @@ const service = new Service({
 
 ### `services` - Service Classes
 
-Use `services` for classes that represent executable services or workers:
+Use `services` for classes that represent executable behaviors or background
+workflows as a semantic grouping in the domain layer:
 
 ```typescript
-import { Service } from '@sentzunhat/zacatl';
+import { registerDependencies, resolveDependencies } from '@sentzunhat/zacatl/dependency-injection';
+import { singleton } from '@sentzunhat/zacatl/third-party/tsyringe';
 
-const service = new Service({
-  type: ServiceType.CLI,
-  layers: {
-    domain: {
-      services: [CLIService, MigrationService, WorkerService],
-    },
-  },
-});
+@singleton()
+class MigrationService {}
+
+@singleton()
+class WorkerService {}
+
+registerDependencies([MigrationService, WorkerService]);
+
+const [migration, worker] = resolveDependencies([MigrationService, WorkerService]);
 ```
 
 **When to use `services`:**
@@ -56,6 +59,10 @@ const service = new Service({
 - Background workers or job processors
 - Migration scripts
 - Standalone service classes with lifecycle methods
+
+**Runtime note:** Naming a class under `layers.domain.services` does not imply
+`ServiceType.CLI` runtime support. CLI and Desktop Service runtimes are still
+stubbed.
 
 ### Both Are Valid
 

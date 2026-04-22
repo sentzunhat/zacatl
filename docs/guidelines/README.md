@@ -12,6 +12,11 @@ This folder contains reusable coding standards and best practices extracted from
 6. **[git-workflow.md](./git-workflow.md)** — Commit message formats, branch naming, versioning strategy, release procedure
 7. **[framework-overview.md](./framework-overview.md)** — High-level framework map and module index
 
+## Companion Context Pack
+
+For fast onboarding context (What / How / Why + API/Security/Performance), see
+**[docs/context/README.md](../context/README.md)**.
+
 ## Quick Reference
 
 ### Language & Tools

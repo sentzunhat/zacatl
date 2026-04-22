@@ -48,12 +48,21 @@ npm run dev
 
 ## Compare with React Version
 
-See [with-sqlite-react](../with-sqlite-react/) for the same example using React instead of Svelte. The backend is identical - only the frontend framework differs.
+See [express-sqlite-react](../express-sqlite-react/) for the same example using React instead of Svelte. The backend is identical - only the frontend framework differs.
 
 ## Documentation
 
-- **[Main Examples README](../../README.md)** - All available examples
-- **[Framework Docs](../../../docs/)** - Full Zacatl documentation
+- **Examples Catalog**: [../README.md](../README.md)
+- **Start Here**: [../../START_HERE.md](../../START_HERE.md)
+- **Framework Overview**: [../../docs/guidelines/framework-overview.md](../../docs/guidelines/framework-overview.md)
+- **Framework Database Guide**: [../../docs/third-party/orm/database-setup.md](../../docs/third-party/orm/database-setup.md)
+- **Service Module**: [../../docs/service/README.md](../../docs/service/README.md)
+
+## Next Steps
+
+- Start from [Fastify + SQLite + React](../fastify-sqlite-react/) as the minimal baseline
+- Compare this variant with [Express + SQLite + React](../express-sqlite-react/)
+- Use the [service module docs](../../docs/service/README.md) when extending platform wiring
 
 ## Why Svelte + SQLite?
 

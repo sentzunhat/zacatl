@@ -18,10 +18,10 @@ describe('CLI.start() — not implemented', () => {
     expect((err as Error).message).toMatch(/deploy-cli/);
   });
 
-  it('error message hints at v0.1.0 timeline', async () => {
+  it('error reason guides users to SERVER runtime', async () => {
     const cli = new CLI({ name: 'tool', version: '1.0.0' });
     const err = await cli.start().catch((e) => e);
-    expect((err as any).reason).toMatch(/v0\.1\.0/);
+    expect((err as any).reason).toMatch(/ServiceType\.SERVER/);
   });
 
   it('stop() resolves without throwing', async () => {

@@ -20,9 +20,9 @@ All HTTP frameworks, databases, and utilities used by the server platform are **
 
 **Key Exports:**
 
-- HTTP Frameworks: `@sentzunhat/zacatl/third-party/express`, `./fastify`
-- Databases: `@sentzunhat/zacatl/third-party/mongoose`, `./sequelize`
-- Utilities: `./zod`, `./uuid`, `./pino`, and more
+- HTTP Frameworks: `@sentzunhat/zacatl/third-party/express`, `@sentzunhat/zacatl/third-party/fastify`
+- Databases: `@sentzunhat/zacatl/third-party/mongoose`, `@sentzunhat/zacatl/third-party/sequelize`
+- Utilities: `@sentzunhat/zacatl/third-party/zod`, `@sentzunhat/zacatl/third-party/uuid`, `@sentzunhat/zacatl/third-party/pino`, and more
 
 ---
 
@@ -64,6 +64,7 @@ type HttpServerConfig = {
   vendor: ServerVendor; // "FASTIFY" | "EXPRESS"
   instance: unknown; // FastifyInstance | Express
   gateway?: GatewayService; // Required if type is GATEWAY
+  apiPrefix?: string; // Optional base path prefix for all API routes (e.g. "/api")
 };
 ```
 
@@ -72,6 +73,7 @@ type HttpServerConfig = {
 - `type` - Server type: `SERVER` (standard REST API) or `GATEWAY` (reverse proxy)
 - `vendor` - HTTP framework: `FASTIFY` or `EXPRESS`
 - `instance` - The Fastify or Express instance (create before passing to config)
+- `apiPrefix` - Optional base path prepended to all API routes (e.g. `"/api"`)
 - `gateway` - Gateway configuration with proxy routes (required when `type` is `GATEWAY`)
 
 ---
@@ -116,7 +118,7 @@ type DatabaseConfig = {
 - `vendor` - Database vendor: `MONGOOSE`, `SEQUELIZE`, or `SQLITE`
 - `instance` - The Mongoose or Sequelize instance. **Not required for `SQLITE`** — the adapter opens the file internally.
 - `connectionString` - For SQLite: a file path (e.g. `'app.db'`) or `':memory:'`. For others: the full connection URI.
-- `onDatabaseConnected` - Optional callback invoked after successful connection (use for model initialization, syncing, etc.)
+- `onDatabaseConnected` - Optional callback invoked after successful connection for `MONGOOSE` and `SEQUELIZE` adapters (use for model initialization, syncing, etc.). It is not currently invoked by the `SQLITE` adapter.
 
 ---
 
@@ -275,7 +277,7 @@ interface DatabaseServerPort {
 REST API adapter for Fastify.
 
 ```typescript
-import { FastifyApiAdapter } from '@sentzunhat/zacatl/service/platforms/server/adapters';
+import { FastifyApiAdapter } from '@sentzunhat/zacatl/service/platforms/server/api/adapters';
 ```
 
 #### `FastifyPageAdapter`
@@ -283,7 +285,7 @@ import { FastifyApiAdapter } from '@sentzunhat/zacatl/service/platforms/server/a
 Page server adapter for Fastify.
 
 ```typescript
-import { FastifyPageAdapter } from '@sentzunhat/zacatl/service/platforms/server/adapters';
+import { FastifyPageAdapter } from '@sentzunhat/zacatl/service/platforms/server/page/adapters';
 ```
 
 ---
@@ -295,7 +297,7 @@ import { FastifyPageAdapter } from '@sentzunhat/zacatl/service/platforms/server/
 REST API adapter for Express.
 
 ```typescript
-import { ExpressApiAdapter } from '@sentzunhat/zacatl/service/platforms/server/adapters';
+import { ExpressApiAdapter } from '@sentzunhat/zacatl/service/platforms/server/api/adapters';
 ```
 
 #### `ExpressPageAdapter`
@@ -303,7 +305,7 @@ import { ExpressApiAdapter } from '@sentzunhat/zacatl/service/platforms/server/a
 Page server adapter for Express.
 
 ```typescript
-import { ExpressPageAdapter } from '@sentzunhat/zacatl/service/platforms/server/adapters';
+import { ExpressPageAdapter } from '@sentzunhat/zacatl/service/platforms/server/page/adapters';
 ```
 
 ---
@@ -713,8 +715,8 @@ When adding new server platform behavior, add unit tests in `test/unit/` alongsi
 - [QA & Testing Guide](../roadmap/qa-testing-guide.md) - Testing patterns and known issues
 - [Express Integration](./express.md) - Express.js framework guide
 - [Examples](../../examples/) - Real-world examples
-- [Platform Fastify Examples](../../examples/platform-fastify/)
-- [Platform Express Examples](../../examples/platform-express/)
+- [Fastify SQLite React Example](../../examples/fastify-sqlite-react/)
+- [Express SQLite React Example](../../examples/express-sqlite-react/)
 
 ---
 

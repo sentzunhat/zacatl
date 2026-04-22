@@ -1,0 +1,7 @@
+{
+  "GREETINGS": {
+    "CREATED": "Greeting created successfully",
+    "DELETED": "Greeting deleted successfully",
+    "NOT_FOUND": "Greeting not found"
+  }
+}

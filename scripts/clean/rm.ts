@@ -16,6 +16,8 @@ import { glob } from 'fs/promises';
 import { resolve, relative } from 'path';
 
 const root = process.cwd();
+const RM_MAX_RETRIES = 10;
+const RM_RETRY_DELAY_MS = 100;
 
 const safeRm = (abs: string): void => {
   const rel = relative(root, abs);
@@ -25,7 +27,15 @@ const safeRm = (abs: string): void => {
     return;
   }
   if (!existsSync(abs)) return;
-  rmSync(abs, { recursive: true, force: true });
+
+  // Retry transient filesystem races that can surface on macOS when removing
+  // large directories like node_modules.
+  rmSync(abs, {
+    recursive: true,
+    force: true,
+    maxRetries: RM_MAX_RETRIES,
+    retryDelay: RM_RETRY_DELAY_MS,
+  });
   // eslint-disable-next-line no-console
   console.log('removed', rel);
 };
@@ -46,7 +56,9 @@ const cleanGitignored = (): void => {
   if (result.status !== 0) {
     // eslint-disable-next-line no-console
     console.warn(
-      `git ls-files warning (skipping gitignored cleanup): exited with code ${result.status}${result.stderr ? ': ' + result.stderr : ''}`,
+      `git ls-files warning (skipping gitignored cleanup): exited with code ${result.status}${
+        result.stderr ? ': ' + result.stderr : ''
+      }`,
     );
     return;
   }

@@ -46,6 +46,8 @@ export default [
       'max-classes-per-file': ['warn', 1],
       // Scripts may use default exports for CJS compatibility
       'import/no-default-export': 'warn',
+      // Prefer arrow-style function expressions over function declarations
+      'func-style': ['warn', 'expression', { allowArrowFunctions: true }],
       // Scripts can import devDependencies
       'import/no-extraneous-dependencies': [
         'error',

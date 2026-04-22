@@ -1,0 +1,32 @@
+project:
+  name: 'Zacatl Framework'
+  purpose: 'TypeScript framework for layered service applications'
+  runtime: 'Node.js 24.14.0+'
+
+architecture:
+  pattern: 'Layered / hexagonal'
+  primary_modules:
+    - configuration
+    - dependency-injection
+    - service
+    - error
+    - logs
+    - localization
+    - third-party
+    - utils
+
+repository_shape:
+  source: 'src/'
+  tests: 'test/'
+  docs: 'docs/'
+  examples: 'examples/'
+  scripts: 'scripts/'
+
+service_platform_status:
+  server: 'stable'
+  cli: 'declared/stub'
+  desktop: 'declared/stub'
+
+examples_baseline:
+  recommended_start: 'examples/fastify-sqlite-react'
+  goal: 'Keep examples aligned on API shape and dependency hygiene'

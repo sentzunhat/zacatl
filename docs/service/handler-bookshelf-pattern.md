@@ -16,7 +16,7 @@ import {
   DeleteRouteHandler,
   PatchRouteHandler,
   PutRouteHandler,
-} from '@sentzunhat/zacatl/handlers/fastify';
+} from '@sentzunhat/zacatl/service/layers/application/entry-points/rest/fastify/handlers';
 ```
 
 ### Express Handlers
@@ -29,7 +29,7 @@ import {
   DeleteRouteHandler,
   PatchRouteHandler,
   PutRouteHandler,
-} from '@sentzunhat/zacatl/handlers/express';
+} from '@sentzunhat/zacatl/service/layers/application/entry-points/rest/express/handlers';
 ```
 
 ## HTTP Method Coverage
@@ -50,7 +50,7 @@ Specify the HTTP method explicitly in the constructor:
 
 ```typescript
 // Fastify
-import { AbstractRouteHandler } from '@sentzunhat/zacatl/handlers/fastify';
+import { AbstractRouteHandler } from '@sentzunhat/zacatl/service/layers/application/entry-points/rest/fastify/handlers';
 
 export class MyHandler extends AbstractRouteHandler<TBody, TQuery, TResponse> {
   constructor() {
@@ -65,7 +65,7 @@ export class MyHandler extends AbstractRouteHandler<TBody, TQuery, TResponse> {
 
 ```typescript
 // Express
-import { AbstractRouteHandler } from '@sentzunhat/zacatl/handlers/express';
+import { AbstractRouteHandler } from '@sentzunhat/zacatl/service/layers/application/entry-points/rest/express/handlers';
 
 export class MyHandler extends AbstractRouteHandler<TBody, TQuery, TResponse> {
   constructor() {
@@ -84,7 +84,7 @@ The HTTP method is automatically set based on the class:
 
 ```typescript
 // Fastify
-import { GetRouteHandler } from '@sentzunhat/zacatl/handlers/fastify';
+import { GetRouteHandler } from '@sentzunhat/zacatl/service/layers/application/entry-points/rest/fastify/handlers';
 
 export class GetUserHandler extends GetRouteHandler<void, void, UserResponse> {
   constructor() {
@@ -98,7 +98,7 @@ export class GetUserHandler extends GetRouteHandler<void, void, UserResponse> {
 
 ```typescript
 // Express
-import { PostRouteHandler } from '@sentzunhat/zacatl/handlers/express';
+import { PostRouteHandler } from '@sentzunhat/zacatl/service/layers/application/entry-points/rest/express/handlers';
 
 export class CreateUserHandler extends PostRouteHandler<CreateUserBody, void, UserResponse> {
   constructor() {
@@ -131,10 +131,10 @@ Switching frameworks is as simple as changing the import path:
 
 ```typescript
 // Before (Fastify)
-import { AbstractRouteHandler } from '@sentzunhat/zacatl/handlers/fastify';
+import { AbstractRouteHandler } from '@sentzunhat/zacatl/service/layers/application/entry-points/rest/fastify/handlers';
 
 // After (Express) - same implementation!
-import { AbstractRouteHandler } from '@sentzunhat/zacatl/handlers/express';
+import { AbstractRouteHandler } from '@sentzunhat/zacatl/service/layers/application/entry-points/rest/express/handlers';
 ```
 
 ## Examples

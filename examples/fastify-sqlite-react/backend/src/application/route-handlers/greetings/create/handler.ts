@@ -9,7 +9,7 @@
  */
 
 import { inject, singleton } from '@sentzunhat/zacatl/third-party/tsyringe';
-import { AbstractRouteHandler, type Request } from '@sentzunhat/zacatl/service';
+import { FastifyPostRouteHandler, type Request } from '@sentzunhat/zacatl/service';
 import { GreetingServiceAdapter } from '../../../../domain/greetings/service';
 import {
   CreateGreetingBodySchema,
@@ -19,7 +19,7 @@ import {
 import { toGreetingResponse } from '../greeting.serializer';
 
 @singleton()
-export class CreateGreetingHandler extends AbstractRouteHandler<
+export class CreateGreetingHandler extends FastifyPostRouteHandler<
   CreateGreetingBody,
   void,
   GreetingResponse
@@ -30,7 +30,6 @@ export class CreateGreetingHandler extends AbstractRouteHandler<
   ) {
     super({
       url: '/greetings',
-      method: 'POST',
       schema: {
         body: CreateGreetingBodySchema,
       },

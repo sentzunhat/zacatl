@@ -1,55 +1,47 @@
-# Zacatl Fastify + SQLite Backend Example
+# Zacatl Fastify + SQLite Backend
 
-Simple, clean Node.js ESM backend using the Zacatl framework.
+Minimal Fastify backend for the Fastify + SQLite + React example.
 
 ## Quick Start
 
 ```bash
-# Development (hot reload)
+npm install
 npm run dev
-
-# Production build
-npm run build
-
-# Run production build
-npm start
 ```
 
-## Build Process
+- API: http://localhost:8081
+- Default DB: sqlite:<example-root>/database.sqlite
+- Project locales: `backend/locales/*.json`
 
-The build is simple and transparent:
+## Environment
 
-1. **TypeScript compilation**: `tsc` compiles your code
-2. **ESM fix**: Framework's built-in `zacatl-fix-esm` adds `.js` extensions for Node.js ESM compatibility
+- PORT (default: 8081)
+- DATABASE_URL (default: sqlite:<example-root>/database.sqlite)
 
-That's it! No bundlers, no complex tooling. The ESM fix script is included in the framework package - no copying scripts needed!
+## Localization
 
-## What's Happening Behind the Scenes
+- Backend locale files live in `backend/locales/`
+- Zacatl built-in locales still come from the library package
+- Add project-specific overrides by creating or updating `en.json`, `es.json`, or new language files in this folder
 
-Node.js ESM requires explicit file extensions in imports:
+## Hook Handler Example
 
-- ❌ `import { thing } from "./file"`
-- ✅ `import { thing } from "./file.js"`
+- Simple session hook example: `src/application/hook-handlers/session/handler.ts`
+- Registration list: `src/application/hook-handlers/hooks.ts`
+- Wired in service config under `entryPoints.rest.hooks`
+- Current behavior: adds `x-session-id` response header using Fastify request id
 
-The framework's `zacatl-fix-esm` utility automatically adds these extensions after TypeScript compilation, so you can write clean TypeScript without manual `.js` extensions everywhere.
+## Documentation
 
-The script is included in `@sentzunhat/zacatl` - no manual setup required!
+- Example Root: [../README.md](../README.md)
+- Examples Catalog: [../../README.md](../../README.md)
+- Start Here: [../../../START_HERE.md](../../../START_HERE.md)
+- Framework Overview: [../../../docs/guidelines/framework-overview.md](../../../docs/guidelines/framework-overview.md)
+- ORM Setup: [../../../docs/third-party/orm/database-setup.md](../../../docs/third-party/orm/database-setup.md)
+- Service Module: [../../../docs/service/README.md](../../../docs/service/README.md)
 
-## Project Structure
+## Next Steps
 
-```
-src/
-├── application/      # HTTP handlers (entry points)
-├── domain/          # Business logic
-├── infrastructure/  # Database models & repos
-├── config.ts        # Configuration
-└── index.ts         # App entry point
-```
-
-## Developer Experience
-
-- ✅ Write clean TypeScript (no `.js` in imports)
-- ✅ One command to build: `npm run build`
-- ✅ Fast development with `tsx watch`
-- ✅ Production-ready output in `dist/`
-- ✅ Works in Docker (distroless images)
+- Keep this example as the primary minimal baseline
+- Compare with [Fastify + MongoDB + React](../../fastify-mongodb-react/)
+- Extend routes and services following the service docs

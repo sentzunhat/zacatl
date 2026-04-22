@@ -1,4 +1,5 @@
-import { describe, it, expect, vi, beforeAll } from 'vitest';
+import { newDb } from 'pg-mem';
+import { describe, it, expect, vi, beforeAll, afterAll } from 'vitest';
 
 import {
   DataTypes,
@@ -21,9 +22,16 @@ interface UserTestDb extends Model {
 }
 
 let UserModel: ModelStatic<UserTestDb>;
+const MISSING_USER_ID = '00000000-0000-0000-0000-000000000000';
 
 const initializeSequelizeModel = async (): Promise<Sequelize> => {
-  const sequelize = new Sequelize('sqlite::memory:');
+  const db = newDb();
+  const adapter = db.adapters.createPg();
+  const sequelize = new Sequelize('postgres://user:password@localhost/db', {
+    dialect: 'postgres',
+    dialectModule: adapter,
+    logging: false,
+  } as any);
 
   UserModel = sequelize.define(
     'SequelizeUser',
@@ -71,18 +79,12 @@ describe('SequelizeRepository', () => {
 
   beforeAll(async (): Promise<void> => {
     sequelize = await initializeSequelizeModel();
-    try {
-      await sequelize.sync({ force: true });
-      repository = new UserTestRepository();
-    } catch (error: unknown) {
-      const msg = error instanceof Error ? error.message : String(error);
-      if (msg?.includes('Sequelize is not installed')) {
-        // eslint-disable-next-line no-console
-        console.log('Skipping SequelizeRepository tests - running from TypeScript source');
-        return;
-      }
-      throw error;
-    }
+    await sequelize.sync({ force: true });
+    repository = new UserTestRepository();
+  });
+
+  afterAll(async (): Promise<void> => {
+    await sequelize.close();
   });
 
   describe('model access', () => {
@@ -177,7 +179,7 @@ describe('SequelizeRepository', () => {
 
     it('should return null if record not found', async () => {
       if (!repository) return;
-      const result = await repository.findById('nonexistent-id');
+      const result = await repository.findById(MISSING_USER_ID);
       expect(result).toBeNull();
     });
 
@@ -246,7 +248,7 @@ describe('SequelizeRepository', () => {
 
     it('should return null if record not found', async () => {
       if (!repository) return;
-      const result = await repository.update('nonexistent-id', {
+      const result = await repository.update(MISSING_USER_ID, {
         name: 'Updated',
       });
       expect(result).toBeNull();
@@ -288,7 +290,7 @@ describe('SequelizeRepository', () => {
 
     it('should return null if record not found', async () => {
       if (!repository) return;
-      const result = await repository.delete('nonexistent-id');
+      const result = await repository.delete(MISSING_USER_ID);
       expect(result).toBeNull();
     });
 
@@ -314,7 +316,7 @@ describe('SequelizeRepository', () => {
 
     it('should return false if record does not exist', async () => {
       if (!repository) return;
-      const exists = await repository.exists('nonexistent-id');
+      const exists = await repository.exists(MISSING_USER_ID);
       expect(exists).toBe(false);
     });
 

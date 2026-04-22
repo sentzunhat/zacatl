@@ -1,30 +1,31 @@
 # Fastify + PostgreSQL React Frontend
 
-Minimal React + Vite + Tailwind client for the Fastify + PostgreSQL example.
+Minimal React + Vite frontend for the Fastify + PostgreSQL + React example.
 
-## ✅ Features
+## Quick Start
 
-- Create, list, filter, delete greetings
-- Fetch a random greeting by language
-- Tailwind UI with a simple single-page layout
-- Vite proxy to avoid CORS in development
+```bash
+npm install
+npm run dev
+```
 
-## 🚀 Quick Start
-
-1. Start the API server (from the example root):
-
-   - Install dependencies
-   - Run the Fastify dev server on http://localhost:3001
-
-2. Start the frontend (from this folder):
-   - Install dependencies
-   - Run Vite dev server on http://localhost:5173
+- Frontend: http://localhost:5003
+- Backend proxy target: http://localhost:8083
 
 ## Environment
 
-- `VITE_API_BASE` (optional) set a full API base URL for production builds.
+- Uses Vite dev proxy for /api and /greetings routes.
+- See [vite.config.ts](./vite.config.ts) for current proxy and port settings.
 
-## Notes
+## Documentation
 
-- File names are lowercase to match repository conventions.
-- Proxy rule forwards `/api/*` and `/greetings` to http://localhost:8083.
+- Example Root: [../README.md](../README.md)
+- Examples Catalog: [../../README.md](../../README.md)
+- Start Here: [../../../START_HERE.md](../../../START_HERE.md)
+- Service Module: [../../../docs/service/README.md](../../../docs/service/README.md)
+
+## Next Steps
+
+- Start from [Fastify + SQLite + React](../../fastify-sqlite-react/) as baseline
+- Validate PostgreSQL flow against backend and proxy target
+- Update proxy/API wiring in vite.config.ts when changing backend ports

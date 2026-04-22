@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 interface Greeting {
   id: string;
@@ -10,31 +10,52 @@ interface Greeting {
 const apiBase = import.meta.env.VITE_API_BASE ?? '';
 const tokenFromEnv = import.meta.env.VITE_API_TOKEN as string | undefined;
 
-interface ApiResponse<T> {
-  ok: boolean;
-  message: string;
-  data: T;
+interface ApiErrorShape {
+  error?: {
+    message?: string;
+  };
+  message?: string;
 }
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
+  const headers = new Headers(init?.headers);
+
+  if (tokenFromEnv && !headers.has('Authorization')) {
+    headers.set('Authorization', `Bearer ${tokenFromEnv}`);
+  }
+
+  if (init?.body != null && !headers.has('Content-Type')) {
+    headers.set('Content-Type', 'application/json');
+  }
+
+  if (init?.body == null && headers.has('Content-Type')) {
+    headers.delete('Content-Type');
+  }
+
   const response = await fetch(`${apiBase}${path}`, {
-    headers: {
-      'Content-Type': 'application/json',
-      ...(tokenFromEnv ? { Authorization: `Bearer ${tokenFromEnv}` } : {}),
-    },
     ...init,
+    headers,
   });
 
   if (!response.ok) {
-    const message = await response.text();
-    throw new Error(message || `Request failed (${response.status})`);
+    try {
+      const errorJson = (await response.json()) as ApiErrorShape;
+      const errorBody = errorJson as ApiErrorShape;
+      const message =
+        errorBody.error?.message ?? errorBody.message ?? `Request failed (${response.status})`;
+      throw new Error(message);
+    } catch {
+      const message = await response.text();
+      throw new Error(message || `Request failed (${response.status})`);
+    }
   }
 
-  const json = (await response.json()) as ApiResponse<T>;
-  return json.data;
+  const json = (await response.json()) as T;
+  return json;
 }
 
 export default function App() {
+  const hasLoadedOnMount = useRef(false);
   const [greetings, setGreetings] = useState<Greeting[]>([]);
   const [filterLanguage, setFilterLanguage] = useState('');
   const [newMessage, setNewMessage] = useState('');
@@ -53,8 +74,8 @@ export default function App() {
     setStatus('Loading greetings...');
     try {
       const query = language ? `?language=${encodeURIComponent(language)}` : '';
-      const data = await request<Greeting[]>(`/greetings${query}`);
-      setGreetings(data);
+      const data = await request<Greeting[]>(`/api/greetings${query}`);
+      setGreetings(Array.isArray(data) ? data : []);
       setStatus('');
     } catch (error) {
       setStatus(`Failed to load greetings: ${(error as Error).message}`);
@@ -72,7 +93,7 @@ export default function App() {
 
     try {
       setIsLoading(true);
-      const created = await request<Greeting>('/greetings', {
+      const created = await request<Greeting>('/api/greetings', {
         method: 'POST',
         body: JSON.stringify({
           message: newMessage.trim(),
@@ -92,7 +113,7 @@ export default function App() {
   const handleDelete = async (id: string) => {
     try {
       setIsLoading(true);
-      await request<{ success: boolean }>(`/greetings/${id}`, {
+      await request<{ success: boolean }>(`/api/greetings/${id}`, {
         method: 'DELETE',
       });
       setGreetings((prev) => prev.filter((item) => item.id !== id));
@@ -113,7 +134,7 @@ export default function App() {
     try {
       setIsLoading(true);
       const data = await request<Greeting | null>(
-        `/greetings/random/${encodeURIComponent(randomLanguage.trim())}`,
+        `/api/greetings/random/${encodeURIComponent(randomLanguage.trim())}`,
       );
       setRandomGreeting(data);
       if (!data) {
@@ -129,6 +150,11 @@ export default function App() {
   };
 
   useEffect(() => {
+    if (hasLoadedOnMount.current) {
+      return;
+    }
+
+    hasLoadedOnMount.current = true;
     void loadGreetings();
   }, []);
 

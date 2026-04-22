@@ -1,4 +1,4 @@
-import { SequelizeRepository } from '@sentzunhat/zacatl';
+import { SequelizeRepository } from '@sentzunhat/zacatl/service/layers/infrastructure/repositories/sequelize';
 import type { ModelStatic } from '@sentzunhat/zacatl/third-party/sequelize';
 import { singleton } from '@sentzunhat/zacatl/third-party/tsyringe';
 

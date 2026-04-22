@@ -96,9 +96,11 @@ docker compose up -d
 
 ## Documentation
 
-- **Production Patterns**: [../docs/production-patterns.md](../docs/production-patterns.md)
-- **Quick Start Guide**: [../docs/quick-start.md](../docs/quick-start.md)
-- **Framework Database Guide**: [../../../docs/third-party/orm/database-setup.md](../../../docs/third-party/orm/database-setup.md)
+- **Examples Catalog**: [../README.md](../README.md)
+- **Start Here**: [../../START_HERE.md](../../START_HERE.md)
+- **Framework Overview**: [../../docs/guidelines/framework-overview.md](../../docs/guidelines/framework-overview.md)
+- **Framework Database Guide**: [../../docs/third-party/orm/database-setup.md](../../docs/third-party/orm/database-setup.md)
+- **Service Module**: [../../docs/service/README.md](../../docs/service/README.md)
 
 ## Why MongoDB?
 
@@ -109,10 +111,10 @@ docker compose up -d
 
 ⚠️ Requires MongoDB server (but Docker makes it easy)
 
-Compare with [SQLite example](../with-sqlite-react/) for zero-config alternative.
+Compare with [Fastify + SQLite + React](../fastify-sqlite-react/) for the minimal zero-config baseline.
 
 ## Next Steps
 
-- Read [production patterns](../docs/production-patterns.md) to understand the architecture
-- Review the [framework database guide](../../../docs/third-party/orm/database-setup.md) for shared ORM patterns
-- Add features using the [extension guide](../docs/production-patterns.md#adding-new-features)
+- Start from [Fastify + SQLite + React](../fastify-sqlite-react/) as the minimal baseline
+- Review the [framework database guide](../../docs/third-party/orm/database-setup.md) for shared ORM patterns
+- Use the [service module docs](../../docs/service/README.md) when extending platform wiring

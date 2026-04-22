@@ -53,6 +53,8 @@ export default [
       'import/order': 'warn',
       // Path aliases resolve at test runtime — resolver may not trace them statically
       'import/no-unresolved': 'warn',
+      // Prefer arrow-style function expressions over function declarations
+      'func-style': ['warn', 'expression', { allowArrowFunctions: true }],
     },
   },
 ];

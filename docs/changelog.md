@@ -2,6 +2,31 @@
 
 ---
 
+## [0.0.53] - 2026-04-10
+
+**Status**: Pending release
+
+### ⚠️ Breaking Changes
+
+- **`ApiServerConfig` removed** — Unused `ApiServerConfig` type removed from `@sentzunhat/zacatl/service` public exports. Use `ServerConfig` directly.
+
+### ✨ Improvements
+
+- **Fastify-prefixed handler aliases** — Added `FastifyGetRouteHandler`, `FastifyPostRouteHandler`, `FastifyPutRouteHandler`, `FastifyPatchRouteHandler`, and `FastifyDeleteRouteHandler` as explicit aliases in the REST entry-point barrel, alongside the existing method-first aliases.
+
+### 🐛 Fixes
+
+- **Installed locale discovery** — Expanded built-in localization path resolution so packaged consumers can find Zacatl locale files from both ESM and CommonJS publish outputs without extra manual path configuration.
+
+### 🔧 Architecture
+
+- **Cleanup task coverage** — Expanded `clean:examples` to remove nested example dependencies and build outputs across the flattened examples layout, and hardened filesystem cleanup retries for large directory removals on macOS.
+
+### 📚 Documentation
+
+- **Examples and runtime guidance** — Updated repository docs to reflect the flattened examples structure, clarified current CLI/Desktop runtime support, and added a practical `START_HERE.md` onboarding guide.
+- **`fastify-sqlite-react` example hardened** — Migrated to Fastify-prefixed handler classes, moved SQLite DB to example root, added backend query validation for language filter, hardened favicon serving with hashed-asset fallback, and improved shutdown signal handling for `tsx watch`.
+
 ## [0.0.52] - 2026-03-08
 
 **Status**: Pending release
@@ -9,6 +34,12 @@
 ### 🐛 Fixes
 
 - **Mongoose third-party exports** — Added missing `Types` and `PipelineStage` exports to `src/third-party/mongoose.ts` to support downstream projects using Zacatl's Mongoose wrapper as single source of truth. Prevents version conflicts when framework consumers need `Types.ObjectId` and aggregation pipeline types.
+
+- **Configurable built-in localization path** — Added `localization.builtInLocalesDir` to `Service` and `configureI18nNode()` so consumers can override Zacatl's built-in locale discovery when their runtime working directory does not match the package's default path probes.
+
+### 🔧 Improvements
+
+- **SQLite audit remediation** — Removed the unused direct `sqlite3` dependency from Zacatl's published package so consumers no longer inherit the vulnerable `node-gyp` and `tar` toolchain through the framework itself. SQLite dialect drivers remain consumer-installed dependencies.
 
 ---
 

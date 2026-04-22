@@ -1,497 +1,239 @@
-# Zacatl for Non-HTTP Services
+# Zacatl for Non-HTTP Processes
 
-> **Elegant dependency injection for CLI tools, workers, and scripts**
+Use Zacatl dependency injection helpers directly for scripts, workers, and migration jobs.
 
----
+## Current Status
 
-## Installation
+- Service runtime supports `ServiceType.SERVER` today.
+- `ServiceType.CLI` is declared but runtime startup is not implemented.
+- `ServiceType.DESKTOP` is declared but runtime startup is not implemented.
+- Server Service startup currently requires both:
+  - `platforms.server`
+  - `layers.application.entryPoints.rest`
 
-```bash
-npm install @sentzunhat/zacatl@latest
-```
+For non-HTTP execution today, prefer standalone DI helpers from
+`@sentzunhat/zacatl/dependency-injection`.
 
----
-
-## The Pattern
-
-Zacatl = **3 Blocks + 1 Engine**
-
-```
-Providers      → Business logic
-Repositories   → Data access
-Service        → DI Engine (wires everything)
-```
-
----
-
-## 1. Providers (Business Logic)
+## Recommended Pattern Today: Standalone DI
 
 ```typescript
-import { singleton } from 'tsyringe';
+import {
+  clearContainer,
+  registerDependency,
+  registerValue,
+  resolveDependency,
+} from '@sentzunhat/zacatl/dependency-injection';
+import { inject, singleton } from '@sentzunhat/zacatl/third-party/tsyringe';
+import { logger } from '@sentzunhat/zacatl/logs';
+
+const ENV_TOKEN = Symbol('ENV_CONFIG');
+
+type EnvConfig = {
+  intervalMs: number;
+  dryRun: boolean;
+};
 
 @singleton()
-class EmailService {
-  send(to: string, message: string) {
-    console.log(`📧 ${to}: ${message}`);
-  }
+class Clock {
+  now = (): Date => new Date();
 }
 
 @singleton()
-class NotificationService {
-  constructor(private email: EmailService) {} // ← Auto-injected
+class WorkerService {
+  constructor(private readonly clock: Clock, @inject(ENV_TOKEN) private readonly env: EnvConfig) {}
 
-  notify(user: string, msg: string) {
-    this.email.send(user, msg);
-  }
-}
-```
-
-**Rules:**
-
-- `@singleton()` decorator required
-- Dependencies via constructor
-- No manual wiring needed
-
----
-
-## 2. Repositories (Data Access)
-
-```typescript
-import { singleton, BaseRepository, ORMType } from '@sentzunhat/zacatl';
-import { Schema } from 'mongoose';
-
-const UserSchema = new Schema({
-  name: String,
-  email: String,
-});
-
-@singleton()
-class UserRepository extends BaseRepository<any, any, any> {
-  constructor() {
-    super({
-      type: ORMType.Mongoose,
-      name: 'User',
-      schema: UserSchema,
+  runOnce = async (): Promise<void> => {
+    logger.info('worker tick', {
+      at: this.clock.now().toISOString(),
+      dryRun: this.env.dryRun,
     });
-  }
+  };
 }
+
+clearContainer();
+registerDependency(Clock, Clock);
+registerDependency(WorkerService, WorkerService);
+registerValue(ENV_TOKEN, { intervalMs: 1000, dryRun: true });
+
+const worker = resolveDependency(WorkerService);
+await worker.runOnce();
 ```
 
-**Rules:**
-
-- Extend `BaseRepository`
-- `@singleton()` decorator required
-- First async call initializes adapter
-
----
-
-## 3. Service (DI Engine)
+## Minimal Setup
 
 ```typescript
-import { Service, resolveDependency, ServiceType, DatabaseVendor } from '@sentzunhat/zacatl';
-import mongoose from 'mongoose';
-
-const service = new Service({
-  type: ServiceType.SERVER,
-  layers: {
-    domain: {
-      services: [EmailService, NotificationService],
-    },
-    infrastructure: {
-      repositories: [UserRepository],
-    },
-  },
-  platforms: {
-    server: {
-      name: 'my-app',
-      databases: [
-        {
-          vendor: DatabaseVendor.MONGOOSE,
-          instance: mongoose.connect('mongodb://localhost/db'),
-        },
-      ],
-    },
-  },
-});
-
-await service.start(); // ← Must call before resolving
-
-// Now use anywhere
-const notify = resolveDependency<NotificationService>('NotificationService');
-notify.notify('user@example.com', 'Hello!');
-```
-
-**Rules:**
-
-- Call `service.start()` once
-- Resolve dependencies after start
-- No HTTP config needed (skip `application`)
-
----
-
-## Complete Patterns
-
-### Pattern A: Simple CLI (No Database)
-
-```typescript
-import { Service, resolveDependency } from '@sentzunhat/zacatl';
-import { singleton } from 'tsyringe';
+import { registerDependency, resolveDependency } from '@sentzunhat/zacatl/dependency-injection';
+import { singleton } from '@sentzunhat/zacatl/third-party/tsyringe';
 
 @singleton()
 class Calculator {
-  add(a: number, b: number) {
-    return a + b;
-  }
+  add = (a: number, b: number): number => a + b;
 }
 
-const service = new Service({
-  type: ServiceType.SERVER,
-  layers: {
-    domain: { providers: [Calculator] },
-  },
-});
+registerDependency(Calculator, Calculator);
 
-await service.start();
-
-const calc = resolveDependency<Calculator>('Calculator');
-console.log(calc.add(2, 3)); // 5
+const calculator = resolveDependency(Calculator);
+console.log(calculator.add(2, 3));
 ```
 
-### Pattern B: Worker with Database
+## Registering Classes
 
 ```typescript
-import { Service, resolveDependency } from '@sentzunhat/zacatl';
-import { BaseRepository, ORMType } from '@sentzunhat/zacatl/infrastructure';
-import { Schema } from 'mongoose';
-import mongoose from 'mongoose';
-import { singleton } from 'tsyringe';
-
-// Repository
-const TaskSchema = new Schema({ name: String, done: Boolean });
+import { registerDependencies, resolveDependencies } from '@sentzunhat/zacatl/dependency-injection';
+import { singleton } from '@sentzunhat/zacatl/third-party/tsyringe';
 
 @singleton()
-class TaskRepository extends BaseRepository<any, any, any> {
-  constructor() {
-    super({ type: ORMType.Mongoose, name: 'Task', schema: TaskSchema });
-  }
+class UserRepository {
+  findById = async (id: string): Promise<{ id: string; email: string } | null> => {
+    return { id, email: 'user@example.com' };
+  };
 }
 
-// Service
 @singleton()
-class TaskWorker {
-  constructor(private tasks: TaskRepository) {}
+class UserNotifier {
+  constructor(private readonly users: UserRepository) {}
 
-  async process() {
-    const task = await this.tasks.create({ name: 'Work', done: false });
-    console.log('Created:', task);
-  }
+  notify = async (id: string): Promise<void> => {
+    const user = await this.users.findById(id);
+    if (user != null) {
+      console.log(`Notified ${user.email}`);
+    }
+  };
 }
 
-// Engine
-const service = new Service({
-  type: ServiceType.SERVER,
-  layers: {
-    domain: { services: [TaskWorker] },
-    infrastructure: { repositories: [TaskRepository] },
-  },
-  platforms: {
-    server: {
-      name: 'worker',
-      databases: [
-        {
-          vendor: DatabaseVendor.MONGOOSE,
-          instance: mongoose.connect('mongodb://localhost/tasks'),
-        },
-      ],
-    },
-  },
-});
+registerDependencies([UserRepository, UserNotifier]);
 
-await service.start();
-
-const worker = resolveDependency<TaskWorker>('TaskWorker');
-await worker.process();
+const [notifier] = resolveDependencies([UserNotifier]);
+await notifier.notify('42');
 ```
 
-### Pattern C: Nested Dependencies
+## Registering Values and Config Objects
 
 ```typescript
-@singleton()
-class Logger {
-  log(msg: string) {
-    console.log(`[LOG] ${msg}`);
-  }
-}
+import { loadYML } from '@sentzunhat/zacatl/configuration';
+import {
+  registerDependency,
+  registerValue,
+  resolveDependency,
+} from '@sentzunhat/zacatl/dependency-injection';
+import { inject, singleton } from '@sentzunhat/zacatl/third-party/tsyringe';
+
+const APP_CONFIG = Symbol('APP_CONFIG');
+
+type AppConfig = {
+  retries: number;
+  queueName: string;
+};
+
+const config = loadYML<AppConfig>('./config.worker.yml');
 
 @singleton()
-class Database {
-  constructor(private logger: Logger) {}
+class QueueJob {
+  constructor(@inject(APP_CONFIG) private readonly appConfig: AppConfig) {}
 
-  async query(sql: string) {
-    this.logger.log(`Querying: ${sql}`);
-    return [];
-  }
+  describe = (): string => `${this.appConfig.queueName}:${this.appConfig.retries}`;
 }
 
-@singleton()
-class UserService {
-  constructor(private db: Database, private logger: Logger) {}
+registerDependency(QueueJob, QueueJob);
+registerValue(APP_CONFIG, config);
 
-  async getUser(id: string) {
-    this.logger.log(`Getting user ${id}`);
-    return this.db.query(`SELECT * FROM users WHERE id = ${id}`);
-  }
-}
-
-// Wire it up
-const service = new Service({
-  type: ServiceType.SERVER,
-  layers: {
-    domain: { services: [Logger, Database, UserService] },
-  },
-});
-
-await service.start();
-
-const users = resolveDependency<UserService>('UserService');
-await users.getUser('123');
+const job = resolveDependency(QueueJob);
+console.log(job.describe());
 ```
 
-**Auto-wires:** Logger → Database → UserService
-
----
-
-## Configuration
+## Background Worker Example
 
 ```typescript
-import { loadConfig } from '@sentzunhat/zacatl/config';
-import { z } from 'zod';
+import {
+  registerDependency,
+  registerValue,
+  resolveDependency,
+} from '@sentzunhat/zacatl/dependency-injection';
+import { InternalServerError } from '@sentzunhat/zacatl/error';
+import { logger } from '@sentzunhat/zacatl/logs';
+import { inject, singleton } from '@sentzunhat/zacatl/third-party/tsyringe';
 
-const ConfigSchema = z.object({
-  db: z.string(),
-  apiKey: z.string(),
-});
+const WORKER_OPTIONS = Symbol('WORKER_OPTIONS');
 
-const config = loadConfig('./config.yaml', 'yaml', ConfigSchema);
-
-const service = new Service({
-  type: ServiceType.SERVER,
-  layers: {
-    domain: { services: [MyService] },
-  },
-  platforms: {
-    server: {
-      name: 'app',
-      databases: [
-        {
-          vendor: DatabaseVendor.MONGOOSE,
-          instance: mongoose.connect(config.db),
-        },
-      ],
-    },
-  },
-});
-```
-
----
-
-## Error Handling
-
-```typescript
-import { NotFoundError, ValidationError } from '@sentzunhat/zacatl/error';
+type WorkerOptions = {
+  delayMs: number;
+};
 
 @singleton()
-class UserService {
-  constructor(private repo: UserRepository) {}
+class JobRunner {
+  constructor(@inject(WORKER_OPTIONS) private readonly options: WorkerOptions) {}
 
-  async getUser(id: string) {
-    if (!id) throw new ValidationError({ message: 'ID required' });
-
-    const user = await this.userRepo.findById(id);
-    if (!user) throw new NotFoundError({ message: 'User not found', metadata: { id } });
-
-    return user;
-  }
+  start = async (): Promise<void> => {
+    for (;;) {
+      try {
+        logger.info('polling job queue');
+        await new Promise((resolve) => setTimeout(resolve, this.options.delayMs));
+      } catch (error) {
+        throw new InternalServerError({
+          message: 'Worker loop failed',
+          reason: error instanceof Error ? error.message : String(error),
+          component: 'JobRunner',
+          operation: 'start',
+          error: error instanceof Error ? error : undefined,
+        });
+      }
+    }
+  };
 }
+
+registerDependency(JobRunner, JobRunner);
+registerValue(WORKER_OPTIONS, { delayMs: 5000 });
+
+const runner = resolveDependency(JobRunner);
+await runner.start();
 ```
 
----
-
-## Logging
+## Migration or Script Example
 
 ```typescript
-import { logger } from '@sentzunhat/zacatl';
+import {
+  clearContainer,
+  registerDependency,
+  resolveDependency,
+} from '@sentzunhat/zacatl/dependency-injection';
+import { logger } from '@sentzunhat/zacatl/logs';
+import { singleton } from '@sentzunhat/zacatl/third-party/tsyringe';
 
 @singleton()
-class Worker {
-  async run() {
-    logger.info('Worker started');
-    logger.error('Something failed', { details: '...' });
-  }
+class LegacyReader {
+  fetch = async (): Promise<Array<{ id: string; oldName: string }>> => {
+    return [{ id: '1', oldName: 'legacy' }];
+  };
 }
-```
-
----
-
-## Key Rules for AI Agents
-
-| Rule                          | Why                     |
-| ----------------------------- | ----------------------- |
-| `@singleton()` on all classes | Enables DI              |
-| Constructor injection         | Auto-wires dependencies |
-| `await service.start()`       | Initialize container    |
-| No `application` layer        | HTTP only               |
-| First repo async call         | Initializes adapter     |
-
----
-
-## Minimal Templates
-
-### Template: CLI Tool
-
-```typescript
-#!/usr/bin/env node
-import { Service, resolveDependency } from '@sentzunhat/zacatl';
-import { singleton } from 'tsyringe';
 
 @singleton()
-class CLI {
-  run(args: string[]) {
-    console.log('Args:', args);
-  }
+class MigrationService {
+  constructor(private readonly legacyReader: LegacyReader) {}
+
+  run = async (): Promise<void> => {
+    const rows = await this.legacyReader.fetch();
+    logger.info('migration finished', { count: rows.length });
+  };
 }
 
-const service = new Service({
-  type: ServiceType.CLI,
-  layers: { domain: { services: [CLI] } },
-});
+const main = async (): Promise<void> => {
+  clearContainer();
+  registerDependency(LegacyReader, LegacyReader);
+  registerDependency(MigrationService, MigrationService);
 
-await service.start();
-resolveDependency<CLI>('CLI').run(process.argv.slice(2));
+  const migration = resolveDependency(MigrationService);
+  await migration.run();
+};
+
+await main();
 ```
 
-### Template: Background Job
+## When To Use Service Later
 
-```typescript
-import { Service, resolveDependency } from '@sentzunhat/zacatl';
-import { singleton } from 'tsyringe';
+Use `Service` for non-HTTP orchestration only after CLI/Desktop runtimes are implemented.
 
-@singleton()
-class Job {
-  async process() {
-    setInterval(() => console.log('Job running...'), 5000);
-  }
-}
+Until then:
 
-const service = new Service({
-  type: ServiceType.WORKER,
-  layers: { domain: { services: [Job] } },
-});
-
-await service.start();
-await resolveDependency<Job>('Job').process();
-```
-
-### Template: Data Migration
-
-```typescript
-import { Service, resolveDependency } from '@sentzunhat/zacatl';
-import { BaseRepository, ORMType } from '@sentzunhat/zacatl/infrastructure';
-import mongoose from 'mongoose';
-import { singleton } from 'tsyringe';
-
-@singleton()
-class Migration {
-  constructor(private sourceRepo: SourceRepository) {}
-
-  async run() {
-    const data = await (this.sourceRepo.model as MongooseModel<Source>).find();
-    // Transform and migrate
-    console.log(`Migrated ${data.length} records`);
-  }
-}
-
-const service = new Service({
-  type: ServiceType.SERVER,
-  layers: {
-    domain: { services: [Migration] },
-    infrastructure: { repositories: [SourceRepository] },
-  },
-  platforms: {
-    server: {
-      name: 'migration',
-      databases: [{ vendor: DatabaseVendor.MONGOOSE, instance: mongoose.connect(uri) }],
-    },
-  },
-});
-
-await service.start();
-await resolveDependency<Migration>('Migration').run();
-```
-
----
-
-## Troubleshooting
-
-| Error                        | Fix                                                 |
-| ---------------------------- | --------------------------------------------------- |
-| `TypeInfo not known`         | Add `@singleton()` decorator                        |
-| `Repository not initialized` | Call async method first: `await repo.findById("x")` |
-| Dependency not found         | Add to `providers` or `repositories` array          |
-
----
-
-## Import Cheat Sheet
-
-```typescript
-// Core
-import { Service, resolveDependency } from '@sentzunhat/zacatl';
-
-// DI (singleton decorator)
-import { singleton } from '@sentzunhat/zacatl';
-// Or import directly from tsyringe (same thing)
-// import { singleton } from "tsyringe";
-
-// Repositories
-import { BaseRepository, ORMType } from '@sentzunhat/zacatl/infrastructure';
-
-// Config
-import { loadConfig } from '@sentzunhat/zacatl/config';
-
-// Errors
-import { NotFoundError, ValidationError } from '@sentzunhat/zacatl/error';
-
-// Logging
-import { logger } from '@sentzunhat/zacatl';
-
-// Database
-import mongoose from 'mongoose';
-import { Schema } from 'mongoose';
-```
-
----
-
-## Architecture Flow
-
-```
-┌──────────────────────────────────────────┐
-│  Providers (domain/providers)            │
-│  - Business logic                        │
-│  - Services                              │
-│  - Workers                               │
-├──────────────────────────────────────────┤
-│  Repositories (infrastructure/repos)     │
-│  - Data access                           │
-│  - Database queries                      │
-├──────────────────────────────────────────┤
-│  Service (DI Container)                  │
-│  - Auto-wires everything                 │
-│  - Manages lifecycle                     │
-└──────────────────────────────────────────┘
-
-No HTTP? Skip: application layer
-```
-
----
-
-**Next:** [Repository README](../../README.md) | [Examples](../../examples/README.md)
+- Use standalone DI helpers for local scripts and workers.
+- Keep Service usage focused on `ServiceType.SERVER` with REST entry points.
+- Do not treat `ServiceType.CLI` as runnable in production yet.

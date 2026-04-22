@@ -111,15 +111,20 @@ class getRouteHandler {} // camelCase
 
 ```typescript
 // ✅ Good
-function createLogger() { }
-function resolveDependency(token) { }
-async function loadConfiguration() { }
+const createLogger = () => { };
+const resolveDependency = (token) => { };
+const loadConfiguration = async () => { };
 method.parseRequest() { }
 
 // ❌ Avoid
 function CreateLogger() { }  // PascalCase (for functions)
 function parse_request() { }  // snake_case
 ```
+
+**Guidance:**
+
+- Prefer `const` arrow function expressions for function declarations.
+- Reserve function declarations only when hoisting is intentionally needed.
 
 ### Interfaces & Type Aliases
 
@@ -933,9 +938,9 @@ const userName = user ? (user.profile ? user.profile.name : 'Anonymous') : 'Anon
 
 ```typescript
 // ✅ Good — Type guards
-function isCustomError(error: unknown): error is CustomError {
+const isCustomError = (error: unknown): error is CustomError => {
   return error instanceof CustomError;
-}
+};
 
 if (isCustomError(error)) {
   logger.error('Custom error occurred', { correlationId: error.correlationId });
@@ -950,15 +955,15 @@ logger.error('Custom error occurred', { correlationId: customError.correlationId
 
 ## Summary
 
-| Aspect           | Rule                    |
-| ---------------- | ----------------------- |
-| Classes          | `PascalCase`            |
-| Functions        | `camelCase`             |
-| Interfaces/Types | `PascalCase`            |
-| Files/Folders    | `kebab-case`            |
-| Indentation      | 2 spaces                |
-| Line Length      | 80–100 chars            |
-| Quotes           | Single (`'`)            |
-| Semicolons       | Always                  |
-| Type Safety      | `strict: true`          |
-| Modules          | ESM + CJS build outputs |
+| Aspect           | Rule                                    |
+| ---------------- | --------------------------------------- |
+| Classes          | `PascalCase`                            |
+| Functions        | `camelCase` + prefer arrow declarations |
+| Interfaces/Types | `PascalCase`                            |
+| Files/Folders    | `kebab-case`                            |
+| Indentation      | 2 spaces                                |
+| Line Length      | 80–100 chars                            |
+| Quotes           | Single (`'`)                            |
+| Semicolons       | Always                                  |
+| Type Safety      | `strict: true`                          |
+| Modules          | ESM + CJS build outputs                 |

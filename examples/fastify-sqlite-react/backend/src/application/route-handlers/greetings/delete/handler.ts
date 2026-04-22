@@ -8,12 +8,12 @@
  */
 
 import { inject, singleton } from '@sentzunhat/zacatl/third-party/tsyringe';
-import { AbstractRouteHandler, type Request } from '@sentzunhat/zacatl/service';
+import { FastifyDeleteRouteHandler, type Request } from '@sentzunhat/zacatl/service';
 import { GreetingServiceAdapter } from '../../../../domain/greetings/service';
 import { type GreetingIdParams } from '../greeting.schema.js';
 
 @singleton()
-export class DeleteGreetingHandler extends AbstractRouteHandler<
+export class DeleteGreetingHandler extends FastifyDeleteRouteHandler<
   void,
   void,
   { success: boolean },
@@ -25,7 +25,6 @@ export class DeleteGreetingHandler extends AbstractRouteHandler<
   ) {
     super({
       url: '/greetings/:id',
-      method: 'DELETE',
       schema: {},
     });
   }

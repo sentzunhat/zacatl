@@ -2,12 +2,12 @@
 
 [![npm version](https://img.shields.io/npm/v/@sentzunhat/zacatl.svg)](https://www.npmjs.com/package/@sentzunhat/zacatl)
 [![npm downloads](https://img.shields.io/npm/dm/@sentzunhat/zacatl.svg)](https://www.npmjs.com/package/@sentzunhat/zacatl)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0)
 [![TypeScript](https://img.shields.io/badge/%3C%2F%3E-TypeScript-3178c6.svg)](https://www.typescriptlang.org/)
 [![Node.js 24+](https://img.shields.io/badge/Node.js-24%2B-brightgreen.svg)](https://nodejs.org/)
 [![Build](https://github.com/sentzunhat/zacatl/actions/workflows/publish-dry.yml/badge.svg)](https://github.com/sentzunhat/zacatl/actions/workflows/publish-dry.yml)
-[![Tests: 425](https://img.shields.io/badge/Tests-425-blue.svg)](#tests)
-[![Coverage: 72.16%](https://img.shields.io/badge/Coverage-72.16%25-orange.svg)](https://img.shields.io/badge/Coverage-72.16%25-orange.svg)
+[![Tests: 430](https://img.shields.io/badge/Tests-430-blue.svg)](#tests)
+[![Coverage: 72.42%](https://img.shields.io/badge/Coverage-72.42%25-orange.svg)](https://img.shields.io/badge/Coverage-72.42%25-orange.svg)
 
 **Universal TypeScript framework for building CLI tools, desktop apps, APIs, and distributed systems.**
 
@@ -32,10 +32,15 @@ Build **CLI tools**, **Desktop apps**, and **HTTP servers** with the same archit
 
 > **Platform availability:** CLI and Desktop platform adapters are planned; the HTTP server platform is the primary supported runtime. See [Service Module](./docs/service/README.md) for platform status and availability.
 
-```typescript
-import { Service, ServiceType } from "@sentzunhat/zacatl";
+> **Runtime status:** `ServiceType.CLI` and `ServiceType.DESKTOP` are declared but currently stubbed at runtime. For non-HTTP scripts/workers today, prefer standalone DI helpers from `@sentzunhat/zacatl/dependency-injection`.
 
-// CLI Application
+```typescript
+import Fastify from 'fastify';
+import { Service, ServiceType, ServerType, ServerVendor } from '@sentzunhat/zacatl';
+
+const fastify = Fastify();
+
+// CLI Application shape (declared, not runnable yet)
 const cli = new Service({
   type: ServiceType.CLI,
   layers: {
@@ -44,11 +49,11 @@ const cli = new Service({
     infrastructure: { repositories: [...] },
   },
   platforms: {
-    cli: { name: "my-tool", version: "1.0.0" },
+    cli: { name: 'my-tool', version: '1.0.0' },
   },
 });
 
-// Desktop Application
+// Desktop Application shape (declared, not runnable yet)
 const desktop = new Service({
   type: ServiceType.DESKTOP,
   layers: {
@@ -57,13 +62,13 @@ const desktop = new Service({
     infrastructure: { repositories: [...] },
   },
   platforms: {
-    desktop: { window: { title: "My App", width: 1024, height: 768 }, platform: "neutralino" },
+    desktop: { window: { title: 'My App', width: 1024, height: 768 }, platform: 'neutralino' },
   },
 });
 
 // HTTP Server (default)
 const server = new Service({
-  type: ServiceType.SERVER, // Optional: defaults to SERVER
+  type: ServiceType.SERVER,
   layers: {
     application: { entryPoints: { rest: { hooks: [...], routes: [...] } } },
     domain: { services: [...] },
@@ -71,7 +76,7 @@ const server = new Service({
   },
   platforms: {
     server: {
-      name: "my-service",
+      name: 'my-service',
       server: { type: ServerType.SERVER, vendor: ServerVendor.FASTIFY, instance: fastify }
     },
   },
@@ -88,7 +93,7 @@ const server = new Service({
 
 ## Service Configuration (notable options)
 
-- `run.auto`: When `true`, the `Service` will attempt to start automatically when `start()` is invoked without additional manual orchestration. Defaults to `false` when omitted. This option is part of the `ConfigService` root config; see the `service` docs for full configuration examples.
+- `run.auto`: When `true`, the `Service` will attempt to start automatically during `Service` construction. Defaults to `false` when omitted. This option is part of the `ConfigService` root config; see the `service` docs for full configuration examples.
 
 ## Public API Surface
 
@@ -115,6 +120,8 @@ The following modules are considered the stable, public surface of Zacatl:
 
 Full documentation lives in **[`docs/`](./docs/README.md)**.
 
+New contributors can start with **[START_HERE.md](./START_HERE.md)** for a practical setup and daily workflow checklist.
+
 - **[Architecture Overview](./docs/guidelines/framework-overview.md)** - System design and module map
 - **[Release Notes](./docs/changelog.md)** - Version history and changes
 - **[Service Module](./docs/service/README.md)** - Service configuration and platform APIs
@@ -130,7 +137,7 @@ Full documentation lives in **[`docs/`](./docs/README.md)**.
 
 ## 🌱 Ethical Use (Non-binding)
 
-Zacatl is MIT-licensed (permissive). Please don’t use it to harm people.
+Zacatl is licensed under the Apache License, Version 2.0 (permissive). Please don’t use it to harm people.
 
 ## 🚀 Quick Start
 
@@ -157,7 +164,7 @@ npm run check:peers
 
 ```typescript
 import Fastify from 'fastify';
-import { Service } from '@sentzunhat/zacatl';
+import { Service, ServiceType, ServerType, ServerVendor } from '@sentzunhat/zacatl';
 
 const fastify = Fastify();
 
@@ -188,26 +195,22 @@ await service.start({ port: 3000 });
 ### CLI / Desktop Application
 
 ```typescript
-import { Service, resolveDependency } from '@sentzunhat/zacatl';
+import { registerDependency, resolveDependency } from '@sentzunhat/zacatl/dependency-injection';
+import { singleton } from '@sentzunhat/zacatl/third-party/tsyringe';
 
+@singleton()
 class MyService {
   doSomething = async () => console.log('Hello from CLI!');
 }
 
-const service = new Service({
-  type: ServiceType.CLI,
-  layers: {
-    domain: { services: [MyService] },
-  },
-  platforms: {
-    cli: { name: 'my-cli', version: '1.0.0' },
-  },
-});
+registerDependency(MyService, MyService);
 
-await service.start();
-const myService = resolveDependency<MyService>('MyService');
+const myService = resolveDependency(MyService);
 await myService.doSomething();
 ```
+
+For Service-based orchestration, keep runtime startup on `ServiceType.SERVER`
+until CLI/Desktop runtimes move beyond stub status.
 
 ## 🏗️ Architecture Layers
 
@@ -353,7 +356,7 @@ Place translation files in `src/localization/locales/`:
 
 ```typescript
 import { z } from 'zod';
-import { loadConfig } from '@sentzunhat/zacatl';
+import { loadYML } from '@sentzunhat/zacatl/configuration';
 
 const AppConfigSchema = z.object({
   server: z.object({
@@ -363,7 +366,7 @@ const AppConfigSchema = z.object({
   logLevel: z.enum(['debug', 'info', 'warn', 'error']).default('info'),
 });
 
-const config = loadConfig('./config/app.yaml', 'yaml', AppConfigSchema);
+const config = loadYML('./config/app.yaml', AppConfigSchema);
 ```
 
 > **Coming Soon**: Yup support and optional validation for maximum flexibility. See [Roadmap: Schema Validation Flexibility](docs/roadmap/index.md#schema-validation-flexibility-v0040--v010).
@@ -435,7 +438,7 @@ npm run type:check # TypeScript checking
 
 ## 📄 License
 
-[MIT License](./LICENSE) © 2025 Zacatl Contributors
+[Apache License 2.0](./LICENSE) © 2025 Zacatl Contributors
 
 ## 🤝 Contributing
 

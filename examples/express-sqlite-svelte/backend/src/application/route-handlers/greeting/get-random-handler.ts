@@ -10,7 +10,7 @@
 import { inject, singleton } from '@sentzunhat/zacatl/third-party/tsyringe';
 import { AbstractRouteHandler, type Request } from '@sentzunhat/zacatl/service';
 import type { FastifyReply } from '@sentzunhat/zacatl/third-party/fastify';
-import { GreetingServiceAdapter } from '../../../../domain/services/greeting';
+import { GreetingServiceAdapter } from '../../../domain/services/greeting';
 import { type GreetingParams, type GreetingResponse } from './greeting.schema';
 import { toGreetingResponse } from './greeting.serializer';
 

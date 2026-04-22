@@ -9,7 +9,8 @@
  */
 
 import { inject, singleton } from '@sentzunhat/zacatl/third-party/tsyringe';
-import type { Greeting, CreateGreetingInput } from '../../models/greeting';
+import { BadRequestError, NotFoundError } from '@sentzunhat/zacatl/error';
+import type { Greeting, CreateGreetingInput } from '../../entities/greeting';
 import { GreetingRepositoryAdapter } from '../../../infrastructure/greetings/repositories/greeting/adapter';
 import type { GreetingServicePort } from './port';
 
@@ -30,11 +31,17 @@ export class GreetingServiceAdapter implements GreetingServicePort {
 
   async createGreeting(input: CreateGreetingInput): Promise<Greeting> {
     if (!input.message || input.message.trim().length === 0) {
-      throw new Error('Greeting message cannot be empty');
+      throw new BadRequestError({
+        message: 'Greeting message cannot be empty',
+        reason: 'validation failed',
+      });
     }
 
     if (!input.language || input.language.trim().length === 0) {
-      throw new Error('Language is required');
+      throw new BadRequestError({
+        message: 'Language is required',
+        reason: 'validation failed',
+      });
     }
 
     const normalizedInput: CreateGreetingInput = {
@@ -48,7 +55,10 @@ export class GreetingServiceAdapter implements GreetingServicePort {
   async deleteGreeting(id: string): Promise<boolean> {
     const exists = await this.greetingRepository.findById(id);
     if (!exists) {
-      throw new Error(`Greeting with id ${id} not found`);
+      throw new NotFoundError({
+        message: `Greeting with id ${id} not found`,
+        reason: 'resource not found',
+      });
     }
 
     const deleted = await this.greetingRepository.delete(id);

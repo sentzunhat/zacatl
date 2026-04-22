@@ -22,10 +22,10 @@ describe('Desktop.start() — not implemented', () => {
     expect((err as Error).message).toMatch(/electron/);
   });
 
-  it('error message hints at v0.1.0 timeline', async () => {
+  it('error reason guides users to SERVER runtime', async () => {
     const desktop = new Desktop(config);
     const err = await desktop.start().catch((e) => e);
-    expect((err as any).reason).toMatch(/v0\.1\.0/);
+    expect((err as any).reason).toMatch(/ServiceType\.SERVER/);
   });
 
   it('stop() resolves without throwing', async () => {

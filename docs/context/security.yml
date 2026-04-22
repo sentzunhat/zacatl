@@ -1,0 +1,23 @@
+dependency_security:
+  baseline:
+    - 'Run npm audit on root before release'
+    - 'Audit example lockfiles in examples/*'
+
+  remediation:
+    - 'Prefer non-breaking updates first'
+    - 'Use major upgrades when advisories require it'
+
+release_checks:
+  required:
+    - 'npm run prepublish:guard'
+    - 'npm run publish:dry'
+
+runtime_security:
+  principles:
+    - 'Avoid leaking sensitive values in logs'
+    - 'Use typed errors and clear operational metadata'
+
+examples_security:
+  practice:
+    - 'Refresh package-lock.json after dependency updates'
+    - 'Keep example vulnerability reports at zero when feasible'

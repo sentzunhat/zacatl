@@ -12,3 +12,4 @@ Current instruction files:
 
 - `repo-standards.instructions.md` (applies to all files; enforces docs-first context intake)
 - `changelog.instructions.md` (applies to `docs/changelog.md` and `package.json`)
+- `docs-drift.instructions.md` (applies to `README.md` and `docs/**`; prevents docs/API drift)

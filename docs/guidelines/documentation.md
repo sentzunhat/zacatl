@@ -380,7 +380,7 @@ const instance = new MyClass();
 
 ## License
 
-MIT
+Apache-2.0
 ````
 
 ---

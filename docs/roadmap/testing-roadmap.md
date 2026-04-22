@@ -4,8 +4,9 @@ This document outlines a strategic approach to improving test coverage by focusi
 
 ## Current State
 
-- **Coverage**: ~52% (statements)
-- **Tests**: 214 unit tests
+- **As of**: 2026-04-22 (from `coverage/lcov-report/index.html` and `test-results.json`)
+- **Coverage**: 72.71% statements (938/1290)
+- **Tests**: 430 total tests (430 passing)
 - **Target**: 75%+ coverage (statements), focusing on critical paths
 
 ---

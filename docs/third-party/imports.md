@@ -196,7 +196,7 @@ await mongoose.connect(url);
 ```typescript
 import type { Mongoose } from '@sentzunhat/zacatl/third-party/mongoose';
 import type { Sequelize } from '@sentzunhat/zacatl/third-party/sequelize';
-import { BaseRepository, ORMType } from '@sentzunhat/zacatl/infrastructure';
+import { BaseRepository, ORMType } from '@sentzunhat/zacatl';
 
 type DatabaseInstance = Mongoose | Sequelize;
 
