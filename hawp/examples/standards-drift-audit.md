@@ -8,15 +8,16 @@ A user asks for an audit of whether a service still matches the team's deploymen
 
 ```ts
 const shape: Shape = {
-  input: 'audit this service for standards drift against our deployment baseline',
+  input:
+    "audit this service for standards drift against our deployment baseline",
   context:
-    'Team has an established deployment baseline covering naming, health checks, resource limits, observability labels, and rollback readiness. The baseline is documented in the team wiki and enforced partly through CI templates. The current service has changed incrementally over time and the deployment manifest was last touched during a resource-tuning pass.',
+    "Team has an established deployment baseline covering naming, health checks, resource limits, observability labels, and rollback readiness. The baseline is documented in the team wiki and enforced partly through CI templates. The current service has changed incrementally over time and the deployment manifest was last touched during a resource-tuning pass.",
   mission:
-    'Audit the service deployment manifest against the documented deployment baseline and identify deviations that matter for reliability, operability, or maintainability. Support the decision of what to align first.',
+    "Audit the service deployment manifest against the documented deployment baseline and identify deviations that matter for reliability, operability, or maintainability. Support the decision of what to align first.",
   constraints:
-    'Use the baseline documentation as the comparison source. Separate directly observed evidence from inference. Use only the categories truth-risk drift, validation drift, maintainability drift, and standard mismatch. Do not collapse present on disk, not ignored, tracked by git, enforced in CI, and documented in inspected scope into a single claim — each is a distinct state. When claiming absence, use within inspected scope or no evidence found in inspected material. Only call something a standard mismatch when the violated standard is proven by the baseline document, an ADR, a tooling contract, or a strong repeated convention that is clearly intentional. When a finding has a confirmed problem but an unresolved policy question, split them using Confirmed and Unresolved. Include compact non-findings when they close likely questions. Do not expand into redesign recommendations.',
+    "Use the baseline documentation as the comparison source. Separate directly observed evidence from inference. Use only the categories truth-risk drift, validation drift, maintainability drift, and standard mismatch. Do not collapse present on disk, not ignored, tracked by git, enforced in CI, and documented in inspected scope into a single claim — each is a distinct state. When claiming absence, use within inspected scope or no evidence found in inspected material. Only call something a standard mismatch when the violated standard is proven by the baseline document, an ADR, a tooling contract, or a strong repeated convention that is clearly intentional. When a finding has a confirmed problem but an unresolved policy question, split them using Confirmed and Unresolved. Include compact non-findings when they close likely questions. Do not expand into redesign recommendations.",
   output:
-    'A bounded drift audit listing category, confidence, directly observed, inference or uncertainty, significance, and recommended action per item. Where applicable, use the Confirmed / Unresolved split for mixed findings. Close with Fix first, Verify next, and Defer.',
+    "A bounded drift audit listing category, confidence, directly observed, inference or uncertainty, significance, and recommended action per item. Where applicable, use the Confirmed / Unresolved split for mixed findings. Close with Fix first, Verify next, and Defer.",
 };
 ```
 

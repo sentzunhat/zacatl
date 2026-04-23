@@ -8,15 +8,15 @@ A user asks for a handoff prompt so another agent can continue work with minimal
 
 ```ts
 const shape: Shape = {
-  input: 'create a handoff prompt for the next agent to continue this task',
+  input: "create a handoff prompt for the next agent to continue this task",
   context:
-    'Current session produced partial implementation, known risks, and pending verification tasks. Next agent should continue without re-discovery.',
+    "Current session produced partial implementation, known risks, and pending verification tasks. Next agent should continue without re-discovery.",
   mission:
-    'Generate a concise, intent-first handoff prompt that preserves decisions, current state, and next actions.',
+    "Generate a concise, intent-first handoff prompt that preserves decisions, current state, and next actions.",
   constraints:
-    'Do not rewrite history; include only verified facts; list open questions explicitly; keep it reusable in a new chat.',
+    "Do not rewrite history; include only verified facts; list open questions explicitly; keep it reusable in a new chat.",
   output:
-    'A copy-ready handoff prompt with sections for intent, current state, decisions, risks, and immediate next steps.',
+    "A copy-ready handoff prompt with sections for intent, current state, decisions, risks, and immediate next steps.",
 };
 ```
 

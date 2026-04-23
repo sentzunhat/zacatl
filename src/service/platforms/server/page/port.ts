@@ -3,12 +3,7 @@ export interface StaticConfig {
   prefix?: string;
 }
 
-export interface PageServerConfig {
-  devServerUrl?: string;
-  staticDir?: string;
-  customRegister?: (server: unknown) => Promise<void> | void;
-  apiPrefix?: string;
-}
+export type { PageServerConfig } from '../types/server-config';
 
 /**
  * PageServerPort - Hexagonal Architecture port for frontend/page server

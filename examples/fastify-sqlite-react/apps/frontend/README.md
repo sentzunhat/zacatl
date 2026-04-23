@@ -5,6 +5,7 @@ Minimal React + Vite frontend for the Fastify + SQLite + React example.
 ## Quick Start
 
 ```bash
+cd ../..
 npm install
 npm run dev
 ```

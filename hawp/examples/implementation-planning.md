@@ -8,15 +8,16 @@ A user asks: "plan the implementation for adding structured review support to ou
 
 ```ts
 const shape: Shape = {
-  input: 'plan the implementation for adding structured review support to our CLI',
+  input:
+    "plan the implementation for adding structured review support to our CLI",
   context:
-    'The CLI already supports direct task execution and basic reporting. The team wants a bounded plan for adding review-oriented flows without redesigning the tool.',
+    "The CLI already supports direct task execution and basic reporting. The team wants a bounded plan for adding review-oriented flows without redesigning the tool.",
   mission:
-    'Produce a bounded implementation plan for adding structured review support to the CLI, including scope, dependencies, and phased delivery.',
+    "Produce a bounded implementation plan for adding structured review support to the CLI, including scope, dependencies, and phased delivery.",
   constraints:
-    'Do not redesign the whole CLI; state assumptions explicitly; call out dependencies and unresolved questions; keep the plan close to the current architecture and delivery capacity.',
+    "Do not redesign the whole CLI; state assumptions explicitly; call out dependencies and unresolved questions; keep the plan close to the current architecture and delivery capacity.",
   output:
-    'A phased implementation plan with scope, assumptions, dependencies, key work items, risks, and immediate next steps.',
+    "A phased implementation plan with scope, assumptions, dependencies, key work items, risks, and immediate next steps.",
 };
 ```
 

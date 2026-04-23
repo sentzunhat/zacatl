@@ -14,8 +14,11 @@ export interface HttpServerConfig {
 export interface PageServerConfig {
   devServerUrl?: string | undefined;
   staticDir?: string | undefined;
-  customRegister?: ((server: unknown) => Promise<void> | void) | undefined;
+  /** Enable SPA fallback (serve index.html for non-API, non-asset routes). Defaults to true when staticDir is set. */
+  spaFallback?: boolean | undefined;
+  /** Base path for API routes excluded from SPA fallback. Defaults to '/api'. */
   apiPrefix?: string | undefined;
+  customRegister?: ((server: unknown) => Promise<void> | void) | undefined;
 }
 
 export enum ServerType {

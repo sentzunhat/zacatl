@@ -6,9 +6,9 @@
   "type": "module",
   "scripts": {
     "start": "node dist/index.js",
-    "dev": "tsx watch --tsconfig tsconfig.dev.json src/index.ts",
-    "build": "tsc && npx tsx ../../../scripts/build/fix-esm.ts dist",
-    "clean": "rm -rf dist ../database.sqlite"
+    "dev": "npm run build && npm run start",
+    "build": "npm --prefix ../.. exec -- tsc -p tsconfig.json && node ../../../../build-scripts-esm/build/fix-esm.js dist",
+    "clean": "rm -rf dist ../../database.sqlite"
   },
   "devDependencies": {}
 }

@@ -33,10 +33,14 @@ const resolveExampleRootDir = (): string => {
   ];
 
   const found = candidates.find((dir) => {
-    return existsSync(join(dir, 'backend')) && existsSync(join(dir, 'frontend'));
+    const hasAppsLayout =
+      existsSync(join(dir, 'apps', 'backend')) && existsSync(join(dir, 'apps', 'frontend'));
+    const hasLegacyLayout = existsSync(join(dir, 'backend')) && existsSync(join(dir, 'frontend'));
+
+    return hasAppsLayout || hasLegacyLayout;
   });
 
-  return found ?? join(__dirname, '..', '..');
+  return found ?? join(__dirname, '..', '..', '..');
 };
 
 const rootDir = resolveExampleRootDir();
@@ -82,7 +86,9 @@ const resolveFaviconPath = async (frontendDistDir: string): Promise<string> => {
  * These are served directly and not prefixed with /api
  */
 export const registerFrontendRoutes = async (fastify: FastifyInstance): Promise<void> => {
-  const frontendDistDir = join(rootDir, 'frontend/dist');
+  const frontendDistDir = existsSync(join(rootDir, 'apps', 'frontend', 'dist'))
+    ? join(rootDir, 'apps', 'frontend', 'dist')
+    : join(rootDir, 'frontend', 'dist');
   const faviconPath = await resolveFaviconPath(frontendDistDir);
 
   fastify.get('/', async (_request, reply) => {
@@ -116,7 +122,11 @@ export const createServiceConfig = (fastify: FastifyInstance, sequelize: Sequeli
       locales: {
         default: 'en',
         supported: ['en', 'es'],
-        directories: [join(rootDir, 'backend/locales')],
+        directories: [
+          existsSync(join(rootDir, 'apps', 'backend', 'locales'))
+            ? join(rootDir, 'apps', 'backend', 'locales')
+            : join(rootDir, 'backend', 'locales'),
+        ],
       },
     },
     platforms: {

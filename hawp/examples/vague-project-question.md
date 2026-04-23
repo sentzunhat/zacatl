@@ -8,14 +8,15 @@ A user asks: "what is this project about?"
 
 ```ts
 const shape: Shape = {
-  input: 'what is this project about?',
+  input: "what is this project about?",
   context:
-    'Repository is infra-as-code for Sentzunhat; includes Kubernetes manifests, ArgoCD configs, and platform service folders.',
+    "Repository is infra-as-code for Sentzunhat; includes Kubernetes manifests, ArgoCD configs, and platform service folders.",
   mission:
-    'Produce a concise project summary that explains purpose, main components, and operational model.',
+    "Produce a concise project summary that explains purpose, main components, and operational model.",
   constraints:
-    'Stay factual to current repository evidence; avoid speculation; keep summary short and readable for non-authors.',
-  output: 'A 5-8 sentence plain-language summary with key folders and responsibilities.',
+    "Stay factual to current repository evidence; avoid speculation; keep summary short and readable for non-authors.",
+  output:
+    "A 5-8 sentence plain-language summary with key folders and responsibilities.",
 };
 ```
 

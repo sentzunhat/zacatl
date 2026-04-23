@@ -11,21 +11,14 @@ import type { DatabaseConfig } from './database/port';
 import { ExpressPageAdapter, FastifyPageAdapter } from './page/adapters';
 import { PageServer } from './page/page-server';
 import type { PageServerPort } from './page/port';
-import { ServerVendor, type HttpServerConfig } from './types/server-config';
+import { ServerVendor, type HttpServerConfig, type PageServerConfig } from './types/server-config';
 import type { RestApplicationEntryPoints } from '../../layers/application/types';
-
-interface ServerPageConfig {
-  devServerUrl?: string;
-  staticDir?: string;
-  customRegister?: (server: unknown) => Promise<void> | void;
-  apiPrefix?: string;
-}
 
 export interface ConfigServer {
   name: string;
   server: HttpServerConfig;
   databases: Array<DatabaseConfig>;
-  page?: ServerPageConfig;
+  page?: PageServerConfig;
   port: number;
   /** REST entry points for route/hook registration */
   entryPoints?: RestApplicationEntryPoints;

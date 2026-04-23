@@ -78,21 +78,17 @@ export class PageServer {
       return;
     }
 
-    const { staticDir, apiPrefix, customRegister } = this.config.page;
+    const { staticDir, spaFallback = true, apiPrefix = '/api', customRegister } = this.config.page;
 
     if (staticDir != null) {
-      this.registerStaticFiles({
-        root: staticDir,
-        ...(apiPrefix != null ? { prefix: apiPrefix } : {}),
-      });
-    }
+      this.registerStaticFiles({ root: staticDir });
 
-    if (staticDir != null && apiPrefix != null) {
-      this.registerSpaFallback(apiPrefix, staticDir);
+      if (spaFallback) {
+        this.registerSpaFallback(apiPrefix, staticDir);
+      }
     }
 
     if (customRegister != null) {
-      // Allow custom registration for specific page frameworks
       await customRegister(this.adapter);
     }
   }

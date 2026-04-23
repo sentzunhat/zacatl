@@ -5,13 +5,14 @@ Minimal Fastify backend for the Fastify + SQLite + React example.
 ## Quick Start
 
 ```bash
+cd ../..
 npm install
 npm run dev
 ```
 
 - API: http://localhost:8081
 - Default DB: sqlite:<example-root>/database.sqlite
-- Project locales: `backend/locales/*.json`
+- Project locales: `apps/backend/locales/*.json`
 
 ## Environment
 
@@ -20,7 +21,7 @@ npm run dev
 
 ## Localization
 
-- Backend locale files live in `backend/locales/`
+- Backend locale files live in `apps/backend/locales/`
 - Zacatl built-in locales still come from the library package
 - Add project-specific overrides by creating or updating `en.json`, `es.json`, or new language files in this folder
 

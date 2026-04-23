@@ -1,5 +1,5 @@
 ---
-applyTo: 'hawp/**,**/hawp/**'
+applyTo: "hawp/**,**/hawp/**"
 ---
 
 # HAWP Modular Intake

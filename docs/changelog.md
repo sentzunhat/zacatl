@@ -2,6 +2,23 @@
 
 ---
 
+## [0.0.54] - 2026-04-22
+
+**Status**: Pending release
+
+### ✨ Improvements
+
+- **Built-in SPA hosting** — `PageServer.configure()` now correctly serves static assets from the dist root and enables SPA fallback (index.html for non-API routes) by default whenever `staticDir` is set. The new `spaFallback` flag (default `true`) lets API-only services opt out explicitly, and `apiPrefix` now defaults to `'/api'` instead of requiring manual configuration.
+
+### 🐛 Fixes
+
+- **`apiPrefix` no longer misused as static URL prefix** — Previously `PageServer.configure()` passed `apiPrefix` as the URL mount path for static files, which caused assets to be unreachable. Static files are now always mounted at root.
+- **SPA fallback silently skipped** — Previously SPA fallback was only activated when `apiPrefix` was explicitly set alongside `staticDir`, meaning most consumers never got it. Fallback now activates automatically when `staticDir` is present.
+
+### 🔧 Architecture
+
+- **Removed duplicate type definitions** — `ServerPageConfig` (private inline in `server.ts`) and the redundant `PageServerConfig` declaration in `page/port.ts` were removed. `PageServerConfig` is now defined once in `types/server-config.ts` and re-exported where needed.
+
 ## [0.0.53] - 2026-04-10
 
 **Status**: Pending release

@@ -16,7 +16,7 @@ npm run dev
 
 - **Storage**: SQLite file at `database.sqlite` (example root)
 - **Auto-init**: Schema is created on app start
-- **Connection**: `backend/src/config.ts`
+- **Connection**: `apps/backend/src/config.ts`
 
 ## What's Included
 
@@ -30,13 +30,14 @@ npm run dev
 ## Project Structure
 
 ```
-backend/              # Fastify API
-├── locales/          # Backend locale overrides
-└── src/
-  ├── application/    # Handlers, schemas
-  ├── domain/         # Services, models, ports
-  └── infrastructure/ # Repositories, DB models
-frontend/             # React + Vite
+apps/
+├── backend/          # Fastify API
+│   ├── locales/      # Backend locale overrides
+│   └── src/
+│     ├── application/    # Handlers, schemas
+│     ├── domain/         # Services, models, ports
+│     └── infrastructure/ # Repositories, DB models
+└── frontend/         # React + Vite
 ```
 
 ## API Endpoints
@@ -81,14 +82,14 @@ The Docker build is self-contained: it compiles required Zacatl framework artifa
 - ✅ One image = backend + compiled frontend
 - ✅ Native module support via `sqlite3` workspace dependency
 - ✅ Distroless base image (production-ready)
-- ✅ Backend runs from `backend/`, so `backend/locales/` is discovered in dev and Docker
-- ⚠️ `npx tsx ../../../scripts/build/fix-esm.ts dist` required in build script (see `backend/package.json`)
+- ✅ Backend runs from `apps/backend/`, so `apps/backend/locales/` is discovered in dev and Docker
+- ⚠️ `node ../../../../build-scripts-esm/build/fix-esm.js dist` required in build script (see `apps/backend/package.json`)
 
 ### Localization
 
-- Backend server locale files live in `backend/locales/`
+- Backend server locale files live in `apps/backend/locales/`
 - Zacatl built-in locales remain packaged with the library
-- Add project-specific locale files in `backend/locales/` and they are picked up automatically when the backend runs
+- Add project-specific locale files in `apps/backend/locales/` and they are picked up automatically when the backend runs
 
 ## Documentation
 

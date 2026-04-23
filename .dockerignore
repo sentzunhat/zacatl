@@ -9,5 +9,7 @@
 **/build
 !scripts/build
 !scripts/build/fix-esm.ts
+!build-scripts-esm/build
+!build-scripts-esm/build/**
 !build
 !build/**

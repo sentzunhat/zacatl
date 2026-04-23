@@ -1,0 +1,11 @@
+{
+  "name": "zacatl-fastify-sqlite-frontend",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "npm --prefix ../.. exec -- vite --host 0.0.0.0 --port 5001",
+    "build": "npm --prefix ../.. exec -- vite build",
+    "preview": "npm --prefix ../.. exec -- vite preview"
+  }
+}
