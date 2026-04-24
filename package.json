@@ -161,7 +161,7 @@
     "reflect-metadata": "^0.2.2",
     "sequelize": "^6.0.0",
     "tsyringe": "^4.10.0",
-    "uuid": "^13.0.0",
+    "uuid": "^14.0.0",
     "zod": "^4.3.6"
   }
 }
