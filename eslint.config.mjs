@@ -34,7 +34,7 @@ const testDefault = (await import('./eslint.test.config.mjs')).default ?? [];
 
 let scriptsDefault = [];
 try {
-  scriptsDefault = (await import('./scripts/eslint.config.mjs')).default ?? [];
+  scriptsDefault = (await import('./scripts/eslint.config.mjs')).scriptsEslintConfig ?? [];
 } catch {
   scriptsDefault = [];
 }

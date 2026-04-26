@@ -70,22 +70,23 @@ const main = async (): Promise<void> => {
       }
 
       const testCountEnv = process.env['TEST_COUNT'];
-      let testCount = testCountEnv ? Number(testCountEnv) || 0 : 0;
+      let testCount = testCountEnv !== undefined ? Number(testCountEnv) || 0 : 0;
 
-      if (!testCount) {
+      if (testCount === 0) {
         const resultsPath = path.join(repoRoot, 'test-results.json');
         try {
           const raw = await fs.readFile(resultsPath, 'utf8');
           const parsed = JSON.parse(raw);
 
           const deriveCount = (obj: unknown): number => {
-            if (!obj || typeof obj !== 'object') return 0;
+            if (obj === null || typeof obj !== 'object') return 0;
             const anyObj = obj as Record<string, unknown>;
             if (typeof anyObj['numTotalTests'] === 'number')
               return anyObj['numTotalTests'] as number;
             if (typeof anyObj['total'] === 'number') return anyObj['total'] as number;
-            if (anyObj['stats'] && typeof anyObj['stats'] === 'object') {
-              const stats = anyObj['stats'] as Record<string, unknown>;
+            const statsValue = anyObj['stats'];
+            if (statsValue !== null && typeof statsValue === 'object') {
+              const stats = statsValue as Record<string, unknown>;
               if (typeof stats['tests'] === 'number') return stats['tests'] as number;
               if (typeof stats['numTotalTests'] === 'number')
                 return stats['numTotalTests'] as number;
@@ -101,7 +102,7 @@ const main = async (): Promise<void> => {
             }
             for (const k of Object.keys(anyObj)) {
               const v = deriveCount(anyObj[k]);
-              if (v && v > 0) return v;
+              if (v > 0) return v;
             }
             return 0;
           };

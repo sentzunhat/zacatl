@@ -26,7 +26,7 @@ const fixEntryKeepBuild = (entry: unknown): unknown => {
       .replace(/^(\.\/)?(build)\/(?!esm\/|cjs\/)/, './build/esm/');
   }
   if (Array.isArray(entry)) return entry.map(fixEntryKeepBuild);
-  if (entry && typeof entry === 'object') {
+  if (entry !== null && typeof entry === 'object') {
     const out: Record<string, unknown> = {};
     for (const [k, v] of Object.entries(entry as Record<string, unknown>))
       out[k] = fixEntryKeepBuild(v);
@@ -69,9 +69,9 @@ const copyFirstExisting = (candidates: string[], dest: string): string | null =>
 const usedEsm = copyFirstExisting(esmCandidates, buildEsmDest);
 const usedCjs = copyFirstExisting(cjsCandidates, buildCjsDest);
 // eslint-disable-next-line no-console
-if (!usedEsm) console.warn('No ESM build source found in', esmCandidates);
+if (usedEsm === null) console.warn('No ESM build source found in', esmCandidates);
 // eslint-disable-next-line no-console
-if (!usedCjs) console.warn('No CJS build source found in', cjsCandidates);
+if (usedCjs === null) console.warn('No CJS build source found in', cjsCandidates);
 
 const binDir = path.join(buildDest, 'bin');
 fs.mkdirSync(binDir, { recursive: true });
@@ -273,29 +273,32 @@ const newPkg: PublishPkg = {
   dependencies: pkg['dependencies'],
   repository: (() => {
     const repo = pkg['repository'];
-    if (repo && typeof repo === 'object' && 'url' in (repo as object)) {
+    if (repo !== null && typeof repo === 'object' && 'url' in (repo as object)) {
       const r = repo as Record<string, string>;
       const url = r['url'] ?? '';
       return { ...r, url: url.startsWith('git+') ? url : `git+${url}` };
     }
     return repo;
   })(),
-  main: pkg['main']
-    ? (ensureDot(pkg['main']) as string).replace(
+  main:
+    typeof pkg['main'] === 'string'
+      ? (ensureDot(pkg['main']) as string).replace(
         /^(\.\/)?(build-cjs|cjs|build|esm)\//,
         './build/cjs/',
       )
-    : undefined,
-  module: pkg['module']
-    ? (ensureDot(pkg['module']) as string).replace(/^(\.\/)?(build|esm)\//, './build/esm/')
-    : undefined,
-  types: pkg['types']
-    ? (ensureDot(pkg['types']) as string).replace(/^(\.\/)?(build|esm)\//, './build/esm/')
-    : undefined,
+      : undefined,
+  module:
+    typeof pkg['module'] === 'string'
+      ? (ensureDot(pkg['module']) as string).replace(/^(\.\/)?(build|esm)\//, './build/esm/')
+      : undefined,
+  types:
+    typeof pkg['types'] === 'string'
+      ? (ensureDot(pkg['types']) as string).replace(/^(\.\/)?(build|esm)\//, './build/esm/')
+      : undefined,
   exports: undefined,
 };
 
-if (pkg['bin']) {
+if (pkg['bin'] !== undefined) {
   const makeLocalBin = (b: string): string => {
     if (!b) return b;
     const p = ensureDot(b) as string;
@@ -313,14 +316,14 @@ if (pkg['bin']) {
   }
 }
 
-if (pkg['exports']) {
+if (pkg['exports'] !== undefined) {
   const fixed: Record<string, unknown> = {};
   for (const [k, v] of Object.entries(pkg['exports'] as Record<string, unknown>))
     fixed[k] = fixEntryKeepBuild(v);
   newPkg['exports'] = fixed;
 }
 
-if (!newPkg['exports']) {
+if (newPkg['exports'] === undefined) {
   const buildEsm = buildEsmDest;
   const exportsObj: Record<string, unknown> = {};
 
@@ -380,8 +383,8 @@ const copyIfExists = (name: string): void => {
 copyIfExists('README.md');
 copyIfExists('LICENSE');
 
-if (!newPkg.bin || typeof newPkg.bin === 'string') newPkg.bin = {};
-if (!(newPkg.bin as Record<string, string>)['zacatl-fix-esm']) {
+if (newPkg.bin === undefined || typeof newPkg.bin === 'string') newPkg.bin = {};
+if ((newPkg.bin as Record<string, string>)['zacatl-fix-esm'] === undefined) {
   (newPkg.bin as Record<string, string>)['zacatl-fix-esm'] = 'build/bin/fix-esm.js';
 }
 

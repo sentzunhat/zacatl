@@ -8,6 +8,7 @@
     "skipLibCheck": true,
     "useUnknownInCatchVariables": false,
     "strict": false,
+    "strictNullChecks": true,
     "paths": {
       "@zacatl": ["./src/index.ts"],
       "@zacatl/service": ["./src/service/index.ts"],

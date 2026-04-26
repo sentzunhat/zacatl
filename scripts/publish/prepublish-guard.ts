@@ -7,7 +7,7 @@ const root = process.cwd();
 const packagePath = resolve(root, 'package.json');
 const changelogPath = resolve(root, 'docs/changelog.md');
 const skipGuard = process.env['SKIP_PREPUBLISH_GUARD'] === '1';
-const skipGuardReason = (process.env['SKIP_PREPUBLISH_GUARD_REASON'] || '').trim();
+const skipGuardReason = (process.env['SKIP_PREPUBLISH_GUARD_REASON'] ?? '').trim();
 
 const fail = (message: string): void => {
   // eslint-disable-next-line no-console
@@ -26,7 +26,7 @@ const pass = (message: string): void => {
 };
 
 if (skipGuard) {
-  if (!skipGuardReason) {
+  if (skipGuardReason.length === 0) {
     fail(
       'SKIP_PREPUBLISH_GUARD=1 requires SKIP_PREPUBLISH_GUARD_REASON with a non-empty emergency reason',
     );
@@ -47,7 +47,9 @@ if (!packageJson) fail('Unable to read package.json');
 const packageName = typeof packageJson['name'] === 'string' ? packageJson['name'] : '';
 const packageVersion = typeof packageJson['version'] === 'string' ? packageJson['version'] : '';
 
-if (!packageName || !packageVersion) fail('package.json must include both name and version');
+if (packageName.length === 0 || packageVersion.length === 0) {
+  fail('package.json must include both name and version');
+}
 
 let changelogContent: string = '';
 try {
@@ -62,11 +64,15 @@ if (firstSeparatorIndex === -1) fail("docs/changelog.md is missing the top '---'
 
 const headerRegex = /^## \[([^\]]+)\]/;
 const firstEntryLine = lines.slice(firstSeparatorIndex + 1).find((line) => headerRegex.test(line));
-if (!firstEntryLine) fail('docs/changelog.md has no release entry after the top separator');
+if (firstEntryLine === undefined) {
+  fail('docs/changelog.md has no release entry after the top separator');
+}
 
 const match = (firstEntryLine?.match(headerRegex) ?? []) as RegExpMatchArray;
 const topVersion = match[1];
-if (!topVersion) fail('Unable to parse top changelog version entry');
+if (topVersion === undefined || topVersion.length === 0) {
+  fail('Unable to parse top changelog version entry');
+}
 
 if (topVersion !== packageVersion) {
   fail(
@@ -84,10 +90,10 @@ try {
     encoding: 'utf8',
   });
   const parsed = JSON.parse(output);
-  publishedVersions = Array.isArray(parsed) ? parsed : parsed ? [parsed] : [];
+  publishedVersions = Array.isArray(parsed) ? parsed : parsed != null ? [parsed] : [];
 } catch (err: unknown) {
   let stderr = '';
-  if (err && typeof err === 'object') {
+  if (err !== null && typeof err === 'object') {
     const maybe = err as { stderr?: unknown };
     if (maybe.stderr != null)
       stderr = typeof maybe.stderr === 'string' ? maybe.stderr : String(maybe.stderr);

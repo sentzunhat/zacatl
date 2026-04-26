@@ -14,7 +14,7 @@ const __dirname = path.dirname(__filename);
  *   import scriptsOverrides from './scripts/eslint.config.mjs';
  *   export default [...recommended, ...scriptsOverrides];
  */
-export default [
+const scriptsEslintConfig = [
   {
     files: ['scripts/**/*.{ts,cts,mts,js,cjs,mjs}'],
     languageOptions: {
@@ -72,3 +72,5 @@ export default [
     },
   },
 ];
+
+export { scriptsEslintConfig };
