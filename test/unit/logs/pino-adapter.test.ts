@@ -39,7 +39,7 @@ describe('PinoLoggerAdapter', () => {
   });
 
   it('initializes pino with destination if provided', () => {
-    const dest: Record<string, unknown> = {};
+    const dest = { write: vi.fn() } as unknown as never;
     new PinoLoggerAdapter(undefined, dest);
     expect(mockPino).toHaveBeenCalledWith(expect.anything(), dest);
   });

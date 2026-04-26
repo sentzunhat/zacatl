@@ -1,5 +1,4 @@
 /* eslint-disable import/order */
-import type { Express } from 'express';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { z } from '@zacatl/third-party/zod';
 
@@ -15,10 +14,7 @@ import { createProxyMiddleware } from 'http-proxy-middleware';
 
 /* eslint-enable import/order */
 
-type MockExpressServer = Pick<
-  Express,
-  'get' | 'post' | 'put' | 'delete' | 'patch' | 'use' | 'all'
-> & {
+type MockExpressServer = {
   get: ReturnType<typeof vi.fn>;
   post: ReturnType<typeof vi.fn>;
   put: ReturnType<typeof vi.fn>;
@@ -43,7 +39,7 @@ describe('ExpressApiAdapter', () => {
       use: vi.fn(),
       all: vi.fn(),
     };
-    adapter = new ExpressApiAdapter(mockServer as unknown as Express);
+    adapter = new ExpressApiAdapter(mockServer as never);
   });
 
   describe('registerRoute', () => {
@@ -66,17 +62,25 @@ describe('ExpressApiAdapter', () => {
         schema: {
           body: z.object({ name: z.string() }),
         },
-        execute: vi.fn().mockImplementation(async (_req, reply: { code: (statusCode: number) => { send: (payload: unknown) => unknown } }) => {
-          // Handler calls reply.send() which translates to res.json()
-          await reply.code(200).send({ success: true });
-          return { success: true };
-        }),
+        execute: vi
+          .fn()
+          .mockImplementation(
+            async (
+              _req,
+              reply: { code: (statusCode: number) => { send: (payload: unknown) => unknown } },
+            ) => {
+              // Handler calls reply.send() which translates to res.json()
+              await reply.code(200).send({ success: true });
+              return { success: true };
+            },
+          ),
       } as unknown as RouteHandler;
 
       adapter.registerRoute(handler);
 
       // Get the callback registered with express
-      const callback = mockServer.post.mock.calls[0][1];
+      const callback = mockServer.post.mock.calls[0]?.[1];
+      expect(callback).toBeDefined();
 
       const req = {
         body: { name: 'Valid' },
@@ -92,7 +96,7 @@ describe('ExpressApiAdapter', () => {
       };
       const next = vi.fn();
 
-      await callback(req, res, next);
+      await (callback as (...args: unknown[]) => Promise<void>)(req, res, next);
 
       expect(handler.execute).toHaveBeenCalled();
       expect(res.status).toHaveBeenCalledWith(200);
@@ -111,7 +115,8 @@ describe('ExpressApiAdapter', () => {
 
       adapter.registerRoute(handler);
 
-      const callback = mockServer.post.mock.calls[0][1];
+      const callback = mockServer.post.mock.calls[0]?.[1];
+      expect(callback).toBeDefined();
 
       const req = {
         body: { name: 123 }, // Invalid type
@@ -126,7 +131,7 @@ describe('ExpressApiAdapter', () => {
       };
       const next = vi.fn();
 
-      await callback(req, res, next);
+      await (callback as (...args: unknown[]) => Promise<void>)(req, res, next);
 
       expect(handler.execute).not.toHaveBeenCalled();
       expect(next).toHaveBeenCalledWith(expect.any(Error));

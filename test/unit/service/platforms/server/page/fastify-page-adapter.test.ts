@@ -38,21 +38,27 @@ describe('FastifyPageAdapter', () => {
       adapter.registerStaticFiles({ root: '/dist/client' });
 
       expect(mockServer.register).toHaveBeenCalledOnce();
-      const [, options] = mockServer.register.mock.calls[0];
+      const firstCall = mockServer.register.mock.calls[0];
+      expect(firstCall).toBeDefined();
+      const [, options] = firstCall as [unknown, { root?: string; prefix?: string }];
       expect(options.root).toBe('/dist/client');
     });
 
     it('should include prefix when provided', () => {
       adapter.registerStaticFiles({ root: '/dist/client', prefix: '/assets/' });
 
-      const [, options] = mockServer.register.mock.calls[0];
+      const firstCall = mockServer.register.mock.calls[0];
+      expect(firstCall).toBeDefined();
+      const [, options] = firstCall as [unknown, { root?: string; prefix?: string }];
       expect(options.prefix).toBe('/assets/');
     });
 
     it('should not include prefix when not provided', () => {
       adapter.registerStaticFiles({ root: '/dist/client' });
 
-      const [, options] = mockServer.register.mock.calls[0];
+      const firstCall = mockServer.register.mock.calls[0];
+      expect(firstCall).toBeDefined();
+      const [, options] = firstCall as [unknown, { root?: string; prefix?: string }];
       expect(options.prefix).toBeUndefined();
     });
   });
@@ -125,7 +131,7 @@ describe('FastifyPageAdapter', () => {
     it('should treat undefined url as root and fall back to index.html', async () => {
       adapter.registerSpaFallback('/api', '/dist/client');
       const reply = { sendFile: vi.fn(), type: vi.fn() };
-      const request = { raw: { url: undefined }, method: 'GET', url: undefined };
+      const request = { raw: {}, method: 'GET' };
 
       await notFoundHandler(request, reply);
 

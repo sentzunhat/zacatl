@@ -4,7 +4,7 @@ import { beforeEach, afterEach, describe, expect, it } from 'vitest';
 import { Sequelize, DataTypes } from '@zacatl/third-party/sequelize';
 
 describe('Sequelize + pg-mem extended operations', () => {
-  let db: ReturnType<typeof newDb>;
+  let db: ReturnType<typeof newDb> | undefined;
   let sequelize: Sequelize;
 
   beforeEach(async () => {
@@ -89,12 +89,13 @@ describe('Sequelize + pg-mem extended operations', () => {
     }
 
     const user = await userModel.create({ email: 'u1@example.com', name: 'U1' });
+    const userId = Number(user.get('id'));
     await postModel.bulkCreate([
-      { title: 'p1', userId: user.id },
-      { title: 'p2', userId: user.id },
+      { title: 'p1', userId },
+      { title: 'p2', userId },
     ]);
 
-    const posts = await postModel.findAll({ where: { userId: user.id }, order: [['id', 'ASC']] });
+    const posts = await postModel.findAll({ where: { userId }, order: [['id', 'ASC']] });
     expect(posts.length).toBe(2);
     expect(posts[0]?.get('title')).toBe('p1');
 

@@ -28,7 +28,7 @@ describe('SequelizeAdapter Extras', () => {
     // Create a fake instance whose prototype matches a minimal Model prototype
     const fakeProto: Record<string, unknown> = {};
     const fakeInstance: Record<string, unknown> = Object.create(fakeProto);
-    fakeInstance.get = vi
+    fakeInstance['get'] = vi
       .fn()
       .mockReturnValue({ id: 'x', name: 'y', createdAt: new Date(), updatedAt: new Date() });
 

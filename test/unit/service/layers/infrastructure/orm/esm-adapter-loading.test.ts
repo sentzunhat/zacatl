@@ -21,7 +21,11 @@ describe('ESM Adapter Loading', () => {
 
   describe('Synchronous Initialization', () => {
     it('should create repository synchronously; model available after first async call', async () => {
-      class TestRepository extends BaseRepository<unknown, string, unknown> {
+      class TestRepository extends BaseRepository<
+        Record<string, unknown>,
+        string,
+        Record<string, unknown>
+      > {
         constructor() {
           super({
             type: ORMType.Mongoose,
@@ -39,7 +43,11 @@ describe('ESM Adapter Loading', () => {
     });
 
     it('should defer model access until after first async call', async () => {
-      class TestRepository extends BaseRepository<unknown, string, unknown> {
+      class TestRepository extends BaseRepository<
+        Record<string, unknown>,
+        string,
+        Record<string, unknown>
+      > {
         constructor() {
           super({
             type: ORMType.Mongoose,
@@ -59,7 +67,11 @@ describe('ESM Adapter Loading', () => {
     });
 
     it('should allow toLean to be called immediately', () => {
-      class TestRepository extends BaseRepository<unknown, string, unknown> {
+      class TestRepository extends BaseRepository<
+        Record<string, unknown>,
+        string,
+        Record<string, unknown>
+      > {
         constructor() {
           super({
             type: ORMType.Mongoose,
@@ -78,7 +90,11 @@ describe('ESM Adapter Loading', () => {
 
   describe('Adapter Error Handling', () => {
     it('should handle errors during adapter construction', () => {
-      class TestRepository extends BaseRepository<unknown, string, unknown> {
+      class TestRepository extends BaseRepository<
+        Record<string, unknown>,
+        string,
+        Record<string, unknown>
+      > {
         constructor() {
           super({
             type: ORMType.Mongoose,
@@ -95,7 +111,11 @@ describe('ESM Adapter Loading', () => {
       // This test verifies that dynamic import() is used (adapter is lazy-loaded)
       // while the constructor itself remains synchronous and fast
 
-      class TestRepository extends BaseRepository<unknown, string, unknown> {
+      class TestRepository extends BaseRepository<
+        Record<string, unknown>,
+        string,
+        Record<string, unknown>
+      > {
         constructor() {
           super({
             type: ORMType.Mongoose,
@@ -117,7 +137,11 @@ describe('ESM Adapter Loading', () => {
 
   describe('Repository Operations', () => {
     it('should allow async methods to be called immediately', async () => {
-      class TestRepository extends BaseRepository<unknown, string, unknown> {
+      class TestRepository extends BaseRepository<
+        Record<string, unknown>,
+        string,
+        Record<string, unknown>
+      > {
         constructor() {
           super({
             type: ORMType.Mongoose,
@@ -146,7 +170,11 @@ describe('ESM Adapter Loading', () => {
 
   describe('Concurrent Operations', () => {
     it('should handle multiple concurrent calls without initialization races', async () => {
-      class TestRepository extends BaseRepository<unknown, string, unknown> {
+      class TestRepository extends BaseRepository<
+        Record<string, unknown>,
+        string,
+        Record<string, unknown>
+      > {
         constructor() {
           super({
             type: ORMType.Mongoose,

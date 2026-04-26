@@ -23,27 +23,25 @@ type MockReply = Pick<ExpressResponse, 'headersSent'> & {
   send: ReturnType<typeof vi.fn<(body?: unknown) => void>>;
   status: ReturnType<typeof vi.fn<(statusCode: number) => MockReply>>;
 };
+type ExecuteReply = MockReply & ExpressResponse;
 type ZacatlErrorCtor = new (args: { message: string; reason: string }) => Error;
 
-const createMockRequest = (
-  overrides: Partial<TestRequest> = {},
-): TestRequest => ({
-  params: undefined,
-  query: {},
-  headers: {},
-  body: undefined,
-  ...overrides,
-}) as unknown as TestRequest;
+const createMockRequest = (overrides: Partial<TestRequest> = {}): TestRequest =>
+  ({
+    params: undefined,
+    query: {},
+    headers: {},
+    body: undefined,
+    ...overrides,
+  } as unknown as TestRequest);
 
-const createMockReply = (
-  overrides: Partial<MockReply> = {},
-): MockReply => {
-  const reply: MockReply = {
+const createMockReply = (overrides: Partial<MockReply> = {}): MockReply => {
+  const reply = {
     headersSent: false,
     send: vi.fn<(body?: unknown) => void>(),
     status: vi.fn<(statusCode: number) => MockReply>(),
     ...overrides,
-  };
+  } as unknown as MockReply;
 
   reply.status.mockReturnValue(reply);
 
@@ -105,7 +103,7 @@ class ExpressHandlerWithCustomErrorHandling extends TestExpressRouteHandler {
 describe('Express AbstractRouteHandler', () => {
   it('auto-sends the handler response data directly', async () => {
     const mockRequest = createMockRequest();
-    const mockReply = createMockReply();
+    const mockReply = createMockReply() as ExecuteReply;
 
     const handler = new TestExpressRouteHandler();
     const result = await handler.execute(mockRequest, mockReply);
@@ -116,7 +114,7 @@ describe('Express AbstractRouteHandler', () => {
 
   it('handles NotFoundError with 404 status', async () => {
     const mockRequest = createMockRequest();
-    const mockReply = createMockReply();
+    const mockReply = createMockReply() as ExecuteReply;
 
     const handler = new ExpressHandlerThatThrowsNotFound();
 
@@ -139,7 +137,7 @@ describe('Express AbstractRouteHandler', () => {
     }
 
     const mockRequest = createMockRequest();
-    const mockReply = createMockReply();
+    const mockReply = createMockReply() as ExecuteReply;
 
     const handler = new BadRequestHandler();
 
@@ -159,7 +157,7 @@ describe('Express AbstractRouteHandler', () => {
     }
 
     const mockRequest = createMockRequest();
-    const mockReply = createMockReply();
+    const mockReply = createMockReply() as ExecuteReply;
 
     const handler = new ValidationErrorHandler();
 
@@ -179,7 +177,7 @@ describe('Express AbstractRouteHandler', () => {
     }
 
     const mockRequest = createMockRequest();
-    const mockReply = createMockReply();
+    const mockReply = createMockReply() as ExecuteReply;
 
     const handler = new UnauthorizedHandler();
 
@@ -199,7 +197,7 @@ describe('Express AbstractRouteHandler', () => {
     }
 
     const mockRequest = createMockRequest();
-    const mockReply = createMockReply();
+    const mockReply = createMockReply() as ExecuteReply;
 
     const handler = new ForbiddenHandler();
 
@@ -228,7 +226,7 @@ describe('Express AbstractRouteHandler', () => {
       };
 
       const mockRequest = createMockRequest();
-      const mockReply = createMockReply();
+      const mockReply = createMockReply() as ExecuteReply;
 
       const handler = new handlerClass();
 
@@ -239,7 +237,7 @@ describe('Express AbstractRouteHandler', () => {
 
   it('allows custom error handling via handleError override', async () => {
     const mockRequest = createMockRequest();
-    const mockReply = createMockReply();
+    const mockReply = createMockReply() as ExecuteReply;
 
     const handler = new ExpressHandlerWithCustomErrorHandling();
 
@@ -254,14 +252,14 @@ describe('Express AbstractRouteHandler', () => {
 
   it('removes statusCode from error response before sending', async () => {
     const mockRequest = createMockRequest();
-    const mockReply = createMockReply();
+    const mockReply = createMockReply() as ExecuteReply;
 
     const handler = new ExpressHandlerThatThrowsNotFound();
 
     await expect(handler.execute(mockRequest, mockReply)).rejects.toThrow();
 
     // Verify that statusCode was not included in the sent data
-    const sendCall = mockReply.send.mock.calls[0][0];
+    const sendCall = mockReply.send.mock.calls[0]?.[0];
     expect(sendCall).not.toHaveProperty('statusCode');
   });
 
@@ -273,7 +271,7 @@ describe('Express AbstractRouteHandler', () => {
     }
 
     const mockRequest = createMockRequest();
-    const mockReply = createMockReply();
+    const mockReply = createMockReply() as ExecuteReply;
 
     const handler = new UnrecognizedErrorHandler();
 
@@ -284,7 +282,7 @@ describe('Express AbstractRouteHandler', () => {
 
   it('does not send twice when response already sent', async () => {
     const mockRequest = createMockRequest();
-    const mockReply = createMockReply({ headersSent: true });
+    const mockReply = createMockReply({ headersSent: true }) as ExecuteReply;
 
     const handler = new TestExpressRouteHandler();
 
@@ -310,7 +308,7 @@ describe('Express AbstractRouteHandler', () => {
       headers: { authorization: 'Bearer token' },
       body: undefined,
     });
-    const mockReply = createMockReply();
+    const mockReply = createMockReply() as ExecuteReply;
 
     const handler = new SpyingHandler();
 

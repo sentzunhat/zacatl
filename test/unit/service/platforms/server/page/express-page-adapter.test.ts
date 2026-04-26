@@ -37,14 +37,18 @@ describe('ExpressPageAdapter', () => {
       adapter.registerStaticFiles({ root: '/dist/client' });
 
       expect(mockServer.use).toHaveBeenCalledOnce();
-      const [prefix] = mockServer.use.mock.calls[0];
+      const firstCall = mockServer.use.mock.calls[0];
+      expect(firstCall).toBeDefined();
+      const [prefix] = firstCall as unknown[];
       expect(prefix).toBe('/');
     });
 
     it('should use provided prefix when given', () => {
       adapter.registerStaticFiles({ root: '/dist/client', prefix: '/assets' });
 
-      const [prefix] = mockServer.use.mock.calls[0];
+      const firstCall = mockServer.use.mock.calls[0];
+      expect(firstCall).toBeDefined();
+      const [prefix] = firstCall as unknown[];
       expect(prefix).toBe('/assets');
     });
   });

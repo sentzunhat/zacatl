@@ -35,14 +35,15 @@ if (skipGuard) {
   process.exit(0);
 }
 
-let packageJson: Record<string, unknown> | undefined;
+let packageJsonRaw: Record<string, unknown> | undefined;
 try {
-  packageJson = JSON.parse(readFileSync(packagePath, 'utf8')) as Record<string, unknown>;
+  packageJsonRaw = JSON.parse(readFileSync(packagePath, 'utf8')) as Record<string, unknown>;
 } catch {
   fail('Unable to read package.json');
 }
 
-if (!packageJson) fail('Unable to read package.json');
+if (!packageJsonRaw) fail('Unable to read package.json');
+const packageJson = packageJsonRaw ?? {};
 
 const packageName = typeof packageJson['name'] === 'string' ? packageJson['name'] : '';
 const packageVersion = typeof packageJson['version'] === 'string' ? packageJson['version'] : '';

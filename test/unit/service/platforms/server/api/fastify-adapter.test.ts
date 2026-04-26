@@ -118,7 +118,10 @@ describe('FastifyApiAdapter', () => {
 
       adapter.registerRoute(handler);
 
-      const registeredHandler = mockServer.route.mock.calls[0][0].handler;
+      const registeredRoute = mockServer.route.mock.calls[0]?.[0] as
+        | { handler?: unknown }
+        | undefined;
+      const registeredHandler = registeredRoute?.handler;
       expect(registeredHandler).toBeDefined();
     });
   });
@@ -309,7 +312,10 @@ describe('FastifyApiAdapter', () => {
 
       adapter.registerRoute(handler);
 
-      const registeredHandler = mockServer.route.mock.calls[0][0].handler;
+      const registeredRoute = mockServer.route.mock.calls[0]?.[0] as
+        | { handler?: unknown }
+        | undefined;
+      const registeredHandler = registeredRoute?.handler;
       expect(typeof registeredHandler).toBe('function');
     });
   });
