@@ -76,7 +76,7 @@ start().catch((error) => {
 ### 2. Service Configuration (`src/service.ts`)
 
 ```typescript
-import { Service } from '@sentzunhat/zacatl';
+import { Service } from '@sentzunhat/zacatl/service';
 import { taskRoutes } from './tasks/application/route-handlers/routes.js';
 import { taskProviders } from './tasks/domain/providers/providers.js';
 import { taskRepositories } from './tasks/infrastructure/repositories/repositories.js';
@@ -126,7 +126,7 @@ export interface TaskOutput extends Task {
 
 ```typescript
 import { singleton } from 'tsyringe';
-import { BaseRepository, ORMType } from '@sentzunhat/zacatl';
+import { BaseRepository, ORMType } from '@sentzunhat/zacatl/service';
 import { Schema } from 'mongoose';
 import type { Task, TaskOutput } from '../../domain/entities/task.entity.js';
 
@@ -217,7 +217,7 @@ export const CreateTaskSchema = {
 
 ```typescript
 import type { FastifyRequest, FastifyReply } from 'fastify';
-import { resolveDependency } from '@sentzunhat/zacatl';
+import { resolveDependency } from '@sentzunhat/zacatl/dependency-injection';
 import { TaskService } from '../../../domain/providers/task.service.js';
 
 interface CreateTaskBody {
@@ -246,7 +246,7 @@ export async function createTaskHandler(
 
 ```typescript
 import type { FastifyRequest, FastifyReply } from 'fastify';
-import { resolveDependency } from '@sentzunhat/zacatl';
+import { resolveDependency } from '@sentzunhat/zacatl/dependency-injection';
 import { TaskService } from '../../../domain/providers/task.service.js';
 
 export async function listTasksHandler(request: FastifyRequest, reply: FastifyReply) {
@@ -441,7 +441,7 @@ src/
 ### Service.ts for Multi-Area
 
 ```typescript
-import { Service } from '@sentzunhat/zacatl';
+import { Service } from '@sentzunhat/zacatl/service';
 
 // Catalyst area
 import { catalystRoutes } from './areas/catalyst/application/route-handlers/routes.js';
@@ -553,7 +553,7 @@ export class UserRepository extends BaseRepository<User, User, UserOutput> {
 ### ✅ 4. Handler Uses resolveDependency
 
 ```typescript
-import { resolveDependency } from '@sentzunhat/zacatl';
+import { resolveDependency } from '@sentzunhat/zacatl/dependency-injection';
 import { TaskService } from '../../../domain/providers/task.service.js';
 
 export async function handler(request: FastifyRequest, reply: FastifyReply) {
@@ -606,7 +606,7 @@ Each feature (e.g., "create user", "list tasks") gets its own folder with:
 
 ```typescript
 import type { FastifyRequest, FastifyReply } from 'fastify';
-import { resolveDependency } from '@sentzunhat/zacatl';
+import { resolveDependency } from '@sentzunhat/zacatl/dependency-injection';
 import { UserService } from '../../../domain/providers/user.service.js';
 
 interface CreateUserBody {
@@ -674,7 +674,7 @@ export async function passportRoutes(app: FastifyInstance, opts: FastifyPluginOp
 ### 1. Error Handling
 
 ```typescript
-import { BadRequestError, NotFoundError, UnauthorizedError } from '@sentzunhat/zacatl';
+import { BadRequestError, NotFoundError, UnauthorizedError } from '@sentzunhat/zacatl/error';
 
 export async function handler(request: FastifyRequest, reply: FastifyReply) {
   const { id } = request.params;

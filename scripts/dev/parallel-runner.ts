@@ -42,7 +42,7 @@ const USAGE = [
 const parseCommandSpec = (raw: string): CommandSpec => {
   const tokens = raw.trim().split(/\s+/);
   const cmd = tokens[0];
-  if (!cmd) {
+  if (cmd === undefined || cmd.length === 0) {
     throw new Error(`Empty command in spec: "${raw}"`);
   }
   return { cmd, args: tokens.slice(1) };
@@ -58,7 +58,7 @@ const parseCommandSpec = (raw: string): CommandSpec => {
 const getFlag = (argv: string[], flag: string): string | undefined => {
   const prefix = `--${flag}=`;
   const inline = argv.find((a) => a.startsWith(prefix));
-  if (inline) return inline.slice(prefix.length);
+  if (inline !== undefined) return inline.slice(prefix.length);
 
   const idx = argv.indexOf(`--${flag}`);
   if (idx !== -1 && idx + 1 < argv.length) return argv[idx + 1];
@@ -77,7 +77,7 @@ const main = async (): Promise<number> => {
       // Positional: first non-flag argument is the comma-separated command string.
       const commandsArg = argv.find((a) => !a.startsWith('--'));
 
-      if (!commandsArg) {
+      if (commandsArg === undefined) {
         // eslint-disable-next-line no-console
         console.error('Error: no commands provided.\n');
         // eslint-disable-next-line no-console
@@ -105,8 +105,9 @@ const main = async (): Promise<number> => {
       const timeoutFlag = getFlag(argv, 'timeout');
 
       const policy = applyPolicyDefaults({
-        maxConcurrency: concurrencyFlag ? parseInt(concurrencyFlag, 10) : specs.length,
-        timeoutMs: timeoutFlag ? parseInt(timeoutFlag, 10) : 120_000,
+        maxConcurrency:
+          concurrencyFlag !== undefined ? parseInt(concurrencyFlag, 10) : specs.length,
+        timeoutMs: timeoutFlag !== undefined ? parseInt(timeoutFlag, 10) : 120_000,
         maxOutputBytes: 2_097_152,
         inheritEnv: true,
       });
@@ -141,15 +142,17 @@ const main = async (): Promise<number> => {
           `  [${status.padEnd(10)}] ${String(result.durationMs).padStart(6)} ms  ${label}`,
         );
 
-        if (result.stdout.trim()) {
-          const lines = result.stdout.trim().split('\n');
+        const stdout = result.stdout.trim();
+        if (stdout.length > 0) {
+          const lines = stdout.split('\n');
           for (const line of lines) {
             // eslint-disable-next-line no-console
             console.log(`               out: ${line}`);
           }
         }
-        if (result.stderr.trim()) {
-          const lines = result.stderr.trim().split('\n');
+        const stderr = result.stderr.trim();
+        if (stderr.length > 0) {
+          const lines = stderr.split('\n');
           for (const line of lines) {
             // eslint-disable-next-line no-console
             console.error(`               err: ${line}`);

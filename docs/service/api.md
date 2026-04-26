@@ -5,14 +5,14 @@ Main service class for building microservices.
 ## Import
 
 ```typescript
-import { Service } from '@sentzunhat/zacatl';
+import { Service } from '@sentzunhat/zacatl/service';
 ```
 
 ## Create Service
 
 ```typescript
 import Fastify from 'fastify';
-import { Service, ServiceType, ServerType, ServerVendor } from '@sentzunhat/zacatl';
+import { Service, ServiceType, ServerType, ServerVendor } from '@sentzunhat/zacatl/service';
 
 const fastify = Fastify();
 

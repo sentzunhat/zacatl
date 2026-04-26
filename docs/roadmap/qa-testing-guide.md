@@ -104,7 +104,7 @@ Use `supertest` for end-to-end handler testing against a fully wired Express ins
 ```typescript
 import request from 'supertest';
 import express from 'express';
-import { Service, ServiceType, ServerVendor, ServerType } from '@sentzunhat/zacatl';
+import { Service, ServiceType, ServerVendor, ServerType } from '@sentzunhat/zacatl/service';
 
 describe('Integration: /greetings endpoints', () => {
   let service: Service;

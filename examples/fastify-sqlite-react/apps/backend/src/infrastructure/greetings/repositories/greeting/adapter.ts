@@ -1,19 +1,19 @@
-import { SequelizeRepository } from '@sentzunhat/zacatl/service/layers/infrastructure/repositories/sequelize';
-import type { ModelStatic } from '@sentzunhat/zacatl/third-party/sequelize';
-import { singleton } from '@sentzunhat/zacatl/third-party/tsyringe';
+import { BaseRepository } from '@sentzunhat/zacatl/service/layers/infrastructure/repositories/sequelize/repository';
+import type { ModelStatic } from '@sentzunhat/zacatl/third-party/databases/sequelize';
+import { singleton } from '@sentzunhat/zacatl/third-party/dependency-injection/tsyringe';
 
-import type { CreateGreetingInput, Greeting } from '../../../../domain/entities/greeting.js';
+import type { CreateGreetingInput, Greeting } from '../../../../domain/entities/greeting';
 import { GreetingModel } from '../../models/greeting.model';
 import type { GreetingRepositoryPort } from './port';
 
 @singleton()
 export class GreetingRepositoryAdapter
-  extends SequelizeRepository<GreetingModel, CreateGreetingInput, Greeting>
+  extends BaseRepository<GreetingModel, CreateGreetingInput, Greeting>
   implements GreetingRepositoryPort
 {
   constructor() {
     super({
-      model: GreetingModel,
+      name: GreetingModel.name,
     });
   }
 

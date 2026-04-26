@@ -3,16 +3,17 @@
  * Entry Point
  */
 
-import '@sentzunhat/zacatl/third-party/reflect-metadata';
-import sqlite3 from '@sentzunhat/zacatl/third-party/sqlite3';
+import '@sentzunhat/zacatl/third-party/dependency-injection/reflect-metadata';
+import sqlite3 from '@sentzunhat/zacatl/third-party/databases/sqlite3';
 import {
   Fastify,
   serializerCompiler,
   validatorCompiler,
 } from '@sentzunhat/zacatl/third-party/fastify';
-import { Sequelize, type SequelizeOptions } from '@sentzunhat/zacatl/third-party/sequelize';
+import { Sequelize, type SequelizeOptions } from '@sentzunhat/zacatl/third-party/databases/sequelize';
 import { Service } from '@sentzunhat/zacatl/service';
-import { API_PREFIX, config, createServiceConfig, registerFrontendRoutes } from './config';
+import { API_PREFIX, config, createServiceConfig } from './config';
+import { initGreetingModel } from './infrastructure/greetings/models/greeting.model';
 
 type FastifyError = Error & {
   statusCode?: number;
@@ -39,30 +40,10 @@ const formatValidationMessage = (error: FastifyError): string => {
   return rawMessage;
 };
 
-type ShutdownSignal = 'SIGINT' | 'SIGTERM' | 'SIGUSR2';
-
+let activeService: Service | null = null;
 let shutdownInProgress = false;
-let activeFastify: ReturnType<typeof Fastify> | null = null;
-let activeSequelize: Sequelize | null = null;
 
-const runWithTimeout = async (
-  task: Promise<void>,
-  timeoutMs: number,
-  label: string,
-): Promise<void> => {
-  const timeoutPromise = new Promise<void>((resolve) => {
-    const timer = setTimeout(() => {
-      console.warn(`Timed out while closing ${label}; continuing shutdown`);
-      resolve();
-    }, timeoutMs);
-
-    timer.unref();
-  });
-
-  await Promise.race([task, timeoutPromise]);
-};
-
-const shutdown = async (signal: ShutdownSignal): Promise<void> => {
+const shutdown = (): void => {
   if (shutdownInProgress) {
     process.exit(0);
     return;
@@ -71,46 +52,19 @@ const shutdown = async (signal: ShutdownSignal): Promise<void> => {
   shutdownInProgress = true;
   console.log('\n👋 Shutting down gracefully...');
 
-  // Ensure watch-mode restarts are never blocked by long close operations.
   const forceExitTimer = setTimeout(() => {
-    console.warn(`Force exit after timeout on ${signal}`);
+    console.warn('Force exit after timeout');
     process.exit(0);
   }, 2500);
 
   forceExitTimer.unref();
 
-  const closeOps: Array<Promise<void>> = [];
-
-  if (activeFastify != null) {
-    closeOps.push(
-      runWithTimeout(activeFastify.close(), 1200, 'Fastify').catch((error) => {
-        console.error(`Failed to close Fastify on ${signal}:`, error);
-      }),
-    );
-  }
-
-  if (activeSequelize != null) {
-    closeOps.push(
-      runWithTimeout(activeSequelize.close(), 1200, 'Sequelize').catch((error) => {
-        console.error(`Failed to close Sequelize on ${signal}:`, error);
-      }),
-    );
-  }
-
-  await Promise.all(closeOps);
-
-  clearTimeout(forceExitTimer);
-
-  process.exit(0);
-};
-
-const registerShutdownHandler = (signal: ShutdownSignal): void => {
-  process.once(signal, () => {
-    shutdown(signal).catch((error) => {
-      console.error(`Shutdown failed on ${signal}:`, error);
-      process.exit(1);
+  (activeService?.stop() ?? Promise.resolve())
+    .catch((error) => { console.error('Error during shutdown:', error); })
+    .finally(() => {
+      clearTimeout(forceExitTimer);
+      process.exit(0);
     });
-  });
 };
 
 const main = async () => {
@@ -120,7 +74,6 @@ const main = async () => {
   try {
     // Initialize Fastify
     const fastify = Fastify({ logger: false });
-    activeFastify = fastify;
 
     // Set up Zod validation for Fastify
     fastify.setValidatorCompiler(validatorCompiler);
@@ -154,14 +107,13 @@ const main = async () => {
       logging: false,
       storage: config.databaseUrl.replace('sqlite:', ''),
     });
-    activeSequelize = sequelize;
 
-    // Register frontend static routes at root
-    await registerFrontendRoutes(fastify);
+    initGreetingModel(sequelize);
 
-    // Create and start service - API prefix comes from server config
+    // Create and start service
     const serviceConfig = createServiceConfig(fastify, sequelize);
     const service = new Service(serviceConfig);
+    activeService = service;
 
     await service.start({ port: config.port });
 
@@ -180,9 +132,7 @@ const main = async () => {
   }
 };
 
-// Handle graceful shutdown (including watcher restart signals)
-registerShutdownHandler('SIGINT');
-registerShutdownHandler('SIGTERM');
-registerShutdownHandler('SIGUSR2');
+process.on('SIGINT', shutdown);
+process.on('SIGTERM', shutdown);
 
 main();

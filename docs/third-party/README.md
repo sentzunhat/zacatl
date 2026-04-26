@@ -44,31 +44,37 @@ See [../third-party/orm/overview.md](../third-party/orm/overview.md) for full us
 
 ```typescript
 // ✅ Only evaluates Mongoose at runtime
-import { mongoose } from '@sentzunhat/zacatl/third-party/mongoose';
+import { mongoose } from '@sentzunhat/zacatl/third-party/databases/mongoose';
 
-// ❌ Would evaluate all ORMs at import time (main entry stays clean)
-import { mongoose, Sequelize } from '@sentzunhat/zacatl';
+// ❌ Do not import from a removed root barrel
+import { Service } from '@sentzunhat/zacatl'; // root export removed in 0.0.56
 ```
 
 ## Package Structure
 
 ```
 src/third-party/
-├── index.ts                  # Re-exports tsyringe, zod (in main package)
+├── index.ts                  # tsyringe + zod + uuid re-exports (no ORM barrels)
+├── databases/
+│   ├── mongoose.ts           # Mongoose re-export (subpath only)
+│   ├── sequelize.ts          # Sequelize re-export (subpath only)
+│   ├── sqlite3.ts            # sqlite3 re-export (subpath only)
+│   └── nodesqlite.ts         # node:sqlite helper (subpath only)
+├── dependency-injection/
+│   ├── tsyringe.ts           # DI container re-export
+│   └── reflect-metadata.ts   # reflect-metadata side-effect import
 ├── eslint.ts                 # ESLint plugins re-export (subpath only)
 ├── express.ts                # Express re-export (subpath only)
-├── fastify.ts                # Fastify + ZodTypeProvider + serializerCompiler/validatorCompiler
+├── fastify.ts                # Fastify + ZodTypeProvider
 ├── http-proxy-middleware.ts  # HTTP proxy re-export (subpath only)
 ├── i18n.ts                   # i18n re-export (subpath only)
 ├── js-yaml.ts                # YAML parser re-export (subpath only)
-├── mongoose.ts               # Mongoose re-export (subpath only)
 ├── pino.ts                   # Pino logger re-export (subpath only)
-├── reflect-metadata.ts       # reflect-metadata side-effect import
-├── sequelize.ts              # Sequelize re-export (subpath only)
-├── tsyringe.ts               # DI container re-export
 ├── uuid.ts                   # UUID utilities re-export (subpath only)
 └── zod.ts                    # Validation re-export (subpath only)
 ```
+
+> ORM and DI modules live under nested folders. Flat shims (`third-party/mongoose`, `third-party/tsyringe`, …) are not published.
 
 ## Version Compatibility
 
@@ -88,7 +94,7 @@ Zacatl uses these third-party versions:
 - **mongoose**: ^9.0.0 (MongoDB adapter)
 - **sequelize**: ^6.0.0 (SQL adapter)
 - **better-sqlite3**: ^12.6.2 (SQLite ecosystem support)
-- **sqlite3**: ^5.1.7 (SQLite ecosystem support)
+- **sqlite3**: ^6.0.1 (SQLite ecosystem support)
 - **pg**: ^8.18.0 (PostgreSQL ecosystem support)
 
 ### Additional Drivers (not provided by Zacatl)
@@ -104,17 +110,18 @@ For optional peers, install the corresponding package in your service.
 ### Main Package Imports
 
 ```typescript
-// From main package - always available
+// Core third-party re-exports (tsyringe symbols also available via nested path)
 import { container, injectable } from '@sentzunhat/zacatl/third-party';
-import { z } from '@sentzunhat/zacatl/third-party';
+import { z } from '@sentzunhat/zacatl/third-party/zod';
 ```
 
-### Subpath Imports
+### Nested ORM / DI Subpaths
 
 ```typescript
-// From subpath
-import { mongoose } from '@sentzunhat/zacatl/third-party/mongoose';
-import { Sequelize } from '@sentzunhat/zacatl/third-party/sequelize';
+import { mongoose } from '@sentzunhat/zacatl/third-party/databases/mongoose';
+import { Sequelize } from '@sentzunhat/zacatl/third-party/databases/sequelize';
+import { inject, singleton } from '@sentzunhat/zacatl/third-party/dependency-injection/tsyringe';
+import '@sentzunhat/zacatl/third-party/dependency-injection/reflect-metadata';
 ```
 
 ## Database Drivers (still required for Sequelize)

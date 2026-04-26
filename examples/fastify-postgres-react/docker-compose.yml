@@ -21,7 +21,12 @@ services:
   backend:
     build:
       context: ../..
-      dockerfile: examples/fastify-postgres-react/Dockerfile
+      dockerfile: examples/Dockerfile
+      args:
+        EXAMPLE: fastify-postgres-react
+        BACKEND: apps/backend
+        FRONTEND: apps/frontend
+        PORT: 8083
     image: zacatl-fastify-postgres
     container_name: fastify-postgres-backend
     ports:
@@ -39,7 +44,7 @@ services:
           'CMD',
           'node',
           '-e',
-          "fetch('http://localhost:8083/greetings').catch(() => process.exit(1))",
+          "fetch('http://localhost:8083/api/greetings').catch(() => process.exit(1))",
         ]
       interval: 10s
       timeout: 5s

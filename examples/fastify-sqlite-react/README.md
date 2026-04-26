@@ -66,8 +66,8 @@ curl http://localhost:8081/api/greetings
 
 ```bash
 # From repository root
-docker build -f examples/fastify-sqlite-react/Dockerfile \
-  -t zacatl-fastify-sqlite .
+docker build --build-arg EXAMPLE=fastify-sqlite-react \
+  -f examples/Dockerfile -t zacatl-fastify-sqlite-react .
 ```
 
 The Docker build is self-contained: it compiles required Zacatl framework artifacts in-container.
@@ -94,7 +94,7 @@ The Docker build is self-contained: it compiles required Zacatl framework artifa
 ## Documentation
 
 - **Examples Catalog**: [../README.md](../README.md)
-- **Start Here**: [../../docs/START_HERE.md](../../docs/START_HERE.md)
+- **Start Here**: [../../docs/start-here.md](../../docs/start-here.md)
 - **Framework Overview**: [../../docs/guidelines/framework-overview.md](../../docs/guidelines/framework-overview.md)
 - **Framework Database Guide**: [../../docs/third-party/orm/database-setup.md](../../docs/third-party/orm/database-setup.md)
 - **Service Module**: [../../docs/service/README.md](../../docs/service/README.md)

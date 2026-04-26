@@ -12,11 +12,13 @@
 ## Common Patterns
 
 ```typescript
+import { BaseRepository, ORMType } from '@sentzunhat/zacatl/service';
+
 // Basic repository usage
 class UserRepository extends BaseRepository<User, CreateUser, UserDTO> {
   constructor() {
     super({
-      type: 'mongoose',
+      type: ORMType.Mongoose,
       name: 'User',
       schema: userSchema,
     });

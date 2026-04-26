@@ -1,15 +1,20 @@
-import type { ModelStatic, SequelizeModel as Model } from '../../../../../third-party/sequelize';
-import type { ORMType } from '../mongoose/types';
-
-export type LeanDocument<T> = T & {
-  id: string;
-  createdAt: Date;
-  updatedAt: Date;
-};
+import type {
+  ModelStatic,
+  SequelizeModel as Model,
+} from '../../../../../third-party/databases/sequelize';
+import type { ORMType } from '../../orm/types';
+export type { LeanDocument } from '../../orm/sequelize/types';
 
 export interface SequelizeRepositoryConfig<D extends object = object> {
   readonly type?: ORMType.Sequelize;
-  readonly model: SequelizeRepositoryModel<D>;
+  /**
+   * The name used when the model was registered with the Sequelize instance
+   * (e.g. the first argument to `sequelize.define('MyModel', ...)` or
+   * the `modelName` option in `Model.init()`). The adapter resolves the
+   * Sequelize instance from the DI container via `SequelizeToken` and
+   * retrieves this model with `sequelize.model(name)`.
+   */
+  readonly name: string & (D extends object ? unknown : never);
 }
 
 export type SequelizeBaseRepositoryConfig<D extends object = object> =

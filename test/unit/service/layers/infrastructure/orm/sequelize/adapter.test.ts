@@ -5,20 +5,23 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 vi.mock('sequelize', () => {
   class Model {
     public static init(): void {}
-    public get(opts: any): any {
-      if (opts && opts.plain) return JSON.parse(JSON.stringify(this));
+    public get(opts?: { plain?: boolean }): unknown {
+      if (opts?.plain === true) return JSON.parse(JSON.stringify(this));
       return this;
     }
-    constructor(values: any) {
+    constructor(values: Record<string, unknown> = {}) {
       Object.assign(this, values);
     }
   }
-  return { Model };
+  return { ['Model']: Model };
 });
 
-import { SequelizeModel as Model } from '@zacatl/third-party/sequelize';
+import { SequelizeModel as Model } from '@zacatl/third-party/databases/sequelize';
+import { container } from '@zacatl/third-party/dependency-injection/tsyringe';
 
+import { clearContainer } from '../../../../../../../src/dependency-injection';
 import { SequelizeAdapter } from '../../../../../../../src/service/layers/infrastructure/orm/sequelize/adapter';
+import { SequelizeToken } from '../../../../../../../src/service/layers/infrastructure/orm/tokens/sequelize';
 
 import { ORMType } from '../../../../../../../src/service/layers/infrastructure/repositories/types';
 
@@ -46,16 +49,61 @@ interface TestOutput {
   updatedAt: Date;
 }
 
+const MODEL_NAME = 'MockModel';
+
 describe('SequelizeAdapter', () => {
   let adapter: SequelizeAdapter<MockModel, TestInput, TestOutput>;
   const mockConfig = {
     type: ORMType.Sequelize as const,
-    model: MockModel as any,
+    name: MODEL_NAME,
   };
 
   beforeEach(() => {
     vi.clearAllMocks();
+    clearContainer();
+    // Register a mock Sequelize instance in DI that returns MockModel by name
+    container.register(SequelizeToken, {
+      useValue: { model: (_name: string) => MockModel },
+    });
     adapter = new SequelizeAdapter(mockConfig);
+  });
+
+  describe('constructor / resolveModel', () => {
+    it('resolves model eagerly in constructor', () => {
+      expect(adapter.model).toBe(MockModel);
+    });
+
+    it('model property is readonly and stable', () => {
+      expect(adapter.model).toBe(adapter.model);
+    });
+
+    it('throws InternalServerError when DI token is not registered', () => {
+      clearContainer();
+
+      expect(() => new SequelizeAdapter(mockConfig)).toThrow(
+        'Sequelize instance not registered in DI container',
+      );
+    });
+
+    it('throws InternalServerError when Sequelize resolves to null from DI', () => {
+      clearContainer();
+      container.register(SequelizeToken, { useFactory: () => null as never });
+
+      expect(() => new SequelizeAdapter(mockConfig)).toThrow(
+        'Sequelize instance resolved to null from DI container',
+      );
+    });
+  });
+
+  describe('constructor bootstrap', () => {
+    it('constructor returns immediately with the resolved model available', () => {
+      const startTime = Date.now();
+      const localAdapter = new SequelizeAdapter(mockConfig);
+      const elapsed = Date.now() - startTime;
+
+      expect(localAdapter.model).toBeDefined();
+      expect(elapsed).toBeLessThan(50);
+    });
   });
 
   describe('toLean', () => {

@@ -1,0 +1,11 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "display": "Zacatl source paths for local dev (copy REL prefix for your example depth)",
+  "compilerOptions": {
+    "paths": {
+      "@sentzunhat/zacatl/*": ["REL/src/*"],
+      "@sentzunhat/zacatl/third-party": ["REL/src/third-party/index.ts"],
+      "@sentzunhat/zacatl/third-party/*": ["REL/src/third-party/*"]
+    }
+  }
+}

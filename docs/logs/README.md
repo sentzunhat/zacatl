@@ -237,7 +237,7 @@ line by passing `requestContextMixin` to `PinoLoggerAdapter`:
 
 ```typescript
 import { createLogger, PinoLoggerAdapter, createPinoConfig } from '@sentzunhat/zacatl/logs';
-import { requestContext, requestContextMixin } from '@sentzunhat/zacatl';
+import { requestContext, requestContextMixin } from '@sentzunhat/zacatl/logs';
 
 // 1. Create logger with mixin — fields appear automatically when context is set
 const logger = createLogger(
@@ -286,7 +286,7 @@ logger.info('Application started');
 ### DI Container
 
 ```typescript
-import { container, inject, singleton } from '@sentzunhat/zacatl';
+import { container, inject, singleton } from '@sentzunhat/zacatl/third-party/dependency-injection/tsyringe';
 import type { LoggerInput } from '@sentzunhat/zacatl/logs';
 import { createLogger, PinoLoggerAdapter } from '@sentzunhat/zacatl/logs';
 

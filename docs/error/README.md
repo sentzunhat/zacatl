@@ -5,16 +5,7 @@ Type-safe error classes with correlation IDs.
 ## Import
 
 ```typescript
-import {
-  CustomError,
-  BadRequestError,
-  UnauthorizedError,
-  ForbiddenError,
-  NotFoundError,
-  ValidationError,
-  InternalServerError,
-  BadResourceError,
-} from '@sentzunhat/zacatl';
+import { CustomError, BadRequestError, UnauthorizedError, ForbiddenError, NotFoundError, ValidationError, InternalServerError, BadResourceError } from '@sentzunhat/zacatl/error';
 ```
 
 ## Error Classes
@@ -68,19 +59,33 @@ throw new BadResourceError({ message: 'Cannot process resource' });
 const error = new NotFoundError({ message: 'User not found', metadata: { userId: 123 } });
 
 error.message; // "User not found"
-error.statusCode; // 404
+error.code; // 404
 error.metadata; // { userId: 123 }
 error.correlationId; // "uuid-v4"
 ```
 
+Common properties available on Zacatl errors:
+
+- `name`: class name (`NotFoundError`, `ValidationError`, etc.)
+- `message`: human-readable description
+- `code`: status/error code (`404`, `500`, `"invalid"`, etc.)
+- `reason`: optional short machine-friendly reason
+- `metadata`: optional structured context
+- `correlationId`: request/trace correlation ID
+
 ## Custom Error
 
 ```typescript
-import { CustomError } from '@sentzunhat/zacatl';
+import { CustomError } from '@sentzunhat/zacatl/error';
 
 class PaymentError extends CustomError {
-  constructor(message: string, metadata?: Record<string, any>) {
-    super(message, 402, metadata);
+  constructor(message: string, metadata?: Record<string, unknown>) {
+    super({
+      message,
+      code: 402,
+      metadata,
+      reason: 'PAYMENT_FAILED',
+    });
     this.name = 'PaymentError';
   }
 }

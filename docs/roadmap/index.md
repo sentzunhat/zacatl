@@ -70,7 +70,7 @@ Handlers can throw errors; a global error handler can normalize responses consis
 **Fastify Setup** (real-world example):
 
 ```typescript
-import { CustomError, BadRequestError, NotFoundError } from '@sentzunhat/zacatl';
+import { CustomError, BadRequestError, NotFoundError } from '@sentzunhat/zacatl/error';
 import { FastifyInstance, FastifyError, FastifyRequest, FastifyReply } from 'fastify';
 import cors from '@fastify/cors';
 import helmet from '@fastify/helmet';
@@ -278,7 +278,7 @@ Enable Yup as an alternative validation library:
 ```typescript
 // Option A: Zod (default, recommended)
 import { z } from 'zod';
-import { PostRouteHandler } from '@sentzunhat/zacatl';
+import { PostRouteHandler } from '@sentzunhat/zacatl/service';
 
 const createUserSchema = z.object({
   name: z.string().min(3),
@@ -296,7 +296,7 @@ class CreateUserHandler extends PostRouteHandler<User, typeof createUserSchema> 
 
 // Option B: Yup (for existing codebases or preference)
 import * as yup from 'yup';
-import { PostRouteHandler } from '@sentzunhat/zacatl';
+import { PostRouteHandler } from '@sentzunhat/zacatl/service';
 
 const createUserSchema = yup.object({
   name: yup.string().required().min(3),
@@ -319,7 +319,7 @@ class CreateUserHandler extends PostRouteHandler<User, typeof createUserSchema> 
 For scenarios where validation isn't needed or is handled elsewhere:
 
 ```typescript
-import { PostRouteHandler } from '@sentzunhat/zacatl';
+import { PostRouteHandler } from '@sentzunhat/zacatl/service';
 
 // Option C: No validation (manual checks or pre-validated data)
 class CreateUserHandler extends PostRouteHandler<User, CreateUserInput> {

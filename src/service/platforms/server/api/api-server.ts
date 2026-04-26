@@ -2,7 +2,8 @@ import { resolveDependencies } from '@zacatl/dependency-injection';
 import { CustomError, InternalServerError } from '@zacatl/error';
 
 import type { ApiServerPort, ProxyConfig } from './port';
-import type { HookHandler, RouteHandler } from '../../../layers/application';
+import type { RouteHandler } from '../../../layers/application/entry-points/rest/fastify/handlers/route-handler';
+import type { HookHandler } from '../../../layers/application/entry-points/rest/hook-handlers/hook-handler';
 import type { RestApplicationEntryPoints } from '../../../layers/application/types';
 import { ServerType, type HttpServerConfig } from '../types/server-config';
 
@@ -135,6 +136,13 @@ export class ApiServer {
    */
   public async listen(port: number): Promise<void> {
     await this.adapter.listen(port);
+  }
+
+  /**
+   * Stop accepting new connections and close the HTTP server.
+   */
+  public async close(): Promise<void> {
+    await this.adapter.close();
   }
 
   /**

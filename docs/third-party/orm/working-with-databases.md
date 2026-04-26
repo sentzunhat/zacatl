@@ -15,7 +15,7 @@ npm install pg pg-hstore  # PostgreSQL
 
 ```typescript
 import { Sequelize } from 'sequelize';
-import { Service, ServiceType, DatabaseVendor } from '@sentzunhat/zacatl';
+import { Service, ServiceType, DatabaseVendor } from '@sentzunhat/zacatl/service';
 
 const sequelize = new Sequelize('postgresql://user:pass@localhost:5432/mydb');
 
@@ -34,7 +34,7 @@ await service.start();
 ### Repository Example
 
 ```typescript
-import { IRepository } from '@sentzunhat/zacatl';
+import { IRepository } from '@sentzunhat/zacatl/service';
 import { DataTypes, Sequelize, Model } from 'sequelize';
 
 interface Product {
@@ -103,7 +103,7 @@ export class ProductRepository implements IRepository<Product> {
 
 ```typescript
 import mongoose from 'mongoose';
-import { Service, ServiceType, DatabaseVendor } from '@sentzunhat/zacatl';
+import { Service, ServiceType, DatabaseVendor } from '@sentzunhat/zacatl/service';
 
 const service = new Service({
   type: ServiceType.SERVER,
@@ -126,7 +126,7 @@ await service.start();
 ### Repository Example
 
 ```typescript
-import { IRepository } from '@sentzunhat/zacatl';
+import { IRepository } from '@sentzunhat/zacatl/service';
 import mongoose, { Schema, Document } from 'mongoose';
 
 interface Article {
@@ -177,7 +177,7 @@ export class ArticleRepository implements IRepository<Article> {
 Implement `IRepository<T>` for any database:
 
 ```typescript
-import { IRepository } from '@sentzunhat/zacatl';
+import { IRepository } from '@sentzunhat/zacatl/service';
 import Database from 'better-sqlite3';
 
 export class SQLiteRepository<T> implements IRepository<T> {
@@ -238,4 +238,4 @@ export class SQLiteRepository<T> implements IRepository<T> {
 | MongoDB    | Mongoose  | ✅ Built-in          |
 | Others     | Custom    | ✅ Easy to implement |
 
-**Next**: [Error Handling →](./05-error-handling.md)
+**Next**: [Error Handling →](../../error/README.md)

@@ -1,13 +1,10 @@
 import { describe, it, expect } from 'vitest';
 
-import {
-  commandSpecSchema,
-  runnerPolicySchema,
-  validateCommandSpec,
-  runCommand,
-  executeCommands,
-} from '../../../src/utils/command-runner';
-import type { RunnerPolicy } from '../../../src/utils/command-runner';
+import { commandSpecSchema, runnerPolicySchema } from '../../../src/utils/command-runner/types';
+import type { RunnerPolicy } from '../../../src/utils/command-runner/types';
+import { validateCommandSpec } from '../../../src/utils/command-runner/policy';
+import { runCommand } from '../../../src/utils/command-runner/runner';
+import { executeCommands } from '../../../src/utils/command-runner/execute-commands';
 
 const defaultPolicy = (): RunnerPolicy =>
   runnerPolicySchema.parse({

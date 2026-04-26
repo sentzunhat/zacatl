@@ -54,11 +54,11 @@ This guide covers formatting, naming conventions, and language-specific rules fo
 
 ### Runtime Requirements
 
-- **Node.js**: 24.14.0 LTS+ (minimum required — enables `node:sqlite`, `AsyncLocalStorage` improvements, and native subpath imports)
+- **Node.js**: 26.0.0+ (minimum required for this branch baseline and the current publish/tooling flow)
 - **Package Manager**: npm 11.0.0+
 - **Module System**: ESM source with dual ESM/CJS build outputs for distribution
 
-> **Upgrade note**: run `nvm install 24.14.0 && nvm use 24.14.0` (or equivalent) if your local Node is below 24.14.0.
+> **Upgrade note**: run `nvm install 26 && nvm use 26` if your local Node is below 26.0.0. If you use another version manager, mirror the same install/use flow.
 
 ### Build Process
 
@@ -188,7 +188,8 @@ src/
 - File name should match primary export (e.g., `get-route-handler.ts` exports `GetRouteHandler`)
 - Test files: `<module>.test.ts`
 - Type definition files (if separate): `<module>.types.ts` or `types/`
-- Index files: `index.ts` for barrel exports
+- Entry files: concrete module files for public exports
+- Avoid `index.ts` barrels; prefer named module files and explicit subpath exports
 
 ### Enums
 
@@ -250,13 +251,13 @@ const items = ['item1', 'item2', 'item3']; // Missing trailing comma
 // ✅ Good
 const message = 'Hello, world!';
 const greeting = `Hello, ${name}!`;
-const path = 'src/services/index.ts';
+const path = 'src/services/service.ts';
 ```
 
 ```text
 // ❌ Avoid
 const message = "Hello, world!"; // Uses double quotes instead of single quotes
-const path = "src/services/index.ts";
+const path = "src/services/service.ts";
 ```
 
 ### Semicolons
@@ -337,14 +338,14 @@ const items: Array<number> = [1, 2, 3]; // Unnecessary annotation
 
 ```typescript
 // ✅ Good — imports from root and subpaths
-import { Service } from '@sentzunhat/zacatl';
+import { Service } from '@sentzunhat/zacatl/service';
 import { BadRequestError } from '@zacatl/error';
 import { GetRouteHandler } from '@zacatl/service';
 
 // ✅ Good — framework/library imports via subpaths
 import { z } from '@zacatl/third-party/zod';
 import { v4 as uuidv4 } from '@zacatl/third-party/uuid';
-import { container } from '@zacatl/third-party/tsyringe';
+import { container } from '@zacatl/third-party/dependency-injection/tsyringe';
 import FastifyClass from '@zacatl/third-party/fastify';
 
 // ✅ Good — namespace import (for large modules)
@@ -362,14 +363,14 @@ module.exports = Service; // CommonJS
 
 ### Export Organization
 
-**Barrel Exports (index.ts):**
+**Facade files (no nested barrels):**
 
 ```typescript
-// src/error/index.ts
-export * from './bad-request';
-export * from './unauthorized';
-export * from './custom';
-export type { CustomErrorsArgs } from './custom';
+// src/error.ts  ← sibling facade, NOT src/error/index.ts
+export * from './error/bad-request';
+export * from './error/unauthorized';
+export * from './error/custom';
+export type { CustomErrorsArgs } from './error/custom';
 ```
 
 **All Dependencies via Subpaths:**
@@ -384,10 +385,10 @@ All third-party dependencies (frameworks, ORMs, utilities) are exported via libr
       "import": "./build-src-esm/third-party/express.js",
       "require": "./build-src-cjs/third-party/express.js"
     },
-    "./third-party/mongoose": {
-      "types": "./build-src-esm/third-party/mongoose.d.ts",
-      "import": "./build-src-esm/third-party/mongoose.js",
-      "require": "./build-src-cjs/third-party/mongoose.js"
+    "./third-party/databases/mongoose": {
+      "types": "./build-src-esm/third-party/databases/mongoose.d.ts",
+      "import": "./build-src-esm/third-party/databases/mongoose.js",
+      "require": "./build-src-cjs/third-party/databases/mongoose.js"
     },
     "./third-party/zod": {
       "types": "./build-src-esm/third-party/zod.d.ts",
@@ -414,8 +415,8 @@ All third-party dependencies (frameworks, ORMs, utilities) are exported via libr
 - Prefer explicit third-party subpath imports from the library, for example:
 
 ```ts
-import { Schema } from '@zacatl/third-party/mongoose';
-import type { Sequelize } from '@zacatl/third-party/sequelize'; // type-only
+import { Schema } from '@zacatl/third-party/databases/mongoose';
+import type { Sequelize } from '@zacatl/third-party/databases/sequelize'; // type-only
 ```
 
 - Avoid importing the package root (`@zacatl`) for runtime implementations; prefer explicit subpaths (the project enforces this with `no-restricted-imports` as a warning).
@@ -678,8 +679,6 @@ Add `.prettierrc.json` or `prettier` key in `package.json`:
 Script names use a `<noun>:<verb>` pattern so related scripts sort together:
 
 ```
-barrels:generate    # Generate barrel files
-barrels:verify      # Verify barrel files match generated output
 build:src           # Build source only
 build:watch         # Watch mode build
 type:check          # Type-check all

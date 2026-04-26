@@ -1,23 +1,26 @@
-import { readFileSync } from 'fs';
+import { readFile } from 'node:fs/promises';
 
 import { describe, it, expect } from 'vitest';
 
-describe('adapter-loader lazy behavior', () => {
-  it('does not statically import SequelizeAdapter', () => {
-    const src = readFileSync(
-      'src/service/layers/infrastructure/orm/sequelize/adapter-loader.ts',
-      'utf8',
+const readSource = (relativePath: string): Promise<string> =>
+  readFile(new URL(relativePath, import.meta.url), 'utf8');
+
+describe('adapter factories', () => {
+  it('instantiate the Sequelize adapter directly', async () => {
+    const source = await readSource(
+      '../../../../../../src/service/layers/infrastructure/orm/sequelize/adapter-loader.ts',
     );
 
-    expect(src).not.toContain('import { SequelizeAdapter');
+    expect(source).toContain('new SequelizeAdapter');
+    expect(source).not.toContain('import(');
   });
 
-  it('does not statically import MongooseAdapter', () => {
-    const src = readFileSync(
-      'src/service/layers/infrastructure/orm/mongoose/adapter-loader.ts',
-      'utf8',
+  it('instantiate the Mongoose adapter directly', async () => {
+    const source = await readSource(
+      '../../../../../../src/service/layers/infrastructure/orm/mongoose/adapter-loader.ts',
     );
 
-    expect(src).not.toContain('import { MongooseAdapter');
+    expect(source).toContain('new MongooseAdapter');
+    expect(source).not.toContain('import(');
   });
 });

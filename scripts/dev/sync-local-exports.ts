@@ -24,7 +24,8 @@
 import fs from 'fs';
 import path from 'path';
 
-import { measureTime } from '../utils/index.js';
+import { shouldExportBuildArtifact } from '../publish/export-policy.js';
+import { measureTime } from '../utils/measure-time.js';
 
 const root = process.cwd();
 const buildEsmDir = path.join(root, 'build-src-esm');
@@ -46,6 +47,7 @@ const addExport = (fullPath: string): void => {
   const rel = path.relative(buildEsmDir, fullPath).split(path.sep).join('/');
   const ext = path.extname(rel);
   if (ext !== '.js' && ext !== '.mjs') return;
+  if (!shouldExportBuildArtifact(rel)) return;
 
   const parts = rel.split('/');
   const last = parts[parts.length - 1] ?? '';

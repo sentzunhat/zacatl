@@ -1,7 +1,7 @@
 project:
   name: 'Zacatl Framework'
   purpose: 'TypeScript framework for layered service applications'
-  runtime: 'Node.js 24.14.0+'
+  runtime: 'Node.js 26.3.0+'
 
 architecture:
   pattern: 'Layered / hexagonal'

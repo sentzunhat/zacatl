@@ -18,7 +18,7 @@ Declare handlers in the `Service` configuration. The framework handles the rest:
 
 ```typescript
 import Fastify from 'fastify';
-import { Service, ServiceType, ServerType, ServerVendor } from '@sentzunhat/zacatl';
+import { Service, ServiceType, ServerType, ServerVendor } from '@sentzunhat/zacatl/service';
 import { container } from '@sentzunhat/zacatl/third-party';
 
 // Register repositories and services before constructing Service
@@ -80,7 +80,7 @@ container.registerSingleton(MyHandler, MyHandler);
 The `HandlersType` enum is exported for internal use by adapters:
 
 ```typescript
-import { HandlersType } from '@sentzunhat/zacatl';
+import { HandlersType } from '@sentzunhat/zacatl/service';
 
 HandlersType.HOOK; // "HOOK"
 HandlersType.ROUTE; // "ROUTE"

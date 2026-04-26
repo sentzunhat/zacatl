@@ -19,7 +19,7 @@ Zacatl uses [tsyringe](https://github.com/microsoft/tsyringe) for dependency inj
 
 ---
 
-## Approach 1: Decorators (Recommended for Production)
+## Approach 1: Decorators (Standalone and Library Modules)
 
 **Best for:** Standard TypeScript apps compiled with `tsc`
 
@@ -39,13 +39,8 @@ Ensure your `tsconfig.json` has:
 ### Basic Usage
 
 ```typescript
-import {
-  inject,
-  singleton,
-  BadRequestError,
-  ValidationError,
-  InternalServerError,
-} from '@sentzunhat/zacatl';
+import { BadRequestError, ValidationError, InternalServerError } from '@sentzunhat/zacatl/error';
+import { inject, singleton } from '@sentzunhat/zacatl/third-party/dependency-injection/tsyringe';
 
 // Define a repository
 @singleton()
@@ -132,13 +127,8 @@ layers. For most applications, the Service architecture is simpler and more robu
 From a production authentication service:
 
 ```typescript
-import {
-  inject,
-  singleton,
-  BadRequestError,
-  ValidationError,
-  InternalServerError,
-} from '@sentzunhat/zacatl';
+import { BadRequestError, ValidationError, InternalServerError } from '@sentzunhat/zacatl/error';
+import { inject, singleton } from '@sentzunhat/zacatl/third-party/dependency-injection/tsyringe';
 
 @singleton()
 export class AttestOptionsProviderAdapter {
@@ -236,7 +226,8 @@ Both work identically - choose based on semantic meaning. See [Layer Registratio
 ### Basic Setup
 
 ```typescript
-import { Service, singleton } from '@sentzunhat/zacatl';
+import { Service } from '@sentzunhat/zacatl/service';
+import { singleton } from '@sentzunhat/zacatl/third-party/dependency-injection/tsyringe';
 
 // Define your classes
 @singleton()
@@ -281,7 +272,8 @@ See the [Service Adapter Pattern](../service/service-adapter-pattern.md) for ful
 ### Pattern 1: Repository with Service
 
 ```typescript
-import { inject, singleton, NotFoundError } from '@sentzunhat/zacatl';
+import { NotFoundError } from '@sentzunhat/zacatl/error';
+import { inject, singleton } from '@sentzunhat/zacatl/third-party/dependency-injection/tsyringe';
 
 @singleton()
 class UserRepository {
@@ -347,7 +339,7 @@ class OrderService {
 ### Pattern 3: Abstract-Class DI (Manual Binding)
 
 ```typescript
-import { inject, singleton, container } from '@sentzunhat/zacatl';
+import { inject, singleton, container } from '@sentzunhat/zacatl/third-party/dependency-injection/tsyringe';
 
 // Define abstract token
 abstract class NotificationService {
@@ -397,9 +389,10 @@ class MyService {
   constructor(@inject(MyRepo) private repo: MyRepo) {}
 }
 
-// ✅ CLI tool with tsx - use helpers
-registerSingletonWithDependencies(MyRepo);
-registerSingletonWithDependencies(MyService, [MyRepo]);
+// ✅ Manual container wiring outside Service architecture
+registerSingleton(MyRepo, MyRepo);
+registerSingleton(MyService, MyService);
+const service = resolveDependency<MyService>(MyService);
 
 // ✅ Full REST API - use Service architecture
 const service = new Service({
@@ -526,10 +519,12 @@ class UserOrderCoordinator {
 
 ```typescript
 // Instead of decorators
-import { registerSingletonWithDependencies } from '@sentzunhat/zacatl';
+import { registerSingleton, resolveDependency } from '@sentzunhat/zacatl/dependency-injection';
 
-registerSingletonWithDependencies(MyRepository);
-registerSingletonWithDependencies(MyService, [MyRepository]);
+registerSingleton(MyRepository, MyRepository);
+registerSingleton(MyService, MyService);
+
+const service = resolveDependency<MyService>(MyService);
 ```
 
 ### Dependency Not Registered
@@ -540,23 +535,23 @@ registerSingletonWithDependencies(MyService, [MyRepository]);
 
 ```typescript
 // ✅ Correct order
-registerSingletonWithDependencies(Logger);
-registerSingletonWithDependencies(Database, [Logger]);
-registerSingletonWithDependencies(Service, [Database, Logger]);
+registerSingleton(Logger, Logger);
+registerSingleton(Database, Database);
+registerSingleton(Service, Service);
 ```
 
 ### Getting Different Instances
 
 **Problem:** Expecting singleton behavior but getting new instances
 
-**Solution:** Use `registerSingletonWithDependencies` not `registerWithDependencies`:
+**Solution:** Use `registerSingleton` not `registerDependency`:
 
 ```typescript
 // ✅ Singleton - same instance
-registerSingletonWithDependencies(MyService, []);
+registerSingleton(MyService, MyService);
 
 // ❌ Transient - new instances
-registerWithDependencies(MyService, []);
+registerDependency(MyService, MyService);
 ```
 
 ---
@@ -640,8 +635,8 @@ container.register(Database, {
 **After:**
 
 ```typescript
-registerSingletonWithDependencies(Logger);
-registerSingletonWithDependencies(Database, [Logger]);
+registerSingleton(Logger, Logger);
+registerSingleton(Database, Database);
 ```
 
 ---
@@ -650,27 +645,16 @@ registerSingletonWithDependencies(Database, [Logger]);
 
 ## Importing from Zacatl
 
-**Recommended:** Import everything from `@sentzunhat/zacatl`:
+Use explicit subpaths (no root barrel since 0.0.56):
 
 ```typescript
-import {
-  // DI decorators and container
-  inject,
-  singleton,
-  container,
-
-  // Errors
-  BadRequestError,
-  ValidationError,
-  NotFoundError,
-
-  // Other utilities
-  Service,
-  BaseRepository,
-} from '@sentzunhat/zacatl';
+import { Service, BaseRepository } from '@sentzunhat/zacatl/service';
+import { BadRequestError, ValidationError, NotFoundError } from '@sentzunhat/zacatl/error';
+import { resolveDependency } from '@sentzunhat/zacatl/dependency-injection';
+import { inject, singleton, container } from '@sentzunhat/zacatl/third-party/dependency-injection/tsyringe';
 ```
 
-This ensures you're using the correct versions bundled with Zacatl. You can also import directly from `tsyringe` if needed, but the Zacatl exports are recommended for consistency.
+This ensures you're using the versions bundled with Zacatl. You can also import directly from `tsyringe` if needed, but the Zacatl re-exports are recommended for consistency.
 
 ---
 

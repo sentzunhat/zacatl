@@ -2,10 +2,12 @@ import type { Sequelize } from 'sequelize';
 
 import { CustomError } from '@zacatl/error';
 
-import { getContainer } from '../../../../../dependency-injection/container';
-import type { DatabaseServerPort, DatabaseConfig } from '../port';
+import { registerOrmInstance } from '../orm-instance';
+import { DatabaseVendor, type DatabaseServerPort, type DatabaseConfig } from '../port';
 
 export class SequelizeAdapter implements DatabaseServerPort {
+  private sequelizeInstance: Sequelize | null = null;
+
   async connect(_serviceName: string, config: DatabaseConfig): Promise<void> {
     const { instance, onDatabaseConnected } = config;
     const sequelize = instance as Sequelize;
@@ -24,12 +26,11 @@ export class SequelizeAdapter implements DatabaseServerPort {
       await onDatabaseConnected(sequelize);
     }
 
-    getContainer().register<Sequelize>(sequelize.constructor.name, {
-      useValue: sequelize,
-    });
+    this.sequelizeInstance = sequelize;
+    registerOrmInstance(DatabaseVendor.SEQUELIZE, sequelize);
   }
 
   async disconnect(): Promise<void> {
-    // Implement disconnect if needed
+    await this.sequelizeInstance?.close();
   }
 }

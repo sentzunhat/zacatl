@@ -2,15 +2,15 @@ import fs from 'fs';
 import os from 'os';
 import path from 'path';
 
+import { describe, it, expect } from 'vitest';
+
+import { BadRequestError } from '../../../../src/error';
 import {
   isPlainObject,
   deepMerge,
   readJsonFile,
   findExistingDir,
-} from '@zacatl/localization/node/helpers';
-import { describe, it, expect } from 'vitest';
-
-import { BadRequestError } from '@zacatl/error';
+} from '../../../../src/localization/node/helpers';
 
 describe('i18n-node helpers', () => {
   it('isPlainObject detects plain objects correctly', () => {
@@ -23,14 +23,25 @@ describe('i18n-node helpers', () => {
   });
 
   it('deepMerge merges nested objects and overrides primitives', () => {
-    const base = { a: 1, b: { x: 1, y: 2 }, c: { nested: { val: 1 } } };
-    const override = { a: 2, b: { y: 3 }, c: { nested: { val: 2 } }, d: 4 };
+    const base: Record<string, unknown> = {
+      a: 1,
+      b: { x: 1, y: 2 },
+      c: { nested: { val: 1 } },
+    };
+    const override: Record<string, unknown> = {
+      a: 2,
+      b: { y: 3 },
+      c: { nested: { val: 2 } },
+      d: 4,
+    };
 
-    const merged = deepMerge(base as any, override as any) as any;
+    const merged = deepMerge(base, override);
     expect(merged['a']).toBe(2);
-    expect(merged['b']['x']).toBe(1);
-    expect(merged['b']['y']).toBe(3);
-    expect(merged['c']['nested']['val']).toBe(2);
+    expect((merged['b'] as Record<string, unknown>)['x']).toBe(1);
+    expect((merged['b'] as Record<string, unknown>)['y']).toBe(3);
+    expect(
+      ((merged['c'] as Record<string, unknown>)['nested'] as Record<string, unknown>)['val'],
+    ).toBe(2);
     expect(merged['d']).toBe(4);
   });
 
@@ -39,7 +50,7 @@ describe('i18n-node helpers', () => {
     const file = path.join(tmp, 'en.json');
     fs.writeFileSync(file, JSON.stringify({ hello: 'world' }), 'utf-8');
 
-    const parsed = readJsonFile(file) as any;
+    const parsed = readJsonFile(file);
     expect(parsed['hello']).toBe('world');
 
     fs.rmSync(tmp, { recursive: true, force: true });

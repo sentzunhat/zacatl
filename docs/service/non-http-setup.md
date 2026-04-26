@@ -22,7 +22,7 @@ import {
   registerDependency,
   resolveDependency,
 } from '@sentzunhat/zacatl/dependency-injection';
-import { singleton } from '@sentzunhat/zacatl/third-party/tsyringe';
+import { singleton } from '@sentzunhat/zacatl/third-party/dependency-injection/tsyringe';
 
 @singleton()
 class GreetingService {
@@ -40,7 +40,7 @@ console.log(greetingService.greet('Zacatl'));
 
 ```typescript
 import { registerDependencies, resolveDependency } from '@sentzunhat/zacatl/dependency-injection';
-import { singleton } from '@sentzunhat/zacatl/third-party/tsyringe';
+import { singleton } from '@sentzunhat/zacatl/third-party/dependency-injection/tsyringe';
 
 @singleton()
 class UserRepository {
@@ -74,7 +74,7 @@ import {
   resolveDependency,
 } from '@sentzunhat/zacatl/dependency-injection';
 import { loadYML } from '@sentzunhat/zacatl/configuration';
-import { inject, singleton } from '@sentzunhat/zacatl/third-party/tsyringe';
+import { inject, singleton } from '@sentzunhat/zacatl/third-party/dependency-injection/tsyringe';
 
 const ENV_TOKEN = Symbol('ENV_TOKEN');
 
@@ -108,7 +108,7 @@ import {
 } from '@sentzunhat/zacatl/dependency-injection';
 import { InternalServerError } from '@sentzunhat/zacatl/error';
 import { logger } from '@sentzunhat/zacatl/logs';
-import { inject, singleton } from '@sentzunhat/zacatl/third-party/tsyringe';
+import { inject, singleton } from '@sentzunhat/zacatl/third-party/dependency-injection/tsyringe';
 
 const WORKER_INTERVAL = Symbol('WORKER_INTERVAL');
 
@@ -150,7 +150,7 @@ import {
   resolveDependency,
 } from '@sentzunhat/zacatl/dependency-injection';
 import { logger } from '@sentzunhat/zacatl/logs';
-import { singleton } from '@sentzunhat/zacatl/third-party/tsyringe';
+import { singleton } from '@sentzunhat/zacatl/third-party/dependency-injection/tsyringe';
 
 @singleton()
 class SourceRepository {

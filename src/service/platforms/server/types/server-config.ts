@@ -3,11 +3,17 @@ export enum ServerVendor {
   EXPRESS = 'EXPRESS',
 }
 
+/** Named API route prefixes. `api` is the required base; add more keys to exclude additional path groups from SPA routing. */
+export interface ApiPrefixes {
+  api: string;
+  [key: string]: string;
+}
+
 export interface HttpServerConfig {
   type: ServerType;
   vendor: ServerVendor;
   instance: unknown;
-  apiPrefix?: string;
+  prefixes?: ApiPrefixes;
   gateway?: GatewayService;
 }
 
@@ -16,8 +22,8 @@ export interface PageServerConfig {
   staticDir?: string | undefined;
   /** Enable SPA fallback (serve index.html for non-API, non-asset routes). Defaults to true when staticDir is set. */
   spaFallback?: boolean | undefined;
-  /** Base path for API routes excluded from SPA fallback. Defaults to '/api'. */
-  apiPrefix?: string | undefined;
+  /** Named API prefixes excluded from SPA fallback. Defaults to `{ api: '/api' }`. Add more keys for additional API groups. */
+  prefixes?: ApiPrefixes | undefined;
   customRegister?: ((server: unknown) => Promise<void> | void) | undefined;
 }
 

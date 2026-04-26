@@ -20,12 +20,12 @@ graph TD
 
 - Mongoose (MongoDB)
 - Sequelize (PostgreSQL, MySQL, SQLite via `sequelize` package)
-- Node.js SQLite (`node:sqlite` module — Node 24+ only, no external package required)
+- Node.js SQLite (`node:sqlite` module — Node 22.5+, no external package required)
 
 ## Mongoose Example
 
 ```typescript
-import { BaseRepository } from '@sentzunhat/zacatl';
+import { BaseRepository, ORMType } from '@sentzunhat/zacatl/service';
 import { Schema } from 'mongoose';
 
 const userSchema = new Schema(
@@ -38,7 +38,7 @@ const userSchema = new Schema(
 
 class UserRepository extends BaseRepository<User, CreateUser, UserDTO> {
   constructor() {
-    super({ type: 'mongoose', name: 'User', schema: userSchema });
+    super({ type: ORMType.Mongoose, name: 'User', schema: userSchema });
   }
 
   async findByEmail(email: string) {
@@ -51,7 +51,7 @@ class UserRepository extends BaseRepository<User, CreateUser, UserDTO> {
 ## Sequelize Example
 
 ```typescript
-import { BaseRepository } from '@sentzunhat/zacatl';
+import { BaseRepository, ORMType } from '@sentzunhat/zacatl/service';
 import { Model } from 'sequelize';
 
 class ProductModel extends Model {
@@ -61,7 +61,10 @@ class ProductModel extends Model {
 
 class ProductRepository extends BaseRepository<ProductModel, CreateProduct, ProductDTO> {
   constructor() {
-    super({ type: 'sequelize', model: ProductModel });
+    super({
+      type: ORMType.Sequelize,
+      name: 'Product',
+    });
   }
 }
 ```
@@ -69,7 +72,7 @@ class ProductRepository extends BaseRepository<ProductModel, CreateProduct, Prod
 ## Node.js SQLite Example
 
 ```typescript
-import { BaseRepository } from '@sentzunhat/zacatl';
+import { BaseRepository, ORMType } from '@sentzunhat/zacatl/service';
 
 interface User {
   id: string;
@@ -78,11 +81,10 @@ interface User {
 }
 
 class UserRepository extends BaseRepository<User, CreateUser, UserDTO> {
-  constructor(database: DatabaseSync) {
+  constructor() {
     super({
-      type: 'nodesqlite',
-      database,
-      tableName: 'users',
+      type: ORMType.NodeSqlite,
+      name: 'users',
     });
   }
 }
@@ -93,7 +95,7 @@ class UserRepository extends BaseRepository<User, CreateUser, UserDTO> {
 ## Custom Adapter
 
 ```typescript
-import type { ORMAdapter } from '@sentzunhat/zacatl';
+import { ORMAdapter } from '@sentzunhat/zacatl/service';
 
 class MyAdapter<D, I, O> implements ORMAdapter<D, I, O> {
   readonly model: any;

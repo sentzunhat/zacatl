@@ -2,7 +2,10 @@ import { describe, it, expect, afterEach, beforeAll } from 'vitest';
 
 import { CustomError } from '@zacatl/error';
 
-import { SqliteAdapter } from '../../../../../../src/service/platforms/server/database/sqlite-adapter';
+import { clearContainer, resolveDependency } from '../../../../../../src/dependency-injection';
+import { NodeSqliteToken } from '../../../../../../src/service/layers/infrastructure/orm/tokens/nodesqlite';
+import { SqliteAdapter } from '../../../../../../src/service/platforms/server/database/adapters/sqlite';
+import { DatabaseVendor } from '../../../../../../src/service/platforms/server/database/port';
 
 describe('SqliteAdapter', () => {
   let adapter: SqliteAdapter;
@@ -23,6 +26,7 @@ describe('SqliteAdapter', () => {
     if (adapter) {
       await adapter.disconnect();
     }
+    clearContainer();
   });
 
   describe('connect()', () => {
@@ -30,7 +34,7 @@ describe('SqliteAdapter', () => {
       adapter = new SqliteAdapter();
 
       await expect(
-        adapter.connect('TestService', { vendor: 'SQLITE' as any, connectionString: '' }),
+        adapter.connect('TestService', { vendor: DatabaseVendor.SQLITE, connectionString: '' }),
       ).rejects.toBeInstanceOf(CustomError);
     });
 
@@ -43,11 +47,12 @@ describe('SqliteAdapter', () => {
       adapter = new SqliteAdapter();
 
       await adapter.connect('TestService', {
-        vendor: 'SQLITE' as any,
+        vendor: DatabaseVendor.SQLITE,
         connectionString: ':memory:',
       });
 
       expect(adapter.getDatabase()).toBeDefined();
+      expect(resolveDependency(NodeSqliteToken)).toBe(adapter.getDatabase());
     });
 
     it('getDatabase() returns undefined before connect is called', () => {
@@ -67,7 +72,7 @@ describe('SqliteAdapter', () => {
       adapter = new SqliteAdapter();
 
       await adapter.connect('TestService', {
-        vendor: 'SQLITE' as any,
+        vendor: DatabaseVendor.SQLITE,
         connectionString: ':memory:',
       });
 
@@ -93,7 +98,7 @@ describe('SqliteAdapter', () => {
       adapter = new SqliteAdapter();
 
       await adapter.connect('TestService', {
-        vendor: 'SQLITE' as any,
+        vendor: DatabaseVendor.SQLITE,
         connectionString: ':memory:',
       });
 

@@ -1,5 +1,5 @@
-import { CLI } from './cli';
-import { Desktop } from './desktop';
+import { CLI } from './cli/cli';
+import { Desktop } from './desktop/desktop';
 import { Server } from './server/server';
 import type { ConfigPlatforms } from './types';
 import type { ApplicationEntryPoints } from '../layers/application/types';
@@ -41,6 +41,12 @@ export class Platforms {
 
     if (this.desktop && entryPoints.ipc) {
       await this.desktop.registerEntrypoints(entryPoints.ipc);
+    }
+  }
+
+  public async stop(): Promise<void> {
+    if (this.server) {
+      await this.server.stop();
     }
   }
 

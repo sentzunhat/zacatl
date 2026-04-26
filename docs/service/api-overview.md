@@ -23,19 +23,19 @@ Complete Zacatl API documentation.
 
 ## Quick Reference
 
-### Main Package
+### Public subpaths
 
 ```typescript
 // Core exports
-import { Service } from '@sentzunhat/zacatl';
+import { Service } from '@sentzunhat/zacatl/service';
 
 // Subpath imports
-import { BaseRepository, ORMType } from '@sentzunhat/zacatl';
+import { BaseRepository, ORMType } from '@sentzunhat/zacatl/service';
 import { NotFoundError, BadRequestError } from '@sentzunhat/zacatl/error';
 import { loadJSON, loadYML } from '@sentzunhat/zacatl/configuration';
 
 // Full paths (still supported)
-import { createLogger } from '@sentzunhat/zacatl';
+import { createLogger } from '@sentzunhat/zacatl/logs';
 ```
 
 ---

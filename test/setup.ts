@@ -1,8 +1,47 @@
-import '@zacatl/third-party/reflect-metadata'; // required by tsyringe (use project shim)
+import '@zacatl/third-party/dependency-injection/reflect-metadata'; // required by tsyringe (use project shim)
 import * as diagnostics from 'diagnostics_channel';
 import { createRequire } from 'module';
 
-// Node 24 changed diagnostics_channel API; libraries like fastify/pino call
+// Polyfill `globalThis.crypto` for older Node versions in the test environment.
+// Some libraries (notably `uuid` v14+) expect the Web Crypto API to be present.
+// This attempts to use Node's `crypto.webcrypto` when available, otherwise
+// falls back to a minimal `getRandomValues` implementation using
+// `crypto.randomFillSync` so tests can run on Node versions without
+// full `globalThis.crypto` support.
+try {
+  const g = globalThis as unknown as Record<string, unknown>;
+  if (typeof g['crypto'] === 'undefined') {
+    try {
+      // Prefer webcrypto where available
+      const requireC = createRequire(import.meta.url);
+      const nodeCrypto = requireC('crypto');
+
+      if (nodeCrypto && nodeCrypto.webcrypto) {
+        g['crypto'] = nodeCrypto.webcrypto;
+      } else if (nodeCrypto && typeof nodeCrypto.randomFillSync === 'function') {
+        g['crypto'] = {
+          getRandomValues: (arr: Uint8Array) => {
+            if (!(arr && typeof arr.length === 'number')) {
+              throw new TypeError('Expected Uint8Array');
+            }
+            nodeCrypto.randomFillSync(arr);
+            return arr;
+          },
+          randomUUID:
+            typeof nodeCrypto.randomUUID === 'function'
+              ? nodeCrypto.randomUUID.bind(nodeCrypto)
+              : undefined,
+        } as Crypto;
+      }
+    } catch {
+      // Best-effort only — if we cannot polyfill, tests may still fail on old Node.
+    }
+  }
+} catch {
+  // noop
+}
+
+// Node 26 changed diagnostics_channel API; libraries like fastify/pino call
 // `tracingChannel` which may not exist or may be non-callable in some
 // environments. Provide a robust fallback for both ESM and CommonJS views
 // so tests don't crash when libraries call `diagnostics.tracingChannel()`.

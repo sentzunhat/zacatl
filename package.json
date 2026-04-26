@@ -1,8 +1,8 @@
 {
   "name": "@sentzunhat/zacatl",
   "type": "module",
-  "version": "0.0.55",
-  "packageManager": "npm@11.9.0",
+  "version": "0.0.56",
+  "packageManager": "npm@12.0.0",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/sentzunhat/zacatl.git"
@@ -10,7 +10,7 @@
   "homepage": "https://github.com/sentzunhat/zacatl#readme",
   "description": "A modular, high-performance TypeScript microservice framework for Node.js, featuring layered architecture, dependency injection, and robust validation for building scalable APIs and distributed systems.",
   "engines": {
-    "node": ">=24.14.0",
+    "node": ">=26.0.0",
     "npm": ">=11.0.0"
   },
   "imports": {
@@ -56,7 +56,7 @@
     "yaml",
     "api-framework",
     "typescript-backend",
-    "node-24",
+    "node-26",
     "enterprise-typescript"
   ],
   "author": "Zacatl Contributors",
@@ -67,7 +67,6 @@
     "access": "public"
   },
   "scripts": {
-    "start": "npx tsx src/index.ts --project ./tsconfig.json",
     "build:scripts:esm": "npx tsc -p scripts/tsconfig.scripts.esm.json && npx tsc-alias -p scripts/tsconfig.scripts.esm.json && npx tsx scripts/build/fix-esm.ts build-scripts-esm",
     "build:scripts:cjs": "npx tsc -p scripts/tsconfig.scripts.cjs.json",
     "build:scripts": "npm run parallel -- \"npm run build:scripts:esm,npm run build:scripts:cjs\"",
@@ -102,78 +101,88 @@
     "clean": "npm run clean:all",
     "clean:all": "npm run parallel -- \"npm run clean:build,npm run clean:src,npm run clean:examples\" && npm run clean:modules && npm run clean:gitignored",
     "prepublish:guard": "npx tsx scripts/publish/prepublish-guard.ts",
-    "prepublish:only": "npm i && npm run prepublish:guard && npm run barrels:verify && npm run clean:src && npm run test:coverage && npm run type:check && npm run lint:silent && npm run build",
+    "prepublish:only": "npm i && npm run prepublish:guard && npm run clean:src && npm run test:coverage && npm run type:check && npm run lint:silent && npm run build",
     "prepare-publish": "npx tsx scripts/publish/prepare-publish.ts",
     "publish:latest": "npm run prepublish:only && npm run prepare-publish && npm publish ./publish --access public --tag latest",
     "publish:otp": "npm run prepublish:only && npm run prepare-publish && npm publish ./publish --access public --tag latest --otp",
     "publish:dry": "npm run prepublish:only && npm run prepare-publish && npm publish ./publish --dry-run",
-    "publish:dry:ci": "npm run prepublish:guard && npm run barrels:verify && npm run clean:src && npm run test && npm run type:check && npm run lint:silent && npm run build && npm run prepare-publish && npm publish ./publish --dry-run",
+    "publish:dry:ci": "npm run prepublish:guard && npm run clean:src && npm run test && npm run type:check && npm run lint:silent && npm run build && npm run prepare-publish && npm publish ./publish --dry-run",
     "update:readme-coverage": "npx tsx scripts/dev/update-coverage-readme.ts",
     "postbuild:esm": "mkdir -p build-src-esm/eslint && cp -R src/eslint/* build-src-esm/eslint/ || true && mkdir -p build-src-esm/localization/locales && cp -R src/localization/locales/* build-src-esm/localization/locales/ || true",
     "postbuild:cjs": "mkdir -p build-src-cjs/eslint && cp -R src/eslint/* build-src-cjs/eslint/ || true && mkdir -p build-src-cjs/localization/locales && cp -R src/localization/locales/* build-src-cjs/localization/locales/ || true",
-    "postbuild": "npm run parallel -- \"npm run postbuild:esm,npm run postbuild:cjs\"",
+    "postbuild": "npm run parallel -- \"npm run postbuild:esm,npm run postbuild:cjs\" && npm run local:exports && npm run prune:barrels",
     "format": "prettier --write .",
     "setup:hooks": "npx tsx scripts/hooks/setup-git-hooks.ts",
     "check:peers": "npx tsx scripts/dev/check-peers.ts",
     "parallel": "npx tsx scripts/dev/parallel-runner.ts",
     "local:exports": "npx tsx scripts/dev/sync-local-exports.ts",
+    "prune:barrels": "npx tsx scripts/publish/prune-barrels.ts build-src-esm build-src-cjs",
+    "paths:generate": "npx tsx scripts/dev/generate-tsconfig-paths.ts",
     "pkg:fix": "npm pkg fix",
-    "barrels:generate": "npx tsx scripts/dev/generate-barrels.ts",
-    "barrels:verify": "npm run barrels:generate && git diff --exit-code -- 'src/**/index.ts'",
-    "setup:dev": "npm ci && npm run check:peers && npm run barrels:generate"
+    "setup:dev": "npm ci && npm run check:peers",
+    "screenshots:examples:capture": "npx tsx scripts/dev/capture-screenshots.ts"
   },
   "devDependencies": {
-    "@eslint/js": "^9.39.3",
+    "@eslint/js": "^9.39.4",
+    "@playwright/test": "^1.61.1",
+    "@sveltejs/vite-plugin-svelte": "^7.2.0",
     "@types/better-sqlite3": "^7.6.13",
     "@types/express": "^5.0.6",
     "@types/i18n": "^0.13.12",
     "@types/js-yaml": "^4.0.9",
-    "@types/sequelize": "^4.28.20",
-    "@types/uuid": "^10.0.0",
-    "@typescript-eslint/eslint-plugin": "^8.48.1",
-    "@typescript-eslint/parser": "^8.48.1",
-    "@vitest/coverage-istanbul": "^4.0.15",
-    "better-sqlite3": "^12.6.2",
-    "eslint": "^9.39.1",
-    "eslint-import-resolver-typescript": "^3.10.1",
+    "@types/node": "^26.1.1",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "@typescript-eslint/eslint-plugin": "^8.63.0",
+    "@typescript-eslint/parser": "^8.63.0",
+    "@vitejs/plugin-react": "^6.0.3",
+    "@vitest/coverage-istanbul": "^4.1.10",
+    "eslint": "^9.39.4",
+    "eslint-import-resolver-typescript": "^4.4.5",
     "eslint-plugin-import": "^2.32.0",
-    "get-tsconfig": "^4.10.0",
-    "mongodb-memory-server": "^11.0.1",
-    "mongoose": "^9.0.0",
-    "pg": "^8.18.0",
-    "pg-mem": "^2.1.0",
-    "prettier": "^2.8.8",
-    "sqlite3": "^6.0.1",
-    "tsc-alias": "^1.8.16",
-    "tsx": "^4.21.0",
-    "typescript": "^5.9.3",
-    "typescript-eslint": "^8.48.1",
-    "vite": "^7.3.1",
-    "vitest": "^4.0.18"
+    "get-tsconfig": "^4.14.0",
+    "mongodb-memory-server": "^11.2.0",
+    "pg-mem": "^3.0.14",
+    "playwright": "^1.61.1",
+    "prettier": "^3.9.5",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
+    "svelte": "^5.56.4",
+    "tsc-alias": "^1.9.0",
+    "tsx": "^4.23.0",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.63.0",
+    "vite": "^8.1.4",
+    "vitest": "^4.1.10"
   },
   "license": "Apache-2.0",
   "dependencies": {
-    "@fastify/http-proxy": "^11.4.1",
-    "@fastify/static": "^9.0.0",
+    "@fastify/http-proxy": "^11.5.0",
+    "@fastify/static": "^9.3.0",
     "express": "^5.2.1",
-    "fastify": "^5.7.4",
-    "fastify-type-provider-zod": "^6.1.0",
-    "http-proxy-middleware": "^3.0.5",
+    "fastify": "^5.10.0",
+    "fastify-type-provider-zod": "^7.0.0",
+    "http-proxy-middleware": "^4.2.0",
     "i18n": "^0.15.3",
-    "js-yaml": "^4.1.1",
-    "pino": "^10.3.0",
+    "js-yaml": "^5.2.1",
+    "pino": "^10.3.1",
     "pino-pretty": "^13.1.3",
     "reflect-metadata": "^0.2.2",
-    "sequelize": "^6.0.0",
+    "sequelize": "^6.37.8",
     "tsyringe": "^4.10.0",
-    "uuid": "^14.0.0",
-    "zod": "^4.3.6"
+    "uuid": "^14.0.1",
+    "zod": "^4.4.3"
+  },
+  "optionalDependencies": {
+    "better-sqlite3": "^12.11.1",
+    "mongoose": "^9.7.4",
+    "pg": "^8.22.0",
+    "sqlite3": "^6.0.1"
   },
   "peerDependencies": {
-    "better-sqlite3": "^12.6.2",
-    "mongoose": "^9.0.0",
-    "pg": "^8.18.0",
-    "sequelize": "^6.0.0",
+    "better-sqlite3": "^12.11.1",
+    "mongoose": "^9.7.0",
+    "pg": "^8.21.0",
     "sqlite3": "^6.0.1"
   },
   "peerDependenciesMeta": {
@@ -194,18 +203,13 @@
     }
   },
   "overrides": {
-    "uuid": "^14.0.0"
+    "uuid": "^14.0.1"
   },
   "exports": {
-    ".": {
-      "types": "./build-src-esm/index.d.ts",
-      "import": "./build-src-esm/index.js",
-      "require": "./build-src-cjs/index.js"
-    },
     "./configuration": {
-      "types": "./build-src-esm/configuration/index.d.ts",
-      "import": "./build-src-esm/configuration/index.js",
-      "require": "./build-src-cjs/configuration/index.js"
+      "types": "./build-src-esm/configuration.d.ts",
+      "import": "./build-src-esm/configuration.js",
+      "require": "./build-src-cjs/configuration.js"
     },
     "./configuration/json": {
       "types": "./build-src-esm/configuration/json.d.ts",
@@ -218,9 +222,9 @@
       "require": "./build-src-cjs/configuration/yml.js"
     },
     "./dependency-injection": {
-      "types": "./build-src-esm/dependency-injection/index.d.ts",
-      "import": "./build-src-esm/dependency-injection/index.js",
-      "require": "./build-src-cjs/dependency-injection/index.js"
+      "types": "./build-src-esm/dependency-injection.d.ts",
+      "import": "./build-src-esm/dependency-injection.js",
+      "require": "./build-src-cjs/dependency-injection.js"
     },
     "./dependency-injection/container": {
       "types": "./build-src-esm/dependency-injection/container.d.ts",
@@ -228,9 +232,9 @@
       "require": "./build-src-cjs/dependency-injection/container.js"
     },
     "./error": {
-      "types": "./build-src-esm/error/index.d.ts",
-      "import": "./build-src-esm/error/index.js",
-      "require": "./build-src-cjs/error/index.js"
+      "types": "./build-src-esm/error.d.ts",
+      "import": "./build-src-esm/error.js",
+      "require": "./build-src-cjs/error.js"
     },
     "./error/bad-request": {
       "types": "./build-src-esm/error/bad-request.d.ts",
@@ -290,19 +294,25 @@
     "./eslint/naming-conventions": {
       "import": "./build-src-esm/eslint/naming-conventions.mjs"
     },
+    "./eslint/scripts": {
+      "import": "./build-src-esm/eslint/scripts.mjs"
+    },
     "./eslint/solid": {
       "import": "./build-src-esm/eslint/solid.mjs"
     },
     "./eslint/strict": {
       "import": "./build-src-esm/eslint/strict.mjs"
     },
+    "./eslint/tests": {
+      "import": "./build-src-esm/eslint/tests.mjs"
+    },
     "./eslint/type-safety": {
       "import": "./build-src-esm/eslint/type-safety.mjs"
     },
     "./localization": {
-      "types": "./build-src-esm/localization/index.d.ts",
-      "import": "./build-src-esm/localization/index.js",
-      "require": "./build-src-cjs/localization/index.js"
+      "types": "./build-src-esm/localization.d.ts",
+      "import": "./build-src-esm/localization.js",
+      "require": "./build-src-cjs/localization.js"
     },
     "./localization/i18n-node": {
       "types": "./build-src-esm/localization/i18n-node.d.ts",
@@ -325,14 +335,14 @@
       "require": "./build-src-cjs/localization/node/types.js"
     },
     "./logs": {
-      "types": "./build-src-esm/logs/index.d.ts",
-      "import": "./build-src-esm/logs/index.js",
-      "require": "./build-src-cjs/logs/index.js"
+      "types": "./build-src-esm/logs.d.ts",
+      "import": "./build-src-esm/logs.js",
+      "require": "./build-src-cjs/logs.js"
     },
     "./logs/console": {
-      "types": "./build-src-esm/logs/console/index.d.ts",
-      "import": "./build-src-esm/logs/console/index.js",
-      "require": "./build-src-cjs/logs/console/index.js"
+      "types": "./build-src-esm/logs/console.d.ts",
+      "import": "./build-src-esm/logs/console.js",
+      "require": "./build-src-cjs/logs/console.js"
     },
     "./logs/console/adapter": {
       "types": "./build-src-esm/logs/console/adapter.d.ts",
@@ -355,9 +365,9 @@
       "require": "./build-src-cjs/logs/console/types.js"
     },
     "./logs/pino": {
-      "types": "./build-src-esm/logs/pino/index.d.ts",
-      "import": "./build-src-esm/logs/pino/index.js",
-      "require": "./build-src-cjs/logs/pino/index.js"
+      "types": "./build-src-esm/logs/pino.d.ts",
+      "import": "./build-src-esm/logs/pino.js",
+      "require": "./build-src-cjs/logs/pino.js"
     },
     "./logs/pino/adapter": {
       "types": "./build-src-esm/logs/pino/adapter.d.ts",
@@ -390,35 +400,10 @@
       "import": "./build-src-esm/service/index.js",
       "require": "./build-src-cjs/service/index.js"
     },
-    "./service/layers": {
-      "types": "./build-src-esm/service/layers/index.d.ts",
-      "import": "./build-src-esm/service/layers/index.js",
-      "require": "./build-src-cjs/service/layers/index.js"
-    },
-    "./service/layers/application": {
-      "types": "./build-src-esm/service/layers/application/index.d.ts",
-      "import": "./build-src-esm/service/layers/application/index.js",
-      "require": "./build-src-cjs/service/layers/application/index.js"
-    },
     "./service/layers/application/application": {
       "types": "./build-src-esm/service/layers/application/application.d.ts",
       "import": "./build-src-esm/service/layers/application/application.js",
       "require": "./build-src-cjs/service/layers/application/application.js"
-    },
-    "./service/layers/application/entry-points": {
-      "types": "./build-src-esm/service/layers/application/entry-points/index.d.ts",
-      "import": "./build-src-esm/service/layers/application/entry-points/index.js",
-      "require": "./build-src-cjs/service/layers/application/entry-points/index.js"
-    },
-    "./service/layers/application/entry-points/rest": {
-      "types": "./build-src-esm/service/layers/application/entry-points/rest/index.d.ts",
-      "import": "./build-src-esm/service/layers/application/entry-points/rest/index.js",
-      "require": "./build-src-cjs/service/layers/application/entry-points/rest/index.js"
-    },
-    "./service/layers/application/entry-points/rest/common": {
-      "types": "./build-src-esm/service/layers/application/entry-points/rest/common/index.d.ts",
-      "import": "./build-src-esm/service/layers/application/entry-points/rest/common/index.js",
-      "require": "./build-src-cjs/service/layers/application/entry-points/rest/common/index.js"
     },
     "./service/layers/application/entry-points/rest/common/handler": {
       "types": "./build-src-esm/service/layers/application/entry-points/rest/common/handler.d.ts",
@@ -439,16 +424,6 @@
       "types": "./build-src-esm/service/layers/application/entry-points/rest/common/schema.d.ts",
       "import": "./build-src-esm/service/layers/application/entry-points/rest/common/schema.js",
       "require": "./build-src-cjs/service/layers/application/entry-points/rest/common/schema.js"
-    },
-    "./service/layers/application/entry-points/rest/express": {
-      "types": "./build-src-esm/service/layers/application/entry-points/rest/express/index.d.ts",
-      "import": "./build-src-esm/service/layers/application/entry-points/rest/express/index.js",
-      "require": "./build-src-cjs/service/layers/application/entry-points/rest/express/index.js"
-    },
-    "./service/layers/application/entry-points/rest/express/handlers": {
-      "types": "./build-src-esm/service/layers/application/entry-points/rest/express/handlers/index.d.ts",
-      "import": "./build-src-esm/service/layers/application/entry-points/rest/express/handlers/index.js",
-      "require": "./build-src-cjs/service/layers/application/entry-points/rest/express/handlers/index.js"
     },
     "./service/layers/application/entry-points/rest/express/handlers/abstract": {
       "types": "./build-src-esm/service/layers/application/entry-points/rest/express/handlers/abstract.d.ts",
@@ -479,16 +454,6 @@
       "types": "./build-src-esm/service/layers/application/entry-points/rest/express/handlers/put-route-handler.d.ts",
       "import": "./build-src-esm/service/layers/application/entry-points/rest/express/handlers/put-route-handler.js",
       "require": "./build-src-cjs/service/layers/application/entry-points/rest/express/handlers/put-route-handler.js"
-    },
-    "./service/layers/application/entry-points/rest/fastify": {
-      "types": "./build-src-esm/service/layers/application/entry-points/rest/fastify/index.d.ts",
-      "import": "./build-src-esm/service/layers/application/entry-points/rest/fastify/index.js",
-      "require": "./build-src-cjs/service/layers/application/entry-points/rest/fastify/index.js"
-    },
-    "./service/layers/application/entry-points/rest/fastify/handlers": {
-      "types": "./build-src-esm/service/layers/application/entry-points/rest/fastify/handlers/index.d.ts",
-      "import": "./build-src-esm/service/layers/application/entry-points/rest/fastify/handlers/index.js",
-      "require": "./build-src-cjs/service/layers/application/entry-points/rest/fastify/handlers/index.js"
     },
     "./service/layers/application/entry-points/rest/fastify/handlers/abstract": {
       "types": "./build-src-esm/service/layers/application/entry-points/rest/fastify/handlers/abstract.d.ts",
@@ -530,35 +495,20 @@
       "import": "./build-src-esm/service/layers/application/entry-points/rest/fastify/handlers/route-handler.js",
       "require": "./build-src-cjs/service/layers/application/entry-points/rest/fastify/handlers/route-handler.js"
     },
-    "./service/layers/application/entry-points/rest/hook-handlers": {
-      "types": "./build-src-esm/service/layers/application/entry-points/rest/hook-handlers/index.d.ts",
-      "import": "./build-src-esm/service/layers/application/entry-points/rest/hook-handlers/index.js",
-      "require": "./build-src-cjs/service/layers/application/entry-points/rest/hook-handlers/index.js"
-    },
     "./service/layers/application/entry-points/rest/hook-handlers/hook-handler": {
       "types": "./build-src-esm/service/layers/application/entry-points/rest/hook-handlers/hook-handler.d.ts",
       "import": "./build-src-esm/service/layers/application/entry-points/rest/hook-handlers/hook-handler.js",
       "require": "./build-src-cjs/service/layers/application/entry-points/rest/hook-handlers/hook-handler.js"
     },
     "./service/layers/application/types": {
-      "types": "./build-src-esm/service/layers/application/types/index.d.ts",
-      "import": "./build-src-esm/service/layers/application/types/index.js",
-      "require": "./build-src-cjs/service/layers/application/types/index.js"
-    },
-    "./service/layers/domain": {
-      "types": "./build-src-esm/service/layers/domain/index.d.ts",
-      "import": "./build-src-esm/service/layers/domain/index.js",
-      "require": "./build-src-cjs/service/layers/domain/index.js"
+      "types": "./build-src-esm/service/layers/application/types.d.ts",
+      "import": "./build-src-esm/service/layers/application/types.js",
+      "require": "./build-src-cjs/service/layers/application/types.js"
     },
     "./service/layers/domain/domain": {
       "types": "./build-src-esm/service/layers/domain/domain.d.ts",
       "import": "./build-src-esm/service/layers/domain/domain.js",
       "require": "./build-src-cjs/service/layers/domain/domain.js"
-    },
-    "./service/layers/domain/ports": {
-      "types": "./build-src-esm/service/layers/domain/ports/index.d.ts",
-      "import": "./build-src-esm/service/layers/domain/ports/index.js",
-      "require": "./build-src-cjs/service/layers/domain/ports/index.js"
     },
     "./service/layers/domain/ports/domain": {
       "types": "./build-src-esm/service/layers/domain/ports/domain.d.ts",
@@ -576,29 +526,14 @@
       "require": "./build-src-cjs/service/layers/domain/ports/service.js"
     },
     "./service/layers/domain/types": {
-      "types": "./build-src-esm/service/layers/domain/types/index.d.ts",
-      "import": "./build-src-esm/service/layers/domain/types/index.js",
-      "require": "./build-src-cjs/service/layers/domain/types/index.js"
-    },
-    "./service/layers/infrastructure": {
-      "types": "./build-src-esm/service/layers/infrastructure/index.d.ts",
-      "import": "./build-src-esm/service/layers/infrastructure/index.js",
-      "require": "./build-src-cjs/service/layers/infrastructure/index.js"
+      "types": "./build-src-esm/service/layers/domain/types.d.ts",
+      "import": "./build-src-esm/service/layers/domain/types.js",
+      "require": "./build-src-cjs/service/layers/domain/types.js"
     },
     "./service/layers/infrastructure/infrastructure": {
       "types": "./build-src-esm/service/layers/infrastructure/infrastructure.d.ts",
       "import": "./build-src-esm/service/layers/infrastructure/infrastructure.js",
       "require": "./build-src-cjs/service/layers/infrastructure/infrastructure.js"
-    },
-    "./service/layers/infrastructure/orm": {
-      "types": "./build-src-esm/service/layers/infrastructure/orm/index.d.ts",
-      "import": "./build-src-esm/service/layers/infrastructure/orm/index.js",
-      "require": "./build-src-cjs/service/layers/infrastructure/orm/index.js"
-    },
-    "./service/layers/infrastructure/orm/mongoose": {
-      "types": "./build-src-esm/service/layers/infrastructure/orm/mongoose/index.d.ts",
-      "import": "./build-src-esm/service/layers/infrastructure/orm/mongoose/index.js",
-      "require": "./build-src-cjs/service/layers/infrastructure/orm/mongoose/index.js"
     },
     "./service/layers/infrastructure/orm/mongoose/adapter": {
       "types": "./build-src-esm/service/layers/infrastructure/orm/mongoose/adapter.d.ts",
@@ -610,20 +545,25 @@
       "import": "./build-src-esm/service/layers/infrastructure/orm/mongoose/adapter-loader.js",
       "require": "./build-src-cjs/service/layers/infrastructure/orm/mongoose/adapter-loader.js"
     },
-    "./service/layers/infrastructure/orm/nodesqlite": {
-      "types": "./build-src-esm/service/layers/infrastructure/orm/nodesqlite/index.d.ts",
-      "import": "./build-src-esm/service/layers/infrastructure/orm/nodesqlite/index.js",
-      "require": "./build-src-cjs/service/layers/infrastructure/orm/nodesqlite/index.js"
+    "./service/layers/infrastructure/orm/mongoose/types": {
+      "types": "./build-src-esm/service/layers/infrastructure/orm/mongoose/types.d.ts",
+      "import": "./build-src-esm/service/layers/infrastructure/orm/mongoose/types.js",
+      "require": "./build-src-cjs/service/layers/infrastructure/orm/mongoose/types.js"
     },
     "./service/layers/infrastructure/orm/nodesqlite/adapter": {
       "types": "./build-src-esm/service/layers/infrastructure/orm/nodesqlite/adapter.d.ts",
       "import": "./build-src-esm/service/layers/infrastructure/orm/nodesqlite/adapter.js",
       "require": "./build-src-cjs/service/layers/infrastructure/orm/nodesqlite/adapter.js"
     },
-    "./service/layers/infrastructure/orm/sequelize": {
-      "types": "./build-src-esm/service/layers/infrastructure/orm/sequelize/index.d.ts",
-      "import": "./build-src-esm/service/layers/infrastructure/orm/sequelize/index.js",
-      "require": "./build-src-cjs/service/layers/infrastructure/orm/sequelize/index.js"
+    "./service/layers/infrastructure/orm/nodesqlite/adapter-loader": {
+      "types": "./build-src-esm/service/layers/infrastructure/orm/nodesqlite/adapter-loader.d.ts",
+      "import": "./build-src-esm/service/layers/infrastructure/orm/nodesqlite/adapter-loader.js",
+      "require": "./build-src-cjs/service/layers/infrastructure/orm/nodesqlite/adapter-loader.js"
+    },
+    "./service/layers/infrastructure/orm/nodesqlite/types": {
+      "types": "./build-src-esm/service/layers/infrastructure/orm/nodesqlite/types.d.ts",
+      "import": "./build-src-esm/service/layers/infrastructure/orm/nodesqlite/types.js",
+      "require": "./build-src-cjs/service/layers/infrastructure/orm/nodesqlite/types.js"
     },
     "./service/layers/infrastructure/orm/sequelize/adapter": {
       "types": "./build-src-esm/service/layers/infrastructure/orm/sequelize/adapter.d.ts",
@@ -635,20 +575,35 @@
       "import": "./build-src-esm/service/layers/infrastructure/orm/sequelize/adapter-loader.js",
       "require": "./build-src-cjs/service/layers/infrastructure/orm/sequelize/adapter-loader.js"
     },
-    "./service/layers/infrastructure/repositories": {
-      "types": "./build-src-esm/service/layers/infrastructure/repositories/index.d.ts",
-      "import": "./build-src-esm/service/layers/infrastructure/repositories/index.js",
-      "require": "./build-src-cjs/service/layers/infrastructure/repositories/index.js"
+    "./service/layers/infrastructure/orm/sequelize/types": {
+      "types": "./build-src-esm/service/layers/infrastructure/orm/sequelize/types.d.ts",
+      "import": "./build-src-esm/service/layers/infrastructure/orm/sequelize/types.js",
+      "require": "./build-src-cjs/service/layers/infrastructure/orm/sequelize/types.js"
+    },
+    "./service/layers/infrastructure/orm/tokens/mongoose": {
+      "types": "./build-src-esm/service/layers/infrastructure/orm/tokens/mongoose.d.ts",
+      "import": "./build-src-esm/service/layers/infrastructure/orm/tokens/mongoose.js",
+      "require": "./build-src-cjs/service/layers/infrastructure/orm/tokens/mongoose.js"
+    },
+    "./service/layers/infrastructure/orm/tokens/nodesqlite": {
+      "types": "./build-src-esm/service/layers/infrastructure/orm/tokens/nodesqlite.d.ts",
+      "import": "./build-src-esm/service/layers/infrastructure/orm/tokens/nodesqlite.js",
+      "require": "./build-src-cjs/service/layers/infrastructure/orm/tokens/nodesqlite.js"
+    },
+    "./service/layers/infrastructure/orm/tokens/sequelize": {
+      "types": "./build-src-esm/service/layers/infrastructure/orm/tokens/sequelize.d.ts",
+      "import": "./build-src-esm/service/layers/infrastructure/orm/tokens/sequelize.js",
+      "require": "./build-src-cjs/service/layers/infrastructure/orm/tokens/sequelize.js"
+    },
+    "./service/layers/infrastructure/orm/types": {
+      "types": "./build-src-esm/service/layers/infrastructure/orm/types.d.ts",
+      "import": "./build-src-esm/service/layers/infrastructure/orm/types.js",
+      "require": "./build-src-cjs/service/layers/infrastructure/orm/types.js"
     },
     "./service/layers/infrastructure/repositories/abstract": {
       "types": "./build-src-esm/service/layers/infrastructure/repositories/abstract.d.ts",
       "import": "./build-src-esm/service/layers/infrastructure/repositories/abstract.js",
       "require": "./build-src-cjs/service/layers/infrastructure/repositories/abstract.js"
-    },
-    "./service/layers/infrastructure/repositories/mongoose": {
-      "types": "./build-src-esm/service/layers/infrastructure/repositories/mongoose/index.d.ts",
-      "import": "./build-src-esm/service/layers/infrastructure/repositories/mongoose/index.js",
-      "require": "./build-src-cjs/service/layers/infrastructure/repositories/mongoose/index.js"
     },
     "./service/layers/infrastructure/repositories/mongoose/repository": {
       "types": "./build-src-esm/service/layers/infrastructure/repositories/mongoose/repository.d.ts",
@@ -660,11 +615,6 @@
       "import": "./build-src-esm/service/layers/infrastructure/repositories/mongoose/types.js",
       "require": "./build-src-cjs/service/layers/infrastructure/repositories/mongoose/types.js"
     },
-    "./service/layers/infrastructure/repositories/nodesqlite": {
-      "types": "./build-src-esm/service/layers/infrastructure/repositories/nodesqlite/index.d.ts",
-      "import": "./build-src-esm/service/layers/infrastructure/repositories/nodesqlite/index.js",
-      "require": "./build-src-cjs/service/layers/infrastructure/repositories/nodesqlite/index.js"
-    },
     "./service/layers/infrastructure/repositories/nodesqlite/repository": {
       "types": "./build-src-esm/service/layers/infrastructure/repositories/nodesqlite/repository.d.ts",
       "import": "./build-src-esm/service/layers/infrastructure/repositories/nodesqlite/repository.js",
@@ -674,11 +624,6 @@
       "types": "./build-src-esm/service/layers/infrastructure/repositories/nodesqlite/types.d.ts",
       "import": "./build-src-esm/service/layers/infrastructure/repositories/nodesqlite/types.js",
       "require": "./build-src-cjs/service/layers/infrastructure/repositories/nodesqlite/types.js"
-    },
-    "./service/layers/infrastructure/repositories/sequelize": {
-      "types": "./build-src-esm/service/layers/infrastructure/repositories/sequelize/index.d.ts",
-      "import": "./build-src-esm/service/layers/infrastructure/repositories/sequelize/index.js",
-      "require": "./build-src-cjs/service/layers/infrastructure/repositories/sequelize/index.js"
     },
     "./service/layers/infrastructure/repositories/sequelize/repository": {
       "types": "./build-src-esm/service/layers/infrastructure/repositories/sequelize/repository.d.ts",
@@ -696,9 +641,9 @@
       "require": "./build-src-cjs/service/layers/infrastructure/repositories/types.js"
     },
     "./service/layers/infrastructure/types": {
-      "types": "./build-src-esm/service/layers/infrastructure/types/index.d.ts",
-      "import": "./build-src-esm/service/layers/infrastructure/types/index.js",
-      "require": "./build-src-cjs/service/layers/infrastructure/types/index.js"
+      "types": "./build-src-esm/service/layers/infrastructure/types.d.ts",
+      "import": "./build-src-esm/service/layers/infrastructure/types.js",
+      "require": "./build-src-cjs/service/layers/infrastructure/types.js"
     },
     "./service/layers/layers": {
       "types": "./build-src-esm/service/layers/layers.d.ts",
@@ -706,19 +651,9 @@
       "require": "./build-src-cjs/service/layers/layers.js"
     },
     "./service/layers/types": {
-      "types": "./build-src-esm/service/layers/types/index.d.ts",
-      "import": "./build-src-esm/service/layers/types/index.js",
-      "require": "./build-src-cjs/service/layers/types/index.js"
-    },
-    "./service/platforms": {
-      "types": "./build-src-esm/service/platforms/index.d.ts",
-      "import": "./build-src-esm/service/platforms/index.js",
-      "require": "./build-src-cjs/service/platforms/index.js"
-    },
-    "./service/platforms/cli": {
-      "types": "./build-src-esm/service/platforms/cli/index.d.ts",
-      "import": "./build-src-esm/service/platforms/cli/index.js",
-      "require": "./build-src-cjs/service/platforms/cli/index.js"
+      "types": "./build-src-esm/service/layers/types.d.ts",
+      "import": "./build-src-esm/service/layers/types.js",
+      "require": "./build-src-cjs/service/layers/types.js"
     },
     "./service/platforms/cli/cli": {
       "types": "./build-src-esm/service/platforms/cli/cli.d.ts",
@@ -730,20 +665,10 @@
       "import": "./build-src-esm/service/platforms/cli/types.js",
       "require": "./build-src-cjs/service/platforms/cli/types.js"
     },
-    "./service/platforms/context": {
-      "types": "./build-src-esm/service/platforms/context/index.d.ts",
-      "import": "./build-src-esm/service/platforms/context/index.js",
-      "require": "./build-src-cjs/service/platforms/context/index.js"
-    },
     "./service/platforms/context/request-context": {
       "types": "./build-src-esm/service/platforms/context/request-context.d.ts",
       "import": "./build-src-esm/service/platforms/context/request-context.js",
       "require": "./build-src-cjs/service/platforms/context/request-context.js"
-    },
-    "./service/platforms/desktop": {
-      "types": "./build-src-esm/service/platforms/desktop/index.d.ts",
-      "import": "./build-src-esm/service/platforms/desktop/index.js",
-      "require": "./build-src-cjs/service/platforms/desktop/index.js"
     },
     "./service/platforms/desktop/desktop": {
       "types": "./build-src-esm/service/platforms/desktop/desktop.d.ts",
@@ -759,16 +684,6 @@
       "types": "./build-src-esm/service/platforms/platforms.d.ts",
       "import": "./build-src-esm/service/platforms/platforms.js",
       "require": "./build-src-cjs/service/platforms/platforms.js"
-    },
-    "./service/platforms/server": {
-      "types": "./build-src-esm/service/platforms/server/index.d.ts",
-      "import": "./build-src-esm/service/platforms/server/index.js",
-      "require": "./build-src-cjs/service/platforms/server/index.js"
-    },
-    "./service/platforms/server/api": {
-      "types": "./build-src-esm/service/platforms/server/api/index.d.ts",
-      "import": "./build-src-esm/service/platforms/server/api/index.js",
-      "require": "./build-src-cjs/service/platforms/server/api/index.js"
     },
     "./service/platforms/server/api/adapters": {
       "types": "./build-src-esm/service/platforms/server/api/adapters.d.ts",
@@ -810,15 +725,15 @@
       "import": "./build-src-esm/service/platforms/server/api/schema-helper.js",
       "require": "./build-src-cjs/service/platforms/server/api/schema-helper.js"
     },
-    "./service/platforms/server/database": {
-      "types": "./build-src-esm/service/platforms/server/database/index.d.ts",
-      "import": "./build-src-esm/service/platforms/server/database/index.js",
-      "require": "./build-src-cjs/service/platforms/server/database/index.js"
-    },
     "./service/platforms/server/database/adapters": {
       "types": "./build-src-esm/service/platforms/server/database/adapters.d.ts",
       "import": "./build-src-esm/service/platforms/server/database/adapters.js",
       "require": "./build-src-cjs/service/platforms/server/database/adapters.js"
+    },
+    "./service/platforms/server/database/adapters/factory": {
+      "types": "./build-src-esm/service/platforms/server/database/adapters/factory.d.ts",
+      "import": "./build-src-esm/service/platforms/server/database/adapters/factory.js",
+      "require": "./build-src-cjs/service/platforms/server/database/adapters/factory.js"
     },
     "./service/platforms/server/database/adapters/mongoose": {
       "types": "./build-src-esm/service/platforms/server/database/adapters/mongoose.d.ts",
@@ -845,6 +760,11 @@
       "import": "./build-src-esm/service/platforms/server/database/mongoose-adapter.js",
       "require": "./build-src-cjs/service/platforms/server/database/mongoose-adapter.js"
     },
+    "./service/platforms/server/database/orm-instance": {
+      "types": "./build-src-esm/service/platforms/server/database/orm-instance.d.ts",
+      "import": "./build-src-esm/service/platforms/server/database/orm-instance.js",
+      "require": "./build-src-cjs/service/platforms/server/database/orm-instance.js"
+    },
     "./service/platforms/server/database/port": {
       "types": "./build-src-esm/service/platforms/server/database/port.d.ts",
       "import": "./build-src-esm/service/platforms/server/database/port.js",
@@ -859,11 +779,6 @@
       "types": "./build-src-esm/service/platforms/server/database/sqlite-adapter.d.ts",
       "import": "./build-src-esm/service/platforms/server/database/sqlite-adapter.js",
       "require": "./build-src-cjs/service/platforms/server/database/sqlite-adapter.js"
-    },
-    "./service/platforms/server/page": {
-      "types": "./build-src-esm/service/platforms/server/page/index.d.ts",
-      "import": "./build-src-esm/service/platforms/server/page/index.js",
-      "require": "./build-src-cjs/service/platforms/server/page/index.js"
     },
     "./service/platforms/server/page/adapters": {
       "types": "./build-src-esm/service/platforms/server/page/adapters.d.ts",
@@ -900,15 +815,45 @@
       "import": "./build-src-esm/service/platforms/server/page/port.js",
       "require": "./build-src-cjs/service/platforms/server/page/port.js"
     },
+    "./service/platforms/server/providers/express/api-adapter": {
+      "types": "./build-src-esm/service/platforms/server/providers/express/api-adapter.d.ts",
+      "import": "./build-src-esm/service/platforms/server/providers/express/api-adapter.js",
+      "require": "./build-src-cjs/service/platforms/server/providers/express/api-adapter.js"
+    },
+    "./service/platforms/server/providers/express/page-adapter": {
+      "types": "./build-src-esm/service/platforms/server/providers/express/page-adapter.d.ts",
+      "import": "./build-src-esm/service/platforms/server/providers/express/page-adapter.js",
+      "require": "./build-src-cjs/service/platforms/server/providers/express/page-adapter.js"
+    },
+    "./service/platforms/server/providers/express/schema-helper": {
+      "types": "./build-src-esm/service/platforms/server/providers/express/schema-helper.d.ts",
+      "import": "./build-src-esm/service/platforms/server/providers/express/schema-helper.js",
+      "require": "./build-src-cjs/service/platforms/server/providers/express/schema-helper.js"
+    },
+    "./service/platforms/server/providers/fastify/api-adapter": {
+      "types": "./build-src-esm/service/platforms/server/providers/fastify/api-adapter.d.ts",
+      "import": "./build-src-esm/service/platforms/server/providers/fastify/api-adapter.js",
+      "require": "./build-src-cjs/service/platforms/server/providers/fastify/api-adapter.js"
+    },
+    "./service/platforms/server/providers/fastify/page-adapter": {
+      "types": "./build-src-esm/service/platforms/server/providers/fastify/page-adapter.d.ts",
+      "import": "./build-src-esm/service/platforms/server/providers/fastify/page-adapter.js",
+      "require": "./build-src-cjs/service/platforms/server/providers/fastify/page-adapter.js"
+    },
     "./service/platforms/server/server": {
       "types": "./build-src-esm/service/platforms/server/server.d.ts",
       "import": "./build-src-esm/service/platforms/server/server.js",
       "require": "./build-src-cjs/service/platforms/server/server.js"
     },
-    "./service/platforms/server/types": {
-      "types": "./build-src-esm/service/platforms/server/types/index.d.ts",
-      "import": "./build-src-esm/service/platforms/server/types/index.js",
-      "require": "./build-src-cjs/service/platforms/server/types/index.js"
+    "./service/platforms/server/shared/prefixes/is-under-prefix": {
+      "types": "./build-src-esm/service/platforms/server/shared/prefixes/is-under-prefix.d.ts",
+      "import": "./build-src-esm/service/platforms/server/shared/prefixes/is-under-prefix.js",
+      "require": "./build-src-cjs/service/platforms/server/shared/prefixes/is-under-prefix.js"
+    },
+    "./service/platforms/server/shared/prefixes/normalize-prefix": {
+      "types": "./build-src-esm/service/platforms/server/shared/prefixes/normalize-prefix.d.ts",
+      "import": "./build-src-esm/service/platforms/server/shared/prefixes/normalize-prefix.js",
+      "require": "./build-src-cjs/service/platforms/server/shared/prefixes/normalize-prefix.js"
     },
     "./service/platforms/server/types/server-config": {
       "types": "./build-src-esm/service/platforms/server/types/server-config.d.ts",
@@ -916,9 +861,9 @@
       "require": "./build-src-cjs/service/platforms/server/types/server-config.js"
     },
     "./service/platforms/types": {
-      "types": "./build-src-esm/service/platforms/types/index.d.ts",
-      "import": "./build-src-esm/service/platforms/types/index.js",
-      "require": "./build-src-cjs/service/platforms/types/index.js"
+      "types": "./build-src-esm/service/platforms/types.d.ts",
+      "import": "./build-src-esm/service/platforms/types.js",
+      "require": "./build-src-cjs/service/platforms/types.js"
     },
     "./service/service": {
       "types": "./build-src-esm/service/service.d.ts",
@@ -926,14 +871,44 @@
       "require": "./build-src-cjs/service/service.js"
     },
     "./service/types": {
-      "types": "./build-src-esm/service/types/index.d.ts",
-      "import": "./build-src-esm/service/types/index.js",
-      "require": "./build-src-cjs/service/types/index.js"
+      "types": "./build-src-esm/service/types.d.ts",
+      "import": "./build-src-esm/service/types.js",
+      "require": "./build-src-cjs/service/types.js"
     },
     "./third-party": {
-      "types": "./build-src-esm/third-party/index.d.ts",
-      "import": "./build-src-esm/third-party/index.js",
-      "require": "./build-src-cjs/third-party/index.js"
+      "types": "./build-src-esm/third-party.d.ts",
+      "import": "./build-src-esm/third-party.js",
+      "require": "./build-src-cjs/third-party.js"
+    },
+    "./third-party/databases/mongoose": {
+      "types": "./build-src-esm/third-party/databases/mongoose.d.ts",
+      "import": "./build-src-esm/third-party/databases/mongoose.js",
+      "require": "./build-src-cjs/third-party/databases/mongoose.js"
+    },
+    "./third-party/databases/nodesqlite": {
+      "types": "./build-src-esm/third-party/databases/nodesqlite.d.ts",
+      "import": "./build-src-esm/third-party/databases/nodesqlite.js",
+      "require": "./build-src-cjs/third-party/databases/nodesqlite.js"
+    },
+    "./third-party/databases/sequelize": {
+      "types": "./build-src-esm/third-party/databases/sequelize.d.ts",
+      "import": "./build-src-esm/third-party/databases/sequelize.js",
+      "require": "./build-src-cjs/third-party/databases/sequelize.js"
+    },
+    "./third-party/databases/sqlite3": {
+      "types": "./build-src-esm/third-party/databases/sqlite3.d.ts",
+      "import": "./build-src-esm/third-party/databases/sqlite3.js",
+      "require": "./build-src-cjs/third-party/databases/sqlite3.js"
+    },
+    "./third-party/dependency-injection/reflect-metadata": {
+      "types": "./build-src-esm/third-party/dependency-injection/reflect-metadata.d.ts",
+      "import": "./build-src-esm/third-party/dependency-injection/reflect-metadata.js",
+      "require": "./build-src-cjs/third-party/dependency-injection/reflect-metadata.js"
+    },
+    "./third-party/dependency-injection/tsyringe": {
+      "types": "./build-src-esm/third-party/dependency-injection/tsyringe.d.ts",
+      "import": "./build-src-esm/third-party/dependency-injection/tsyringe.js",
+      "require": "./build-src-cjs/third-party/dependency-injection/tsyringe.js"
     },
     "./third-party/eslint": {
       "types": "./build-src-esm/third-party/eslint.d.ts",
@@ -1006,14 +981,9 @@
       "require": "./build-src-cjs/third-party/zod.js"
     },
     "./utils": {
-      "types": "./build-src-esm/utils/index.d.ts",
-      "import": "./build-src-esm/utils/index.js",
-      "require": "./build-src-cjs/utils/index.js"
-    },
-    "./utils/command-runner": {
-      "types": "./build-src-esm/utils/command-runner/index.d.ts",
-      "import": "./build-src-esm/utils/command-runner/index.js",
-      "require": "./build-src-cjs/utils/command-runner/index.js"
+      "types": "./build-src-esm/utils.d.ts",
+      "import": "./build-src-esm/utils.js",
+      "require": "./build-src-cjs/utils.js"
     },
     "./utils/command-runner/execute-commands": {
       "types": "./build-src-esm/utils/command-runner/execute-commands.d.ts",
@@ -1060,5 +1030,13 @@
       "import": "./build-src-esm/utils/optionals.js",
       "require": "./build-src-cjs/utils/optionals.js"
     }
+  },
+  "allowScripts": {
+    "better-sqlite3@12.11.1": true,
+    "esbuild@0.28.1": true,
+    "fsevents@2.3.3": true,
+    "mongodb-memory-server@11.2.0": true,
+    "sqlite3@6.0.1": true,
+    "unrs-resolver@1.12.2": true
   }
 }

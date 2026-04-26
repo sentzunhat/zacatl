@@ -65,8 +65,8 @@ curl http://localhost:8081/greetings
 
 ```bash
 # From repository root
-docker build -f examples/fastify-sqlite-svelte/Dockerfile \
-  -t zacatl-fastify-sqlite-svelte .
+docker build --build-arg EXAMPLE=fastify-sqlite-svelte \
+  -f examples/Dockerfile -t zacatl-fastify-sqlite-svelte .
 
 # Or use docker-compose
 cd examples/fastify-sqlite-svelte
@@ -89,7 +89,7 @@ docker compose up -d
 ## Documentation
 
 - **Examples Catalog**: [../README.md](../README.md)
-- **Start Here**: [../../docs/START_HERE.md](../../docs/START_HERE.md)
+- **Start Here**: [../../docs/start-here.md](../../docs/start-here.md)
 - **Framework Overview**: [../../docs/guidelines/framework-overview.md](../../docs/guidelines/framework-overview.md)
 - **Framework Database Guide**: [../../docs/third-party/orm/database-setup.md](../../docs/third-party/orm/database-setup.md)
 - **Service Module**: [../../docs/service/README.md](../../docs/service/README.md)

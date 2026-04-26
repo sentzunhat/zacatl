@@ -5,7 +5,7 @@ This guide shows how to configure MongoDB (Mongoose) and PostgreSQL/MySQL/SQLite
 ## Quick Example: Multi-Database Service
 
 ```typescript
-import { Service, DatabaseVendor, ServerVendor, ServerType } from '@sentzunhat/zacatl';
+import { Service, DatabaseVendor, ServerVendor, ServerType } from '@sentzunhat/zacatl/service';
 import { ORMType } from '@sentzunhat/zacatl/service/layers/infrastructure';
 import mongoose from 'mongoose';
 import { Sequelize } from 'sequelize';
@@ -188,7 +188,7 @@ export class ProductRepository extends BaseRepository<ProductModel, ProductInput
   constructor() {
     super({
       type: ORMType.Sequelize, // ✅ Use enum
-      model: ProductModel,
+      name: 'Product',
     });
   }
 
@@ -206,7 +206,7 @@ export class ProductRepository extends BaseRepository<ProductModel, ProductInput
 
 ```typescript
 // index.ts
-import { Service, DatabaseVendor, ServerVendor, ServerType } from '@sentzunhat/zacatl';
+import { Service, DatabaseVendor, ServerVendor, ServerType } from '@sentzunhat/zacatl/service';
 import mongoose from 'mongoose';
 import { Sequelize } from 'sequelize';
 import fastify from 'fastify';
@@ -451,7 +451,7 @@ ORMType.Sequelize; // For PostgreSQL, MySQL, SQLite, MSSQL
 ## Database Vendors (Enum)
 
 ```typescript
-import { DatabaseVendor } from '@sentzunhat/zacatl';
+import { DatabaseVendor } from '@sentzunhat/zacatl/service';
 
 DatabaseVendor.MONGOOSE; // MongoDB
 DatabaseVendor.SEQUELIZE; // SQL databases

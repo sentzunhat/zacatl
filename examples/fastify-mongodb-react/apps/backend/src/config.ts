@@ -3,18 +3,18 @@
  * Simple, centralized configuration for the Fastify + MongoDB example
  */
 
-import type { FastifyInstance } from '@sentzunhat/zacatl/third-party/fastify';
-import type { Mongoose } from 'mongoose';
-import { fileURLToPath } from 'url';
 import { existsSync } from 'node:fs';
 import { dirname, join } from 'path';
-import { ServiceType, ServerType, ServerVendor, DatabaseVendor } from '@sentzunhat/zacatl';
-import { resolveDependency } from '@sentzunhat/zacatl/dependency-injection';
-import type { ApplicationRestRoutes, HookHandler } from '@sentzunhat/zacatl/service';
+import { fileURLToPath } from 'url';
+import { ServiceType } from '@sentzunhat/zacatl/service/service';
+import type { HookHandler } from '@sentzunhat/zacatl/service/layers/application/entry-points/rest/hook-handlers/hook-handler';
+import { DatabaseVendor } from '@sentzunhat/zacatl/service/platforms/server/database/port';
+import { ServerType, ServerVendor } from '@sentzunhat/zacatl/service/platforms/server/types/server-config';
+import type { FastifyInstance } from '@sentzunhat/zacatl/third-party/fastify';
+import type { Mongoose } from 'mongoose';
 import { repositories } from './infrastructure/greetings/repositories/repositories';
-import { GreetingRepositoryAdapter } from './infrastructure/greetings/repositories/greeting/adapter';
-import { GreetingServiceAdapter } from './domain/greetings/service';
-import { hookHandlers } from './application/hook-handlers';
+import { GreetingServiceAdapter } from './domain/greetings/service/adapter';
+import { hookHandlers } from './application/hook-handlers/hooks';
 import { GetAllGreetingsHandler } from './application/route-handlers/greetings/get-all/handler';
 import { GetGreetingByIdHandler } from './application/route-handlers/greetings/get-by-id/handler';
 import { CreateGreetingHandler } from './application/route-handlers/greetings/create/handler';
@@ -67,10 +67,6 @@ const resolveBuiltInLocalesDir = (): string | undefined => {
 
 const builtInLocalesDir = resolveBuiltInLocalesDir();
 
-type InitializableGreetingRepository = GreetingRepositoryAdapter & {
-  initializeModel: () => Promise<void>;
-};
-
 export interface AppConfig {
   port: number;
   mongoUri: string;
@@ -90,7 +86,7 @@ export const createServiceConfig = (fastify: FastifyInstance, mongoose: Mongoose
     CreateGreetingHandler,
     DeleteGreetingHandler,
     GetRandomGreetingHandler,
-  ] as unknown as ApplicationRestRoutes;
+  ];
   const hooks = hookHandlers as Array<new () => HookHandler>;
 
   return {
@@ -106,7 +102,7 @@ export const createServiceConfig = (fastify: FastifyInstance, mongoose: Mongoose
           type: ServerType.SERVER,
           vendor: ServerVendor.FASTIFY,
           instance: fastify,
-          apiPrefix: API_PREFIX,
+          prefixes: { api: API_PREFIX },
         },
         page: {
           staticDir: join(appsRootDir, 'frontend', 'dist'),
@@ -116,12 +112,7 @@ export const createServiceConfig = (fastify: FastifyInstance, mongoose: Mongoose
             vendor: DatabaseVendor.MONGOOSE,
             instance: mongoose,
             connectionString: config.mongoUri,
-            onDatabaseConnected: async () => {
-              const greetingRepository = resolveDependency(
-                GreetingRepositoryAdapter,
-              ) as InitializableGreetingRepository;
-              await greetingRepository.initializeModel();
-            },
+            onDatabaseConnected: async () => {},
           },
         ],
       },

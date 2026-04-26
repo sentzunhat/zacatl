@@ -6,13 +6,13 @@ import {
   Sequelize,
   SequelizeModel as Model,
   ModelStatic,
-} from '@zacatl/third-party/sequelize';
-import { singleton } from '@zacatl/third-party/tsyringe';
+} from '@zacatl/third-party/databases/sequelize';
+import { singleton } from '@zacatl/third-party/dependency-injection/tsyringe';
 
-import {
-  SequelizeRepository,
-  ORMType,
-} from '../../../../../../src/service/layers/infrastructure/repositories/sequelize';
+import { clearContainer, getContainer } from '../../../../../../src/dependency-injection/container';
+import { SequelizeToken } from '../../../../../../src/service/layers/infrastructure/orm/tokens/sequelize';
+import { BaseRepository } from '../../../../../../src/service/layers/infrastructure/repositories/sequelize/repository';
+import { ORMType } from '../../../../../../src/service/layers/infrastructure/repositories/types';
 
 interface UserTestDb extends Model {
   id: string;
@@ -21,7 +21,7 @@ interface UserTestDb extends Model {
   updatedAt: Date;
 }
 
-let UserModel: ModelStatic<UserTestDb>;
+const MODEL_NAME = 'SequelizeUser';
 const MISSING_USER_ID = '00000000-0000-0000-0000-000000000000';
 
 const initializeSequelizeModel = async (): Promise<Sequelize> => {
@@ -31,10 +31,10 @@ const initializeSequelizeModel = async (): Promise<Sequelize> => {
     dialect: 'postgres',
     dialectModule: adapter,
     logging: false,
-  } as any);
+  } as ConstructorParameters<typeof Sequelize>[1]);
 
-  UserModel = sequelize.define(
-    'SequelizeUser',
+  sequelize.define(
+    MODEL_NAME,
     {
       id: {
         type: DataTypes.UUID,
@@ -57,41 +57,52 @@ const initializeSequelizeModel = async (): Promise<Sequelize> => {
     {
       timestamps: true,
     },
-  ) as ModelStatic<UserTestDb>;
+  );
 
   return sequelize;
 };
 
 @singleton()
-class UserTestRepository extends SequelizeRepository<
+class UserTestRepository extends BaseRepository<
   UserTestDb,
   Record<string, unknown>,
   UserTestDb
 > {
   constructor() {
-    super({ type: ORMType.Sequelize, model: UserModel });
+    super({ type: ORMType.Sequelize, name: MODEL_NAME });
   }
 }
 
-describe('SequelizeRepository', () => {
+describe('BaseRepository', () => {
   let repository: UserTestRepository;
   let sequelize: Sequelize;
+  let userModel: ModelStatic<UserTestDb>;
 
   beforeAll(async (): Promise<void> => {
     sequelize = await initializeSequelizeModel();
     await sequelize.sync({ force: true });
+    // Register the Sequelize instance in DI so the adapter can resolve it
+    getContainer().register(SequelizeToken, { useValue: sequelize });
     repository = new UserTestRepository();
+    userModel = sequelize.model(MODEL_NAME) as ModelStatic<UserTestDb>;
   });
 
   afterAll(async (): Promise<void> => {
     await sequelize.close();
+    clearContainer();
   });
 
   describe('model access', () => {
-    it('should have model property set', () => {
+    it('should expose the model immediately', () => {
       if (!repository) return;
+      expect(repository.model).toBe(userModel);
+    });
+
+    it('should keep the resolved model available after operations', async () => {
+      if (!repository) return;
+      await repository.create({ name: 'Bootstrap' });
       expect(repository.model).toBeDefined();
-      expect(repository.model).toBe(UserModel);
+      expect(repository.model).toBe(userModel);
     });
   });
 
@@ -157,7 +168,7 @@ describe('SequelizeRepository', () => {
 
     it('should call model.create with input', async () => {
       if (!repository) return;
-      const spyCreate = vi.spyOn(UserModel, 'create');
+      const spyCreate = vi.spyOn(userModel, 'create');
       const input = { name: 'Charlie' };
 
       await repository.create(input);
@@ -186,7 +197,7 @@ describe('SequelizeRepository', () => {
     it('should call model.findByPk', async () => {
       if (!repository) return;
       const created = await repository.create({ name: 'Eve' });
-      const spyFindByPk = vi.spyOn(UserModel, 'findByPk');
+      const spyFindByPk = vi.spyOn(userModel, 'findByPk');
 
       await repository.findById(created.id);
 
@@ -227,7 +238,7 @@ describe('SequelizeRepository', () => {
 
     it('should call model.findAll', async () => {
       if (!repository) return;
-      const spyFindAll = vi.spyOn(UserModel, 'findAll');
+      const spyFindAll = vi.spyOn(userModel, 'findAll');
 
       await repository.findMany();
 
@@ -257,7 +268,7 @@ describe('SequelizeRepository', () => {
     it('should call model.update', async () => {
       if (!repository) return;
       const created = await repository.create({ name: 'Iris' });
-      const spyUpdate = vi.spyOn(UserModel, 'update');
+      const spyUpdate = vi.spyOn(userModel, 'update');
 
       await repository.update(created.id, { name: 'Irene' });
 
@@ -297,7 +308,7 @@ describe('SequelizeRepository', () => {
     it('should call model.destroy', async () => {
       if (!repository) return;
       const created = await repository.create({ name: 'Leo' });
-      const spyDestroy = vi.spyOn(UserModel, 'destroy');
+      const spyDestroy = vi.spyOn(userModel, 'destroy');
 
       await repository.delete(created.id);
 
@@ -323,7 +334,7 @@ describe('SequelizeRepository', () => {
     it('should call model.count', async () => {
       if (!repository) return;
       const created = await repository.create({ name: 'Nina' });
-      const spyCount = vi.spyOn(UserModel, 'count');
+      const spyCount = vi.spyOn(userModel, 'count');
 
       await repository.exists(created.id);
 

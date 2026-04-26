@@ -1,3 +1,5 @@
+import type { DatabaseSync } from 'node:sqlite';
+
 import type { Mongoose } from 'mongoose';
 import type { Sequelize } from 'sequelize';
 
@@ -9,7 +11,7 @@ export enum DatabaseVendor {
   SQLITE = 'SQLITE',
 }
 
-export type DatabaseInstance = Mongoose | Sequelize;
+export type DatabaseInstance = Mongoose | Sequelize | DatabaseSync;
 
 export type OnDatabaseConnectedFunction = Optional<
   (dbInstance: DatabaseInstance) => Promise<void> | void
@@ -19,7 +21,7 @@ export interface DatabaseConfig {
   vendor: DatabaseVendor;
   /**
    * The ORM/database instance (Mongoose or Sequelize).
-   * Not required for `SQLITE` — the adapter opens the file internally
+   * Not required for `NODESQLITE` — the adapter opens the file internally
    * using `connectionString` as the file path (or `':memory:'`).
    */
   instance?: DatabaseInstance;

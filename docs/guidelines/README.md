@@ -4,13 +4,14 @@ This folder contains reusable coding standards and best practices extracted from
 
 ## Documents
 
-1. **[QUICK_REFERENCE.md](./QUICK_REFERENCE.md)** — One-page cheat sheet (print-friendly!)
+1. **[quick-reference.md](./quick-reference.md)** — One-page cheat sheet (print-friendly!)
 2. **[code-style.md](./code-style.md)** — Formatting, naming conventions, language-specific rules, build process, logging, and configuration patterns
 3. **[architecture.md](./architecture.md)** — Folder structure, module organization, layering patterns, dependency management, and common pitfalls
 4. **[testing.md](./testing.md)** — Test structure, naming conventions, test framework setup, coverage expectations, and real examples
 5. **[documentation.md](./documentation.md)** — Comment and docstring conventions, README guidelines, changelog format
 6. **[git-workflow.md](./git-workflow.md)** — Commit message formats, branch naming, versioning strategy, release procedure
 7. **[framework-overview.md](./framework-overview.md)** — High-level framework map and module index
+8. **[../documentation-guidelines.md](../documentation-guidelines.md)** — Documentation naming and drift-prevention rules
 
 ## Companion Context Pack
 
@@ -22,7 +23,7 @@ For fast onboarding context (What / How / Why + API/Security/Performance), see
 ### Language & Tools
 
 - **Language**: TypeScript (strict mode)
-- **Runtime**: Node.js 24.14.0 LTS+
+- **Runtime**: Node.js 26.0.0+
 - **Package Manager**: npm 11.0.0+
 - **Build**: TypeScript compiler (tsc) + path alias resolution (tsc-alias) + ESM fixing (fix-esm.ts)
 - **Testing**: Vitest
@@ -55,7 +56,7 @@ For fast onboarding context (What / How / Why + API/Security/Performance), see
 ### For New Contributors
 
 1. Start with **[CONTRIBUTING.md](../../.github/CONTRIBUTING.md)** — Setup, workflow, PR process
-2. Reference **[QUICK_REFERENCE.md](./QUICK_REFERENCE.md)** during development
+2. Reference **[quick-reference.md](./quick-reference.md)** during development
 3. Check specific guides for detailed rules (code-style, testing, etc.)
 4. Bookmark this folder for quick access
 

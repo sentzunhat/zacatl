@@ -7,13 +7,14 @@
  * - Simple success response
  */
 
-import { inject, singleton } from '@sentzunhat/zacatl/third-party/tsyringe';
-import { FastifyDeleteRouteHandler, type Request } from '@sentzunhat/zacatl/service';
+import { inject, singleton } from '@sentzunhat/zacatl/third-party/dependency-injection/tsyringe';
+import type { Request } from '@sentzunhat/zacatl/service/layers/application/entry-points/rest/fastify/handlers/abstract';
+import { DeleteRouteHandler } from '@sentzunhat/zacatl/service/layers/application/entry-points/rest/fastify/handlers/delete-route-handler';
 import { GreetingServiceAdapter } from '../../../../domain/greetings/service';
 import { type GreetingIdParams } from '../greeting.schema';
 
 @singleton()
-export class DeleteGreetingHandler extends FastifyDeleteRouteHandler<
+export class DeleteGreetingHandler extends DeleteRouteHandler<
   void,
   void,
   { success: boolean },

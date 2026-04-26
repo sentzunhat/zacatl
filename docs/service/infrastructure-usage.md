@@ -3,12 +3,21 @@
 > Import from the infrastructure subpath:
 >
 > ```typescript
-> import { BaseRepository, ORMType } from '@sentzunhat/zacatl';
+> import { BaseRepository, ORMType } from '@sentzunhat/zacatl/service';
 > ```
 
 ## Modular ORM System
 
-Your service supports **multiple ORMs simultaneously**. You can mix Mongoose (MongoDB), Sequelize (PostgreSQL/MySQL/SQLite), or any future ORM in the same application.
+Your service supports **multiple ORMs simultaneously**. You can mix Mongoose (MongoDB), Sequelize (PostgreSQL/MySQL/SQLite), and Node.js SQLite (`node:sqlite`) in the same application.
+
+## Which repository class should I use?
+
+- **Use `BaseRepository`** for repositories that may target Mongoose, Sequelize, or node:sqlite with the shared CRUD interface.
+- **Use ORM-specific abstract repositories** when your repository is tied to one ORM:
+  - `AbstractMongooseRepository`
+  - `AbstractSequelizeRepository`
+  - `AbstractNodeSqliteRepository`
+- **Use adapters directly** only for framework extension or low-level advanced integrations. For normal app repositories, prefer `BaseRepository` or ORM-specific abstract repositories.
 
 ## Architecture
 
@@ -100,8 +109,8 @@ interface ProductOutput {
 #### Option A: Using Mongoose (MongoDB)
 
 ```typescript
-import { BaseRepository, ORMType } from '@sentzunhat/zacatl';
-import { Schema } from '@sentzunhat/zacatl/third-party/mongoose';
+import { BaseRepository, ORMType } from '@sentzunhat/zacatl/service';
+import { Schema } from '@sentzunhat/zacatl/third-party/databases/mongoose';
 
 const UserSchema = new Schema<UserDb>(
   {
@@ -129,14 +138,16 @@ export class UserRepository extends BaseRepository<UserDb, UserInput, UserOutput
 }
 ```
 
-#### Option B: Using Native SQLite (Node 24 — No External Package)
+#### Option B: Using Native SQLite (Node 22.5+ — No External Package)
 
 Uses the built-in `node:sqlite` module. No external package needed.
+
+For repository-style CRUD with normalized output, use `AbstractNodeSqliteRepository`.
 
 **Service config:**
 
 ```typescript
-import { DatabaseVendor } from '@sentzunhat/zacatl';
+import { DatabaseVendor } from '@sentzunhat/zacatl/service';
 
 databases: [{ vendor: DatabaseVendor.SQLITE, connectionString: 'app.db' }];
 // ':memory:' is also valid for in-memory databases
@@ -145,7 +156,8 @@ databases: [{ vendor: DatabaseVendor.SQLITE, connectionString: 'app.db' }];
 **Raw SQL access (inject `DatabaseServer`):**
 
 ```typescript
-import { singleton, inject, DatabaseServer, DatabaseVendor } from '@sentzunhat/zacatl';
+import { DatabaseServer, DatabaseVendor } from '@sentzunhat/zacatl/service';
+import { singleton, inject } from '@sentzunhat/zacatl/third-party/dependency-injection/tsyringe';
 import type { DatabaseSync } from 'node:sqlite';
 
 @singleton()
@@ -169,8 +181,8 @@ export class ItemRepository {
 #### Option C: Using Sequelize (PostgreSQL/MySQL/SQLite via ORM)
 
 ```typescript
-import { BaseRepository, ORMType } from '@sentzunhat/zacatl';
-import { DataTypes, Model, Sequelize } from '@sentzunhat/zacatl/third-party/sequelize';
+import { BaseRepository, ORMType } from '@sentzunhat/zacatl/service';
+import { DataTypes, Model, Sequelize } from '@sentzunhat/zacatl/third-party/databases/sequelize';
 
 // Sequelize model definition
 class ProductModel extends Model {}
@@ -191,7 +203,7 @@ export class ProductRepository extends BaseRepository<ProductModel, ProductInput
   constructor() {
     super({
       type: ORMType.Sequelize,
-      model: ProductModel,
+      name: 'Product',
     });
   }
 
@@ -208,7 +220,7 @@ export class ProductRepository extends BaseRepository<ProductModel, ProductInput
 ### 3. Register in Service
 
 ```typescript
-import { Service, ServiceType } from '@sentzunhat/zacatl';
+import { Service, ServiceType } from '@sentzunhat/zacatl/service';
 import { UserRepository } from './repositories/user.repository';
 import { ProductRepository } from './repositories/product.repository';
 
@@ -259,7 +271,7 @@ const foundProduct = await productRepo.findById(product.id);
 ## Mix Multiple ORMs in One Service
 
 ```typescript
-import { Service, ServiceType } from '@sentzunhat/zacatl';
+import { Service, ServiceType } from '@sentzunhat/zacatl/service';
 
 const service = new Service({
   type: ServiceType.SERVER,
@@ -274,7 +286,7 @@ const service = new Service({
         ProductRepository,
         OrderRepository,
 
-        // SQLite repositories (same Sequelize adapter!)
+        // SQLite repositories (native node:sqlite repositories)
         CacheRepository,
       ],
     },
@@ -294,12 +306,13 @@ const service = new Service({
 
 ## Available ORM Adapters
 
-| Adapter          | Database                         | Status    |
-| ---------------- | -------------------------------- | --------- |
-| MongooseAdapter  | MongoDB                          | ✅ Ready  |
-| SequelizeAdapter | PostgreSQL, MySQL, SQLite, MSSQL | ✅ Ready  |
-| PrismaAdapter    | Multi-database                   | 🔜 Future |
-| TypeORMAdapter   | Multi-database                   | 🔜 Future |
+| Adapter           | Database                         | Status    |
+| ----------------- | -------------------------------- | --------- |
+| MongooseAdapter   | MongoDB                          | ✅ Ready  |
+| SequelizeAdapter  | PostgreSQL, MySQL, SQLite, MSSQL | ✅ Ready  |
+| NodeSqliteAdapter | SQLite (`node:sqlite`, Node 22.5+) | ✅ Ready  |
+| PrismaAdapter     | Multi-database                   | 🔜 Future |
+| TypeORMAdapter    | Multi-database                   | 🔜 Future |
 
 ## Creating Custom Adapters
 

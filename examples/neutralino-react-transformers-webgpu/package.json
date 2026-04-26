@@ -1,0 +1,15 @@
+{
+  "name": "zacatl-neutralino-react-transformers-webgpu",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Experiment: Neutralinojs shell + React frontend + Transformers.js WebGPU inference",
+  "scripts": {
+    "dev": "node scripts/dev-server.mjs",
+    "build": "node scripts/build.mjs",
+    "clean": "rm -rf node_modules .cache"
+  },
+  "dependencies": {
+    "@sentzunhat/zacatl": "file:../../"
+  }
+}

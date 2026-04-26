@@ -1,7 +1,7 @@
 import { CustomError } from '@zacatl/error';
 
 import type { ConfigServer } from '../server';
-import { type PageServerPort, type StaticConfig } from './port';
+import { type ApiPrefixes, type PageServerPort, type StaticConfig } from './port';
 
 /**
  * PageServer - Encapsulates frontend/page rendering logic
@@ -39,16 +39,16 @@ export class PageServer {
    * Register SPA fallback (e.g., for React Router, Vue Router, etc.)
    * Routes non-API requests to index.html for client-side routing
    */
-  public registerSpaFallback(apiPrefix: string, staticDir: string): void {
+  public registerSpaFallback(prefixes: ApiPrefixes, staticDir: string): void {
     try {
-      this.adapter.registerSpaFallback(apiPrefix, staticDir);
+      this.adapter.registerSpaFallback(prefixes, staticDir);
     } catch (error: unknown) {
       throw new CustomError({
         message: 'failed to register SPA fallback',
         code: 500,
         reason: 'SPA fallback registration failed',
         error: error as Error,
-        metadata: { apiPrefix, staticDir },
+        metadata: { prefixes, staticDir },
       });
     }
   }
@@ -56,9 +56,9 @@ export class PageServer {
   /**
    * Generic register method for page module setup
    */
-  public async register(server: unknown): Promise<void> {
+  public async register(): Promise<void> {
     try {
-      await this.adapter.register(server);
+      await this.adapter.register();
     } catch (error: unknown) {
       throw new CustomError({
         message: 'failed to register page module',
@@ -78,13 +78,13 @@ export class PageServer {
       return;
     }
 
-    const { staticDir, spaFallback = true, apiPrefix = '/api', customRegister } = this.config.page;
+    const { staticDir, spaFallback = true, prefixes = { api: '/api' }, customRegister } = this.config.page;
 
     if (staticDir != null) {
       this.registerStaticFiles({ root: staticDir });
 
       if (spaFallback) {
-        this.registerSpaFallback(apiPrefix, staticDir);
+        this.registerSpaFallback(prefixes, staticDir);
       }
     }
 

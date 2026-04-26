@@ -1,14 +1,11 @@
 import { describe, it, expect, vi } from 'vitest';
 
+import { container } from '@zacatl/third-party/dependency-injection/tsyringe';
 import type { FastifyRequest } from '@zacatl/third-party/fastify';
-import { container } from '@zacatl/third-party/tsyringe';
 
-import { Application } from '../../../../../src/service/layers/application';
-import type {
-  ConfigApplication,
-  HookHandler,
-  HookHandlerName,
-} from '../../../../../src/service/layers/application';
+import { Application } from '../../../../../src/service/layers/application/application';
+import type { ConfigApplication } from '../../../../../src/service/layers/application/types';
+import type { HookHandler, HookHandlerName } from '../../../../../src/service/layers/application/entry-points/rest/hook-handlers/hook-handler';
 import type { Request } from '../../../../../src/service/layers/application/entry-points/rest/common/request';
 import { AbstractRouteHandler } from '../../../../../src/service/layers/application/entry-points/rest/fastify/handlers/abstract';
 

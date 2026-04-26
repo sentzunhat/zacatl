@@ -75,8 +75,8 @@ curl http://localhost:8182/greetings
 
 ```bash
 # From repository root
-docker build -f examples/express-mongodb-react/Dockerfile \
-  -t zacatl-express-mongodb .
+docker build --build-arg EXAMPLE=express-mongodb-react \
+  -f examples/Dockerfile -t zacatl-express-mongodb-react .
 
 # Or use docker-compose
 cd examples/express-mongodb-react
@@ -92,12 +92,12 @@ docker compose up -d
 
 - MongoDB runs in a separate container via docker-compose
 - Backend connects to `mongodb://mongo:27017/greetings-db`
-- See [DOCKER.md](../../DOCKER.md) for multi-example setup
+- See [docker.md](../docker.md) for multi-example setup
 
 ## Documentation
 
 - **Examples Catalog**: [../README.md](../README.md)
-- **Start Here**: [../../docs/START_HERE.md](../../docs/START_HERE.md)
+- **Start Here**: [../../docs/start-here.md](../../docs/start-here.md)
 - **Framework Overview**: [../../docs/guidelines/framework-overview.md](../../docs/guidelines/framework-overview.md)
 - **Framework Database Guide**: [../../docs/third-party/orm/database-setup.md](../../docs/third-party/orm/database-setup.md)
 - **Service Module**: [../../docs/service/README.md](../../docs/service/README.md)

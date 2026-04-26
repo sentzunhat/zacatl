@@ -1,0 +1,56 @@
+old_path,new_path,classification,export_eligible,hawp_absorbable,status,rationale
+standards/README.md,standards/README.md,public,false,false,retained,Top-level governance index is public-safe but not an absorbable standard artifact
+standards/audits/2026-05-11-standards-boundary-analysis.md,standards/audits/2026-05-11-standards-boundary-analysis.md,public,false,false,retained,Historical audit evidence remains public audit material
+standards/audits/2026-05-11-standards-candidate-classification.md,standards/audits/2026-05-11-standards-candidate-classification.md,public,false,false,retained,Historical candidate classification retained for lineage
+standards/audits/BOUNDARY_SUMMARY.md,standards/audits/BOUNDARY_SUMMARY.md,public,false,false,retained,Audit summary remains public evidence
+standards/audits/source-docs-diff.md,standards/audits/source-docs-diff.md,public,false,false,retained,Diff evidence remains in audit layer
+standards/audits/standards-promotion-log.md,standards/audits/standards-promotion-log.md,public,false,false,retained,Promotion lineage remains in audit layer
+standards/audits/standards-reorg-audit.md,standards/audits/standards-reorg-audit.md,public,false,false,retained,Reorg baseline remains in audit layer
+standards/audits/export/standards-classification.json,standards/public/exports/machine-readable/legacy-standards-classification.json,deprecated,false,false,moved,Legacy export moved to new public machine-readable surface and superseded by updated boundary map
+standards/audits/export/standards-classification.csv,standards/public/exports/machine-readable/legacy-standards-classification.csv,deprecated,false,false,moved,Legacy export moved to new public machine-readable surface and superseded by updated boundary map
+standards/guidelines/README.md,standards/public/guidelines/README.md,public,true,false,moved,Reusable guideline index is public-safe
+standards/guidelines/architecture.md,standards/public/guidelines/architecture.md,public,true,true,moved,Architecture principles are abstraction-first and portable
+standards/guidelines/code-style.md,standards/public/guidelines/code-style.md,public,true,true,moved,Code style guidance is reusable across repositories
+standards/guidelines/documentation.md,standards/public/guidelines/documentation.md,public,true,true,moved,Documentation conventions are reusable and public-safe
+standards/guidelines/git-workflow.md,standards/public/guidelines/git-workflow.md,public,true,true,moved,Git workflow guidance is generic and portable
+standards/guidelines/mongodb-schema-design.md,standards/public/guidelines/mongodb-schema-design.md,public,true,false,moved,Public but technology-specific guidance kept shared-only for now
+standards/guidelines/security.md,standards/private/security/security.md,private,false,false,moved,Security posture details and assumptions remain private
+standards/guidelines/testing.md,standards/public/guidelines/testing.md,public,true,true,moved,Testing principles are generic and reusable
+standards/guidelines/adr-template.md,standards/public/templates/ADR.template.md,duplicate,false,true,merged,Duplicate ADR template merged into canonical template path
+standards/standards/auth/README.md,standards/private/auth/README.md,private,false,false,moved,Auth assumptions and internal model details are restricted
+standards/standards/auth/protected-routes.md,standards/private/auth/protected-routes.md,private,false,false,moved,Route protection and auth posture remain private
+standards/standards/database/README.md,standards/public/standards/database/README.md,public,true,false,moved,Database standards are public but not yet selected for HAWP absorbable export
+standards/standards/database/mongodb-schema-design.md,standards/public/standards/database/mongodb-schema-design.md,public,true,false,moved,MongoDB-specific standard kept shared-only pending broader abstraction
+standards/standards/docs/README.md,standards/public/standards/docs/README.md,public,true,false,moved,Documentation standards index is public-safe
+standards/standards/nodejs/README.md,standards/public/standards/nodejs/README.md,public,true,false,moved,Domain index retained as public shared standard
+standards/standards/nodejs/area-composition.md,standards/public/standards/nodejs/area-composition.md,public,true,true,moved,Layered composition pattern is reusable and abstraction-first
+standards/standards/nodejs/build-and-env.md,standards/public/standards/nodejs/build-and-env.md,public,true,true,moved,Build and environment guidance is broadly reusable
+standards/standards/nodejs/code-style.md,standards/public/standards/nodejs/code-style.md,public,true,true,moved,Node.js code-style standard is portable
+standards/standards/nodejs/git-workflow.md,standards/public/standards/nodejs/git-workflow.md,public,true,true,moved,Node.js git workflow standard is portable
+standards/standards/nodejs/project-structure.md,standards/public/standards/nodejs/project-structure.md,public,true,true,moved,Project structure pattern is reusable across repos
+standards/standards/product/README.md,standards/private/product/README.md,private,false,false,moved,Product launch/process strategy remains internal
+standards/standards/providers/README.md,standards/private/providers/README.md,private,false,false,moved,Provider integration assumptions remain internal
+standards/standards/framework-domain/README.md,standards/public/standards/framework-domain/README.md,public,true,false,moved,Framework domain guidance is public but not selected for absorbable export yet
+standards/standards/framework-domain/contract-testing.md,standards/public/standards/framework-domain/contract-testing.md,public,true,false,moved,Public framework guidance kept shared-only pending additional abstraction review
+standards/standards/framework-domain/dependency-registration.md,standards/public/standards/framework-domain/dependency-registration.md,public,true,false,moved,Public framework guidance kept shared-only pending additional abstraction review
+standards/standards/framework-domain/evidence-linked-documentation.md,standards/public/standards/framework-domain/evidence-linked-documentation.md,public,true,false,moved,Public framework guidance kept shared-only pending additional abstraction review
+standards/standards/framework-domain/handler-responsibilities.md,standards/public/standards/framework-domain/handler-responsibilities.md,public,true,false,moved,Public framework guidance kept shared-only pending additional abstraction review
+standards/standards/framework-domain/layered-composition.md,standards/public/standards/framework-domain/layered-composition.md,public,true,false,moved,Public framework guidance kept shared-only pending additional abstraction review
+standards/standards/framework-domain/service-boundaries.md,standards/public/standards/framework-domain/service-boundaries.md,public,true,false,moved,Public framework guidance kept shared-only pending additional abstraction review
+standards/templates/ADR.template.md,standards/public/templates/ADR.template.md,public,true,true,moved,Canonical ADR template is portable and absorbable
+standards/context/guidelines.yml,standards/private/context/guidelines.yml,private,false,false,moved,Internal AI context remains private
+standards/context/patterns.yml,standards/private/context/patterns.yml,private,false,false,moved,Internal AI context remains private
+standards/context/security.yml,standards/private/context/security.yml,private,false,false,moved,Internal AI context remains private
+standards/project-specific/README.md,standards/project-specific/README.md,project-specific,false,false,created,Boundary marker for project-local documentation scope
+standards/project-specific/example-a/README.md,standards/project-specific/example-a/README.md,project-specific,false,false,created,Pointer to Example project A local source of truth
+standards/project-specific/example-b/README.md,standards/project-specific/example-b/README.md,project-specific,false,false,created,Pointer to Example project B local source of truth
+standards/project-specific/example-c/README.md,standards/project-specific/example-c/README.md,project-specific,false,false,created,Pointer to Example project C local source of truth
+standards/public/context/README.md,standards/public/context/README.md,public,false,false,created,Reserved public context surface with no approved payload yet
+standards/private/internal-runtime/README.md,standards/private/internal-runtime/README.md,private,false,false,created,Reserved private runtime-coupled guidance surface
+standards/public/exports/hawp-absorbable/README.md,standards/public/exports/hawp-absorbable/README.md,public,false,false,created,Documents strict HAWP absorbable boundary policy
+standards/public/exports/hawp-absorbable/manifest.json,standards/public/exports/hawp-absorbable/manifest.json,public,true,false,created,Authoritative list of approved HAWP absorbable candidates
+upstream/archive/project-c/docs/service/handler-best-practices.md,upstream/archive/project-c/docs/service/handler-best-practices.md,deferred-review,false,false,deferred,Reusable guidance mixed with runtime-coupled framework details
+upstream/archive/project-c/docs/service/service-adapter-pattern.md,upstream/archive/project-c/docs/service/service-adapter-pattern.md,deferred-review,false,false,deferred,Pattern candidate contains framework implementation assumptions
+upstream/archive/project-c/docs/service/http-service-scaffold.md,upstream/archive/project-c/docs/service/http-service-scaffold.md,deferred-review,false,false,deferred,Scaffold remains framework-tooling coupled
+upstream/archive/project-c/docs/service/handler-registration.md,upstream/archive/project-c/docs/service/handler-registration.md,deferred-review,false,false,deferred,Registration guidance is implementation-coupled and requires abstraction
+upstream/archive/project-c/docs/dependency-injection/patterns.md,upstream/archive/project-c/docs/dependency-injection/patterns.md,deferred-review,false,false,deferred,DI guidance references framework helpers and runtime-specific behavior

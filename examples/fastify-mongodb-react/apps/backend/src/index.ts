@@ -3,13 +3,14 @@
  * Entry Point
  */
 
-import '@sentzunhat/zacatl/third-party/reflect-metadata';
+import '@sentzunhat/zacatl/third-party/dependency-injection/reflect-metadata';
 import { Fastify } from '@sentzunhat/zacatl/third-party/fastify';
-import { mongoose } from '@sentzunhat/zacatl/third-party/mongoose';
+import { mongoose } from '@sentzunhat/zacatl/third-party/databases/mongoose';
 import { serializerCompiler, validatorCompiler } from 'fastify-type-provider-zod';
-import { Service } from '@sentzunhat/zacatl/service';
+import { Service } from '@sentzunhat/zacatl/service/service';
 import { API_PREFIX, config, createServiceConfig } from './config';
 
+let activeService: Service | null = null;
 async function main() {
   console.log('🚀 Starting Fastify + MongoDB (Mongoose) Example');
   console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
@@ -39,6 +40,7 @@ async function main() {
 
     const serviceConfig = createServiceConfig(fastify, mongoose);
     const service = new Service(serviceConfig);
+    activeService = service;
 
     await service.start({ port: config.port });
 
@@ -57,14 +59,12 @@ async function main() {
   }
 }
 
-process.on('SIGINT', () => {
+const shutdown = (): void => {
   console.log('\n👋 Shutting down gracefully...');
-  process.exit(0);
-});
+  (activeService?.stop() ?? Promise.resolve()).finally(() => process.exit(0));
+};
 
-process.on('SIGTERM', () => {
-  console.log('\n👋 Shutting down gracefully...');
-  process.exit(0);
-});
+process.on('SIGINT', shutdown);
+process.on('SIGTERM', shutdown);
 
 main();

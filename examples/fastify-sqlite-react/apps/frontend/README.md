@@ -24,13 +24,13 @@ npm run dev
 
 ## Documentation
 
-- Example Root: [../README.md](../README.md)
-- Examples Catalog: [../../README.md](../../README.md)
-- Start Here: [../../../docs/START_HERE.md](../../../docs/START_HERE.md)
-- Service Module: [../../../docs/service/README.md](../../../docs/service/README.md)
+- Example Root: [../../README.md](../../README.md)
+- Examples Catalog: [../../../README.md](../../../README.md)
+- Start Here: [../../../../docs/start-here.md](../../../../docs/start-here.md)
+- Service Module: [../../../../docs/service/README.md](../../../../docs/service/README.md)
 
 ## Next Steps
 
 - Keep this example with Fastify + SQLite as the baseline minimal flow
-- Compare with [Fastify + MongoDB + React](../../fastify-mongodb-react/)
+- Compare with [Fastify + MongoDB + React](../../../fastify-mongodb-react/)
 - Update proxy/API wiring in vite.config.ts when changing backend ports

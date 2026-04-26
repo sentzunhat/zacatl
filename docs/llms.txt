@@ -17,7 +17,7 @@ Zacatl enforces four layers:
 Application  — use-cases, handlers, commands
 Domain       — ports, contracts, domain services
 Infrastructure — repository implementations (Mongoose / Sequelize / SQLite)
-Platforms    — server (Fastify / Express), CLI, Desktop
+Platforms    — server (Fastify / Express), CLI stub, Desktop stub
 ```
 
 Full architecture docs: [guidelines/architecture.md](guidelines/architecture.md)
@@ -28,25 +28,25 @@ Full architecture docs: [guidelines/architecture.md](guidelines/architecture.md)
 npm install @sentzunhat/zacatl
 ```
 
-All supported ORMs and platforms (`mongoose`, `sequelize`, `express`, `fastify`,
-`better-sqlite3`) are **bundled as dependencies** — no extra installs required.
-Only SQL dialect drivers (e.g. `pg`, `mysql2`) need a separate install.
+Core runtime packages such as `express` and `fastify` are installed with Zacatl.
+ORM/database ecosystems (`mongoose`, `sequelize`, `better-sqlite3`, `sqlite3`,
+`pg`) are optional peers and should be installed based on what your service uses.
 
 ## Core imports
 
 ```typescript
 // Framework core
-import { Service, ServiceType } from "@sentzunhat/zacatl";
+import { Service, ServiceType } from "@sentzunhat/zacatl/service";
 
 // Dependency injection
-import { singleton, inject, resolveDependency } from "@sentzunhat/zacatl";
+import { singleton, inject, resolveDependency } from "@sentzunhat/zacatl/dependency-injection";
 
 // Structured errors
-import { NotFoundError, InternalServerError } from "@sentzunhat/zacatl";
+import { NotFoundError, InternalServerError } from "@sentzunhat/zacatl/error";
 
 // ORM — subpath imports only (keeps main entry lean)
-import { mongoose, Schema } from "@sentzunhat/zacatl/third-party/mongoose";
-import { Sequelize, DataTypes } from "@sentzunhat/zacatl/third-party/sequelize";
+import { mongoose, Schema } from "@sentzunhat/zacatl/third-party/databases/mongoose";
+import { Sequelize, DataTypes } from "@sentzunhat/zacatl/third-party/databases/sequelize";
 ```
 
 ## Key modules
@@ -91,7 +91,6 @@ import { Sequelize } from "@sentzunhat/zacatl/third-party/sequelize";
 
 ```
 src/
-  index.ts               — main barrel (core only, no ORM)
   configuration/         — YAML/JSON config loading
   dependency-injection/  — tsyringe DI helpers
   error/                 — structured error types
@@ -99,7 +98,7 @@ src/
   logs/                  — pino logger adapter
   service/
     layers/              — application / domain / infrastructure
-    platforms/           — server (Fastify + Express), CLI, desktop
+    platforms/           — server (Fastify + Express), CLI stub, desktop stub
   third-party/           — thin re-export wrappers (mongoose, sequelize, etc.)
   utils/                 — command runner, optionals, path aliases
 ```

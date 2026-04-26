@@ -7,7 +7,7 @@
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 
-import { container } from '@zacatl/third-party/tsyringe';
+import { container } from '@zacatl/third-party/dependency-injection/tsyringe';
 
 import { clearContainer, resolveDependency } from '../../../src/dependency-injection';
 import { Domain } from '../../../src/service/layers/domain/domain';

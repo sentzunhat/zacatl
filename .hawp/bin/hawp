@@ -1,0 +1,104 @@
+#!/bin/bash
+
+# HAWP CLI Entry Point
+#
+# Delegates to TypeScript implementations via tsx runtime.
+# Supported commands:
+#   ./.hawp/bin/hawp kit validate [options]
+#   ./.hawp/bin/hawp kit normalize [options]
+#   ./.hawp/bin/hawp work validate [options]
+#   ./.hawp/bin/hawp work normalize [options]
+#   ./.hawp/bin/hawp backlog upgrade [options]   (alias for work normalize)
+#   ./.hawp/bin/hawp backlog validate [options]  (alias for work validate)
+#   ./.hawp/bin/hawp uuid [--short]              (generate a work item UUID)
+#   ./.hawp/bin/hawp generate uuid [--short]     (alias for uuid)
+
+set -e
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
+
+COMMAND="${1:-}"
+SUBCOMMAND="${2:-}"
+
+shift 0
+
+run_npm_script() {
+	if [ ! -d "$REPO_ROOT/librarian" ]; then
+		echo "Error: '$1' requires the librarian tooling, which only exists in the HAWP source repository." >&2
+		echo "This installed copy supports: uuid, generate uuid." >&2
+		exit 2
+	fi
+	npm --prefix "$REPO_ROOT/librarian" run "$1" -- "${@:2}"
+}
+
+# Prints a UUID v4 for work item IDs. --short prints the 8-char display form.
+generate_uuid() {
+	local uuid
+	uuid="$(node -e 'console.log(crypto.randomUUID())')"
+	if [ "${1:-}" = "--short" ]; then
+		echo "${uuid:0:8}"
+	else
+		echo "$uuid"
+	fi
+}
+
+case "$COMMAND $SUBCOMMAND" in
+	"kit validate")
+		shift 2
+		run_npm_script "kit:validate" "$@"
+		;;
+	"kit normalize")
+		shift 2
+		run_npm_script "kit:normalize" "$@"
+		;;
+	"work validate")
+		shift 2
+		run_npm_script "work:validate" "$@"
+		;;
+	"work normalize")
+		shift 2
+		run_npm_script "work:normalize:cli" "$@"
+		;;
+	"backlog upgrade")
+		shift 2
+		run_npm_script "work:normalize:cli" "$@"
+		;;
+	"backlog validate")
+		shift 2
+		run_npm_script "work:validate" "$@"
+		;;
+	"generate uuid")
+		shift 2
+		generate_uuid "$@"
+		;;
+	"uuid "*|"uuid")
+		shift 1
+		generate_uuid "$@"
+		;;
+	*)
+		cat <<'EOF'
+Unknown command.
+
+Usage:
+	./.hawp/bin/hawp kit validate [options]
+	./.hawp/bin/hawp kit normalize [options]
+	./.hawp/bin/hawp work validate [options]
+	./.hawp/bin/hawp work normalize [options]
+	./.hawp/bin/hawp backlog upgrade [options]
+	./.hawp/bin/hawp backlog validate [options]
+	./.hawp/bin/hawp uuid [--short]
+	./.hawp/bin/hawp generate uuid [--short]
+
+Examples:
+	./.hawp/bin/hawp kit validate
+	./.hawp/bin/hawp kit normalize --apply
+	./.hawp/bin/hawp work validate
+	./.hawp/bin/hawp work normalize --dry-run --validate
+	./.hawp/bin/hawp work normalize --apply --validate
+	./.hawp/bin/hawp uuid            # new work item ID
+	./.hawp/bin/hawp uuid --short    # 8-char display form
+EOF
+		exit 2
+		;;
+esac

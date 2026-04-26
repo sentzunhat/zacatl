@@ -13,7 +13,7 @@ Type utilities for values that may or may not be present.
 ## Example
 
 ```typescript
-import type { Optional, Nullable, Maybe } from '@sentzunhat/zacatl';
+import { Optional, Nullable, Maybe } from '@sentzunhat/zacatl/utils';
 
 // Optional: undefined is allowed
 function greet(name?: Optional<string>) {

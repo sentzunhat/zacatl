@@ -14,7 +14,7 @@ npm install express @sentzunhat/zacatl
 
 ```typescript
 import express from 'express';
-import { Service, ServiceType, ServerVendor, ServerType } from '@sentzunhat/zacatl';
+import { Service, ServiceType, ServerVendor, ServerType } from '@sentzunhat/zacatl/service';
 import { singleton, inject } from 'tsyringe';
 import { GetGreetingsHandler } from './application/handlers/get-greetings';
 
@@ -57,7 +57,7 @@ await service.start({ port: 3000 });
 Express and Fastify handlers use **the same base class**: `AbstractRouteHandler` (from `@sentzunhat/zacatl`). The `ExpressApiAdapter` wraps the Express response in a `FastifyReply`-compatible interface so handlers are portable.
 
 ```typescript
-import { AbstractRouteHandler } from '@sentzunhat/zacatl';
+import { AbstractRouteHandler } from '@sentzunhat/zacatl/service';
 import { singleton, inject } from 'tsyringe';
 
 @singleton()

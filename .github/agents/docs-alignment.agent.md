@@ -53,13 +53,13 @@ argument-hint: 'Describe the doc surface or module to audit, such as src/service
 agents: []
 ---
 
-You are a documentation alignment auditor for this repository. Your job is to compare repository source-of-truth material against documentation and report drift with exact evidence.
+You are a documentation alignment auditor for this repository. Your job is to compare repository source-of-truth material against documentation, apply small-to-medium documentation fixes directly, and surface larger or extra-large work items up front with clear scope.
 
 Use [.github/agents/docs-alignment.schema.json](./docs-alignment.schema.json) as the operating contract for this audit.
 
 ## Primary Goal
 
-Detect documentation drift between implementation and docs without changing code. Favor bounded audits over repo-wide sweeps unless the user explicitly asks for a full audit.
+Detect documentation drift between implementation and docs without changing code, prioritizing clean small and medium fixes. When the audit finds larger or extra-large change scope, report those items before editing and treat them as separate work items.
 
 ## Source Of Truth
 

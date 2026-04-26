@@ -4,21 +4,19 @@
  */
 
 import type { FastifyInstance } from '@sentzunhat/zacatl/third-party/fastify';
-import type { Sequelize } from '@sentzunhat/zacatl/third-party/sequelize';
+import type { Sequelize } from '@sentzunhat/zacatl/third-party/databases/sequelize';
 import { fileURLToPath } from 'url';
 import { existsSync } from 'node:fs';
-import { readFile, readdir } from 'node:fs/promises';
-import { dirname, extname, join } from 'path';
-import { ServiceType, ServerType, ServerVendor, DatabaseVendor } from '@sentzunhat/zacatl/service';
-import {
-  GetAllGreetingsHandler,
-  GetGreetingByIdHandler,
-  CreateGreetingHandler,
-  DeleteGreetingHandler,
-  GetRandomGreetingHandler,
-} from './application/route-handlers/greetings';
-import { hookHandlers } from './application/hook-handlers';
-import { initGreetingModel } from './infrastructure/greetings/models/greeting.model';
+import { dirname, join } from 'path';
+import { ServiceType } from '@sentzunhat/zacatl/service';
+import { DatabaseVendor } from '@sentzunhat/zacatl/service/platforms/server/database/port';
+import { ServerType, ServerVendor } from '@sentzunhat/zacatl/service/platforms/server/types/server-config';
+import { GetAllGreetingsHandler } from './application/route-handlers/greetings/get-all/handler';
+import { GetGreetingByIdHandler } from './application/route-handlers/greetings/get-by-id/handler';
+import { CreateGreetingHandler } from './application/route-handlers/greetings/create/handler';
+import { DeleteGreetingHandler } from './application/route-handlers/greetings/delete/handler';
+import { GetRandomGreetingHandler } from './application/route-handlers/greetings/get-random/handler';
+import { hookHandlers } from './application/hook-handlers/hooks';
 import { repositories } from './infrastructure/greetings/repositories/repositories';
 import { GreetingServiceAdapter } from './domain/greetings/service';
 
@@ -32,13 +30,9 @@ const resolveExampleRootDir = (): string => {
     join(__dirname, '..'),
   ];
 
-  const found = candidates.find((dir) => {
-    const hasAppsLayout =
-      existsSync(join(dir, 'apps', 'backend')) && existsSync(join(dir, 'apps', 'frontend'));
-    const hasLegacyLayout = existsSync(join(dir, 'backend')) && existsSync(join(dir, 'frontend'));
-
-    return hasAppsLayout || hasLegacyLayout;
-  });
+  const found = candidates.find((dir) =>
+    existsSync(join(dir, 'apps', 'backend')) && existsSync(join(dir, 'apps', 'frontend')),
+  );
 
   return found ?? join(__dirname, '..', '..', '..');
 };
@@ -55,66 +49,8 @@ export const config: AppConfig = {
   databaseUrl: process.env['DATABASE_URL'] || `sqlite:${join(rootDir, 'database.sqlite')}`,
 };
 
-const MIME_BY_EXT: Record<string, string> = {
-  '.css': 'text/css; charset=utf-8',
-  '.html': 'text/html; charset=utf-8',
-  '.js': 'application/javascript; charset=utf-8',
-  '.svg': 'image/svg+xml',
-};
-
 export const API_PREFIX = '/api';
 
-const resolveFaviconPath = async (frontendDistDir: string): Promise<string> => {
-  const stablePath = join(frontendDistDir, 'favicon.svg');
-  if (existsSync(stablePath)) {
-    return stablePath;
-  }
-
-  const assetsDir = join(frontendDistDir, 'assets');
-  const assetFiles = await readdir(assetsDir);
-  const hashedFavicon = assetFiles.find((name) => /^favicon-.*\.svg$/i.test(name));
-
-  if (hashedFavicon != null) {
-    return join(assetsDir, hashedFavicon);
-  }
-
-  throw new Error('Missing favicon in frontend dist output');
-};
-
-/**
- * Register static frontend routes at the root level
- * These are served directly and not prefixed with /api
- */
-export const registerFrontendRoutes = async (fastify: FastifyInstance): Promise<void> => {
-  const frontendDistDir = existsSync(join(rootDir, 'apps', 'frontend', 'dist'))
-    ? join(rootDir, 'apps', 'frontend', 'dist')
-    : join(rootDir, 'frontend', 'dist');
-  const faviconPath = await resolveFaviconPath(frontendDistDir);
-
-  fastify.get('/', async (_request, reply) => {
-    const html = await readFile(join(frontendDistDir, 'index.html'), 'utf-8');
-    await reply.type(MIME_BY_EXT['.html']).send(html);
-  });
-
-  fastify.get('/favicon.svg', async (_request, reply) => {
-    const content = await readFile(faviconPath);
-    await reply.type(MIME_BY_EXT['.svg']).send(content);
-  });
-
-  fastify.get('/assets/*', async (request, reply) => {
-    const assetPath = (request.params as { '*': string })['*'];
-    const fullPath = join(frontendDistDir, 'assets', assetPath);
-    const content = await readFile(fullPath);
-    const contentType = MIME_BY_EXT[extname(fullPath)] ?? 'application/octet-stream';
-
-    await reply.type(contentType).send(content);
-  });
-};
-
-/**
- * Create service config for REST API routes
- * Routes are registered with a global API prefix from server config
- */
 export const createServiceConfig = (fastify: FastifyInstance, sequelize: Sequelize) => {
   return {
     type: ServiceType.SERVER,
@@ -122,11 +58,7 @@ export const createServiceConfig = (fastify: FastifyInstance, sequelize: Sequeli
       locales: {
         default: 'en',
         supported: ['en', 'es'],
-        directories: [
-          existsSync(join(rootDir, 'apps', 'backend', 'locales'))
-            ? join(rootDir, 'apps', 'backend', 'locales')
-            : join(rootDir, 'backend', 'locales'),
-        ],
+        directories: [join(rootDir, 'apps', 'backend', 'locales')],
       },
     },
     platforms: {
@@ -137,7 +69,10 @@ export const createServiceConfig = (fastify: FastifyInstance, sequelize: Sequeli
           type: ServerType.SERVER,
           vendor: ServerVendor.FASTIFY,
           instance: fastify,
-          apiPrefix: API_PREFIX,
+          prefixes: { api: API_PREFIX },
+        },
+        page: {
+          staticDir: join(rootDir, 'apps', 'frontend', 'dist'),
         },
         databases: [
           {
@@ -146,7 +81,6 @@ export const createServiceConfig = (fastify: FastifyInstance, sequelize: Sequeli
             connectionString: config.databaseUrl,
             onDatabaseConnected: async (db: unknown) => {
               const sequelizeDb = db as Sequelize;
-              initGreetingModel(sequelizeDb);
               await sequelizeDb.sync({ alter: true });
             },
           },

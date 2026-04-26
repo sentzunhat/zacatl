@@ -17,7 +17,7 @@ Located in `src/service/layers/application/entry-points/rest/fastify/handlers/`
 **Example:**
 
 ```typescript
-import { GetRouteHandler } from '@sentzunhat/zacatl/service';
+import { GetRouteHandler } from '@sentzunhat/zacatl/service/layers/application/entry-points/rest/fastify/handlers/get-route-handler';
 
 export class FetchGreetingsHandler extends GetRouteHandler {
   constructor() {
@@ -95,28 +95,28 @@ rest/
 │   ├── handler.ts
 │   ├── request.ts
 │   ├── http-methods.ts      ← Shared HTTP methods
-│   └── index.ts
+│   └── schema.ts
 ├── fastify/
-│   ├── handlers/
-│   │   ├── abstract.ts      ← Base class
-│   │   ├── route-handler.ts ← Interface
-│   │   ├── get-route-handler.ts
-│   │   ├── post-route-handler.ts
-│   │   ├── generics.ts
-│   │   └── index.ts
-│   └── index.ts
+│   └── handlers/
+│       ├── abstract.ts      ← Base class
+│       ├── route-handler.ts ← Interface
+│       ├── get-route-handler.ts
+│       ├── post-route-handler.ts
+│       ├── put-route-handler.ts
+│       ├── patch-route-handler.ts
+│       ├── delete-route-handler.ts
+│       └── generics.ts
 ├── express/
-│   ├── handlers/
-│   │   ├── abstract.ts      ← Base class
-│   │   ├── get-route-handler.ts
-│   │   ├── post-route-handler.ts
-│   │   ├── put-route-handler.ts
-│   │   ├── patch-route-handler.ts
-│   │   ├── delete-route-handler.ts
-│   │   └── index.ts
-│   └── index.ts
+│   └── handlers/
+│       ├── abstract.ts      ← Base class
+│       ├── get-route-handler.ts
+│       ├── post-route-handler.ts
+│       ├── put-route-handler.ts
+│       ├── patch-route-handler.ts
+│       └── delete-route-handler.ts
 ├── hook-handlers/
-├── index.ts
+│   └── hook-handler.ts
+└── index.ts                 ← Compat re-exports (internal use only)
 ```
 
 ## Migration Guide

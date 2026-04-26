@@ -4,8 +4,20 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "npm --prefix ../.. exec -- vite --host 0.0.0.0 --port 5001",
-    "build": "npm --prefix ../.. exec -- vite build",
-    "preview": "npm --prefix ../.. exec -- vite preview"
+    "dev": "vite --host 0.0.0.0 --port 5001",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.3.2",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.3",
+    "tailwindcss": "^4.3.2",
+    "vite": "^8.1.4"
   }
 }

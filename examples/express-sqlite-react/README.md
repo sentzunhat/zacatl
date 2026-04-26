@@ -64,8 +64,8 @@ curl http://localhost:8181/greetings
 
 ```bash
 # From repository root
-docker build -f examples/express-sqlite-react/Dockerfile \
-  -t zacatl-express-sqlite .
+docker build --build-arg EXAMPLE=express-sqlite-react \
+  -f examples/Dockerfile -t zacatl-express-sqlite-react .
 
 # Or use docker-compose
 cd examples/express-sqlite-react
@@ -88,7 +88,7 @@ docker compose up -d
 ## Documentation
 
 - **Examples Catalog**: [../README.md](../README.md)
-- **Start Here**: [../../docs/START_HERE.md](../../docs/START_HERE.md)
+- **Start Here**: [../../docs/start-here.md](../../docs/start-here.md)
 - **Framework Overview**: [../../docs/guidelines/framework-overview.md](../../docs/guidelines/framework-overview.md)
 - **Framework Database Guide**: [../../docs/third-party/orm/database-setup.md](../../docs/third-party/orm/database-setup.md)
 - **Service Module**: [../../docs/service/README.md](../../docs/service/README.md)

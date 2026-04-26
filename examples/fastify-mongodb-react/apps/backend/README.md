@@ -19,15 +19,15 @@ npm run dev
 
 ## Documentation
 
-- Example Root: [../README.md](../README.md)
-- Examples Catalog: [../../README.md](../../README.md)
-- Start Here: [../../../docs/START_HERE.md](../../../docs/START_HERE.md)
-- Framework Overview: [../../../docs/guidelines/framework-overview.md](../../../docs/guidelines/framework-overview.md)
-- ORM Setup: [../../../docs/third-party/orm/database-setup.md](../../../docs/third-party/orm/database-setup.md)
-- Service Module: [../../../docs/service/README.md](../../../docs/service/README.md)
+- Example Root: [../../README.md](../../README.md)
+- Examples Catalog: [../../../README.md](../../../README.md)
+- Start Here: [../../../../docs/start-here.md](../../../../docs/start-here.md)
+- Framework Overview: [../../../../docs/guidelines/framework-overview.md](../../../../docs/guidelines/framework-overview.md)
+- ORM Setup: [../../../../docs/third-party/orm/database-setup.md](../../../../docs/third-party/orm/database-setup.md)
+- Service Module: [../../../../docs/service/README.md](../../../../docs/service/README.md)
 
 ## Next Steps
 
-- Start from [Fastify + SQLite + React](../../fastify-sqlite-react/) as baseline
+- Start from [Fastify + SQLite + React](../../../fastify-sqlite-react/) as baseline
 - Validate Mongo flow with a local Mongo container plus the example app image
 - Extend routes and services following the service docs

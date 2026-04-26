@@ -1,43 +1,30 @@
 import type { DatabaseSync } from 'node:sqlite';
 
+import type { ORMType } from '../../orm/types';
+
+export type {
+  LeanDocument,
+  NodeSqliteLean,
+  NodeSqliteLeanDocument,
+  WithNodeSqliteMeta,
+} from '../../orm/nodesqlite/types';
+
 /**
  * Node.js SQLite Repository Configuration
  *
- * Simple configuration for SQLite-based repositories using the built-in
- * node:sqlite module in Node.js 24+.
- *
- * Requires a reference to the DatabaseSync instance and table name.
+ * Repositories resolve the shared DatabaseSync instance from the DI container
+ * through NodeSqliteToken, mirroring the Mongoose and Sequelize repository flow.
  */
 export interface NodeSqliteBaseRepositoryConfig {
-  type: 'nodesqlite';
-  /** Reference to the DatabaseSync instance from node:sqlite */
-  database: DatabaseSync;
-  /** Table name for this repository */
-  tableName: string;
+  type: ORMType.NodeSqlite;
+  /** Model name for this repository */
+  name: string;
 }
 
-export type NodeSqliteRepositoryConfig = NodeSqliteBaseRepositoryConfig;
+export interface NodeSqliteRepositoryConfig {
+  readonly type?: ORMType.NodeSqlite;
+  readonly name: string;
+}
 
 /** Node.js SQLite model type - the DatabaseSync instance */
 export type NodeSqliteRepositoryModel = DatabaseSync;
-
-/**
- * Node.js SQLite output document with normalized id, createdAt, updatedAt fields
- */
-export interface NodeSqliteLeanDocument {
-  id: string;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-/** Lean output type for Node.js SQLite repositories */
-export type NodeSqliteLean = NodeSqliteLeanDocument;
-
-/**
- * Helper type to ensure ID and timestamp fields exist in output
- */
-export type WithNodeSqliteMeta<T extends object> = T & {
-  id: string;
-  createdAt: Date;
-  updatedAt: Date;
-};

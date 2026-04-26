@@ -8,8 +8,9 @@
  * - Response serialization
  */
 
-import { inject, singleton } from '@sentzunhat/zacatl/third-party/tsyringe';
-import { FastifyPostRouteHandler, type Request } from '@sentzunhat/zacatl/service';
+import { inject, singleton } from '@sentzunhat/zacatl/third-party/dependency-injection/tsyringe';
+import type { Request } from '@sentzunhat/zacatl/service/layers/application/entry-points/rest/fastify/handlers/abstract';
+import { PostRouteHandler } from '@sentzunhat/zacatl/service/layers/application/entry-points/rest/fastify/handlers/post-route-handler';
 import { GreetingServiceAdapter } from '../../../../domain/greetings/service';
 import {
   CreateGreetingBodySchema,
@@ -19,7 +20,7 @@ import {
 import { toGreetingResponse } from '../greeting.serializer';
 
 @singleton()
-export class CreateGreetingHandler extends FastifyPostRouteHandler<
+export class CreateGreetingHandler extends PostRouteHandler<
   CreateGreetingBody,
   void,
   GreetingResponse

@@ -76,8 +76,8 @@ curl http://localhost:8082/api/greetings
 
 ```bash
 # From repository root
-docker build -f examples/fastify-mongodb-react/Dockerfile \
-  -t zacatl-fastify-mongodb .
+docker build --build-arg EXAMPLE=fastify-mongodb-react \
+  -f examples/Dockerfile -t zacatl-fastify-mongodb-react .
 
 # Run a MongoDB container first
 docker run -d --rm --name zacatl-mongo -p 27017:27017 mongo:latest
@@ -98,12 +98,12 @@ docker run --rm -p 8082:8082 \
 - MongoDB runs separately from the app image
 - For container-to-host access on macOS, the example uses `host.docker.internal`
 - If both containers run on the same Docker network, point `MONGO_URI` at that Mongo service name instead
-- See [DOCKER.md](../../DOCKER.md) for multi-example setup
+- See [docker.md](../docker.md) for multi-example setup
 
 ## Documentation
 
 - **Examples Catalog**: [../README.md](../README.md)
-- **Start Here**: [../../docs/START_HERE.md](../../docs/START_HERE.md)
+- **Start Here**: [../../docs/start-here.md](../../docs/start-here.md)
 - **Framework Overview**: [../../docs/guidelines/framework-overview.md](../../docs/guidelines/framework-overview.md)
 - **Framework Database Guide**: [../../docs/third-party/orm/database-setup.md](../../docs/third-party/orm/database-setup.md)
 - **Service Module**: [../../docs/service/README.md](../../docs/service/README.md)

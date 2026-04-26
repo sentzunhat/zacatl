@@ -1,5 +1,5 @@
-import { runCommand } from './runner';
-import type { CommandSpec, CommandResult, RunnerPolicy } from './types';
+import { runCommand } from './runner.js';
+import type { CommandSpec, CommandResult, RunnerPolicy } from './types.js';
 
 /**
  * Executes a batch of `CommandSpec` entries in parallel, bounded by `policy.maxConcurrency`.
@@ -47,7 +47,7 @@ export const executeCommands = (
 
         // capturedIndex is always < commands.length (guarded by the while condition above)
 
-        runCommand(commands[capturedIndex]!, policy)
+        void runCommand(commands[capturedIndex]!, policy)
           .then((result) => {
             results[capturedIndex] = result;
           })

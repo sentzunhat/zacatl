@@ -4,12 +4,17 @@ Complete API reference for the server platform, including HTTP servers, page ser
 
 ## Overview
 
-The server platform provides infrastructure for building web applications with REST APIs, static file hosting, and database connectivity. It uses the **Hexagonal Architecture** (Ports and Adapters pattern) to abstract HTTP server implementations (Fastify, Express) and database vendors (Mongoose, Sequelize).
+The server platform provides infrastructure for building web applications with REST APIs, static file hosting, and database connectivity. It uses the **Hexagonal Architecture** (Ports and Adapters pattern) to abstract HTTP server implementations (Fastify, Express) and database vendors (Mongoose, Sequelize, SQLite).
+
+## Platform Status in Current `src`
+
+- `ServiceType.SERVER` is implemented and runnable.
+- `ServiceType.CLI` and `ServiceType.DESKTOP` are currently contract stubs and throw when started.
 
 ## Import
 
 ```typescript
-import { ConfigServer, ServerVendor, ServerType, DatabaseVendor } from '@sentzunhat/zacatl';
+import { ConfigServer, ServerVendor, ServerType, DatabaseVendor } from '@sentzunhat/zacatl/service';
 ```
 
 ---
@@ -21,7 +26,7 @@ All HTTP frameworks, databases, and utilities used by the server platform are **
 **Key Exports:**
 
 - HTTP Frameworks: `@sentzunhat/zacatl/third-party/express`, `@sentzunhat/zacatl/third-party/fastify`
-- Databases: `@sentzunhat/zacatl/third-party/mongoose`, `@sentzunhat/zacatl/third-party/sequelize`
+- Databases: `@sentzunhat/zacatl/third-party/databases/mongoose`, `@sentzunhat/zacatl/third-party/databases/sequelize`
 - Utilities: `@sentzunhat/zacatl/third-party/zod`, `@sentzunhat/zacatl/third-party/uuid`, `@sentzunhat/zacatl/third-party/pino`, and more
 
 ---
@@ -64,7 +69,7 @@ type HttpServerConfig = {
   vendor: ServerVendor; // "FASTIFY" | "EXPRESS"
   instance: unknown; // FastifyInstance | Express
   gateway?: GatewayService; // Required if type is GATEWAY
-  apiPrefix?: string; // Optional base path prefix for all API routes (e.g. "/api")
+  prefixes?: ApiPrefixes; // Named route prefixes (e.g. { api: "/api", webhooks: "/webhooks" })
 };
 ```
 
@@ -73,7 +78,7 @@ type HttpServerConfig = {
 - `type` - Server type: `SERVER` (standard REST API) or `GATEWAY` (reverse proxy)
 - `vendor` - HTTP framework: `FASTIFY` or `EXPRESS`
 - `instance` - The Fastify or Express instance (create before passing to config)
-- `apiPrefix` - Optional base path prepended to all API routes (e.g. `"/api"`)
+- `prefixes` - Named route prefixes used by the server and SPA fallback guards
 - `gateway` - Gateway configuration with proxy routes (required when `type` is `GATEWAY`)
 
 ---
@@ -87,7 +92,7 @@ type PageServerConfig = {
   devServerUrl?: string;
   staticDir?: string;
   customRegister?: (server: unknown) => Promise<void> | void;
-  apiPrefix?: string;
+  prefixes?: ApiPrefixes;
 };
 ```
 
@@ -96,13 +101,13 @@ type PageServerConfig = {
 - `devServerUrl` - Development server URL for proxying (e.g., Vite dev server at `http://localhost:5173`)
 - `staticDir` - Directory containing built static files (e.g., `./dist/client`)
 - `customRegister` - Custom registration function for advanced server configuration
-- `apiPrefix` - API route prefix to exclude from SPA fallback (default: `/api`)
+- `prefixes` - API route prefixes to exclude from SPA fallback (default: `{ api: "/api" }`)
 
 ---
 
 ### `DatabaseConfig`
 
-Database connection configuration supporting Mongoose (MongoDB), Sequelize (SQL), and the Node 24 built-in SQLite.
+Database connection configuration supporting Mongoose (MongoDB), Sequelize (SQL), and the Node 22.5+ built-in SQLite.
 
 ```typescript
 type DatabaseConfig = {
@@ -158,14 +163,14 @@ Database vendor/ORM.
 enum DatabaseVendor {
   MONGOOSE = 'MONGOOSE', // MongoDB via Mongoose
   SEQUELIZE = 'SEQUELIZE', // SQL databases via Sequelize
-  SQLITE = 'SQLITE', // SQLite via Node 24 built-in node:sqlite (no external package)
+  SQLITE = 'SQLITE', // SQLite via node:sqlite (Node 22.5+) (no external package)
 }
 ```
 
 **SQLite example** (no `instance` needed):
 
 ```typescript
-import { DatabaseVendor } from '@sentzunhat/zacatl';
+import { DatabaseVendor } from '@sentzunhat/zacatl/service';
 
 databases: [
   {
@@ -195,7 +200,7 @@ src/service/platforms/server/
 │   └── page-server.ts          # PageServer implementation
 ├── database/
 │   ├── port.ts                 # DatabaseServerPort interface
-│   ├── adapters.ts             # MongooseAdapter, SequelizeAdapter
+│   ├── adapters.ts             # MongooseAdapter, SequelizeAdapter, SQLiteAdapter
 │   └── database-server.ts      # DatabaseServer implementation
 ├── types/
 │   └── server-config.ts        # Configuration types
@@ -237,7 +242,7 @@ Port interface for frontend/page servers. Handles static files and SPA routing.
 ```typescript
 interface PageServerPort {
   registerStaticFiles(config: StaticConfig): void;
-  registerSpaFallback(apiPrefix: string, staticDir: string): void;
+  registerSpaFallback(prefixes: ApiPrefixes, staticDir: string): void;
   register(server: unknown): Promise<void>;
 }
 ```
@@ -312,13 +317,18 @@ import { ExpressPageAdapter } from '@sentzunhat/zacatl/service/platforms/server/
 
 ## Examples
 
+SQLite can be used in two different ways:
+
+- Native `DatabaseVendor.SQLITE` (no ORM instance required)
+- Sequelize configured with SQLite dialect (`DatabaseVendor.SEQUELIZE`)
+
 ### Example 1: Fastify API Server (Basic)
 
 Simple REST API server with Fastify.
 
 ```typescript
 import Fastify from 'fastify';
-import { Service, ServiceType, ServerVendor, ServerType } from '@sentzunhat/zacatl';
+import { Service, ServiceType, ServerVendor, ServerType } from '@sentzunhat/zacatl/service';
 
 const fastify = Fastify();
 
@@ -351,20 +361,18 @@ await service.start();
 
 ---
 
-### Example 2: Fastify with SQLite Database
+### Example 2: Fastify with Native SQLite Vendor
 
-Fastify server with Sequelize + SQLite.
+Fastify server with `DatabaseVendor.SQLITE` (no Sequelize instance).
 
 ```typescript
 import Fastify from 'fastify';
-import { Sequelize } from 'sequelize';
-import { Service, ServerVendor, ServerType, DatabaseVendor } from '@sentzunhat/zacatl';
+import { Service, ServiceType, ServerVendor, ServerType, DatabaseVendor } from '@sentzunhat/zacatl/service';
 
 const fastify = Fastify();
-const sequelize = new Sequelize('sqlite:database.sqlite');
 
 const service = new Service({
-  type: 'SERVER',
+  type: ServiceType.SERVER,
   platforms: {
     server: {
       name: 'fastify-sqlite',
@@ -376,13 +384,8 @@ const service = new Service({
       },
       databases: [
         {
-          vendor: DatabaseVendor.SEQUELIZE,
-          instance: sequelize,
-          connectionString: 'sqlite:database.sqlite',
-          onDatabaseConnected: async (db) => {
-            await (db as Sequelize).sync({ alter: true });
-            console.log('Database synchronized');
-          },
+          vendor: DatabaseVendor.SQLITE,
+          connectionString: 'app.db',
         },
       ],
     },
@@ -421,7 +424,7 @@ Simple Express REST API server.
 
 ```typescript
 import express from 'express';
-import { Service, ServerVendor, ServerType } from '@sentzunhat/zacatl';
+import { Service, ServerVendor, ServerType } from '@sentzunhat/zacatl/service';
 
 const app = express();
 
@@ -460,12 +463,12 @@ await service.start();
 
 ### Example 4: Full-Stack App with Page Server
 
-Fastify server with React SPA + API + Database.
+Fastify server with React SPA + API + Sequelize using SQLite dialect.
 
 ```typescript
 import Fastify from 'fastify';
 import { Sequelize } from 'sequelize';
-import { Service, ServerVendor, ServerType, DatabaseVendor } from '@sentzunhat/zacatl';
+import { Service, ServerVendor, ServerType, DatabaseVendor } from '@sentzunhat/zacatl/service';
 
 const fastify = Fastify();
 const sequelize = new Sequelize('sqlite:database.sqlite');
@@ -483,7 +486,7 @@ const service = new Service({
       },
       page: {
         staticDir: './dist/client', // Built React/Vue/Svelte app
-        apiPrefix: '/api', // API routes excluded from SPA fallback
+        prefixes: { api: '/api', webhooks: '/webhooks' }, // API routes excluded from SPA fallback
       },
       databases: [
         {
@@ -533,7 +536,7 @@ Fastify gateway server that proxies requests to multiple backend services.
 
 ```typescript
 import Fastify from 'fastify';
-import { Service, ServerVendor, ServerType } from '@sentzunhat/zacatl';
+import { Service, ServerVendor, ServerType } from '@sentzunhat/zacatl/service';
 
 const fastify = Fastify();
 
@@ -586,7 +589,7 @@ Server with both MongoDB (Mongoose) and PostgreSQL (Sequelize).
 import Fastify from 'fastify';
 import mongoose from 'mongoose';
 import { Sequelize } from 'sequelize';
-import { Service, ServerVendor, ServerType, DatabaseVendor } from '@sentzunhat/zacatl';
+import { Service, ServerVendor, ServerType, DatabaseVendor } from '@sentzunhat/zacatl/service';
 
 const fastify = Fastify();
 const sequelize = new Sequelize('postgres://localhost:5432/mydb');
@@ -663,7 +666,7 @@ const service = new Service({
     server: {
       page: {
         devServerUrl: 'http://localhost:5173', // Vite dev server
-        apiPrefix: '/api',
+        prefixes: { api: '/api' },
       },
       // ...
     },

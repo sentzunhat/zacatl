@@ -1,569 +1,131 @@
-# Single Import Guide - @sentzunhat/zacatl
+# Subpath Import Guide — @sentzunhat/zacatl
 
-## Import Everything from One Package
-
-Import **everything** from `@sentzunhat/zacatl`. No need to install or import from multiple packages!
+Since **0.0.56**, Zacatl has **no root package barrel**. Import from explicit subpaths instead of `from '@sentzunhat/zacatl'`.
 
 ---
 
-## Before (Multiple Packages)
+## Before (pre-0.0.56)
 
 ```typescript
-// ❌ OLD WAY - Multiple imports from different packages
-import { Service } from '@sentzunhat/zacatl';
-import { Schema, Model, Types } from 'mongoose';
-import { DataTypes, Sequelize, Model as SequelizeModel } from 'sequelize';
-import { container } from 'tsyringe';
-import { z } from 'zod';
+// ❌ No longer supported — root barrel removed
+import { Service, NotFoundError, container, mongoose, Schema } from '@sentzunhat/zacatl';
+import { mongoose, Schema } from '@sentzunhat/zacatl/third-party/mongoose';
+import { container } from '@sentzunhat/zacatl/third-party/tsyringe';
 ```
 
-## After (Single Package)
+## After (0.0.56+)
 
 ```typescript
-// ✅ NEW WAY - Everything from one place!
-import {
-  Service,
-  Schema,
-  Model,
-  Types,
-  DataTypes,
-  Sequelize,
-  SequelizeModelClass,
-  container,
-  z,
-  ORMType,
-  BaseRepository,
-} from '@sentzunhat/zacatl';
+// ✅ Explicit module subpaths
+import { Service, BaseRepository, ORMType } from '@sentzunhat/zacatl/service';
+import { NotFoundError } from '@sentzunhat/zacatl/error';
+import { resolveDependency } from '@sentzunhat/zacatl/dependency-injection';
+import { container, inject, singleton } from '@sentzunhat/zacatl/third-party/dependency-injection/tsyringe';
+import { mongoose, Schema } from '@sentzunhat/zacatl/third-party/databases/mongoose';
+import { Sequelize, DataTypes } from '@sentzunhat/zacatl/third-party/databases/sequelize';
+import { z } from '@sentzunhat/zacatl/third-party/zod';
 ```
 
 ---
 
-## Complete Import Reference
+## Public API modules
 
-### Framework Core
+| What you need | Import path |
+| ------------- | ----------- |
+| `Service`, `BaseRepository`, `ORMType`, route handlers | `@sentzunhat/zacatl/service` |
+| Error classes | `@sentzunhat/zacatl/error` |
+| `registerDependency`, `resolveDependency`, … | `@sentzunhat/zacatl/dependency-injection` |
+| `loadJSON`, `loadYML` | `@sentzunhat/zacatl/configuration` |
+| `configureI18nNode`, locale helpers | `@sentzunhat/zacatl/localization` |
+| `createLogger`, `requestContext` | `@sentzunhat/zacatl/logs` |
+| `Optional`, command runner utilities | `@sentzunhat/zacatl/utils` |
+| tsyringe, zod, express, fastify re-exports | `@sentzunhat/zacatl/third-party` or deeper subpaths |
 
-```typescript
-import {
-  // Service
-  Service,
-  ConfigService,
-
-  // Server
-  ServerType,
-  ServerVendor,
-  DatabaseVendor,
-  HandlersType,
-  ConfigServer,
-
-  // Infrastructure
-  BaseRepository,
-  ORMType,
-  Infrastructure,
-
-  // Dependency Injection
-  container,
-  DependencyContainer,
-
-  // Errors
-  CustomError,
-  BadRequestError,
-  NotFoundError,
-  UnauthorizedError,
-  ForbiddenError,
-  InternalServerError,
-
-  // Localization
-  Localization,
-
-  // Validation
-  z,
-  ZodType,
-  ZodError,
-} from '@sentzunhat/zacatl';
-```
-
-### Mongoose (MongoDB)
-
-```typescript
-import {
-  // Classes
-  Schema,
-  Model,
-  Types,
-  connect,
-  connection,
-  createConnection,
-
-  // Types
-  Document,
-  SchemaDefinition,
-  SchemaOptions,
-  SchemaTypeOptions,
-  Connection,
-  Mongoose,
-  ObjectId,
-  UpdateQuery,
-  QueryOptions,
-  PopulateOptions,
-  HydratedDocument,
-  InferSchemaType,
-} from '@sentzunhat/zacatl';
-```
-
-### Sequelize (SQL Databases)
-
-```typescript
-import {
-  // Classes
-  DataTypes,
-  Sequelize,
-  SequelizeModelClass,
-
-  // Types
-  ModelStatic,
-  QueryInterface,
-  Transaction,
-  SequelizeOptions,
-  ModelAttributes,
-  ModelOptions,
-  FindOptions,
-  CreateOptions,
-  UpdateOptions,
-  DestroyOptions,
-  WhereOptions,
-  Order,
-  Includeable,
-} from '@sentzunhat/zacatl';
-```
+See the [main README](../../README.md#-public-api-modules) for the full module table.
 
 ---
 
-## Real-World Examples
+## Third-party nested paths (ORM & DI)
 
-### Example 1: Mongoose Repository (Single Import)
+Database and DI re-exports use **nested subpaths only** — flat paths such as `/third-party/mongoose` or `/third-party/tsyringe` are not published.
+
+| Package | Import path |
+| ------- | ----------- |
+| Mongoose | `@sentzunhat/zacatl/third-party/databases/mongoose` |
+| Sequelize | `@sentzunhat/zacatl/third-party/databases/sequelize` |
+| sqlite3 driver | `@sentzunhat/zacatl/third-party/databases/sqlite3` |
+| node:sqlite helper | `@sentzunhat/zacatl/third-party/databases/nodesqlite` |
+| tsyringe | `@sentzunhat/zacatl/third-party/dependency-injection/tsyringe` |
+| reflect-metadata | `@sentzunhat/zacatl/third-party/dependency-injection/reflect-metadata` |
+| Zod | `@sentzunhat/zacatl/third-party/zod` |
+
+---
+
+## Complete example
 
 ```typescript
-import { BaseRepository, ORMType, Schema, InferSchemaType } from '@sentzunhat/zacatl';
+import { Service, ServiceType, ServerType, ServerVendor, BaseRepository, ORMType } from '@sentzunhat/zacatl/service';
+import { NotFoundError } from '@sentzunhat/zacatl/error';
+import { resolveDependency } from '@sentzunhat/zacatl/dependency-injection';
+import { inject, singleton } from '@sentzunhat/zacatl/third-party/dependency-injection/tsyringe';
+import { mongoose, Schema } from '@sentzunhat/zacatl/third-party/databases/mongoose';
+import { z } from '@sentzunhat/zacatl/third-party/zod';
 
-// Define schema
-const UserSchema = new Schema(
-  {
-    username: { type: String, required: true },
-    email: { type: String, required: true },
-    passwordHash: { type: String, required: true },
-  },
-  { timestamps: true },
-);
-
-// Infer types
-type UserDb = InferSchemaType<typeof UserSchema>;
-interface UserInput extends Omit<UserDb, 'timestamps'> {}
-interface UserOutput extends UserDb {
-  id: string;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-// Create repository
-export class UserRepository extends BaseRepository<UserDb, UserInput, UserOutput> {
+@singleton()
+class GreetingRepository extends BaseRepository<{ message: string }, { message: string }> {
   constructor() {
-    super({
-      type: ORMType.Mongoose,
-      name: 'User',
-      schema: UserSchema,
-    });
+    super({ type: ORMType.Mongoose, schema: new Schema({ message: String }) });
   }
 }
-```
 
-### Example 2: Sequelize Repository (Single Import)
-
-```typescript
-import {
-  BaseRepository,
-  ORMType,
-  DataTypes,
-  Sequelize,
-  SequelizeModelClass,
-  ModelAttributes,
-} from '@sentzunhat/zacatl';
-
-// Define Sequelize instance
-const sequelize = new Sequelize({
-  dialect: 'postgres',
-  host: 'localhost',
-  database: 'myapp',
-});
-
-// Define model
-class ProductModel extends SequelizeModelClass {}
-
-const attributes: ModelAttributes = {
-  id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-  name: { type: DataTypes.STRING, allowNull: false },
-  price: { type: DataTypes.FLOAT, allowNull: false },
-  stock: { type: DataTypes.INTEGER, defaultValue: 0 },
-};
-
-ProductModel.init(attributes, { sequelize, modelName: 'Product' });
-
-// Define types
-interface ProductInput {
-  name: string;
-  price: number;
-  stock: number;
-}
-
-interface ProductOutput {
-  id: string;
-  name: string;
-  price: number;
-  stock: number;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-// Create repository
-export class ProductRepository extends BaseRepository<ProductModel, ProductInput, ProductOutput> {
-  constructor() {
-    super({
-      type: ORMType.Sequelize,
-      model: ProductModel,
-    });
-  }
-}
-```
-
-### Example 3: Complete Service (Single Import)
-
-```typescript
-import {
-  Service,
-  ServerType,
-  ServerVendor,
-  DatabaseVendor,
-  Schema,
-  Sequelize,
-  container,
-} from '@sentzunhat/zacatl';
-import fastify from 'fastify'; // Only external package you need!
-
-import { UserRepository } from './repositories/user.repository';
-import { ProductRepository } from './repositories/product.repository';
-
-// Create ORM instances (also from single import!)
-import { connect, Sequelize as SequelizeClass } from '@sentzunhat/zacatl';
-
-const mongooseInstance = await connect('mongodb://localhost:27017/myapp');
-const sequelizeInstance = new SequelizeClass('postgres://localhost:5432/myapp');
-
-// Create service
 const service = new Service({
   type: ServiceType.SERVER,
   layers: {
-    infrastructure: {
-      repositories: [UserRepository, ProductRepository],
-    },
-    domain: {
-      services: [],
-    },
+    application: { entryPoints: { rest: { hooks: [], routes: [] } } },
+    domain: { services: [] },
+    infrastructure: { repositories: [GreetingRepository] },
   },
   platforms: {
     server: {
-      name: 'my-service',
-      server: {
-        type: ServerType.SERVER,
-        vendor: ServerVendor.FASTIFY,
-        instance: fastify(),
-      },
-      databases: [
-        {
-          vendor: DatabaseVendor.MONGOOSE,
-          instance: mongooseInstance,
-          connectionString: 'mongodb://localhost:27017/myapp',
-        },
-        {
-          vendor: DatabaseVendor.SEQUELIZE,
-          instance: sequelizeInstance,
-          connectionString: 'postgres://localhost:5432/myapp',
-        },
-      ],
+      name: 'greeting-service',
+      server: { type: ServerType.SERVER, vendor: ServerVendor.FASTIFY, instance: fastify },
     },
   },
 });
-
-await service.start({ port: 3000 });
 ```
 
-### Example 4: Validation with Zod (Single Import)
+---
+
+## In-repo development (`@zacatl/*`)
+
+Examples and tests inside this repository map `@zacatl/*` to `build-src-esm` or `src` via `tsconfig.json`. That alias is **not** part of the published npm package.
 
 ```typescript
-import { z, BaseRepository, ORMType, Schema } from '@sentzunhat/zacatl';
-
-// Create Zod schema for validation
-const CreateUserSchema = z.object({
-  username: z.string().min(3).max(20),
-  email: z.string().email(),
-  password: z.string().min(8),
-});
-
-type CreateUserInput = z.infer<typeof CreateUserSchema>;
-
-// Mongoose schema
-const UserSchema = new Schema(
-  {
-    username: String,
-    email: String,
-    passwordHash: String,
-  },
-  { timestamps: true },
-);
-
-// Repository with validation
-export class UserRepository extends BaseRepository<any, any, any> {
-  constructor() {
-    super({
-      type: ORMType.Mongoose,
-      name: 'User',
-      schema: UserSchema,
-    });
-  }
-
-  async createValidated(input: unknown) {
-    // Validate with Zod
-    const validated = CreateUserSchema.parse(input);
-
-    // Create user
-    return this.create({
-      username: validated.username,
-      email: validated.email,
-      passwordHash: await this.hashPassword(validated.password),
-    });
-  }
-
-  private async hashPassword(password: string): Promise<string> {
-    // Hash implementation
-    return password; // Placeholder
-  }
-}
+// Inside the zacatl repo / examples only
+import { Service } from '@zacatl/service';
+import { inject, singleton } from '@zacatl/third-party/dependency-injection/tsyringe';
+import { mongoose, Schema } from '@zacatl/third-party/databases/mongoose';
 ```
 
-### Example 5: Dependency Injection (Single Import)
-
-```typescript
-import { container, Service, BaseRepository } from '@sentzunhat/zacatl';
-
-import { UserRepository } from './repositories/user.repository';
-
-// Start service (auto-registers repositories)
-const service = new Service({
-  type: ServiceType.SERVER,
-  layers: {
-    infrastructure: {
-      repositories: [UserRepository],
-    },
-    domain: { services: [] },
-  },
-  platforms: {
-    server: { name: 'my-service' },
-  },
-});
-
-await service.start();
-
-// Get repository from DI container
-const userRepo = container.resolve(UserRepository);
-
-const user = await userRepo.create({
-  username: 'john',
-  email: 'john@example.com',
-  passwordHash: 'hashed',
-});
-```
+Templates: [examples/shared/zacatl-build-paths.json](../../examples/shared/zacatl-build-paths.json).
 
 ---
 
-## Package.json Comparison
+## Migration checklist (0.0.55 → 0.0.56)
 
-### Before (Multiple Dependencies)
-
-```json
-{
-  "dependencies": {
-    "@sentzunhat/zacatl": "latest",
-    "mongoose": "^9.0.1",
-    "sequelize": "^6.37.7",
-    "tsyringe": "^4.10.0",
-    "zod": "^4.3.6",
-    "fastify": "^5.6.2"
-  }
-}
-```
-
-### After (Minimal Dependencies)
-
-```json
-{
-  "dependencies": {
-    "@sentzunhat/zacatl": "latest",
-    "fastify": "^5.7.4" // Only if using Fastify server
-  }
-}
-```
-
-**Everything else is bundled in `@sentzunhat/zacatl`!** 🎉
+1. Replace `from '@sentzunhat/zacatl'` with the matching subpath (`/service`, `/error`, `/dependency-injection`, …).
+2. Replace flat third-party paths:
+   - `/third-party/mongoose` → `/third-party/databases/mongoose`
+   - `/third-party/sequelize` → `/third-party/databases/sequelize`
+   - `/third-party/tsyringe` → `/third-party/dependency-injection/tsyringe`
+   - `/third-party/reflect-metadata` → `/third-party/dependency-injection/reflect-metadata`
+3. Run `npm run type:check` in your consumer project after upgrading.
 
 ---
 
-## Benefits
+## Related
 
-### ✅ Fewer Dependencies
-
-- Install only `@sentzunhat/zacatl`
-- No need to manage versions of mongoose, sequelize, zod, tsyringe separately
-- Smaller `package.json`
-
-### ✅ Version Compatibility
-
-- Framework ensures ORM versions are compatible
-- No version conflicts between packages
-- Tested combinations
-
-### ✅ Cleaner Imports
-
-- Single import statement
-- No confusion about which package exports what
-- Better IDE autocomplete
-
-### ✅ Smaller Bundle (Potentially)
-
-- Shared dependencies
-- No duplicate packages
-- Tree-shaking still works
-
-### ✅ Better DX (Developer Experience)
-
-- Less to install
-- Less to learn
-- Faster onboarding
-
----
-
-## Migration from Multiple Imports
-
-### Quick Find & Replace
-
-1. **Find:** `import { Schema, Model } from "mongoose"`
-   **Replace:** `import { Schema, Model } from "@sentzunhat/zacatl"`
-
-2. **Find:** `import { DataTypes, Sequelize } from "sequelize"`
-   **Replace:** `import { DataTypes, Sequelize } from "@sentzunhat/zacatl"`
-
-3. **Find:** `import { container } from "tsyringe"`
-   **Replace:** `import { container } from "@sentzunhat/zacatl"`
-
-4. **Find:** `import { z } from "zod"`
-   **Replace:** `import { z } from "@sentzunhat/zacatl"`
-
-5. **Uninstall unused packages:**
-   ```bash
-   npm uninstall mongoose sequelize tsyringe zod
-   ```
-
----
-
-## What's Re-exported
-
-| Package     | Re-exported in @sentzunhat/zacatl                           |
-| ----------- | ----------------------------------------------------------- |
-| `mongoose`  | ✅ Schema, Model, Types, connect, connection, and all types |
-| `sequelize` | ✅ Sequelize, DataTypes, Model class, and all types         |
-| `tsyringe`  | ✅ container, DependencyContainer                           |
-| `zod`       | ✅ z, ZodType, ZodError                                     |
-| `fastify`   | ❌ Import separately (many server options)                  |
-| `express`   | ❌ Import separately (many server options)                  |
-
----
-
-## Advanced Usage
-
-### Type-Safe Generic Repository
-
-```typescript
-import { BaseRepository, ORMType, Schema, InferSchemaType, z } from '@sentzunhat/zacatl';
-
-// Everything from one import!
-const UserSchema = new Schema(
-  {
-    username: String,
-    email: String,
-  },
-  { timestamps: true },
-);
-
-type UserDb = InferSchemaType<typeof UserSchema>;
-
-const UserValidator = z.object({
-  username: z.string(),
-  email: z.string().email(),
-});
-
-export class UserRepository extends BaseRepository<UserDb, any, any> {
-  constructor() {
-    super({
-      type: ORMType.Mongoose,
-      name: 'User',
-      schema: UserSchema,
-    });
-  }
-
-  async createValidated(input: unknown) {
-    const validated = UserValidator.parse(input);
-    return this.create(validated);
-  }
-}
-```
-
----
-
-## Summary
-
-**One package to rule them all!**
-
-```typescript
-import {
-  // Framework
-  Service,
-  BaseRepository,
-  ORMType,
-
-  // MongoDB
-  Schema,
-  Model,
-  Types,
-
-  // SQL
-  DataTypes,
-  Sequelize,
-
-  // Utilities
-  container,
-  z,
-} from '@sentzunhat/zacatl';
-```
-
-**No more:**
-
-- ❌ `npm install mongoose sequelize tsyringe zod`
-- ❌ Multiple import statements
-- ❌ Version compatibility issues
-- ❌ Package management overhead
-
-**Just:**
-
-- ✅ `npm install @sentzunhat/zacatl`
-- ✅ Single import
-- ✅ Everything works together
-- ✅ Better DX
-
-🎉 **Enjoy the cleaner codebase!**
+- [Third-Party README](./README.md)
+- [Import strategies](./orm/orm-import-strategies.md)
+- [Dependencies reference](./dependencies-reference.md)
+- [Release notes — 0.0.56](../changelog.md)

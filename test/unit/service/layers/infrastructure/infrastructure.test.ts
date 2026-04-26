@@ -1,7 +1,7 @@
-import { container } from '@zacatl/third-party/tsyringe';
+import { container } from '@zacatl/third-party/dependency-injection/tsyringe';
 
-import type { ConfigInfrastructure } from '../../../../../src/service/layers/infrastructure';
-import { Infrastructure } from '../../../../../src/service/layers/infrastructure';
+import type { ConfigInfrastructure } from '../../../../../src/service/layers/infrastructure/types';
+import { Infrastructure } from '../../../../../src/service/layers/infrastructure/infrastructure';
 import type { RepositoryModel } from '../../../../../src/service/layers/infrastructure/repositories/types';
 import type { RepositoryPort } from '../../../../../src/service/layers/infrastructure/types';
 

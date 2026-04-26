@@ -2,12 +2,12 @@
 
 ## Runtime Support
 
-Zacatl standardizes on **Node.js 24.14.0 LTS+** with **npm**:
+Zacatl standardizes on **Node.js 26.0.0+** with **npm**:
 
-- **Node.js 24.14.0+** (minimum): Required for stable `node:sqlite`, improved `AsyncLocalStorage`, and native subpath imports
+- **Node.js 26.0.0+** (minimum): Required for the current branch baseline and publish/tooling flow
 - **npm 11+**: Deterministic installs using `package-lock.json`
 
-> Upgrade: `nvm install 24.14.0 && nvm use 24.14.0`
+> Upgrade: `nvm install 26 && nvm use 26`
 
 ## What's Available After Install
 
@@ -17,13 +17,11 @@ Some ORM/database integrations are optional peers and should be installed by usa
 ### Core Dependencies
 
 ```typescript
-import { singleton, inject, container } from '@sentzunhat/zacatl/third-party/tsyringe';
+import { singleton, inject, container } from '@sentzunhat/zacatl/third-party/dependency-injection/tsyringe';
 import { z } from '@sentzunhat/zacatl/third-party/zod';
-import {
-  Service, // ✅ Zacatl core
-  resolveDependency, // ✅ Zacatl DI
-  logger, // ✅ Pino logger
-} from '@sentzunhat/zacatl';
+import { Service } from '@sentzunhat/zacatl/service';
+import { resolveDependency } from '@sentzunhat/zacatl/dependency-injection';
+import { logger } from '@sentzunhat/zacatl/logs';
 ```
 
 ### Errors
@@ -50,7 +48,7 @@ import { loadJSON, loadYML } from '@sentzunhat/zacatl/configuration';
 ### Infrastructure
 
 ```typescript
-import { BaseRepository, ORMType } from '@sentzunhat/zacatl';
+import { BaseRepository, ORMType } from '@sentzunhat/zacatl/service';
 ```
 
 ---
@@ -65,8 +63,8 @@ ORM and platform code is still **only loaded via subpath imports** to keep the
 main entry lean:
 
 ```typescript
-import { mongoose } from '@sentzunhat/zacatl/third-party/mongoose';
-import { Sequelize } from '@sentzunhat/zacatl/third-party/sequelize';
+import { mongoose } from '@sentzunhat/zacatl/third-party/databases/mongoose';
+import { Sequelize } from '@sentzunhat/zacatl/third-party/databases/sequelize';
 ```
 
 ### Database drivers (still required)
@@ -80,12 +78,12 @@ npm install sqlite3           # SQLite via Sequelize ORM
 npm install tedious           # MSSQL
 ```
 
-### For Native SQLite (Node 24 Built-in — No Install Needed)
+### For Native SQLite (Node 22.5+ Built-in — No Install Needed)
 
 Use `DatabaseVendor.SQLITE` — no external package required. Powered by the built-in `node:sqlite` module:
 
 ```typescript
-import { DatabaseVendor } from '@sentzunhat/zacatl';
+import { DatabaseVendor } from '@sentzunhat/zacatl/service';
 
 databases: [
   {
@@ -98,7 +96,7 @@ databases: [
 **SQLite ORM Support:** Full ORM integration via `createNodeSqliteAdapter()` factory with `BaseRepository` for type-safe CRUD operations.
 
 ```typescript
-import { createNodeSqliteAdapter } from '@sentzunhat/zacatl';
+import { createNodeSqliteAdapter } from '@sentzunhat/zacatl/service';
 import type { DatabaseSync } from 'node:sqlite';
 
 const adapter = createNodeSqliteAdapter<InputModel, OutputModel>({
@@ -126,7 +124,9 @@ npm install @sentzunhat/zacatl
 **Use:**
 
 ```typescript
-import { Service, singleton, resolveDependency } from '@sentzunhat/zacatl';
+import { resolveDependency } from '@sentzunhat/zacatl/dependency-injection';
+import { Service } from '@sentzunhat/zacatl/service';
+import { singleton } from '@sentzunhat/zacatl/third-party/dependency-injection/tsyringe';
 
 @singleton()
 class MyService {
@@ -158,8 +158,9 @@ npm install @sentzunhat/zacatl mongoose
 **Use:**
 
 ```typescript
-import { Service, singleton, BaseRepository, ORMType } from '@sentzunhat/zacatl';
-import { mongoose, Schema } from '@sentzunhat/zacatl/third-party/mongoose';
+import { Service, BaseRepository, ORMType } from '@sentzunhat/zacatl/service';
+import { singleton } from '@sentzunhat/zacatl/third-party/dependency-injection/tsyringe';
+import { mongoose, Schema } from '@sentzunhat/zacatl/third-party/databases/mongoose';
 
 const UserSchema = new Schema({ name: String });
 
@@ -202,8 +203,9 @@ npm install @sentzunhat/zacatl pg pg-hstore
 **Use:**
 
 ```typescript
-import { Service, singleton, BaseRepository, ORMType } from '@sentzunhat/zacatl';
-import { Sequelize, DataTypes } from '@sentzunhat/zacatl/third-party/sequelize';
+import { Service, BaseRepository, ORMType } from '@sentzunhat/zacatl/service';
+import { singleton } from '@sentzunhat/zacatl/third-party/dependency-injection/tsyringe';
+import { Sequelize, DataTypes } from '@sentzunhat/zacatl/third-party/databases/sequelize';
 
 const sequelize = new Sequelize('postgresql://localhost/db');
 
@@ -214,7 +216,10 @@ const UserModel = sequelize.define('User', {
 @singleton()
 class UserRepository extends BaseRepository<any, any, any> {
   constructor() {
-    super({ type: ORMType.Sequelize, model: UserModel });
+    super({
+      type: ORMType.Sequelize,
+      name: 'User',
+    });
   }
 }
 
@@ -243,14 +248,14 @@ const service = new Service({
 
 | Feature               | Import From                                | Install Required?           |
 | --------------------- | ------------------------------------------ | --------------------------- |
-| `singleton` decorator | `@sentzunhat/zacatl/third-party/tsyringe`  | ❌ No (included)            |
+| `singleton` decorator | `@sentzunhat/zacatl/third-party/dependency-injection/tsyringe`  | ❌ No (included)            |
 | `Service`             | `@sentzunhat/zacatl`                       | ❌ No (included)            |
 | `BaseRepository`      | `@sentzunhat/zacatl`                       | ❌ No (included)            |
 | `logger`              | `@sentzunhat/zacatl`                       | ❌ No (included)            |
 | `z` (Zod)             | `@sentzunhat/zacatl/third-party/zod`       | ❌ No (included)            |
-| `mongoose`            | `@sentzunhat/zacatl/third-party/mongoose`  | ✅ Yes (optional peer)      |
-| `Schema`              | `@sentzunhat/zacatl/third-party/mongoose`  | ✅ Yes (optional peer)      |
-| `Sequelize`           | `@sentzunhat/zacatl/third-party/sequelize` | ✅ Yes (optional peer)      |
+| `mongoose`            | `@sentzunhat/zacatl/third-party/databases/mongoose`  | ✅ Yes (optional peer)      |
+| `Schema`              | `@sentzunhat/zacatl/third-party/databases/mongoose`  | ✅ Yes (optional peer)      |
+| `Sequelize`           | `@sentzunhat/zacatl/third-party/databases/sequelize` | ✅ Yes (optional peer)      |
 | Database drivers      | `pg`, `mysql2`, etc                        | ✅ Yes (if using Sequelize) |
 
 ---
@@ -260,7 +265,9 @@ const service = new Service({
 All TypeScript types are included automatically:
 
 ```typescript
-import type { DependencyContainer, ZodType, ZodError, ConfigServer } from '@sentzunhat/zacatl';
+import { ConfigServer } from '@sentzunhat/zacatl/service';
+import { DependencyContainer } from '@sentzunhat/zacatl/third-party/dependency-injection/tsyringe';
+import { ZodType, ZodError } from '@sentzunhat/zacatl/third-party/zod';
 ```
 
 **No `@types/*` packages needed for Zacatl core!** ✅
@@ -287,7 +294,9 @@ Do you need database access?
 
 ```typescript
 // Everything you need for a basic service (no database)
-import { Service, singleton, resolveDependency } from '@sentzunhat/zacatl';
+import { resolveDependency } from '@sentzunhat/zacatl/dependency-injection';
+import { Service } from '@sentzunhat/zacatl/service';
+import { singleton } from '@sentzunhat/zacatl/third-party/dependency-injection/tsyringe';
 
 // That's it! No other imports needed. ✅
 ```
@@ -317,7 +326,7 @@ import { Service, singleton, resolveDependency } from '@sentzunhat/zacatl';
 | `mongoose`       | ^9.0.0  | MongoDB/Mongoose repositories |
 | `sequelize`      | ^6.0.0  | SQL database ORM              |
 | `better-sqlite3` | ^12.6.2 | SQLite ecosystem support      |
-| `sqlite3`        | ^5.1.7  | SQLite ecosystem support      |
+| `sqlite3`        | ^6.0.1  | SQLite ecosystem support      |
 | `pg`             | ^8.18.0 | PostgreSQL ecosystem support  |
 
 ### Development Tools
@@ -325,7 +334,7 @@ import { Service, singleton, resolveDependency } from '@sentzunhat/zacatl';
 | Tool         | Version      |
 | ------------ | ------------ |
 | `typescript` | ^5.9.3       |
-| `node`       | 24.14.0 LTS+ |
+| `node`       | 26.0.0+ |
 | `npm`        | 11.0.0+      |
 
 ---
@@ -333,7 +342,7 @@ import { Service, singleton, resolveDependency } from '@sentzunhat/zacatl';
 ## Version Info
 
 - **Zacatl:** see `package.json`
-- **Node.js:** 24.14.0 LTS+
+- **Node.js:** 26.0.0+
 - **TypeScript:** 5.9.3+ (recommended)
 
 ---

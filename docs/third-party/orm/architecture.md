@@ -70,7 +70,7 @@ MongoDB | PostgreSQL | Your Database
 ## Option 1: Mongoose
 
 ```typescript
-import { BaseRepository } from '@sentzunhat/zacatl';
+import { BaseRepository, ORMType } from '@sentzunhat/zacatl/service';
 import { Schema } from 'mongoose';
 
 const userSchema = new Schema(
@@ -84,7 +84,7 @@ const userSchema = new Schema(
 class UserRepository extends BaseRepository<User, CreateUser, UserDTO> {
   constructor() {
     super({
-      type: 'mongoose',
+      type: ORMType.Mongoose,
       name: 'User',
       schema: userSchema,
     });
@@ -101,7 +101,7 @@ class UserRepository extends BaseRepository<User, CreateUser, UserDTO> {
 ## Option 2: Sequelize
 
 ```typescript
-import { BaseRepository } from '@sentzunhat/zacatl';
+import { BaseRepository, ORMType } from '@sentzunhat/zacatl/service';
 import { Model } from 'sequelize';
 
 class ProductModel extends Model {
@@ -112,8 +112,8 @@ class ProductModel extends Model {
 class ProductRepository extends BaseRepository<ProductModel, CreateProduct, ProductDTO> {
   constructor() {
     super({
-      type: 'sequelize',
-      model: ProductModel,
+      type: ORMType.Sequelize,
+      name: 'Product',
     });
   }
 }
@@ -122,7 +122,7 @@ class ProductRepository extends BaseRepository<ProductModel, CreateProduct, Prod
 ### Using Sequelize
 
 ```typescript
-import { BaseRepository } from '@sentzunhat/zacatl';
+import { BaseRepository } from '@sentzunhat/zacatl/service';
 import { Model, DataTypes } from 'sequelize';
 
 // Define Sequelize model
@@ -146,8 +146,8 @@ ProductModel.init(
 class ProductRepository extends BaseRepository<ProductModel, CreateProduct, ProductDTO> {
   constructor() {
     super({
-      type: 'sequelize',
-      model: ProductModel,
+      type: ORMType.Sequelize,
+      name: 'Product',
     });
   }
 
@@ -170,7 +170,7 @@ class ProductRepository extends BaseRepository<ProductModel, CreateProduct, Prod
 ```typescript
 // src/adapters/prisma-adapter.ts
 import type { PrismaClient } from '@prisma/client';
-import type { ORMAdapter } from '@sentzunhat/zacatl';
+import { ORMAdapter } from '@sentzunhat/zacatl/service';
 
 export class PrismaAdapter<D, I, O> implements ORMAdapter<D, I, O> {
   public readonly model: any;
@@ -229,7 +229,7 @@ export class PrismaAdapter<D, I, O> implements ORMAdapter<D, I, O> {
 ### Step 2: Use Your Custom Adapter
 
 ```typescript
-import { BaseRepository } from '@sentzunhat/zacatl';
+import { BaseRepository } from '@sentzunhat/zacatl/service';
 import { PrismaClient } from '@prisma/client';
 import { PrismaAdapter } from './adapters/prisma-adapter';
 
@@ -259,20 +259,23 @@ class UserRepository extends BaseRepository<User, CreateUser, UserDTO> {
 You can use different ORMs in the same application:
 
 ```typescript
-import { BaseRepository } from '@sentzunhat/zacatl';
+import { BaseRepository, ORMType } from '@sentzunhat/zacatl/service';
 import { createClient } from 'redis';
 
 // Users in MongoDB (Mongoose)
 class UserRepository extends BaseRepository<User, CreateUser, UserDTO> {
   constructor() {
-    super({ type: 'mongoose', name: 'User', schema: userSchema });
+    super({ type: ORMType.Mongoose, name: 'User', schema: userSchema });
   }
 }
 
 // Products in PostgreSQL (Sequelize)
-class ProductRepository extends BaseRepository<Product, CreateProduct, ProductDTO> {
+class ProductRepository extends BaseRepository<ProductModel, ProductInput, ProductOutput> {
   constructor() {
-    super({ type: 'sequelize', model: ProductModel });
+    super({
+      type: ORMType.Sequelize,
+      name: 'Product',
+    });
   }
 }
 
@@ -421,7 +424,7 @@ class BaseRepository<D, I, O> {
 
 ## Examples
 
-See the [examples](../examples/) directory for complete working examples:
+See the [examples](../../examples/) directory for complete working examples:
 
 - `examples/mongoose-repository/` - Mongoose adapter usage
 - `examples/sequelize-repository/` - Sequelize adapter usage
@@ -430,7 +433,7 @@ See the [examples](../examples/) directory for complete working examples:
 
 ## Related Documentation
 
-- [ADAPTER_PATTERN_IMPLEMENTATION.md](./ADAPTER_PATTERN_IMPLEMENTATION.md) - Technical implementation details
+- [ADAPTER_PATTERN_IMPLEMENTATION.md](./overview.md) - Technical implementation details
 - [Repository Pattern](https://martinfowler.com/eaaCatalog/repository.html) - Martin Fowler's pattern reference
 
 ---
@@ -535,7 +538,7 @@ Instead of a factory layer, we keep BaseRepository as the main interface and mak
 ```typescript
 // Same API - user doesn't need to know about adapters
 const userRepo = new BaseRepository({
-  type: 'mongoose', // or 'sequelize'
+  type: ORMType.Mongoose, // or ORMType.Sequelize
   name: 'User',
   schema: userSchema,
 });

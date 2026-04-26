@@ -44,7 +44,7 @@ await sequelize.sync();
 ### Create Repository
 
 ```typescript
-import { IRepository } from '@sentzunhat/zacatl';
+import { IRepository } from '@sentzunhat/zacatl/service';
 
 class UserRepository implements IRepository<User> {
   async findById(id: string) {
@@ -76,7 +76,7 @@ class UserRepository implements IRepository<User> {
 ### Register
 
 ```typescript
-import { Service, ServiceType, ServerType, ServerVendor, DatabaseVendor } from '@sentzunhat/zacatl';
+import { Service, ServiceType, ServerType, ServerVendor, DatabaseVendor } from '@sentzunhat/zacatl/service';
 
 const service = new Service({
   type: ServiceType.SERVER,
@@ -112,7 +112,7 @@ const service = new Service({
 ```bash
 # mongoose is bundled — no install needed.
 # Use via subpath import:
-# import mongoose from '@sentzunhat/zacatl/third-party/mongoose';
+# import mongoose from '@sentzunhat/zacatl/third-party/databases/mongoose';
 ```
 
 ### Setup
@@ -167,7 +167,7 @@ class UserRepository implements IRepository<User> {
 ### Register
 
 ```typescript
-import { Service, ServiceType, DatabaseVendor } from '@sentzunhat/zacatl';
+import { Service, ServiceType, DatabaseVendor } from '@sentzunhat/zacatl/service';
 
 const service = new Service({
   type: ServiceType.SERVER,

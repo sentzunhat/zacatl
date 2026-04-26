@@ -1,6 +1,6 @@
-import { MongooseRepository } from '@sentzunhat/zacatl/service/layers/infrastructure/repositories/mongoose';
-import type { MongooseModel } from '@sentzunhat/zacatl/third-party/mongoose';
-import { singleton } from '@sentzunhat/zacatl/third-party/tsyringe';
+import { BaseRepository } from '@sentzunhat/zacatl/service/layers/infrastructure/repositories/mongoose/repository';
+import type { MongooseModel } from '@sentzunhat/zacatl/third-party/databases/mongoose';
+import { singleton } from '@sentzunhat/zacatl/third-party/dependency-injection/tsyringe';
 
 import type { CreateGreetingInput, Greeting } from '../../../../domain/entities/greeting';
 import type { GreetingRepositoryPort } from './port';
@@ -8,7 +8,7 @@ import { greetingSchema } from './schema';
 
 @singleton()
 export class GreetingRepositoryAdapter
-  extends MongooseRepository<Greeting, CreateGreetingInput, Greeting>
+  extends BaseRepository<Greeting, CreateGreetingInput, Greeting>
   implements GreetingRepositoryPort
 {
   constructor() {

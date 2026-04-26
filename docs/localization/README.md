@@ -17,7 +17,7 @@ src/localization/
 ## Quick Start (i18n-node)
 
 ```typescript
-import { configureI18nNode } from '@sentzunhat/zacatl';
+import { configureI18nNode } from '@sentzunhat/zacatl/localization';
 import i18n from '@sentzunhat/zacatl/third-party/i18n';
 
 configureI18nNode({
@@ -121,7 +121,7 @@ console.log(i18n.__('greeting', { name: 'Juan' })); // "Hola Juan"
 Extend i18n-node by loading translations from custom sources:
 
 ```typescript
-import { configureI18nNode } from '@sentzunhat/zacatl';
+import { configureI18nNode } from '@sentzunhat/zacatl/localization';
 import i18n from '@sentzunhat/zacatl/third-party/i18n';
 
 // Configure with custom locale directories

@@ -2,11 +2,50 @@
 
 A catalog of standalone, production-ready server applications demonstrating different patterns and use cases. Each example is fully functional, copy-paste deployable, and follows the same domain logic across different server frameworks and databases.
 
-> **🤖 For Agents:** See [AGENTS.md](./AGENTS.md) - Comprehensive guidance for building parallel platform examples.
-> **🐳 For Docker:** See [DOCKER.md](./DOCKER.md) - Complete Docker deployment guide and architecture explanation.
-> **💾 For Databases:** Use [dev-env](../dev-env/) to run MongoDB + PostgreSQL containers for local development.
-> **Note**: Examples use **Node.js 24+** with **npm**.
-> **📦 Dependencies:** All examples import from `@sentzunhat/zacatl` exports—see [Unified Dependency Strategy](../docs/service/dependency-exports.md) for details.
+> **🐳 For Docker:** See [docker.md](./docker.md) - Complete Docker deployment guide and architecture explanation.
+> **💾 For Databases:** Use [dev-env]() to run MongoDB + PostgreSQL containers for local development.
+> **Note**: Examples use **Node.js 26+** with **npm**.
+> **📦 Dependencies:** All examples import from `@zacatl/*` paths — see [shared/zacatl-build-paths.json](./shared/zacatl-build-paths.json) for the standard tsconfig mapping. Run `npm run build` at the repo root before type-checking examples against compiled output.
+
+## Screenshots
+
+Each example implements the same greeting CRUD flow. Screenshots are captured automatically via Playwright:
+
+```bash
+npm run screenshots:examples:capture   # requires Docker
+```
+
+**Re-run this command whenever you change any example's frontend UI.** The script builds each Docker image, boots it, performs create/delete, and saves three PNGs per example to `examples/screenshots/{name}/`.
+
+### Fastify + SQLite + React · Fastify + SQLite + Svelte
+
+| | Initial | After Create | After Delete |
+|---|---------|-------------|--------------|
+| **React** | ![](./screenshots/fastify-sqlite-react/01-initial.png) | ![](./screenshots/fastify-sqlite-react/02-after-create.png) | ![](./screenshots/fastify-sqlite-react/03-after-delete.png) |
+| **Svelte** | ![](./screenshots/fastify-sqlite-svelte/01-initial.png) | ![](./screenshots/fastify-sqlite-svelte/02-after-create.png) | ![](./screenshots/fastify-sqlite-svelte/03-after-delete.png) |
+
+### Fastify + PostgreSQL + React · Fastify + MongoDB + React
+
+| | Initial | After Create | After Delete |
+|---|---------|-------------|--------------|
+| **PostgreSQL** | ![](./screenshots/fastify-postgres-react/01-initial.png) | ![](./screenshots/fastify-postgres-react/02-after-create.png) | ![](./screenshots/fastify-postgres-react/03-after-delete.png) |
+| **MongoDB** | ![](./screenshots/fastify-mongodb-react/01-initial.png) | ![](./screenshots/fastify-mongodb-react/02-after-create.png) | ![](./screenshots/fastify-mongodb-react/03-after-delete.png) |
+
+### Express + SQLite + React · Express + SQLite + Svelte
+
+| | Initial | After Create | After Delete |
+|---|---------|-------------|--------------|
+| **React** | ![](./screenshots/express-sqlite-react/01-initial.png) | ![](./screenshots/express-sqlite-react/02-after-create.png) | ![](./screenshots/express-sqlite-react/03-after-delete.png) |
+| **Svelte** | ![](./screenshots/express-sqlite-svelte/01-initial.png) | ![](./screenshots/express-sqlite-svelte/02-after-create.png) | ![](./screenshots/express-sqlite-svelte/03-after-delete.png) |
+
+### Express + PostgreSQL + React · Express + MongoDB + React
+
+| | Initial | After Create | After Delete |
+|---|---------|-------------|--------------|
+| **PostgreSQL** | ![](./screenshots/express-postgres-react/01-initial.png) | ![](./screenshots/express-postgres-react/02-after-create.png) | ![](./screenshots/express-postgres-react/03-after-delete.png) |
+| **MongoDB** | ![](./screenshots/express-mongodb-react/01-initial.png) | ![](./screenshots/express-mongodb-react/02-after-create.png) | ![](./screenshots/express-mongodb-react/03-after-delete.png) |
+
+---
 
 ### Choose Your Framework & Database
 
@@ -22,6 +61,8 @@ A catalog of standalone, production-ready server applications demonstrating diff
   - `express-sqlite-svelte/` - Express + SQLite + Svelte (Backend: 8181)
   - `express-mongodb-react/` - Express + MongoDB + React (Backend: 8182)
   - `express-postgres-react/` - Express + PostgreSQL + React (Backend: 8183)
+- **Desktop experiment**
+  - `neutralino-react-transformers-webgpu/` - Neutralinojs + React + Transformers.js + WebGPU prototype
 
 **All examples include:**
 
@@ -178,7 +219,7 @@ cd fastify-mongodb-react && npm install && npm run dev
 
 ## 🏗️ Shared Code
 
-### [shared/domain/](./shared/domain/)
+### [shared/domain/](./shared/)
 
 Reusable business logic and data models used across all backend examples.
 
@@ -195,49 +236,61 @@ Reusable business logic and data models used across all backend examples.
 
 ## � Endpoint Specification
 
-All backend examples implement these 5 identical endpoints:
+All backend examples implement these 5 identical endpoints under the `/api` prefix:
 
 ### Create Greeting
 
-**POST** `/greetings`
+**POST** `/api/greetings`
 
 ```json
-Request:  { "message": "Hello" }
-Response: { "id": "uuid", "message": "Hello", "createdAt": "2024-01-01T00:00:00Z" }
+Request:  { "message": "Hello", "language": "en" }
+Response: { "id": "uuid", "message": "Hello", "language": "en", "createdAt": "2024-01-01T00:00:00Z" }
 ```
 
 ### List Greetings
 
-**GET** `/greetings`
+**GET** `/api/greetings?language=en`
 
 ```json
-Response: { "data": [ { "id": "uuid", "message": "Hello", "createdAt": "..." } ] }
+Response: [ { "id": "uuid", "message": "Hello", "language": "en", "createdAt": "..." } ]
+```
+
+> Plain JSON array — no `{ data: [...] }` wrapper.
+
+### Get Random Greeting
+
+**GET** `/api/greetings/random/{language}`
+
+```json
+Response: { "id": "uuid", "message": "Hello", "language": "en", "createdAt": "..." }
 ```
 
 ### Get Single Greeting
 
-**GET** `/greetings/{id}`
+**GET** `/api/greetings/{id}`
 
 ```json
-Response: { "id": "uuid", "message": "Hello", "createdAt": "..." }
+Response: { "id": "uuid", "message": "Hello", "language": "en", "createdAt": "..." }
 ```
 
 ### Update Greeting
 
-**PATCH** `/greetings/{id}`
+**PATCH** `/api/greetings/{id}`
 
 ```json
 Request:  { "message": "Updated" }
-Response: { "id": "uuid", "message": "Updated", "createdAt": "..." }
+Response: { "id": "uuid", "message": "Updated", "language": "en", "createdAt": "..." }
 ```
 
 ### Delete Greeting
 
-**DELETE** `/greetings/{id}`
+**DELETE** `/api/greetings/{id}`
 
 ```json
-Response: { "id": "uuid", "deleted": true }
+Response: { "success": true }
 ```
+
+> **Fastify note:** Do not send `Content-Type: application/json` on DELETE — Fastify rejects requests where the header is set but the body is empty.
 
 ---
 
@@ -294,8 +347,7 @@ cd express-mongodb-react && npm install && npm run dev
 
 ## 📚 Additional Resources
 
-- **[AGENTS.md](./AGENTS.md)** - Guidance for AI agents building new examples
-- **[shared/domain/README.md](./shared/domain/README.md)** - Domain logic documentation
+- 
 
 ---
 
@@ -305,11 +357,14 @@ Each example should pass:
 
 - [ ] `npm install` succeeds
 - [ ] `npm run dev` starts server on assigned port without errors
-- [ ] All 5 endpoints respond with valid JSON
-- [ ] Database operations (CRUD) work correctly
+- [ ] All endpoints respond with valid JSON
+- [ ] Database operations (CRUD) work correctly — create, list, delete
 - [ ] README.md documents setup and port usage
 - [ ] `.env.example` provided with all required variables
 - [ ] `npm run build` produces no errors
+- [ ] `npm run type:check` passes at repo root
+- [ ] `npm run lint` passes at repo root
+- [ ] Screenshots updated: `npm run screenshots:examples:capture` (requires Docker)
 
 ---
 
@@ -317,18 +372,19 @@ Each example should pass:
 
 To add a new example:
 
-1. Follow the structure in [AGENTS.md](./AGENTS.md)
 2. Use identical endpoints as other examples
 3. Reuse shared domain logic from `shared/domain/`
 4. Document setup steps in README.md
 5. Include `.env.example` with all environment variables
+6. Run `npm run screenshots:examples:capture` and commit the new screenshots under `examples/screenshots/{name}/`
+
+**When editing an existing example's frontend UI**, always re-run `npm run screenshots:examples:capture` and commit the updated PNGs alongside your code changes. The script handles Docker build + boot + capture automatically.
 
 ---
 
 ## 📞 Support
 
-See [AGENTS.md - Quick Diagnosis Checklist](./AGENTS.md#quick-diagnosis-checklist) for common issues and solutions.
 
 ---
 
-**Last Updated:** February 4, 2026
+**Last Updated:** July 9, 2026

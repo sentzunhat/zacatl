@@ -4,27 +4,29 @@
 [![npm downloads](https://img.shields.io/npm/dm/@sentzunhat/zacatl.svg)](https://www.npmjs.com/package/@sentzunhat/zacatl)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0)
 [![TypeScript](https://img.shields.io/badge/%3C%2F%3E-TypeScript-3178c6.svg)](https://www.typescriptlang.org/)
-[![Node.js 24+](https://img.shields.io/badge/Node.js-24%2B-brightgreen.svg)](https://nodejs.org/)
+[![Node.js 26+](https://img.shields.io/badge/Node.js-26%2B-brightgreen.svg)](https://nodejs.org/)
 [![Build](https://github.com/sentzunhat/zacatl/actions/workflows/publish-dry.yml/badge.svg)](https://github.com/sentzunhat/zacatl/actions/workflows/publish-dry.yml)
-[![Tests: 461](https://img.shields.io/badge/Tests-461-blue.svg)](#tests)
-[![Coverage: 75.93%](https://img.shields.io/badge/Coverage-75.93%25-yellow.svg)](https://img.shields.io/badge/Coverage-75.94%25-yellow.svg)
+[![Tests: 555](https://img.shields.io/badge/Tests-555-blue.svg)](#tests)
+[![Coverage: 85.96%](https://img.shields.io/badge/Coverage-85.96%25-yellow.svg)](https://img.shields.io/badge/Coverage-85.96%25-yellow.svg)
 
 **Universal TypeScript framework for building APIs, CLI tools, and distributed systems.**
 
 Zacatl enforces layered (hexagonal) architecture with built-in dependency injection, type-safe validation, and structured error handling — designed for both human developers and AI agents to collaborate effectively.
 
+Zacatl was built with the help of AI models and digital agents, and is intentionally designed to be navigable by both humans and automated tooling alike.
+
 ## ✨ What You Get
 
-| Capability                  | Detail                                                         |
-| --------------------------- | -------------------------------------------------------------- |
-| 🏗️ Layered Architecture     | Strict Application → Domain → Infrastructure → Platform layers |
-| 💉 Dependency Injection     | Built-in DI container via `tsyringe`                           |
-| ✅ Type-Safe Validation     | Zod schema support; Yup and optional validation planned        |
-| 🛡️ Structured Errors        | 7 custom error types with correlation IDs                      |
-| 🗄️ Pluggable ORM Adapters   | Sequelize, Mongoose, built-in SQLite (Node 24+), or custom     |
-| 🌐 Internationalization     | Pluggable i18n with filesystem/memory adapters                 |
-| 📝 Production Observability | Structured logging and error tracking                          |
-| 🧪 Tested                   | Vitest — test count and coverage shown in badges above         |
+| Capability                  | Detail                                                            |
+| --------------------------- | ----------------------------------------------------------------- |
+| 🏗️ Layered Architecture     | Strict Application → Domain → Infrastructure → Platform layers    |
+| 💉 Dependency Injection     | Built-in DI container via `tsyringe`                              |
+| ✅ Type-Safe Validation     | Zod schema support; Yup and optional validation planned           |
+| 🛡️ Structured Errors        | 7 custom error types with correlation IDs                         |
+| 🗄️ Pluggable ORM Adapters   | Sequelize, Mongoose, built-in SQLite via `node:sqlite`, or custom |
+| 🌐 Internationalization     | Pluggable i18n with filesystem/memory adapters                    |
+| 📝 Production Observability | Structured logging and error tracking                             |
+| 🧪 Tested                   | Vitest — test count and coverage shown in badges above            |
 
 ## 🏗️ Architecture
 
@@ -62,7 +64,7 @@ npm install @sentzunhat/zacatl
 
 ```typescript
 import Fastify from 'fastify';
-import { Service, ServiceType, ServerType, ServerVendor } from '@sentzunhat/zacatl';
+import { Service, ServiceType, ServerType, ServerVendor } from '@sentzunhat/zacatl/service';
 
 const fastify = Fastify();
 
@@ -90,17 +92,18 @@ See [examples/](./examples/) for production-ready starters (Express, Fastify × 
 
 | Module                 | Import path                               |
 | ---------------------- | ----------------------------------------- |
-| Service                | `@sentzunhat/zacatl`                      |
+| Service                | `@sentzunhat/zacatl/service`              |
 | Configuration          | `@sentzunhat/zacatl/configuration`        |
 | Dependency Injection   | `@sentzunhat/zacatl/dependency-injection` |
-| Errors                 | `@sentzunhat/zacatl`                      |
-| Logs                   | `@sentzunhat/zacatl`                      |
-| Localization           | `@sentzunhat/zacatl`                      |
+| Errors                 | `@sentzunhat/zacatl/error`                |
+| Logs                   | `@sentzunhat/zacatl/logs`                 |
+| Localization           | `@sentzunhat/zacatl/localization`         |
+| Utils                  | `@sentzunhat/zacatl/utils`                |
 | Third-party re-exports | `@sentzunhat/zacatl/third-party/*`        |
 
 ## 📖 Documentation
 
-Full docs live in **[`docs/`](./docs/README.md)**. New contributors start with **[START_HERE.md](./docs/START_HERE.md)**.
+Full docs live in **[`docs/`](./docs/README.md)**. New contributors start with **[START_HERE.md](./docs/start-here.md)**.
 
 | Topic                 | Link                                                                             |
 | --------------------- | -------------------------------------------------------------------------------- |
@@ -125,9 +128,9 @@ npm run test:coverage    # Coverage report
 
 ## 📋 Requirements
 
-- **Node.js**: 24.14.0+ (LTS)
-- **npm**: 11.0.0+ (bundled with Node 24)
-- **TypeScript**: 5.9+
+- **Node.js**: 26.0.0+
+- **npm**: 11.0.0+
+- **TypeScript**: 6.0+
 
 ## 🤝 Contributing
 
@@ -135,10 +138,10 @@ npm run test:coverage    # Coverage report
 2. Branch off it: `git checkout -b issue-<number>/type/description`
 3. Add tests, update docs, commit with [Conventional Commits](https://www.conventionalcommits.org/).
 
-See [CONTRIBUTING.md](./.github/CONTRIBUTING.md) for the full guide.
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for the full guide.
 
 ## 📄 License
 
-[Apache License 2.0](./LICENSE) © 2025 Zacatl Contributors
+[Apache License 2.0](./LICENSE) © 2026 Zacatl Contributors
 
 > Zacatl is permissively licensed. Please don't use it to harm people.

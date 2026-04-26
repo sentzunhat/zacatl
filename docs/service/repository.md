@@ -1,17 +1,26 @@
 # Repository Pattern API
 
-Multi-ORM repository implementation supporting Mongoose and Sequelize with unified interface.
+Repository primitives for Mongoose, Sequelize, and Node.js SQLite.
 
 ## BaseRepository
 
-Abstract base class providing ORM-agnostic data access with immediate model availability.
+Abstract base class providing ORM-agnostic data access with immediate model availability for **Mongoose**, **Sequelize**, and **node:sqlite**.
 
 ### Features
 
 - **Sync initialization** - models ready immediately after construction
-- **Multi-ORM support** - unified interface for Mongoose and Sequelize
+- **Multi-ORM support** - unified interface for Mongoose, Sequelize, and node:sqlite
 - **Direct model access** - use `this.model` for ORM-specific queries
 - **Type-safe** - full TypeScript support with model type assertions
+
+## Which class should I use?
+
+- **Default for fixed ORM repositories**:
+  - `AbstractMongooseRepository` for Mongoose-only repositories
+  - `AbstractSequelizeRepository` for Sequelize-only repositories
+  - `AbstractNodeSqliteRepository` for `node:sqlite` repositories
+- **Use `BaseRepository`** when the same repository shape may switch between Mongoose, Sequelize, and node:sqlite via config.
+- **Use adapters directly (`MongooseAdapter`, `SequelizeAdapter`, `NodeSqliteAdapter`)** only for framework extension or very advanced low-level use. For application repositories, prefer abstract repository classes.
 
 ## API Reference
 
@@ -32,14 +41,15 @@ export abstract class BaseRepository<D, I, O> {
   toLean(input: unknown): O | null;
   isMongoose(): boolean;
   isSequelize(): boolean;
+  isNodeSqlite(): boolean;
 }
 ```
 
 ## Sequelize Example
 
 ```typescript
-import { BaseRepository, ORMType, LeanDocument } from '@sentzunhat/zacatl';
-import { ModelStatic } from '@sentzunhat/zacatl/third-party/sequelize';
+import { BaseRepository, ORMType, LeanDocument } from '@sentzunhat/zacatl/service';
+import { ModelStatic } from '@sentzunhat/zacatl/third-party/databases/sequelize';
 import { UserModel } from './models/user.model';
 
 interface User
@@ -55,7 +65,7 @@ class UserRepository extends BaseRepository<UserModel, CreateUser, User> {
   constructor() {
     super({
       type: ORMType.Sequelize,
-      model: UserModel,
+      name: 'User',
     });
   }
 
@@ -71,8 +81,8 @@ class UserRepository extends BaseRepository<UserModel, CreateUser, User> {
 ## Mongoose Example
 
 ```typescript
-import { BaseRepository, ORMType, LeanWithMeta } from '@sentzunhat/zacatl';
-import { MongooseModel } from '@sentzunhat/zacatl/third-party/mongoose';
+import { BaseRepository, ORMType, LeanWithMeta } from '@sentzunhat/zacatl/service';
+import { MongooseModel } from '@sentzunhat/zacatl/third-party/databases/mongoose';
 import { Schema } from 'mongoose';
 
 interface User
@@ -129,27 +139,19 @@ interface OutputType {
 
 Use the library's base types to enforce this contract:
 
-**Mongoose:**
+**All ORMs:**
 
 ```typescript
-import { LeanWithMeta } from '@sentzunhat/zacatl';
-
-type User = LeanWithMeta<{
-  email: string;
-  role: string;
-}>;
-```
-
-**Sequelize:**
-
-```typescript
-import { LeanDocument } from '@sentzunhat/zacatl';
+import { LeanDocument } from '@sentzunhat/zacatl/service';
 
 type User = LeanDocument<{
   email: string;
   role: string;
 }>;
 ```
+
+> **Note:** `LeanDocument<T>` is the shared output shape for repository results.
+> Mongoose also exposes `LeanWithMeta<T>` as a backward-compatible alias.
 
 These base types automatically include `id`, `createdAt`, and `updatedAt` with correct types.
 
@@ -172,18 +174,17 @@ type MongooseRepositoryConfig<D> = {
 ```typescript
 type SequelizeRepositoryConfig<D extends object> = {
   readonly type: ORMType.Sequelize;
-  readonly model: ModelStatic<SequelizeModel<D>>;
+  readonly name: string; // registered Sequelize model name
 };
 ```
 
 ## Dependency Injection
 
 ```typescript
-import { service, NotFoundError } from '@sentzunhat/zacatl';
-import { singleton } from 'tsyringe';
+import { NotFoundError } from '@sentzunhat/zacatl/error';
+import { singleton, inject } from '@sentzunhat/zacatl/third-party/dependency-injection/tsyringe';
 
 @singleton()
-@service()
 class UserService {
   constructor(private userRepo: UserRepository) {}
 
@@ -219,6 +220,7 @@ async getUserById(id: string): Promise<User | null> {
 ### ORM-Specific Queries
 
 ```typescript
+// After the ORM connection is ready, use the provider-specific model directly.
 // Sequelize
 const active = await(this.model as ModelStatic<UserModel>).findAll({
   where: { isActive: true },

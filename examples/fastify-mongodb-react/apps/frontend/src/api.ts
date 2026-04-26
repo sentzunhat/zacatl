@@ -53,7 +53,7 @@ const unwrapResponse = <T>(payload: unknown): T => {
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const headers: HeadersInit = {
-    'Content-Type': 'application/json',
+    ...(init?.body != null ? { 'Content-Type': 'application/json' } : {}),
     ...getAuthHeaders(),
     ...(init?.headers ?? {}),
   };

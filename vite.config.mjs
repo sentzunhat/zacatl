@@ -9,22 +9,28 @@ const __dirname = path.dirname(__filename);
 export default defineConfig({
   resolve: {
     extensions: ['.ts', '.tsx', '.js', '.mjs', '.json'],
-    alias: {
-      '@zacatl/configuration': path.resolve(__dirname, './src/configuration'),
-      '@zacatl/dependency-injection': path.resolve(__dirname, './src/dependency-injection'),
-      '@zacatl/error': path.resolve(__dirname, './src/error'),
-      '@zacatl/localization': path.resolve(__dirname, './src/localization'),
-      '@zacatl/logs': path.resolve(__dirname, './src/logs'),
-      '@zacatl/orm': path.resolve(__dirname, './src/service/layers/infrastructure/orm'),
-      '@zacatl/service': path.resolve(__dirname, './src/service'),
-      '@zacatl/utils': path.resolve(__dirname, './src/utils'),
-      '@zacatl/third-party': path.resolve(__dirname, './src/third-party'),
-      '@zacatl/optionals': path.resolve(__dirname, './src/utils/optionals.ts'),
-      '@zacatl/infrastructure': path.resolve(__dirname, './src/service/layers/infrastructure'),
-      '@zacatl/domain': path.resolve(__dirname, './src/service/layers/domain'),
-      '@zacatl/application': path.resolve(__dirname, './src/service/layers/application'),
-      '@zacatl/platform': path.resolve(__dirname, './src/service/platforms'),
-    },
+    alias: [
+      // Exact-match entries first (regex) — prevent subpath bleed-through
+      { find: /^@zacatl\/service$/, replacement: path.resolve(__dirname, './src/service/service.ts') },
+      // Specific subpath prefixes before shorter ones
+      { find: '@zacatl/third-party/databases/mongoose', replacement: path.resolve(__dirname, './src/third-party/databases/mongoose') },
+      { find: '@zacatl/third-party/databases/sequelize', replacement: path.resolve(__dirname, './src/third-party/databases/sequelize') },
+      { find: '@zacatl/optionals', replacement: path.resolve(__dirname, './src/utils/optionals.ts') },
+      { find: '@zacatl/orm', replacement: path.resolve(__dirname, './src/service/layers/infrastructure/orm') },
+      { find: '@zacatl/infrastructure', replacement: path.resolve(__dirname, './src/service/layers/infrastructure') },
+      { find: '@zacatl/domain', replacement: path.resolve(__dirname, './src/service/layers/domain') },
+      { find: '@zacatl/application', replacement: path.resolve(__dirname, './src/service/layers/application') },
+      { find: '@zacatl/platform', replacement: path.resolve(__dirname, './src/service/platforms') },
+      // Generic prefixes after specific ones
+      { find: '@zacatl/configuration', replacement: path.resolve(__dirname, './src/configuration') },
+      { find: '@zacatl/dependency-injection', replacement: path.resolve(__dirname, './src/dependency-injection') },
+      { find: '@zacatl/error', replacement: path.resolve(__dirname, './src/error') },
+      { find: '@zacatl/localization', replacement: path.resolve(__dirname, './src/localization') },
+      { find: '@zacatl/logs', replacement: path.resolve(__dirname, './src/logs') },
+      { find: '@zacatl/service', replacement: path.resolve(__dirname, './src/service') },
+      { find: '@zacatl/utils', replacement: path.resolve(__dirname, './src/utils') },
+      { find: '@zacatl/third-party', replacement: path.resolve(__dirname, './src/third-party') },
+    ],
   },
   test: {
     globals: true,

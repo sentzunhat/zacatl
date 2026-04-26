@@ -63,8 +63,8 @@ curl http://localhost:8083/greetings
 
 ```bash
 # From repository root
-docker build -f examples/fastify-postgres-react/Dockerfile \
-  -t zacatl-fastify-postgres .
+docker build --build-arg EXAMPLE=fastify-postgres-react \
+  -f examples/Dockerfile -t zacatl-fastify-postgres-react .
 
 # Or use docker-compose
 cd examples/fastify-postgres-react
@@ -80,12 +80,12 @@ docker compose up -d
 
 - PostgreSQL runs in a separate container via docker-compose
 - Backend connects using `DATABASE_URL` environment variable
-- See [DOCKER.md](../../DOCKER.md) for multi-example setup
+- See [docker.md](../docker.md) for multi-example setup
 
 ## Documentation
 
 - **Examples Catalog**: [../README.md](../README.md)
-- **Start Here**: [../../docs/START_HERE.md](../../docs/START_HERE.md)
+- **Start Here**: [../../docs/start-here.md](../../docs/start-here.md)
 - **Framework Overview**: [../../docs/guidelines/framework-overview.md](../../docs/guidelines/framework-overview.md)
 - **Framework Database Guide**: [../../docs/third-party/orm/database-setup.md](../../docs/third-party/orm/database-setup.md)
 - **Service Module**: [../../docs/service/README.md](../../docs/service/README.md)

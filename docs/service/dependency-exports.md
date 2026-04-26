@@ -6,7 +6,7 @@ Zacatl consolidates all third-party dependencies into **single point of control*
 
 ### Core Principle
 
-**All examples and consuming applications import dependencies exclusively from `@sentzunhat/zacatl` and its subpath exports**, never directly from `npm` packages.
+**All examples and consuming applications import dependencies from `@sentzunhat/zacatl/*` subpath exports**, never directly from standalone `npm` packages.
 
 ---
 
@@ -69,18 +69,18 @@ import {
 
 ```typescript
 // Mongoose (MongoDB ODM)
-import { mongoose, Schema, Model, Document } from '@sentzunhat/zacatl/third-party/mongoose';
+import { mongoose, Schema, Model, Document } from '@sentzunhat/zacatl/third-party/databases/mongoose';
 
 // Sequelize (SQL ORM)
-import { Sequelize, DataTypes, Op } from '@sentzunhat/zacatl/third-party/sequelize';
+import { Sequelize, DataTypes, Op } from '@sentzunhat/zacatl/third-party/databases/sequelize';
 ```
 
 #### Utilities
 
 ```typescript
 // Dependency Injection
-import '@sentzunhat/zacatl/third-party/reflect-metadata';
-import { container } from '@sentzunhat/zacatl/dependency-injection';
+import '@sentzunhat/zacatl/third-party/dependency-injection/reflect-metadata';
+import { container } from '@sentzunhat/zacatl/third-party/dependency-injection/tsyringe';
 
 // Validation
 import { z } from '@sentzunhat/zacatl/third-party/zod';
@@ -120,8 +120,8 @@ import { z } from 'zod';
 // ✅ Import from library
 import { express } from '@sentzunhat/zacatl/third-party/express';
 import { Fastify } from '@sentzunhat/zacatl/third-party/fastify';
-import { mongoose } from '@sentzunhat/zacatl/third-party/mongoose';
-import { Sequelize } from '@sentzunhat/zacatl/third-party/sequelize';
+import { mongoose } from '@sentzunhat/zacatl/third-party/databases/mongoose';
+import { Sequelize } from '@sentzunhat/zacatl/third-party/databases/sequelize';
 import { v4 as uuidv4 } from '@sentzunhat/zacatl/third-party/uuid';
 import { z } from '@sentzunhat/zacatl/third-party/zod';
 ```
@@ -131,9 +131,9 @@ import { z } from '@sentzunhat/zacatl/third-party/zod';
 ## Complete Example: Express + MongoDB
 
 ```typescript
-import '@sentzunhat/zacatl/third-party/reflect-metadata';
+import '@sentzunhat/zacatl/third-party/dependency-injection/reflect-metadata';
 import { express, Application } from '@sentzunhat/zacatl/third-party/express';
-import { mongoose, Schema } from '@sentzunhat/zacatl/third-party/mongoose';
+import { mongoose, Schema } from '@sentzunhat/zacatl/third-party/databases/mongoose';
 import { z } from '@sentzunhat/zacatl/third-party/zod';
 import { v4 as uuidv4 } from '@sentzunhat/zacatl/third-party/uuid';
 import {
@@ -191,6 +191,11 @@ await service.start({ port: 4000 });
 - `build-src-esm/` → `build/esm/`
 - `build-src-cjs/` → `build/cjs/`
 
+Before writing the export map, `prepare-publish.ts` prunes nested `index.*`
+barrels from `publish/build/{esm,cjs}` unless they are still exported entry
+points. That keeps the tarball focused on the public surface without deleting
+subpaths that `publish/package.json` still exposes.
+
 **Local development**: The root `package.json` **does NOT** include an exports map. Consuming examples and applications resolve subpath imports via direct file system access:
 
 ```
@@ -213,6 +218,10 @@ No manual `tsconfig paths` config is needed because builds use real files, not v
 ```
 
 (Note: paths are `build/esm/` and `build/cjs/` in published package; `build-src-esm/` and `build-src-cjs/` in development)
+
+Nested `index.*` barrel files are pruned from the published tarball. Consumers
+should import explicit leaf modules or named entry files that are exported from
+`publish/package.json`.
 
 ### Development vs Publish Export Patterns
 
@@ -312,8 +321,8 @@ export * from './express';
 export * from './http-proxy-middleware';
 
 // ✅ ORM exports available via subpaths to avoid conflicts
-// @sentzunhat/zacatl/third-party/mongoose
-// @sentzunhat/zacatl/third-party/sequelize
+// @sentzunhat/zacatl/third-party/databases/mongoose
+// @sentzunhat/zacatl/third-party/databases/sequelize
 ```
 
 ### Step 2: Remove Duplicate Dependencies from Examples
@@ -357,7 +366,7 @@ import mongoose from 'mongoose';
 // ✅ After
 import { express } from '@sentzunhat/zacatl/third-party/express';
 import { Fastify } from '@sentzunhat/zacatl/third-party/fastify';
-import { mongoose } from '@sentzunhat/zacatl/third-party/mongoose';
+import { mongoose } from '@sentzunhat/zacatl/third-party/databases/mongoose';
 ```
 
 ### Step 4: Run Integration Tests
@@ -370,7 +379,7 @@ npm install
 npm run build
 
 # Run examples to verify imports resolve
-npm run backend:start
+cd examples/fastify-sqlite-react && npm run dev
 ```
 
 ---

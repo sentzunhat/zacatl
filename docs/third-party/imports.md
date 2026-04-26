@@ -51,7 +51,7 @@ export default [
 For Mongoose types and model utilities:
 
 ```typescript
-import { mongoose, Schema, type Mongoose } from '@sentzunhat/zacatl/third-party/mongoose';
+import { mongoose, Schema, type Mongoose } from '@sentzunhat/zacatl/third-party/databases/mongoose';
 ```
 
 **Use case:** Model definitions and repositories that target MongoDB without importing mongoose at the main entry.
@@ -59,12 +59,16 @@ import { mongoose, Schema, type Mongoose } from '@sentzunhat/zacatl/third-party/
 **Example:**
 
 ```typescript
-import { mongoose, Schema, type Mongoose } from '@sentzunhat/zacatl/third-party/mongoose';
-import { BaseRepository, ORMType } from '@sentzunhat/zacatl';
+import { mongoose, Schema, type Mongoose } from '@sentzunhat/zacatl/third-party/databases/mongoose';
+import { BaseRepository, ORMType } from '@sentzunhat/zacatl/service';
 
-class UserRepository extends BaseRepository<UserModel, CreateUser, User> {
-  constructor() {
-    super({ type: ORMType.Mongoose, model: UserModel });
+class UserRepository extends BaseRepository<User, CreateUser, User> {
+  constructor(schema: Schema<User>) {
+    super({
+      type: ORMType.Mongoose,
+      name: 'User',
+      schema,
+    });
   }
 }
 ```
@@ -78,7 +82,7 @@ import {
   Sequelize,
   DataTypes,
   SequelizeModel as Model,
-} from '@sentzunhat/zacatl/third-party/sequelize';
+} from '@sentzunhat/zacatl/third-party/databases/sequelize';
 ```
 
 **Use case:** Model definitions and repositories that target SQL databases without importing sequelize at the main entry.
@@ -90,12 +94,15 @@ import {
   DataTypes,
   SequelizeModel as Model,
   type Sequelize,
-} from '@sentzunhat/zacatl/third-party/sequelize';
-import { BaseRepository, ORMType } from '@sentzunhat/zacatl';
+} from '@sentzunhat/zacatl/third-party/databases/sequelize';
+import { BaseRepository, ORMType } from '@sentzunhat/zacatl/service';
 
 class UserRepository extends BaseRepository<UserModel, CreateUser, User> {
   constructor() {
-    super({ type: ORMType.Sequelize, model: UserModel });
+    super({
+      type: ORMType.Sequelize,
+      name: 'User',
+    });
   }
 }
 ```
@@ -123,13 +130,13 @@ Use `@sentzunhat/zacatl/third-party/*` for **code that handles external dependen
 
 ```typescript
 // ✅ For exported database adapters
-export { MongooseAdapter } from '@sentzunhat/zacatl/third-party/mongoose';
+export { MongooseAdapter } from '@sentzunhat/zacatl/third-party/databases/mongoose';
 
 // ✅ For optional ORM support in repos
-import type { Mongoose } from '@sentzunhat/zacatl/third-party/mongoose';
+import type { Mongoose } from '@sentzunhat/zacatl/third-party/databases/mongoose';
 
 // ✅ For lazy-loaded infrastructure
-const adapter = await import('@sentzunhat/zacatl/third-party/mongoose');
+const adapter = await import('@sentzunhat/zacatl/third-party/databases/mongoose');
 ```
 
 ---
@@ -162,7 +169,7 @@ import { tseslint, tsEslintParser } from '@sentzunhat/zacatl/third-party/eslint'
 
 ```typescript
 // ✅ CORRECT - Isolated type import, no bundle bloat
-import type { Mongoose } from '@sentzunhat/zacatl/third-party/mongoose';
+import type { Mongoose } from '@sentzunhat/zacatl/third-party/databases/mongoose';
 
 class UserRepository {
   constructor(mongoose: Mongoose) {
@@ -182,7 +189,7 @@ import type { Mongoose } from 'mongoose';
 
 ```typescript
 // ✅ CORRECT - Core functionality
-import { BaseRepository, Service } from '@sentzunhat/zacatl';
+import { BaseRepository, Service } from '@sentzunhat/zacatl/service';
 
 // ✅ CORRECT - Actual mongoose usage (in code path that needs it)
 import mongoose from 'mongoose';
@@ -194,42 +201,63 @@ await mongoose.connect(url);
 ## Real-World Example: Multi-Adapter Repository
 
 ```typescript
-import type { Mongoose } from '@sentzunhat/zacatl/third-party/mongoose';
-import type { Sequelize } from '@sentzunhat/zacatl/third-party/sequelize';
-import { BaseRepository, ORMType } from '@sentzunhat/zacatl';
+import type { Mongoose } from '@sentzunhat/zacatl/third-party/databases/mongoose';
+import type { ModelStatic } from '@sentzunhat/zacatl/third-party/databases/sequelize';
+import { BaseRepository, ORMType } from '@sentzunhat/zacatl/service';
 
-type DatabaseInstance = Mongoose | Sequelize;
+interface UserModel {
+  id: string;
+  email: string;
+}
 
-export class UserRepository extends BaseRepository<User, DatabaseInstance> {
-  constructor(private db: DatabaseInstance) {
-    const isMongoose = (db: DatabaseInstance): db is Mongoose => {
-      return 'connect' in db;
-    };
+interface User {
+  id: string;
+  email: string;
+}
 
-    const config = isMongoose(db)
-      ? {
+interface CreateUser {
+  email: string;
+}
+
+declare const userSchema: object;
+
+type Runtime = 'mongoose' | 'sequelize';
+
+export class UserRepository extends BaseRepository<UserModel, CreateUser, User> {
+  constructor(runtime: Runtime) {
+    const config =
+      runtime === 'mongoose'
+        ? {
           type: ORMType.Mongoose,
-          instance: db,
           schema: userSchema,
           name: 'User',
         }
-      : {
+        : {
           type: ORMType.Sequelize,
-          instance: db,
-          model: UserModel,
+          name: 'User',
         };
 
     super(config);
+  }
+
+  async findByEmail(email: string): Promise<User | null> {
+    if (this.isMongoose()) {
+      const user = await (this.model as Mongoose['models'][string]).findOne({ email }).lean().exec();
+      return this.toLean(user);
+    }
+
+    const user = await (this.model as ModelStatic<UserModel>).findOne({ where: { email } });
+    return this.toLean(user);
   }
 }
 ```
 
 This approach:
 
-- ✅ Bundles **neither** mongoose nor sequelize by default
-- ✅ **Types work** regardless of which ORM is installed
-- ✅ **Lazy loading** at runtime when needed
-- ✅ **Clean imports** without workarounds
+- ✅ Keeps repository config aligned with the current DI-token based ORM resolution
+- ✅ Uses valid `BaseRepository` config for either supported ORM
+- ✅ Preserves clean type-only imports for optional dependencies
+- ✅ Keeps custom queries available through `this.model`
 
 ---
 
@@ -239,7 +267,9 @@ This approach:
 
 ```typescript
 // ✅ Always available
-import { Service, BaseRepository, singleton, logger } from '@sentzunhat/zacatl';
+import { logger } from '@sentzunhat/zacatl/logs';
+import { Service, BaseRepository } from '@sentzunhat/zacatl/service';
+import { singleton } from '@sentzunhat/zacatl/third-party/dependency-injection/tsyringe';
 ```
 
 ### Subpath: `/eslint`
@@ -256,20 +286,20 @@ import { recommended, baseConfig } from '@sentzunhat/zacatl/eslint';
 import { tseslint, tsEslintParser } from '@sentzunhat/zacatl/third-party/eslint';
 ```
 
-### Subpath: `/third-party/mongoose`
+### Subpath: `/third-party/databases/mongoose`
 
 ```typescript
 // ✅ Mongoose types and adapters
-import type { Mongoose } from '@sentzunhat/zacatl/third-party/mongoose';
-import { MongooseAdapter } from '@sentzunhat/zacatl/third-party/mongoose';
+import type { Mongoose } from '@sentzunhat/zacatl/third-party/databases/mongoose';
+import { MongooseAdapter } from '@sentzunhat/zacatl/third-party/databases/mongoose';
 ```
 
-### Subpath: `/third-party/sequelize`
+### Subpath: `/third-party/databases/sequelize`
 
 ```typescript
 // ✅ Sequelize types and adapters
-import type { Sequelize } from '@sentzunhat/zacatl/third-party/sequelize';
-import { SequelizeAdapter } from '@sentzunhat/zacatl/third-party/sequelize';
+import type { Sequelize } from '@sentzunhat/zacatl/third-party/databases/sequelize';
+import { SequelizeAdapter } from '@sentzunhat/zacatl/third-party/databases/sequelize';
 ```
 
 ---
@@ -280,7 +310,7 @@ When you import only what you need:
 
 ```typescript
 // ✅ This import...
-import type { Mongoose } from '@sentzunhat/zacatl/third-party/mongoose';
+import type { Mongoose } from '@sentzunhat/zacatl/third-party/databases/mongoose';
 
 // ...is tree-shaken away if mongoose is never actually used
 // Final bundle = Zero mongoose overhead
@@ -290,7 +320,7 @@ vs.
 
 ```typescript
 // ❌ This import...
-import { BaseRepository, mongooseSupport } from '@sentzunhat/zacatl';
+import { BaseRepository, mongooseSupport } from '@sentzunhat/zacatl/service';
 
 // ...bundles ALL ORMs by default
 // Final bundle = mongoose + sequelize + better-sqlite3 + types
@@ -316,7 +346,7 @@ import { BaseRepository, mongooseSupport } from '@sentzunhat/zacatl';
 
 **A:** No - it is purely a bundling optimization. At runtime, all imports resolve to the same dependencies.
 
-### Q: What's the difference between `third-party/mongoose` and plain `mongoose`?
+### Q: What's the difference between `third-party/databases/mongoose` and plain `mongoose`?
 
 **A:** Both reference the same package at runtime. The subpath is for:
 

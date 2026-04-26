@@ -1,0 +1,11 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "display": "Zacatl build output paths (copy REL prefix for your example depth)",
+  "compilerOptions": {
+    "paths": {
+      "@sentzunhat/zacatl/*": ["REL/build-src-esm/*"],
+      "@sentzunhat/zacatl/third-party": ["REL/build-src-esm/third-party/index.ts"],
+      "@sentzunhat/zacatl/third-party/*": ["REL/build-src-esm/third-party/*"]
+    }
+  }
+}

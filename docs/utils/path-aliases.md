@@ -2,7 +2,7 @@
 
 > ⚠️ **INTERNAL DEVELOPMENT ONLY**: The aliases documented here (`@zacatl/*`) are internal path aliases used **within the Zacatl repository** during development. These are **NOT available** to users of the `@sentzunhat/zacatl` package.
 >
-> **For users:** Import from `@sentzunhat/zacatl` and its subpaths as shown in [Third-Party Dependencies](../third-party/README.md).
+> **For users:** Import from explicit `@sentzunhat/zacatl/*` subpaths (no root barrel). See [Third-Party Dependencies](../third-party/README.md) and the [main README](../../README.md#-public-api-modules).
 
 Zacatl uses TypeScript path aliases internally for cleaner imports during development.
 
@@ -40,8 +40,8 @@ import { z } from '@zacatl/third-party';
 
 ```typescript
 // ORM packages are NOT in main exports - use subpath imports:
-import { mongoose, Schema } from '@sentzunhat/zacatl/third-party/mongoose';
-import { Sequelize, DataTypes } from '@sentzunhat/zacatl/third-party/sequelize';
+import { mongoose, Schema } from '@sentzunhat/zacatl/third-party/databases/mongoose';
+import { Sequelize, DataTypes } from '@sentzunhat/zacatl/third-party/databases/sequelize';
 ```
 
 ## How Users Should Import
@@ -50,14 +50,9 @@ If you're using Zacatl in your project, import from the published package:
 
 ```typescript
 // ✅ Correct - Public API imports
-import {
-  Service,
-  ServiceType,
-  ServerVendor,
-  BaseRepository,
-  NotFoundError,
-} from '@sentzunhat/zacatl';
-import { mongoose } from '@sentzunhat/zacatl/third-party/mongoose';
+import { NotFoundError } from '@sentzunhat/zacatl/error';
+import { Service, ServiceType, ServerVendor, BaseRepository } from '@sentzunhat/zacatl/service';
+import { mongoose } from '@sentzunhat/zacatl/third-party/databases/mongoose';
 
 // ❌ Wrong - Internal aliases don't work in user projects
 import { Service } from '@zacatl/service'; // This won't resolve
@@ -105,7 +100,7 @@ import { logger } from '@zacatl/logs';
 
 ## Native Subpath Imports (`#/*`)
 
-Node 24 native subpath imports are configured in `package.json` alongside the TypeScript path aliases:
+Node.js native subpath imports are configured in `package.json` alongside the TypeScript path aliases:
 
 ```json
 {
@@ -122,7 +117,7 @@ import { UserService } from '#/application/user.service';
 import { requestContext } from '#/service/platforms/context';
 ```
 
-> **Note:** `#/*` imports require Node 24.14.0+ and are for internal module use within the repository. They are not exported in the published package.
+> **Note:** `#/*` imports are for internal module use within the repository and are not exported in the published package.
 
 ## Usage in Your Project
 

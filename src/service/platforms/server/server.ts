@@ -3,14 +3,16 @@ import type { FastifyInstance } from 'fastify';
 
 import { CustomError, InternalServerError } from '@zacatl/error';
 
-import { ExpressApiAdapter, FastifyApiAdapter } from './api/adapters';
 import { ApiServer } from './api/api-server';
 import type { ApiServerPort } from './api/port';
 import { DatabaseServer } from './database/database-server';
 import type { DatabaseConfig } from './database/port';
-import { ExpressPageAdapter, FastifyPageAdapter } from './page/adapters';
 import { PageServer } from './page/page-server';
 import type { PageServerPort } from './page/port';
+import { createApiAdapter as createExpressApiAdapter } from './providers/express/api-adapter';
+import { createPageAdapter as createExpressPageAdapter } from './providers/express/page-adapter';
+import { createApiAdapter as createFastifyApiAdapter } from './providers/fastify/api-adapter';
+import { createPageAdapter as createFastifyPageAdapter } from './providers/fastify/page-adapter';
 import { ServerVendor, type HttpServerConfig, type PageServerConfig } from './types/server-config';
 import type { RestApplicationEntryPoints } from '../../layers/application/types';
 
@@ -60,19 +62,19 @@ export class Server {
     api: ApiServerPort;
     page: PageServerPort;
   } {
-    const apiPrefix = config.apiPrefix ?? '';
+    const prefixes = config.prefixes?.api ?? '';
 
     if (config.vendor === ServerVendor.FASTIFY) {
       const instance = config.instance as FastifyInstance;
       return {
-        api: new FastifyApiAdapter(instance, apiPrefix),
-        page: new FastifyPageAdapter(instance),
+        api: createFastifyApiAdapter(instance, prefixes),
+        page: createFastifyPageAdapter(instance),
       };
     } else if (config.vendor === ServerVendor.EXPRESS) {
       const instance = config.instance as Express;
       return {
-        api: new ExpressApiAdapter(instance, apiPrefix),
-        page: new ExpressPageAdapter(instance),
+        api: createExpressApiAdapter(instance, prefixes),
+        page: createExpressPageAdapter(instance),
       };
     } else {
       throw new InternalServerError({
@@ -150,6 +152,14 @@ export class Server {
    */
   public getDatabaseServer(): DatabaseServer | undefined {
     return this.databaseServer;
+  }
+
+  /**
+   * Stop the server: close HTTP connections and disconnect all databases.
+   */
+  public async stop(): Promise<void> {
+    await this.apiServer?.close();
+    await this.databaseServer?.disconnect();
   }
 
   /**

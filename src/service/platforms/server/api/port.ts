@@ -1,4 +1,5 @@
-import type { HookHandler, RouteHandler } from '../../../layers/application';
+import type { RouteHandler } from '../../../layers/application/entry-points/rest/fastify/handlers/route-handler';
+import type { HookHandler } from '../../../layers/application/entry-points/rest/hook-handlers/hook-handler';
 
 export interface ProxyConfig {
   upstream: string;
@@ -16,5 +17,6 @@ export interface ApiServerPort {
   registerHook(handler: HookHandler): void;
   registerProxy(config: ProxyConfig): void;
   listen(port: number): Promise<void>;
+  close(): Promise<void>;
   getRawServer(): unknown;
 }

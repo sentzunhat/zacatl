@@ -17,14 +17,9 @@
 Import everything from one place:
 
 ```typescript
-import {
-  Service,
-  BaseRepository,
-  mongoose,
-  Schema,
-  Sequelize,
-  DataTypes,
-} from '@sentzunhat/zacatl';
+import { Service, BaseRepository } from '@sentzunhat/zacatl/service';
+import { mongoose, Schema } from '@sentzunhat/zacatl/third-party/databases/mongoose';
+import { Sequelize, DataTypes } from '@sentzunhat/zacatl/third-party/databases/sequelize';
 ```
 
 **When to use:**
@@ -41,10 +36,10 @@ import {
 Import ORMs separately:
 
 ```typescript
-import { Service, BaseRepository } from '@sentzunhat/zacatl';
-import { mongoose, Schema } from '@sentzunhat/zacatl/third-party/mongoose';
+import { Service, BaseRepository } from '@sentzunhat/zacatl/service';
+import { mongoose, Schema } from '@sentzunhat/zacatl/third-party/databases/mongoose';
 // OR
-import { Sequelize, DataTypes } from '@sentzunhat/zacatl/third-party/sequelize';
+import { Sequelize, DataTypes } from '@sentzunhat/zacatl/third-party/databases/sequelize';
 ```
 
 **When to use:**
@@ -63,7 +58,8 @@ import { Sequelize, DataTypes } from '@sentzunhat/zacatl/third-party/sequelize';
 **Style 1 - Main Package:**
 
 ```typescript
-import { Service, BaseRepository, ORMType, mongoose, Schema } from '@sentzunhat/zacatl';
+import { Service, BaseRepository, ORMType } from '@sentzunhat/zacatl/service';
+import { mongoose, Schema } from '@sentzunhat/zacatl/third-party/databases/mongoose';
 
 const UserSchema = new Schema({
   name: String,
@@ -84,8 +80,8 @@ class UserRepository extends BaseRepository {
 **Style 2 - Subpath (Minimal):**
 
 ```typescript
-import { Service, BaseRepository, ORMType } from '@sentzunhat/zacatl';
-import { mongoose, Schema } from '@sentzunhat/zacatl/third-party/mongoose';
+import { Service, BaseRepository, ORMType } from '@sentzunhat/zacatl/service';
+import { mongoose, Schema } from '@sentzunhat/zacatl/third-party/databases/mongoose';
 
 const UserSchema = new Schema({
   name: String,
@@ -110,7 +106,8 @@ class UserRepository extends BaseRepository {
 **Style 1 - Main Package:**
 
 ```typescript
-import { Service, BaseRepository, ORMType, Sequelize, DataTypes } from '@sentzunhat/zacatl';
+import { Service, BaseRepository, ORMType } from '@sentzunhat/zacatl/service';
+import { Sequelize, DataTypes } from '@sentzunhat/zacatl/third-party/databases/sequelize';
 
 const sequelize = new Sequelize('sqlite::memory:');
 
@@ -132,8 +129,8 @@ class UserRepository extends BaseRepository {
 **Style 2 - Subpath (Minimal):**
 
 ```typescript
-import { Service, BaseRepository, ORMType } from '@sentzunhat/zacatl';
-import { Sequelize, DataTypes } from '@sentzunhat/zacatl/third-party/sequelize';
+import { Service, BaseRepository, ORMType } from '@sentzunhat/zacatl/service';
+import { Sequelize, DataTypes } from '@sentzunhat/zacatl/third-party/databases/sequelize';
 
 const sequelize = new Sequelize('sqlite::memory:');
 
@@ -160,11 +157,12 @@ If you were importing ORMs from zacatl, **no changes needed** - both styles work
 
 ```typescript
 // v0.0.22 and v0.0.23+ - Still works ✅
-import { Service, mongoose, Schema } from '@sentzunhat/zacatl';
+import { Service } from '@sentzunhat/zacatl/service';
+import { mongoose, Schema } from '@sentzunhat/zacatl/third-party/databases/mongoose';
 
 // v0.0.23+ New option - Minimal bundle
-import { Service } from '@sentzunhat/zacatl';
-import { mongoose, Schema } from '@sentzunhat/zacatl/third-party/mongoose';
+import { Service } from '@sentzunhat/zacatl/service';
+import { mongoose, Schema } from '@sentzunhat/zacatl/third-party/databases/mongoose';
 ```
 
 ---
@@ -183,7 +181,7 @@ import {
   connect,
   connection,
   MongooseModel, // Type only
-} from '@sentzunhat/zacatl/third-party/mongoose';
+} from '@sentzunhat/zacatl/third-party/databases/mongoose';
 ```
 
 ### Sequelize
@@ -196,7 +194,7 @@ import {
   Op,
   ModelStatic, // Type only
   SequelizeOptions, // Type only
-} from '@sentzunhat/zacatl/third-party/sequelize';
+} from '@sentzunhat/zacatl/third-party/databases/sequelize';
 ```
 
 ---

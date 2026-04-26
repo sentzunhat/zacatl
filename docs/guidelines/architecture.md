@@ -19,14 +19,13 @@ This guide covers folder structure, layering patterns, module boundaries, and de
 
 ```
 src/
-├── index.ts                    # Main barrel export
 ├── configuration/              # Config loading & validation
 ├── dependency-injection/       # DI container wrappers
 ├── error/                      # Error classes & types
 ├── logs/                       # Logging abstractions
 ├── localization/               # i18n/translation adapters
 ├── service/                    # Service orchestration
-│   ├── types/                  # Service types (ServiceType, etc.)
+│   ├── types.ts                # Service types (ServiceType, etc.)
 │   ├── platforms/              # Platform implementations
 │   │   ├── server/             # HTTP server, database adapters
 │   │   │   ├── api/
@@ -37,13 +36,14 @@ src/
 │   │   │       └── adapters/   # Mongoose, Sequelize & SQLite DB adapters
 │   │   ├── cli/                # CLI platform
 │   │   ├── desktop/            # Desktop platform
-│   │   └── context/            # AsyncLocalStorage request context (Node 24)
+│   │   └── context/            # AsyncLocalStorage request context
 │   ├── layers/                 # Application, Domain, Infrastructure
 │   │   ├── application/        # Use cases, handlers, ports
 │   │   ├── domain/             # Business logic, services
 │   │   └── infrastructure/     # Repositories, adapters
 │   │       └── orm/
 │   │           ├── mongoose/   # Mongoose adapter & lazy loader
+│   │           ├── nodesqlite/ # Node sqlite adapter
 │   │           └── sequelize/  # Sequelize adapter & lazy loader
 │   └── service.ts              # Main Service class
 ├── third-party/                # Framework & library wrappers
@@ -51,6 +51,7 @@ src/
 │   ├── fastify.ts              # Fastify export
 │   ├── mongoose.ts             # Mongoose export
 │   ├── sequelize.ts            # Sequelize export
+│   ├── sqlite3.ts              # sqlite3 export
 │   ├── zod.ts                  # Zod export
 │   └── ...other libs
 └── utils/                      # Utility functions
@@ -101,9 +102,10 @@ src/
   utils/misc/types/  # Too deep
 ```
 
-### Max Folder Depth
+### Folder Depth in Practice
 
-Keep folder nesting to **3–4 levels deep**:
+Most modules stay around **3-4 levels deep**, but service entry-point and adapter
+paths are intentionally deeper to preserve clear boundaries.
 
 ```
 // ✅ Good (3 levels)
@@ -112,15 +114,15 @@ src/
     layers/
       application/
 
-// ❌ Too deep (5+ levels)
+// ✅ Expected deep path in current service module
 src/
   service/
     layers/
       application/
         entry-points/
           rest/
-            handlers/
-              concrete/
+            fastify/
+              handlers/
 ```
 
 ---
@@ -150,8 +152,7 @@ src/service/layers/application/
 │   ├── rest/           # HTTP routes
 │   │   └── handlers/   # Method-specific handlers
 │   └── cli/            # CLI commands
-├── types/
-└── index.ts
+└── types.ts
 
 // Example Handler
 export abstract class GetRouteHandler<TResponse> {
@@ -218,7 +219,7 @@ export class GreetingService {
 **Contains:**
 
 - Repository implementations
-- Database clients (Mongoose, Sequelize)
+- Database clients (Mongoose, Sequelize, node sqlite)
 - External API clients
 - Logger adapters
 
@@ -312,47 +313,78 @@ Platforms → (orchestrates all layers)
 
 ## Module Organization
 
-### Index.ts Pattern (Barrel Exports)
+### Named Module Files
 
-Every meaningful folder has an `index.ts` that re-exports public APIs:
+Every top-level module gets a facade file **as a sibling of its folder**,
+not inside it — `src/error.ts` next to `src/error/`, not `src/error/error.ts`:
+
+```
+src/
+├── error.ts          # facade — the only public entrypoint for this module
+└── error/
+    ├── bad-request.ts
+    ├── unauthorized.ts
+    └── custom.ts
+```
 
 ```typescript
-// src/error/index.ts
-export * from './bad-request';
-export * from './unauthorized';
-export * from './custom';
-export type { CustomErrorsArgs } from './custom';
+// src/error.ts
+export * from './error/bad-request';
+export * from './error/unauthorized';
+export * from './error/custom';
+export type { CustomErrorsArgs } from './error/custom';
 
 // Usage
 import { BadRequestError, UnauthorizedError } from '@zacatl/error';
 ```
 
+**Why sibling, not nested — this is not a style preference:**
+
+TypeScript/Node module resolution always prefers a **file** over a
+same-named **directory** when both exist. `src/error.ts` sitting next to
+`src/error/` means a bare import (`from '../error'`, or the public
+`@zacatl/error` subpath) resolves straight to the facade file — no
+`index.ts` required anywhere. If the facade lived *inside* the folder
+instead (`src/error/error.ts`), the bare import `'../error'` would need
+Node to fall back to directory-index resolution (`error/index.ts`) to work
+without an explicit `/error` suffix on the import — which reintroduces
+exactly the barrel-file indirection this convention exists to avoid.
+
+**Adding a new top-level module — do both, in the same commit:**
+
+1. Create the folder: `src/<name>/` with its real implementation files.
+2. Create the sibling facade: `src/<name>.ts` at `src/` root, re-exporting
+   what should be public.
+
+No script or generated file needs manual updates for this — `npm run build`
+already handles it dynamically:
+- `scripts/dev/sync-local-exports.ts` walks `build-src-esm/` recursively and
+  adds every top-level `<name>.js` it finds to `package.json`'s `exports`
+  map automatically (see `scripts/publish/export-policy.ts` for the exact
+  policy — top-level facade files are always exported; nested `index.*`
+  files are not, unless explicitly allowlisted).
+- `scripts/publish/prune-barrels.ts` (wired into `postbuild`) removes any
+  dead nested `index.*` files left behind, using that same exports map as
+  its source of truth.
+- `scripts/dev/generate-tsconfig-paths.ts` recursively regenerates
+  `tsconfig.base.json`'s `@zacatl/*` path aliases from whatever exists
+  under `src/` — run `npm run paths:generate` after adding a new module if
+  you need the alias for local test imports.
+
 **Benefits:**
 
-- Cleaner imports (`from "@zacatl/error"` vs `from "@zacatl/error/bad-request"`)
-- Single point for public vs. internal APIs
-- Easier refactoring (move files without breaking imports)
+- Prefer explicit module files over barrel files
+- Keep public subpaths stable in package exports
+- Make folder-level entrypoints opt-in rather than implicit
 
-### Barrel Annotation System
+### Module Entry Files
 
-Every `index.ts` barrel carries a one-line header that declares ownership:
+Prefer concrete entry files for public modules and keep imports pointed at the specific module
+file that owns the exports. This keeps module boundaries explicit and avoids directory-level
+index barrels.
 
-```typescript
-// @barrel-generated — do not edit manually
-// (generator rewrites this file on every run)
-
-// @barrel-manual
-// (custom shape — exports are maintained by hand)
-```
-
-**`@barrel-generated`** — The file is fully managed by `npm run barrels:generate`. Exports are
-always alphabetically sorted. Do not edit manually; your changes will be overwritten.
-
-**`@barrel-manual`** — The file has a custom shape (e.g. `export type`, backward-compat aliases,
-JSDoc header, or ORM isolation). The generator ignores it entirely.
-
-Use `npm run barrels:verify` to confirm no generated barrels have drifted from the committed state.
-This runs automatically in CI (`publish-dry.yml`), in `prepublish:only`, and in `publish:dry:ci`.
+When a module needs a small public façade, document it in the owning folder README instead of
+relying on generated barrel headers or automation.
 
 ### Per-Module Documentation
 
@@ -437,63 +469,226 @@ Use adapters to abstract third-party libraries and frameworks:
 
 ### Framework Adapters (Express, Fastify)
 
-```typescript
-// src/service/layers/application/entry-points/rest/fastify/handlers/abstract.ts
-export abstract class AbstractRouteHandler<TRequest, TResponse> {
-  abstract execute(input: TRequest): Promise<TResponse>;
+**Don't extend `AbstractRouteHandler` directly.** It exists as the shared base
+(handles error mapping, reply sending, and the `RouteSchema` shape) but is **not
+exported** from the top-level `@sentzunhat/zacatl/service` barrel. Every consumer —
+library code and example apps alike — must use one of the **named, method-bound
+handlers** instead:
 
-  async handle(request: FastifyRequest): Promise<TResponse> {
-    // Framework-specific to domain translation
-    const input = this.validateRequest(request);
-    return this.execute(input);
+| Named handler       | HTTP method | Import path (Fastify)                                                                          |
+| ------------------- | ----------- | ----------------------------------------------------------------------------------------------- |
+| `GetRouteHandler`    | GET         | `@sentzunhat/zacatl/service/layers/application/entry-points/rest/fastify/handlers/get-route-handler` |
+| `PostRouteHandler`   | POST        | `.../fastify/handlers/post-route-handler`                                                        |
+| `PutRouteHandler`    | PUT         | `.../fastify/handlers/put-route-handler`                                                         |
+| `PatchRouteHandler`  | PATCH       | `.../fastify/handlers/patch-route-handler`                                                       |
+| `DeleteRouteHandler` | DELETE      | `.../fastify/handlers/delete-route-handler`                                                      |
+
+Swap `fastify` for `express` in the path for the Express variants. Each named
+class sets `method` for you at construction time — you never pass `method`
+yourself, which removes an entire class of "wrong verb wired to this route"
+bugs.
+
+```typescript
+// ✅ Fastify — named handler, method is implicit
+import type { Request } from '@sentzunhat/zacatl/service/layers/application/entry-points/rest/fastify/handlers/abstract';
+import { PostRouteHandler } from '@sentzunhat/zacatl/service/layers/application/entry-points/rest/fastify/handlers/post-route-handler';
+
+export class CreateGreetingHandler extends PostRouteHandler<CreateGreetingBody, void, GreetingResponse> {
+  constructor(private readonly greetingService: GreetingServiceAdapter) {
+    super({ url: '/greetings', schema: { body: CreateGreetingBodySchema } });
+  }
+
+  async handler(request: Request<CreateGreetingBody>): Promise<GreetingResponse> {
+    return this.greetingService.createGreeting(request.body);
   }
 }
 
-// Same pattern for Express
-export abstract class AbstractRouteHandler<TRequest, TResponse> {
-  abstract execute(input: TRequest): Promise<TResponse>;
+// ✅ Express — same named-handler pattern, different Request generic order
+// Express Request is <Params, ResBody, ReqBody, Query>; Fastify Request is <Body, Query, Params, Headers>.
+import type { Request } from '@sentzunhat/zacatl/third-party/express';
+import { PostRouteHandler } from '@sentzunhat/zacatl/service/layers/application/entry-points/rest/express/handlers/post-route-handler';
 
-  async handle(req: Request, res: Response): Promise<void> {
-    const input = this.validateRequest(req);
-    const result = await this.execute(input);
-    res.json(result);
+export class CreateGreetingHandler extends PostRouteHandler<CreateGreetingBody, void, GreetingResponse> {
+  async handler(request: Request<void, GreetingResponse, CreateGreetingBody, void>): Promise<GreetingResponse> {
+    return this.greetingService.createGreeting(request.body);
   }
+}
+
+// ❌ Don't do this — AbstractRouteHandler is internal, and 'method' becomes a
+// stringly-typed footgun the named handlers exist to remove.
+import { AbstractRouteHandler } from '@sentzunhat/zacatl/service'; // not exported — will fail to compile
+export class CreateGreetingHandler extends AbstractRouteHandler<CreateGreetingBody, void, GreetingResponse> {
+  method = 'POST'; // easy to typo, easy to leave stale after a refactor
 }
 ```
 
-### Database Adapters
+**Why this matters for examples/consumer apps:** if a handler still imports
+`AbstractRouteHandler` from `@sentzunhat/zacatl/service`, it is using a stale
+API and will fail `tsc --noEmit`. Grep for `AbstractRouteHandler` outside of
+`src/service/**` as a stale-API signal.
+
+### Database Adapters — Named Repository Pattern
+
+Same rule as handlers and providers: the exported class name is identical
+across every ORM vendor; only the file path differs. Each vendor's
+`repository.ts` exports `BaseRepository` — the `Base` prefix signals "this
+is abstract, extend it" (satisfying the `naming-conventions.mjs` lint rule
+for exported abstract classes), and the vendor is resolved entirely by which
+path you import from:
+
+```
+src/service/layers/infrastructure/repositories/
+├── mongoose/
+│   └── repository.ts    # BaseRepository (Mongoose)
+├── sequelize/
+│   └── repository.ts    # BaseRepository (Sequelize)
+└── nodesqlite/
+    └── repository.ts    # BaseRepository (node:sqlite)
+```
 
 ```typescript
-// Repository Port (Domain)
-export interface GreetingPort {
-  findAll(): Promise<Greeting[]>;
-  save(input: CreateGreetingInput): Promise<Greeting>;
+// ✅ Sequelize — import the vendor you need, name is always BaseRepository
+import { BaseRepository } from '@sentzunhat/zacatl/service/layers/infrastructure/repositories/sequelize/repository';
+
+export class GreetingRepositoryAdapter extends BaseRepository<
+  GreetingModel,
+  CreateGreetingInput,
+  Greeting
+> {
+  // Concrete repository — domain never sees Sequelize, Mongoose, or
+  // node:sqlite directly.
 }
 
-// Mongoose Implementation
-export class MongooseGreetingRepository implements GreetingPort {
-  constructor(private mongoose: Mongoose) {}
-  async findAll() {
-    /* ... */
-  }
-  async save(input) {
-    /* ... */
-  }
-}
+// ✅ Mongoose — same name, different path
+import { BaseRepository } from '@sentzunhat/zacatl/service/layers/infrastructure/repositories/mongoose/repository';
 
-// Sequelize Implementation
-export class SequelizeGreetingRepository implements GreetingPort {
-  constructor(private sequelize: Sequelize) {}
-  async findAll() {
-    /* ... */
-  }
-  async save(input) {
-    /* ... */
-  }
+export class GreetingRepositoryAdapter extends BaseRepository<
+  Greeting,
+  CreateGreetingInput,
+  Greeting
+> {
+  // ...
 }
-
-// Domain doesn't know which implementation is used!
 ```
+
+Domain code depends only on the port (`RepositoryPort` / a domain-specific
+port like `GreetingRepositoryPort`), never on which ORM adapter is wired up.
+
+### Naming Rule: How an Exported Abstract Class Signals "Extend Me"
+
+`src/eslint/naming-conventions.mjs` enforces this with **one rule, one
+allowlist** — not a base rule plus scattered independent exemptions. An
+exported abstract class must do one of:
+
+- **end in a role suffix** from the single `ABSTRACT_ROLE_SUFFIXES` array
+  (currently `Handler`, `Repository`) — the role noun itself signals
+  "extend this" (`GetRouteHandler`, `BaseRepository`'s per-vendor
+  siblings), **or**
+- **start with `Abstract` or `Base`** when the name doesn't end in one of
+  those suffixes.
+
+Both are the same semantic signal ("this class is abstract, extend it"),
+expressed two ways depending on whether the class already has a
+self-describing role name. Adding a new role that should skip the prefix
+requirement means adding one entry to `ABSTRACT_ROLE_SUFFIXES` — not a new
+standalone filter block. This intentionally does **not** cover the
+`Adapter`-suffix rule, the `Error`-suffix rule, or the exact-match
+orchestration-class allowlist (`Service`, `Domain`, `Infrastructure`,
+etc.) elsewhere in the same file — those govern unrelated naming concerns,
+not the abstract-extend signal.
+
+### Named Provider Pattern (Platform Adapters)
+
+Same rule again: the exported factory name is identical across every vendor;
+only the file path differs. `src/service/platforms/server/providers/` uses
+**named factory functions**, not classes or an `AbstractProvider` base, to
+implement a port per vendor:
+
+```
+src/service/platforms/server/
+├── api/
+│   └── port.ts              # ApiServerPort interface (the contract)
+├── page/
+│   └── port.ts               # PageServerPort interface (the contract)
+└── providers/
+    ├── fastify/
+    │   ├── api-adapter.ts     # createApiAdapter(): ApiServerPort
+    │   └── page-adapter.ts    # createPageAdapter(): PageServerPort
+    └── express/
+        ├── api-adapter.ts     # createApiAdapter(): ApiServerPort
+        ├── page-adapter.ts    # createPageAdapter(): PageServerPort
+        └── schema-helper.ts   # Express-only: manual Zod validation helper
+```
+
+**Naming convention:** `create<Kind>Adapter(...): <Kind>Port` — no vendor
+prefix on the function name; the vendor is the path you import from.
+
+```typescript
+// ✅ Port — the contract, framework-agnostic
+export interface ApiServerPort {
+  registerRoute(handler: RouteHandler): void;
+  registerHook(handler: HookHandler): void;
+  registerProxy(config: ProxyConfig): void;
+  listen(port: number): Promise<void>;
+  getRawServer(): unknown;
+}
+
+// ✅ Named provider — one factory function per vendor path, no shared base class
+// providers/fastify/api-adapter.ts
+export const createApiAdapter = (
+  server: FastifyInstance,
+  apiPrefix = '',
+): ApiServerPort => ({
+  registerRoute: (handler) => { /* fastify-specific wiring */ },
+  registerHook: (handler) => { /* ... */ },
+  registerProxy: (config) => { /* ... */ },
+  listen: async (port) => { /* ... */ },
+  getRawServer: () => server,
+});
+
+// providers/express/api-adapter.ts — same name, different path
+export const createApiAdapter = (
+  server: Express,
+  apiPrefix = '',
+): ApiServerPort => ({
+  // Same port, different wiring — Express has no schema/type-provider
+  // integration, so it needs its own `applyZodSchema` helper (schema-helper.ts)
+  // to validate body/query/params before calling the handler.
+  registerRoute: (handler) => { /* express-specific wiring */ },
+  registerHook: (handler) => { /* ... */ },
+  registerProxy: (config) => { /* ... */ },
+  listen: async (port) => { /* ... */ },
+  getRawServer: () => server,
+});
+```
+
+**Why factory functions instead of an `AbstractApiProvider` class:**
+
+- No inheritance to reason about — each vendor's quirks stay local to its own file
+- The port (`ApiServerPort`/`PageServerPort`) is the only shared contract; there is
+  nothing to override or call `super()` on
+- Easier to unit test: construct the adapter with a mock server instance, assert
+  against the returned plain object
+
+**The one exception — `server.ts`.** It's the single file that wires up
+*both* vendors together (it runtime-selects Fastify vs Express from config),
+so it's the one place that needs vendor-prefixed local aliases at the import
+site, since two same-named imports would collide in one file:
+
+```typescript
+// service/platforms/server/server.ts
+import { createApiAdapter as createExpressApiAdapter } from './providers/express/api-adapter';
+import { createApiAdapter as createFastifyApiAdapter } from './providers/fastify/api-adapter';
+```
+
+This is expected and correct — vendor selection here is genuinely a runtime
+decision, not a per-file consumer choice like everywhere else.
+
+**Always test each named provider against its port contract.** Every adapter in
+`providers/<vendor>/` has a matching test in
+`test/unit/service/platforms/server/providers/<vendor>/`; when adding a new
+vendor (e.g. a `koa` adapter), add its test file in the same pass — don't let
+implementation and coverage drift apart.
 
 ---
 
@@ -508,9 +703,9 @@ Configure short import paths for better readability:
   "compilerOptions": {
     "baseUrl": "./",
     "paths": {
-      "@zacatl/configuration": ["src/configuration/index.ts"],
-      "@zacatl/error": ["src/error/index.ts"],
-      "@zacatl/service": ["src/service/index.ts"],
+      "@zacatl/configuration": ["src/configuration.ts"],
+      "@zacatl/error": ["src/error.ts"],
+      "@zacatl/service": ["src/service/service.ts"],
       "@zacatl/*": ["src/*"]
     }
   }
@@ -544,10 +739,10 @@ import { logger } from '@zacatl/logs';
 ```json
 {
   "exports": {
-    ".": {
-      "types": "./build/esm/index.d.ts",
-      "import": "./build/esm/index.js",
-      "require": "./build/cjs/index.js"
+    "./service": {
+      "types": "./build/esm/service/index.d.ts",
+      "import": "./build/esm/service/index.js",
+      "require": "./build/cjs/service/index.js"
     },
     "./third-party/fastify": {
       "types": "./build/esm/third-party/fastify.d.ts",
@@ -555,9 +750,9 @@ import { logger } from '@zacatl/logs';
       "require": "./build/cjs/third-party/fastify.js"
     },
     "./error": {
-      "types": "./build/esm/error/index.d.ts",
-      "import": "./build/esm/error/index.js",
-      "require": "./build/cjs/error/index.js"
+      "types": "./build/esm/error.d.ts",
+      "import": "./build/esm/error.js",
+      "require": "./build/cjs/error.js"
     }
   }
 }
@@ -570,7 +765,7 @@ import { logger } from '@zacatl/logs';
 import { FastifyInstance } from '@zacatl/third-party/fastify';
 
 // ✅ Core library imports
-import { Service } from '@sentzunhat/zacatl';
+import { Service } from '@sentzunhat/zacatl/service';
 import { BadRequestError } from '@zacatl/error';
 ```
 
@@ -955,4 +1150,4 @@ export const loadJSON = <T>(filePath: string, schema: ZodSchema<T>): T => {
 | DI Pattern    | Constructor injection via container     |
 | Adapters      | One per framework/database variant      |
 | Imports       | Path aliases + consistent order         |
-| Index Files   | Barrel exports in every module          |
+| Entry Files   | Facade `.ts` sibling per module; no nested barrels |

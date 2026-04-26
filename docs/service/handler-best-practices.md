@@ -18,7 +18,7 @@ Zacatl handlers follow a **lean, generic approach**:
 Fetch a single resource by ID:
 
 ```typescript
-import { GetRouteHandler } from '@sentzunhat/zacatl/service';
+import { GetRouteHandler } from '@sentzunhat/zacatl/service/layers/application/entry-points/rest/fastify/handlers/get-route-handler';
 import type User from '../domain';
 import { UserService } from '../domain';
 
@@ -73,7 +73,7 @@ export class GetUserHandler extends GetRouteHandler<
 Create a new resource:
 
 ```typescript
-import { PostRouteHandler } from '@sentzunhat/zacatl/service';
+import { PostRouteHandler } from '@sentzunhat/zacatl/service/layers/application/entry-points/rest/fastify/handlers/post-route-handler';
 import type { CreateUserInput } from '../domain';
 import { UserService } from '../domain';
 
@@ -422,7 +422,7 @@ export class UpdateUserHandler extends PutRouteHandler<
 Verify JWT and attach user to request:
 
 ```typescript
-import type { HookHandler } from '@sentzunhat/zacatl/service';
+import type { HookHandler } from '@sentzunhat/zacatl/service/layers/application/entry-points/rest/hook-handlers/hook-handler';
 
 export const AuthHook: HookHandler = {
   name: 'preHandler',
@@ -465,7 +465,7 @@ new Service({
 Log request details:
 
 ```typescript
-import type { HookHandler } from '@sentzunhat/zacatl/service';
+import type { HookHandler } from '@sentzunhat/zacatl/service/layers/application/entry-points/rest/hook-handlers/hook-handler';
 
 export const LoggingHook: HookHandler = {
   name: 'onRequest',

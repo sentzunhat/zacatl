@@ -61,7 +61,7 @@ container.registerSingleton(CreateHandler, CreateHandler);
 
 ```typescript
 import { Service } from '@sentzunhat/zacatl/service';
-import { ServiceType, ServerType, ServerVendor, DatabaseVendor } from '@sentzunhat/zacatl';
+import { ServiceType, ServerType, ServerVendor, DatabaseVendor } from '@sentzunhat/zacatl/service';
 
 const serviceConfig = {
   type: ServiceType.SERVER,
@@ -121,7 +121,7 @@ All handlers **MUST** extend `AbstractRouteHandler`:
 ```typescript
 import { injectable, inject } from 'tsyringe';
 import { AbstractRouteHandler } from '@sentzunhat/zacatl/service';
-import { HttpMethod } from '@sentzunhat/zacatl';
+import { HttpMethod } from '@sentzunhat/zacatl/service';
 import { GreetingService } from '../domain/services/greeting.service';
 
 interface CreateBody {

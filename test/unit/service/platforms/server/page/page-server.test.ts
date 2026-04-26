@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-import type { ConfigServer } from '../../../../../../src/service/platforms/server';
+import type { ConfigServer } from '../../../../../../src/service/platforms/server/server';
 import { PageServer } from '../../../../../../src/service/platforms/server/page/page-server';
 import type {
   PageServerPort,
@@ -48,23 +48,26 @@ describe('PageServer', () => {
       await pageServer.configure();
 
       expect(adapter.registerStaticFiles).toHaveBeenCalledWith({ root: './dist/client' });
-      expect(adapter.registerSpaFallback).toHaveBeenCalledWith('/api', './dist/client');
+      expect(adapter.registerSpaFallback).toHaveBeenCalledWith({ api: '/api' }, './dist/client');
     });
 
-    it('should use configured apiPrefix for SPA fallback guard', async () => {
-      pageServer = new PageServer(makeConfig({ staticDir: './dist', apiPrefix: '/v1' }), adapter);
+    it('should use configured prefixes for SPA fallback guard', async () => {
+      pageServer = new PageServer(makeConfig({ staticDir: './dist', prefixes: { api: '/v1' } }), adapter);
 
       await pageServer.configure();
 
-      expect(adapter.registerSpaFallback).toHaveBeenCalledWith('/v1', './dist');
+      expect(adapter.registerSpaFallback).toHaveBeenCalledWith({ api: '/v1' }, './dist');
     });
 
-    it('should NOT pass apiPrefix as static file URL prefix', async () => {
-      pageServer = new PageServer(makeConfig({ staticDir: './dist', apiPrefix: '/api' }), adapter);
+    it('should NOT pass prefixes as static file URL prefix', async () => {
+      pageServer = new PageServer(makeConfig({ staticDir: './dist', prefixes: { api: '/api' } }), adapter);
 
       await pageServer.configure();
 
-      const staticCall: StaticConfig = (adapter.registerStaticFiles as any).mock.calls[0][0];
+      const registerStaticFilesMock = adapter.registerStaticFiles as unknown as {
+        mock: { calls: unknown[][] };
+      };
+      const staticCall = registerStaticFilesMock.mock.calls[0]?.[0] as StaticConfig;
       expect(staticCall.prefix).toBeUndefined();
       expect(staticCall.root).toBe('./dist');
     });
@@ -121,9 +124,9 @@ describe('PageServer', () => {
   describe('registerSpaFallback()', () => {
     it('should delegate to adapter', () => {
       pageServer = new PageServer(makeConfig(), adapter);
-      pageServer.registerSpaFallback('/api', '/dist');
+      pageServer.registerSpaFallback({ api: '/api' }, '/dist');
 
-      expect(adapter.registerSpaFallback).toHaveBeenCalledWith('/api', '/dist');
+      expect(adapter.registerSpaFallback).toHaveBeenCalledWith({ api: '/api' }, '/dist');
     });
   });
 

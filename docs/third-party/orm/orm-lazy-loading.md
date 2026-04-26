@@ -1,7 +1,7 @@
 # ORM Lazy Loading - Node.js Solutions & Implementation
 
 > **Historical reference:** This document captures the design decisions made in v0.0.23.
-> The chosen solutions (conditional exports, type-only imports, dynamic imports) are still in place.
+> The chosen solutions (conditional exports, type-only imports, and eager DI-backed adapters) are still in place.
 > As of v0.0.46, ORMs are bundled in `dependencies` — no separate install needed.
 >
 > **Version:** 0.0.23 (historical)
@@ -16,7 +16,7 @@ When importing from the main zacatl package, mongoose and sequelize were being l
 
 ```typescript
 // This caused: SyntaxError: The requested module 'mongoose' does not provide an export named 'connection'
-import { Service } from '@sentzunhat/zacatl';
+import { Service } from '@sentzunhat/zacatl/service';
 ```
 
 **Root Cause:** Main index.ts was re-exporting ORMs through barrel exports:
@@ -38,8 +38,8 @@ export * from './orm-exports'; // ❌ Eagerly loads mongoose + sequelize
 {
   "exports": {
     ".": "./build/index.js", // Main package (NO ORMs)
-    "./third-party/mongoose": "./build/third-party/mongoose.js", // Opt-in Mongoose
-    "./third-party/sequelize": "./build/third-party/sequelize.js" // Opt-in Sequelize
+    "./third-party/databases/mongoose": "./build/third-party/databases/mongoose.js", // Opt-in Mongoose
+    "./third-party/databases/sequelize": "./build/third-party/databases/sequelize.js" // Opt-in Sequelize
   }
 }
 ```
@@ -48,16 +48,16 @@ export * from './orm-exports'; // ❌ Eagerly loads mongoose + sequelize
 
 ```typescript
 // No ORM loading
-import { Service, BaseRepository } from '@sentzunhat/zacatl';
+import { Service, BaseRepository } from '@sentzunhat/zacatl/service';
 
 // Explicit opt-in
-import { mongoose, Schema } from '@sentzunhat/zacatl/third-party/mongoose';
-import { Sequelize, DataTypes } from '@sentzunhat/zacatl/third-party/sequelize';
+import { mongoose, Schema } from '@sentzunhat/zacatl/third-party/databases/mongoose';
+import { Sequelize, DataTypes } from '@sentzunhat/zacatl/third-party/databases/sequelize';
 ```
 
 **Pros:**
 
-- ✅ Official Node.js standard (12.20+, we're on 24+)
+- ✅ Official Node.js standard (12.20+, we're on 26+)
 - ✅ Zero runtime overhead
 - ✅ Tree-shaking friendly
 - ✅ Works with all bundlers (Webpack, Vite, Rollup, esbuild)
@@ -97,45 +97,32 @@ import type { Sequelize, DataTypes } from 'sequelize'; // Type-only
 
 ---
 
-### 🔄 **Solution 3: Dynamic Imports (ALREADY IN PLACE)**
+### 🔄 **Solution 3: Eager Adapter Factories (ALREADY IN PLACE)**
 
-**What:** Lazy-load modules at runtime using `await import()`
+**What:** Create adapters directly and resolve shared ORM instances through DI tokens.
 
 ```typescript
-// src/service/layers/infrastructure/orm/adapter-loader.ts
-export async function loadMongooseAdapter<D, I, O>(
-  config: MongooseRepositoryConfig<D>,
-): Promise<ORMAdapter<D, I, O>> {
-  try {
-    // Dynamic import - only loads when Mongoose is actually used
-    const adapters = await import('./adapters/mongoose-adapter');
-    return new adapters.MongooseAdapter<D, I, O>(config);
-  } catch (error: any) {
-    if (error.code === 'ERR_MODULE_NOT_FOUND') {
-      // Note: as of v0.0.46 mongoose is bundled — this branch should not trigger
-      throw new Error('Mongoose adapter could not be loaded.');
-    }
-    throw error;
-  }
-}
+// src/service/layers/infrastructure/orm/*/adapter-loader.ts
+// Mongoose, Sequelize, and node:sqlite repositories each return a concrete
+// adapter instance while the adapter resolves its ORM/database via DI.
 ```
 
 **When It Loads:**
 
-- Only when `BaseRepository` is instantiated with `ORMType.Mongoose`
-- Only when user actually creates a Mongoose repository
-- Graceful error if mongoose not installed
+- When a repository is instantiated for a given ORM
+- When the adapter first resolves its shared runtime instance
+- Graceful error if the optional ORM dependency cannot be resolved
 
 **Pros:**
 
-- ✅ Perfect for optional peer dependencies
+- ✅ No dynamic import wrapper overhead
 - ✅ Clear error messages when ORM missing
-- ✅ Works with ESM and CommonJS
+- ✅ Keeps repository factories simple
 
 **Cons:**
 
-- Async initialization required
-- Slightly more complex than static imports
+- Requires the ORM/database runtime to be registered in DI
+- Slightly more coupled to the service bootstrap
 
 ---
 
@@ -253,7 +240,7 @@ export * from './orm-exports'; // ❌ Eager loading
 ```typescript
 // src/index.ts
 // Note: ORM exports moved to dedicated entry points
-// Import from: @sentzunhat/zacatl/third-party/mongoose
+// Import from: @sentzunhat/zacatl/third-party/databases/mongoose
 ```
 
 #### 2. **Created Dedicated ORM Entry Points**
@@ -265,7 +252,7 @@ src/third-party/
 ```
 
 ```typescript
-// src/third-party/mongoose.ts
+// src/third-party/databases/mongoose.ts
 export {
   default as mongoose,
   Mongoose,
@@ -288,13 +275,13 @@ export type { Model as MongooseModel } from 'mongoose';
       "import": "./build/index.js",
       "types": "./build/index.d.ts"
     },
-    "./third-party/mongoose": {
-      "import": "./build/third-party/mongoose.js",
-      "types": "./build/third-party/mongoose.d.ts"
+    "./third-party/databases/mongoose": {
+      "import": "./build/third-party/databases/mongoose.js",
+      "types": "./build/third-party/databases/mongoose.d.ts"
     },
-    "./third-party/sequelize": {
-      "import": "./build/third-party/sequelize.js",
-      "types": "./build/third-party/sequelize.d.ts"
+    "./third-party/databases/sequelize": {
+      "import": "./build/third-party/databases/sequelize.js",
+      "types": "./build/third-party/databases/sequelize.d.ts"
     }
   }
 }
@@ -322,8 +309,8 @@ export { Sequelize, DataTypes } from 'sequelize'; // ❌
 
 ```typescript
 // Note: Import ORMs from dedicated entry points
-// - @sentzunhat/zacatl/third-party/mongoose
-// - @sentzunhat/zacatl/third-party/sequelize
+// - @sentzunhat/zacatl/third-party/databases/mongoose
+// - @sentzunhat/zacatl/third-party/databases/sequelize
 ```
 
 ---
@@ -334,18 +321,19 @@ export { Sequelize, DataTypes } from 'sequelize'; // ❌
 
 ```typescript
 // ORM exports available from main package
-import { Service, Schema, mongoose } from '@sentzunhat/zacatl';
+import { Service } from '@sentzunhat/zacatl/service';
+import { Schema, mongoose } from '@sentzunhat/zacatl/third-party/databases/mongoose';
 ```
 
 ### v0.0.23+ (NEW)
 
 ```typescript
 // Main package - NO ORMs
-import { Service, BaseRepository } from '@sentzunhat/zacatl';
+import { Service, BaseRepository } from '@sentzunhat/zacatl/service';
 
 // ORM imports - opt-in from dedicated paths
-import { mongoose, Schema } from '@sentzunhat/zacatl/third-party/mongoose';
-import { Sequelize, DataTypes } from '@sentzunhat/zacatl/third-party/sequelize';
+import { mongoose, Schema } from '@sentzunhat/zacatl/third-party/databases/mongoose';
+import { Sequelize, DataTypes } from '@sentzunhat/zacatl/third-party/databases/sequelize';
 ```
 
 ### Non-Breaking for Most Users
@@ -354,7 +342,7 @@ If you weren't importing ORMs from zacatl (best practice), no changes needed:
 
 ```typescript
 // Still works fine ✅
-import { Service } from '@sentzunhat/zacatl';
+import { Service } from '@sentzunhat/zacatl/service';
 import { Schema } from 'mongoose'; // Direct import
 ```
 
@@ -362,7 +350,7 @@ import { Schema } from 'mongoose'; // Direct import
 
 ## Verification Tests
 
-Added comprehensive test suite ([test/unit/conditional-exports.test.ts](test/unit/conditional-exports.test.ts)):
+Added comprehensive test suite (`test/unit/conditional-exports.test.ts`):
 
 ```typescript
 it('should import from main package without loading ORMs', async () => {
@@ -377,7 +365,7 @@ it('should import from main package without loading ORMs', async () => {
 });
 
 it('should import Mongoose from dedicated entry point', async () => {
-  const mongooseExports = await import('../../src/third-party/mongoose.js');
+  const mongooseExports = await import('../../src/third-party/databases/mongoose.js');
 
   // ✅ Available from dedicated path
   expect(mongooseExports.mongoose).toBeDefined();
@@ -399,7 +387,7 @@ it('should import Mongoose from dedicated entry point', async () => {
 ### 1. **No Eager Loading**
 
 ```typescript
-import { Service } from '@sentzunhat/zacatl'; // ✅ No mongoose/sequelize loaded
+import { Service } from '@sentzunhat/zacatl/service'; // ✅ No mongoose/sequelize loaded
 ```
 
 ### 2. **Smaller Bundle Size**

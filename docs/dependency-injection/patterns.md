@@ -255,7 +255,7 @@ registerValue(MyRepositoryPort, repository);
 ## Complete Example
 
 ```typescript
-import '@sentzunhat/zacatl/third-party/reflect-metadata';
+import '@sentzunhat/zacatl/third-party/dependency-injection/reflect-metadata';
 import { container } from '@sentzunhat/zacatl/dependency-injection';
 
 // Infrastructure

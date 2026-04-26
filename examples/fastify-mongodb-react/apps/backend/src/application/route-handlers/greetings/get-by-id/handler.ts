@@ -7,15 +7,15 @@
  * - Type-safe params
  */
 
-import { inject, singleton } from '@sentzunhat/zacatl/third-party/tsyringe';
-import { AbstractRouteHandler, type Request } from '@sentzunhat/zacatl/service';
-import type { FastifyReply } from '@sentzunhat/zacatl/third-party/fastify';
-import { GreetingServiceAdapter } from '../../../../domain/greetings/service';
+import { inject, singleton } from '@sentzunhat/zacatl/third-party/dependency-injection/tsyringe';
+import type { Request } from '@sentzunhat/zacatl/service/layers/application/entry-points/rest/fastify/handlers/abstract';
+import { GetRouteHandler } from '@sentzunhat/zacatl/service/layers/application/entry-points/rest/fastify/handlers/get-route-handler';
+import { GreetingServiceAdapter } from '../../../../domain/greetings/service/adapter';
 import { type GreetingIdParams, type GreetingResponse } from '../greeting.schema';
 import { toGreetingResponse } from '../greeting.serializer';
 
 @singleton()
-export class GetGreetingByIdHandler extends AbstractRouteHandler<
+export class GetGreetingByIdHandler extends GetRouteHandler<
   void,
   void,
   GreetingResponse | null,
@@ -27,7 +27,6 @@ export class GetGreetingByIdHandler extends AbstractRouteHandler<
   ) {
     super({
       url: '/greetings/:id',
-      method: 'GET',
       schema: {},
     });
   }

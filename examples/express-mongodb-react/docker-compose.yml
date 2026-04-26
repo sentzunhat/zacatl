@@ -22,7 +22,12 @@ services:
   backend:
     build:
       context: ../..
-      dockerfile: examples/express-mongodb-react/Dockerfile
+      dockerfile: examples/Dockerfile
+      args:
+        EXAMPLE: express-mongodb-react
+        BACKEND: apps/backend
+        FRONTEND: apps/frontend
+        PORT: 8182
     image: zacatl-express-mongodb
     container_name: express-mongodb-backend
     ports:
@@ -38,9 +43,9 @@ services:
       test:
         [
           'CMD',
-          '/nodejs/bin/node',
+          'node',
           '-e',
-          "fetch('http://localhost:8182/greetings').catch(() => process.exit(1))",
+          "fetch('http://localhost:8182/api/greetings').catch(() => process.exit(1))",
         ]
       interval: 10s
       timeout: 5s

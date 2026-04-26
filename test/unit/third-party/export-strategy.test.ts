@@ -1,47 +1,70 @@
 /**
- * Export Strategy Verification (v0.0.24)
+ * Export Strategy Verification
  *
- * Consolidated test verifying the critical bug fix for eager ORM loading.
- *
- * Core Requirement: Main package NO LONGER exports ORMs
- * - Users MUST import ORMs via dedicated subpaths
- * - Prevents eager loading and maintains minimal bundle size
- *
- * Users must use:
- *   import { mongoose } from "@sentzunhat/zacatl/orm/mongoose"
- *   import { Sequelize } from "@sentzunhat/zacatl/orm/sequelize"
+ * Core requirements:
+ * - No root package barrel — consumers import via explicit subpaths only.
+ * - ORMs are subpath-only to prevent eager loading and keep bundles minimal.
  */
 
-import { describe, it, expect } from 'vitest';
+import fs from 'node:fs';
+import path from 'node:path';
+
+import { beforeAll, describe, it, expect } from 'vitest';
+
+const repoRoot = path.resolve(import.meta.dirname, '../../..');
+
+/** Cold ESM import of @zacatl/service pulls the full service barrel (layers + platforms). */
+type ServiceExports = typeof import('@zacatl/service');
 
 describe('Export Strategy Verification', () => {
+  let serviceModule: ServiceExports;
+
+  beforeAll(async () => {
+    serviceModule = await import('@zacatl/service');
+  }, 20_000);
+
   describe('Core Requirements', () => {
-    it('should NOT export ORMs from main package (bug fix)', async () => {
-      const mainExports = await import('../../../src/index.js');
-
-      // Core exports should work
-      expect(mainExports.Service).toBeDefined();
-      expect(mainExports.resolveDependency).toBeDefined();
-      expect(mainExports.BaseRepository).toBeDefined();
-
-      // ORMs should NOT be exported (prevents eager loading)
-      expect('mongoose' in mainExports).toBe(false);
-      expect('Schema' in mainExports).toBe(false);
-      expect('Sequelize' in mainExports).toBe(false);
-      expect('DataTypes' in mainExports).toBe(false);
+    it('should not ship a root index barrel in source', () => {
+      expect(fs.existsSync(path.join(repoRoot, 'src/index.ts'))).toBe(false);
     });
 
-    it('should provide DI utilities from main package', async () => {
-      const mainExports = await import('../../../src/index.js');
+    it('should provide Service from @zacatl/service subpath', () => {
+      expect(serviceModule.Service).toBeDefined();
+      expect(serviceModule.ServiceType).toBeDefined();
+    });
 
-      expect(mainExports.resolveDependency).toBeDefined();
-      expect(mainExports.registerDependency).toBeDefined();
-      expect(mainExports.registerSingleton).toBeDefined();
-      expect(mainExports.clearContainer).toBeDefined();
+    it('should provide BaseRepository from each ORM vendor subpath', async () => {
+      const { BaseRepository: MongooseBaseRepository } = await import(
+        '@zacatl/service/layers/infrastructure/repositories/mongoose/repository'
+      );
+      const { BaseRepository: SequelizeBaseRepository } = await import(
+        '@zacatl/service/layers/infrastructure/repositories/sequelize/repository'
+      );
+      const { BaseRepository: NodeSqliteBaseRepository } = await import(
+        '@zacatl/service/layers/infrastructure/repositories/nodesqlite/repository'
+      );
+      expect(MongooseBaseRepository).toBeDefined();
+      expect(SequelizeBaseRepository).toBeDefined();
+      expect(NodeSqliteBaseRepository).toBeDefined();
+    });
+    it('should provide DI utilities from @zacatl/dependency-injection subpath', async () => {
+      const diExports = await import('@zacatl/dependency-injection');
+
+      expect(diExports.resolveDependency).toBeDefined();
+      expect(diExports.registerDependency).toBeDefined();
+      expect(diExports.registerSingleton).toBeDefined();
+      expect(diExports.clearContainer).toBeDefined();
+    });
+
+    it('should NOT export ORMs from service subpath', () => {
+      expect('mongoose' in serviceModule).toBe(false);
+      expect('Schema' in serviceModule).toBe(false);
+      expect('Sequelize' in serviceModule).toBe(false);
+      expect('DataTypes' in serviceModule).toBe(false);
     });
 
     it('should provide dedicated Mongoose subpath', async () => {
-      const mongooseExports = await import('../../../src/third-party/mongoose.js');
+      const mongooseExports = await import('@zacatl/third-party/databases/mongoose');
 
       expect(mongooseExports.mongoose).toBeDefined();
       expect(mongooseExports.Schema).toBeDefined();
@@ -51,7 +74,7 @@ describe('Export Strategy Verification', () => {
     });
 
     it('should provide dedicated Sequelize subpath', async () => {
-      const sequelizeExports = await import('../../../src/third-party/sequelize.js');
+      const sequelizeExports = await import('@zacatl/third-party/databases/sequelize');
 
       expect(sequelizeExports.Sequelize).toBeDefined();
       expect(sequelizeExports.DataTypes).toBeDefined();
@@ -62,80 +85,61 @@ describe('Export Strategy Verification', () => {
 
   describe('Subpath-Only Import Strategy', () => {
     it('should require subpath imports for Mongoose access', async () => {
-      const mongooseExports = await import('../../../src/third-party/mongoose.js');
+      const mongooseExports = await import('@zacatl/third-party/databases/mongoose');
       expect(mongooseExports.mongoose).toBeDefined();
       expect(mongooseExports.Schema).toBeDefined();
       expect(mongooseExports.Model).toBeDefined();
     });
 
     it('should require subpath imports for Sequelize access', async () => {
-      const sequelizeExports = await import('../../../src/third-party/sequelize.js');
+      const sequelizeExports = await import('@zacatl/third-party/databases/sequelize');
       expect(sequelizeExports.Sequelize).toBeDefined();
       expect(sequelizeExports.DataTypes).toBeDefined();
       expect(sequelizeExports.SequelizeModel).toBeDefined();
     });
 
-    it('should not load mongoose when importing Service from main', async () => {
-      // Import only Service from main package
-      const { Service } = await import('../../../src/index.js');
-
-      // Verify Service was imported
-      expect(Service).toBeDefined();
-
-      // No mongoose properties in main exports
-      const mainExports = await import('../../../src/index.js');
-      expect('mongoose' in mainExports).toBe(false);
-      expect('Schema' in mainExports).toBe(false);
+    it('should not load mongoose when importing Service from service subpath', () => {
+      expect(serviceModule.Service).toBeDefined();
+      expect('mongoose' in serviceModule).toBe(false);
+      expect('Schema' in serviceModule).toBe(false);
     });
 
-    it('should not load sequelize when importing Service from main', async () => {
-      // Import only Service from main package
-      const { Service } = await import('../../../src/index.js');
-
-      // Verify Service was imported
-      expect(Service).toBeDefined();
-
-      // No sequelize properties in main exports
-      const mainExports = await import('../../../src/index.js');
-      expect('Sequelize' in mainExports).toBe(false);
-      expect('DataTypes' in mainExports).toBe(false);
+    it('should not load sequelize when importing Service from service subpath', () => {
+      expect(serviceModule.Service).toBeDefined();
+      expect('Sequelize' in serviceModule).toBe(false);
+      expect('DataTypes' in serviceModule).toBe(false);
     });
   });
 
   describe('Benefits of Subpath Strategy', () => {
     it('should enable tree-shaking of unused ORMs', async () => {
-      // Subpath imports allow bundlers to tree-shake unused ORMs
-      const mongooseExports = await import('../../../src/third-party/mongoose.js');
+      const mongooseExports = await import('@zacatl/third-party/databases/mongoose');
       expect(mongooseExports.mongoose).toBeDefined();
 
-      const sequelizeExports = await import('../../../src/third-party/sequelize.js');
+      const sequelizeExports = await import('@zacatl/third-party/databases/sequelize');
       expect(sequelizeExports.Sequelize).toBeDefined();
     });
 
-    it('should provide clean imports without re-exports from main', async () => {
-      // Main package exports both Service and DI utilities
-      const mainExports = await import('../../../src/index.js');
+    it('should keep module imports explicit without a root re-export barrel', async () => {
+      const diExports = await import('@zacatl/dependency-injection');
 
-      expect(mainExports.Service).toBeDefined();
-      expect(mainExports.resolveDependency).toBeDefined();
-      expect(mainExports.registerDependency).toBeDefined();
+      expect(serviceModule.Service).toBeDefined();
+      expect(diExports.resolveDependency).toBeDefined();
+      expect(diExports.registerDependency).toBeDefined();
 
-      // Main package is clean - no ORM exports
-      expect('mongoose' in mainExports).toBe(false);
-      expect('Schema' in mainExports).toBe(false);
-      expect('Sequelize' in mainExports).toBe(false);
-      expect('DataTypes' in mainExports).toBe(false);
+      expect('mongoose' in serviceModule).toBe(false);
+      expect('Schema' in serviceModule).toBe(false);
+      expect('Sequelize' in serviceModule).toBe(false);
+      expect('DataTypes' in serviceModule).toBe(false);
     });
 
     it('should maintain minimal bundle size for users not needing ORMs', async () => {
-      // Users who only need Service and DI don't get ORM dependencies
-      const { Service, resolveDependency } = await import('../../../src/index.js');
+      const { resolveDependency } = await import('@zacatl/dependency-injection');
 
-      expect(Service).toBeDefined();
+      expect(serviceModule.Service).toBeDefined();
       expect(resolveDependency).toBeDefined();
 
-      // ORM subpaths are optional imports
-      const mongooseExports = await import('../../../src/third-party/mongoose.js');
+      const mongooseExports = await import('@zacatl/third-party/databases/mongoose');
       expect(mongooseExports.mongoose).toBeDefined();
     });
   });

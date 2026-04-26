@@ -1,12 +1,34 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+@theme {
+  --font-display: 'Playfair Display', Georgia, serif;
+  --font-body: Inter, 'Open Sans', sans-serif;
+  --font-sans: Inter, system-ui, sans-serif;
+
+  --shadow-soft: 0 12px 30px rgba(15, 23, 42, 0.08);
+
+  --animate-fade-in-up: fade-in-up 0.4s ease-out;
+  --animate-pulse-gentle: pulse-gentle 3s ease-in-out infinite;
+}
+
+@keyframes fade-in-up {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 12px, 0);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes pulse-gentle {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.92; }
+}
 
 @layer base {
   :root {
-    --font-display: 'Playfair Display';
-    --font-body: 'Inter';
-    --font-sans: 'Inter';
     color-scheme: light;
   }
 

@@ -1,6 +1,6 @@
-import { Application } from './application';
-import { Domain } from './domain';
-import { Infrastructure } from './infrastructure';
+import { Application } from './application/application';
+import { Domain } from './domain/domain';
+import { Infrastructure } from './infrastructure/infrastructure';
 import type { ConfigLayers } from './types';
 
 export class Layers {

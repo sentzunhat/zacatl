@@ -2,9 +2,93 @@
 
 ---
 
+## [0.0.56] - 2026-07-11
+
+**Status**: Ready for publication
+
+### ⚠️ Breaking Changes
+
+- **Named repository/provider pattern: vendor moves from the name to the path** — Repository classes and server provider factories now follow the same rule route handlers already did: the exported name is identical across every vendor, and only the file path disambiguates.
+  - `AbstractMongooseRepository`/`MongooseRepository`, `AbstractSequelizeRepository`/`SequelizeRepository`, and `AbstractNodeSqliteRepository`/`NodeSqliteRepository` are now all just **`BaseRepository`**, exported from their own vendor path (`.../repositories/mongoose/repository`, `.../repositories/sequelize/repository`, `.../repositories/nodesqlite/repository`).
+  - `createFastifyApiAdapter`/`createExpressApiAdapter` are now **`createApiAdapter`**; `createFastifyPageAdapter`/`createExpressPageAdapter` are now **`createPageAdapter`** — each exported from its own vendor path under `.../platforms/server/providers/<vendor>/`.
+  - The old cross-vendor `BaseRepository` (`.../repositories/abstract`, runtime `config.type` dispatch) is removed entirely — it had zero usage in any example or `src/` consumer. Import the vendor-specific `BaseRepository` instead.
+  - No aliases are kept for any of the above — update imports directly. See `docs/guidelines/architecture.md`'s "Database Adapters" and "Named Provider Pattern" sections for the updated pattern.
+- **Removed root package barrel** — Dropped `src/index.ts` and the `"."` export. Import from explicit subpaths such as `@sentzunhat/zacatl/service`, `@sentzunhat/zacatl/error`, and `@sentzunhat/zacatl/dependency-injection` instead of `@sentzunhat/zacatl`.
+- **Nested third-party paths only** — Flat publish shims removed. Use:
+  - `@sentzunhat/zacatl/third-party/databases/mongoose`
+  - `@sentzunhat/zacatl/third-party/databases/sequelize`
+  - `@sentzunhat/zacatl/third-party/databases/sqlite3`
+  - `@sentzunhat/zacatl/third-party/dependency-injection/tsyringe`
+  - `@sentzunhat/zacatl/third-party/dependency-injection/reflect-metadata`
+
+  Previous flat paths (`/third-party/mongoose`, `/third-party/tsyringe`, etc.) no longer resolve.
+
+### 🔧 Architecture
+
+- **Unified ORM adapter loading** — Aligned the Mongoose, Sequelize, and node:sqlite repository adapters around eager factory creation, DI-token ORM resolution, and consistent repository entrypoints.
+- **Export map automation** — Wired `local:exports` into `postbuild` so `package.json` exports stay aligned with build output; publish tarball prunes to entrance index files only.
+- **Consolidated export targets** — 152 nested export paths in published tarball (down from 192 pre-pruning); 21 entrance index files in package root and modules.
+
+### ✨ Improvements
+
+- **Graceful shutdown** — `Service` now exposes a `stop()` method that closes the HTTP server and disconnects all configured databases. Wire it to `SIGTERM`/`SIGINT` in your entry file for clean process exit.
+- **Real database disconnect** — `MongooseAdapter.disconnect()` and `SequelizeAdapter.disconnect()` now call the underlying ORM's close method instead of no-oping. `SQLiteAdapter` already implemented this.
+- **Example import standardization** — All examples use `@zacatl/*` subpath imports with unified root `tsconfig.json` path mappings.
+- **Neutralino/WebGPU experiment scaffold** — Added a minimal runnable desktop experiment starter under `examples/neutralino-react-transformers-webgpu/` with a local preview path for the Neutralino + React + Transformers.js + WebGPU prototype.
+- **Test suite expansion** — All 555 tests pass under Node 26+ with no type errors.
+
+### 🐛 Fixes
+
+- **Third-party compatibility shims** — Added explicit re-exports for `mongoose.ts`, `sequelize.ts`, `sqlite3.ts`, `tsyringe.ts`, and `reflect-metadata.ts` to prevent version conflicts in downstream projects.
+- **Fastify DELETE with empty body** — Fixed frontend `api.ts` in all Fastify examples: `Content-Type: application/json` is now only sent when a request body is present. Fastify's strict JSON parser (`FST_ERR_CTP_EMPTY_JSON_BODY`) rejected DELETE requests that sent the header with no body.
+- **express-mongodb-react brand label** — Corrected UI footer text from "Fastify" to "Express".
+
+### 🔧 Tooling
+
+- **Example screenshots automated** — Added `npm run screenshots:examples:capture` (Playwright) that boots each example via Docker Compose, performs create + delete, and saves 3 PNGs per example to `examples/screenshots/{name}/`. Screenshots are embedded in `examples/README.md`.
+- **Docker images lean** — All 8 example images use `node:26-alpine` across all 3 build stages with a non-root runtime user. Frontend build tools (`vite`, `react`, `svelte`) are kept as `devDependencies` at the repo root and pruned from the final image layer.
+- **Docker-compose healthchecks** — Fixed all 8 compose files: healthcheck URLs updated from `/greetings` to `/api/greetings`; Express examples corrected from `/nodejs/bin/node` to `node` (PATH-resolved, matching `node:26-alpine`).
+- **Dependency updates** — `prettier` → `^3.9.5`, `vite` → `^8.1.4` across all examples, `npm` → `12`, `packageManager` pinned. TypeScript stays at `^6.0.3` (`@typescript-eslint@8.x` does not yet support TS 7); ESLint stays at `^9.x` (`eslint-plugin-import` blocks ESLint 10).
+- **`prepare-publish.ts`** — Fixed `fix-esm.js` import rewrite: was only rewriting `../utils/index.js`; now rewrites all `../utils/*` paths including `measure-time.js`.
+- **Removed dead `nestedIndexAllowlist`** from `export-policy.ts`.
+
+### 🔬 Refactored
+
+- **Unified API prefix** — All 8 examples now serve routes at `/api/greetings` via `server.prefixes: { api: '/api' }`. Vite dev proxies updated to `'^/api'`.
+- **Tailwind CSS 4 migration** — All 8 example frontends migrated from Tailwind 3 to Tailwind 4 (`@import "tailwindcss"`, `@theme {}` block, `@tailwindcss/vite` plugin). No `postcss.config` or `tailwind.config` files remain.
+- **Barrel removal** — Removed `src/service/layers/application/entry-points/rest/index.ts` and its orphaned test; the barrel was not in the published exports map and the Fastify-prefixed aliases it exposed were unreachable to consumers.
+- **Node.js engine requirement** — Broadened from `>=26.3.0` to `>=26.0.0`; `node:sqlite` availability correctly attributed to Node 22.5+.
+
+### 📚 Documentation
+
+- **Repository/ORM docs cleanup** — Updated the repository and ORM docs to reflect BaseRepository's node:sqlite support and the Sequelize `name`-based model lookup flow.
+- **Subpath import guide** — Refreshed third-party and migration docs for Option B (explicit subpaths, nested third-party only).
+- **examples/README** — Added screenshot gallery, correct API endpoint spec (including `GET /greetings/random/:lang`), validation checklist, and instructions for re-running screenshots after UI changes.
+- **Non-root Docker hardening** — All example containers now run as `node` user (uid 1000), not root. Documented in `examples/docker.md`.
+- **`docs/examples/frontend-backend-gotchas.md`** — New reference covering API prefix wiring, React vs Svelte CSS differences, port table, DELETE body gotcha, and common mistakes.
+- **Docs drift** — Cleared stale Node 26.3 references across guidelines, service, third-party, and utils docs. Fixed 109 broken relative links in example and docs READMEs.
+- **AI attribution** — Package description updated: built with the help of AI models and digital agents.
+
+#### Migration (0.0.55 → 0.0.56)
+
+```typescript
+// Before
+import { Service, NotFoundError } from '@sentzunhat/zacatl';
+import { mongoose, Schema } from '@sentzunhat/zacatl/third-party/mongoose';
+import { container } from '@sentzunhat/zacatl/third-party/tsyringe';
+
+// After
+import { Service } from '@sentzunhat/zacatl/service';
+import { NotFoundError } from '@sentzunhat/zacatl/error';
+import { mongoose, Schema } from '@sentzunhat/zacatl/third-party/databases/mongoose';
+import { container } from '@sentzunhat/zacatl/third-party/dependency-injection/tsyringe';
+```
+
+See [third-party/single-import.md](third-party/single-import.md) for the full subpath table.
+
 ## [0.0.55] - 2026-04-25
 
-**Status**: Pending release
+**Status**: Released
 
 ### ✨ Improvements
 
@@ -24,16 +108,16 @@
 
 ## [0.0.54] - 2026-04-22
 
-**Status**: Pending release
+**Status**: Released
 
 ### ✨ Improvements
 
-- **Built-in SPA hosting** — `PageServer.configure()` now correctly serves static assets from the dist root and enables SPA fallback (index.html for non-API routes) by default whenever `staticDir` is set. The new `spaFallback` flag (default `true`) lets API-only services opt out explicitly, and `apiPrefix` now defaults to `'/api'` instead of requiring manual configuration.
+- **Built-in SPA hosting** — `PageServer.configure()` now correctly serves static assets from the dist root and enables SPA fallback (index.html for non-API routes) by default whenever `staticDir` is set. The new `spaFallback` flag (default `true`) lets API-only services opt out explicitly, and `prefixes` now defaults to `{ api: '/api' }` instead of requiring manual configuration.
 
 ### 🐛 Fixes
 
-- **`apiPrefix` no longer misused as static URL prefix** — Previously `PageServer.configure()` passed `apiPrefix` as the URL mount path for static files, which caused assets to be unreachable. Static files are now always mounted at root.
-- **SPA fallback silently skipped** — Previously SPA fallback was only activated when `apiPrefix` was explicitly set alongside `staticDir`, meaning most consumers never got it. Fallback now activates automatically when `staticDir` is present.
+- **`prefixes` no longer misused as static URL prefix** — Previously `PageServer.configure()` passed the API prefix value as the URL mount path for static files, which caused assets to be unreachable. Static files are now always mounted at root.
+- **SPA fallback silently skipped** — Previously SPA fallback was only activated when an API prefix was explicitly set alongside `staticDir`, meaning most consumers never got it. Fallback now activates automatically when `staticDir` is present.
 
 ### 🔧 Architecture
 
@@ -41,7 +125,7 @@
 
 ## [0.0.53] - 2026-04-10
 
-**Status**: Pending release
+**Status**: Released
 
 ### ⚠️ Breaking Changes
 
@@ -66,11 +150,11 @@
 
 ## [0.0.52] - 2026-03-08
 
-**Status**: Pending release
+**Status**: Released
 
 ### 🐛 Fixes
 
-- **Mongoose third-party exports** — Added missing `Types` and `PipelineStage` exports to `src/third-party/mongoose.ts` to support downstream projects using Zacatl's Mongoose wrapper as single source of truth. Prevents version conflicts when framework consumers need `Types.ObjectId` and aggregation pipeline types.
+- **Mongoose third-party exports** — Added missing `Types` and `PipelineStage` exports to `src/third-party/databases/mongoose.ts` to support downstream projects using Zacatl's Mongoose wrapper as single source of truth. Prevents version conflicts when framework consumers need `Types.ObjectId` and aggregation pipeline types.
 
 - **Configurable built-in localization path** — Added `localization.builtInLocalesDir` to `Service` and `configureI18nNode()` so consumers can override Zacatl's built-in locale discovery when their runtime working directory does not match the package's default path probes.
 
@@ -82,7 +166,7 @@
 
 ## [0.0.51] - 2026-03-04
 
-**Status**: Pending release
+**Status**: Released
 
 ### 🐛 Fixes
 
@@ -94,11 +178,11 @@
 
 ## [0.0.50] - 2026-03-04
 
-**Status**: Pending release
+**Status**: Released
 
 ### ✨ Features
 
-- **Built-in SQLite ORM adapter** — Added Node.js built-in sqlite module adapter (Node 24+) with dynamic module loading. Eliminates experimental warnings through lazy-loading pattern, provides zero external dependencies, and offers type-safe repository operations. Matches feature parity with Mongoose and Sequelize adapters.
+- **Built-in SQLite ORM adapter** — Added Node.js built-in sqlite module adapter (Node 26+) with dynamic module loading. Eliminates experimental warnings through lazy-loading pattern, provides zero external dependencies, and offers type-safe repository operations. Matches feature parity with Mongoose and Sequelize adapters.
 
 ### 🔧 Improvements
 
@@ -142,7 +226,7 @@
 
 ### ✨ Features
 
-- **Node:sqlite ORM adapter** — Added complete ORM implementation for Node.js built-in sqlite module (Node 24+). Includes `NodeSqliteAdapter`, lazy-loading factory, type-safe repository class, and comprehensive unit tests. Follows same architecture as Mongoose and Sequelize adapters with prepared statements and defensive mode security.
+- **Node:sqlite ORM adapter** — Added complete ORM implementation for Node.js built-in sqlite module (Node 26+). Includes `NodeSqliteAdapter`, lazy-loading factory, type-safe repository class, and comprehensive unit tests. Follows same architecture as Mongoose and Sequelize adapters with prepared statements and defensive mode security.
 
 ### 🔧 Improvements
 
@@ -154,7 +238,7 @@
 
 - **ESLint config simplification** — Refactored root ESLint configuration to use Zacatl's recommended config directly, reducing complexity and improving maintainability. Removed manual config normalization logic.
 
-- **Node 24.14.0 LTS** — Updated `.nvmrc` to Node 24.14.0 (latest LTS point release) and bumped npm requirement to 11.0.0+ in documentation.
+- **Node 26.3.0** — Updated `.nvmrc` to Node 26.3.0 and bumped npm requirement to 11.0.0+ in documentation.
 
 ### 📚 Documentation
 
@@ -193,12 +277,12 @@
 
 ### ✨ New
 
-- **Node 24 LTS standardization** — Bumped `engines.node` to `>=24.14.0` (LTS point release). Added
+- **Node 26 baseline standardization** — Bumped `engines.node` to `>=26.3.0`. Added
   native `imports` field (`"#/*": "./src/*"`) to `package.json` for Node-native subpath imports,
   removing the need for TypeScript path-alias hacks in consuming projects.
 
 - **Built-in SQLite adapter (`node:sqlite`)** — Added `DatabaseVendor.SQLITE` and
-  `src/service/platforms/server/database/sqlite-adapter.ts` using the Node 24 built-in
+  `src/service/platforms/server/database/sqlite-adapter.ts` using the Node 26 built-in
   `node:sqlite` (`DatabaseSync`). Defensive mode is enabled by default. No external SQLite
   package or native bindings required. `instance` is now optional in `DatabaseConfig` — only
   needed for Mongoose / Sequelize.
@@ -264,7 +348,7 @@
   `better-sqlite3` from `peerDependencies` into `dependencies`. A single
   `npm install @sentzunhat/zacatl` now provides all supported ORMs and platforms without extra
   peer install steps. Platform-specific code remains gated behind subpath imports
-  (`@sentzunhat/zacatl/third-party/mongoose`, `/third-party/sequelize`, etc.) so the main entry
+  (`@sentzunhat/zacatl/third-party/databases/mongoose`, `/third-party/databases/sequelize`, etc.) so the main entry
   stays lean. Removed corresponding `peerDependenciesMeta` block.
 
 ### 🔧 Tooling
@@ -454,8 +538,8 @@ export class MyHandler extends PostRouteHandler<Input, MyData> {
 - **Unified Dependency Export Strategy**: All dependencies (frameworks, ORMs, utilities) exported via library subpaths; examples import only from `@sentzunhat/zacatl` for a single source of truth
   - Express: `@sentzunhat/zacatl/third-party/express`
   - Fastify: `@sentzunhat/zacatl/third-party/fastify`
-  - Mongoose: `@sentzunhat/zacatl/third-party/mongoose`
-  - Sequelize: `@sentzunhat/zacatl/third-party/sequelize`
+  - Mongoose: `@sentzunhat/zacatl/third-party/databases/mongoose`
+  - Sequelize: `@sentzunhat/zacatl/third-party/databases/sequelize`
   - Utilities: Zod, UUID, Pino, i18n, YAML via subpaths or root exports
 - **Shared HTTP Methods**: Created unified `HTTPMethod` type in common module for consistent method naming across Fastify and Express
 - **Express Framework Support**: Full Express.js handler implementation with adapters matching Fastify patterns
@@ -501,7 +585,7 @@ Three Express examples targeting parity with existing Fastify examples:
 
 Each example will include:
 
-- Docker multi-stage build with distroless Node.js 24
+- Docker multi-stage build with distroless Node.js 26
 - ESM build pipeline using `fix-esm.mjs`
 - Same monorepo structure as Fastify examples (apps/backend, apps/frontend)
 - Verified end-to-end with live API calls and DB persistence
@@ -621,7 +705,7 @@ See version 0.0.32 below for the latest changes. Version 0.0.33 is a minor versi
 #### New ServiceType Enum (Already Implemented)
 
 ```typescript
-import { Service, ServiceType } from "@sentzunhat/zacatl";
+import { Service, ServiceType } from '@sentzunhat/zacatl/service';
 
 // CLI Application
 const cli = new Service({
@@ -762,6 +846,8 @@ const server = new Service({
 
 ## [0.0.23] - 2026-01-31
 
+> **Historical note:** The root barrel described below was removed in **0.0.56**. Use explicit subpaths — see [0.0.56](#0056---2026-06-23).
+
 ### 🎯 Dual ORM Import Strategy - Flexibility for All Use Cases
 
 **New Feature:** Choose between convenience (main package) or minimal bundles (subpath imports).
@@ -771,15 +857,17 @@ const server = new Service({
 **Option 1 - Main Package (Convenience):**
 
 ```typescript
-import { Service, mongoose, Schema, Sequelize } from '@sentzunhat/zacatl';
+import { Service } from '@sentzunhat/zacatl/service';
+import { mongoose, Schema } from '@sentzunhat/zacatl/third-party/databases/mongoose';
+import { Sequelize } from '@sentzunhat/zacatl/third-party/databases/sequelize';
 ```
 
 **Option 2 - Subpath Imports (Minimal Bundle):**
 
 ```typescript
-import { Service } from '@sentzunhat/zacatl';
-import { mongoose, Schema } from '@sentzunhat/zacatl/third-party/mongoose';
-import { Sequelize, DataTypes } from '@sentzunhat/zacatl/third-party/sequelize';
+import { Service } from '@sentzunhat/zacatl/service';
+import { mongoose, Schema } from '@sentzunhat/zacatl/third-party/databases/mongoose';
+import { Sequelize, DataTypes } from '@sentzunhat/zacatl/third-party/databases/sequelize';
 ```
 
 #### Why Both Options?

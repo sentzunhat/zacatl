@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Neutralino WebGPU Experiment</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+        background:
+          radial-gradient(circle at top, rgba(51, 65, 85, 0.95), rgba(15, 23, 42, 1) 55%),
+          #0f172a;
+        color: #e2e8f0;
+      }
+      html,
+      body {
+        margin: 0;
+        min-height: 100%;
+      }
+      body {
+        display: grid;
+        place-items: center;
+        min-height: 100vh;
+        padding: 24px;
+      }
+      main {
+        max-width: 720px;
+        width: min(100%, 720px);
+        border: 1px solid rgba(148, 163, 184, 0.25);
+        border-radius: 24px;
+        background: rgba(15, 23, 42, 0.72);
+        box-shadow: 0 20px 80px rgba(15, 23, 42, 0.45);
+        backdrop-filter: blur(18px);
+        padding: 32px;
+      }
+      h1 {
+        margin: 0 0 12px;
+        font-size: clamp(2rem, 4vw, 3.25rem);
+        letter-spacing: -0.04em;
+      }
+      p {
+        margin: 0 0 16px;
+        line-height: 1.6;
+        color: #cbd5e1;
+      }
+      .tag {
+        display: inline-block;
+        margin-bottom: 18px;
+        padding: 6px 12px;
+        border-radius: 999px;
+        background: rgba(56, 189, 248, 0.15);
+        color: #7dd3fc;
+        font-size: 0.875rem;
+        letter-spacing: 0.02em;
+      }
+      code {
+        padding: 2px 6px;
+        border-radius: 6px;
+        background: rgba(148, 163, 184, 0.14);
+      }
+      ul {
+        margin: 16px 0 0;
+        padding-left: 20px;
+      }
+      li + li {
+        margin-top: 8px;
+      }
+      .status {
+        margin-top: 22px;
+        padding-top: 18px;
+        border-top: 1px solid rgba(148, 163, 184, 0.18);
+        font-size: 0.95rem;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <div class="tag">Runnable scaffold</div>
+      <h1>Neutralino + React + Transformers.js + WebGPU</h1>
+      <p>
+        This experiment now has a real start path. It launches a local preview page that can become the
+        Neutralino shell target once the desktop wrapper is added.
+      </p>
+      <p>
+        The goal is to keep the launch surface tiny while we prove the runtime story:
+        <code>Neutralino</code> for the shell, <code>React</code> for the UI, and
+        <code>Transformers.js</code> with <code>WebGPU</code> when the browser runtime supports it.
+      </p>
+      <ul>
+        <li>Minimal local launch path is in place.</li>
+        <li>Neutralino integration can now target a concrete page.</li>
+        <li>Next step is adding the UI and model-loading flow on top of this shell.</li>
+      </ul>
+      <div class="status">Run <code>npm run dev</code> to start the preview server.</div>
+    </main>
+  </body>
+</html>

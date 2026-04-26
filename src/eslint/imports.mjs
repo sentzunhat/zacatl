@@ -31,7 +31,7 @@ const importsConfig = {
       },
       node: true,
     },
-    // Teach the import resolver about Node 24 built-in modules that use the
+    // Teach the import resolver about Node 26 built-in modules that use the
     // `node:` scheme and aren't yet listed in older resolver versions.
     'import/core-modules': [
       'node:sqlite',
@@ -94,7 +94,7 @@ const importsConfig = {
           {
             name: '@zacatl',
             message:
-              "Import explicit subpaths instead (e.g. '@zacatl/third-party/mongoose' or '@zacatl/service') to avoid pulling runtime implementations unintentionally.",
+              "Import explicit subpaths instead (e.g. '@zacatl/third-party/databases/mongoose' or '@zacatl/service') to avoid pulling runtime implementations unintentionally.",
           },
         ],
       },

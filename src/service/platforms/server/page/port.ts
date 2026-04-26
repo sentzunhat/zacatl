@@ -1,9 +1,12 @@
+import type { ApiPrefixes } from '../types/server-config';
+
 export interface StaticConfig {
   root: string;
   prefix?: string;
 }
 
 export type { PageServerConfig } from '../types/server-config';
+export type { ApiPrefixes } from '../types/server-config';
 
 /**
  * PageServerPort - Hexagonal Architecture port for frontend/page server
@@ -11,6 +14,6 @@ export type { PageServerConfig } from '../types/server-config';
  */
 export interface PageServerPort {
   registerStaticFiles(config: StaticConfig): void;
-  registerSpaFallback(apiPrefix: string, staticDir: string): void;
-  register(server: unknown): Promise<void>;
+  registerSpaFallback(prefixes: ApiPrefixes, staticDir: string): void;
+  register(): Promise<void>;
 }

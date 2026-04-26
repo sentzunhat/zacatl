@@ -2,7 +2,7 @@
 
 All project documentation is organized here.
 
-If you are new to this repository, start with [START_HERE.md](./START_HERE.md).
+If you are new to this repository, start with [START_HERE.md](./start-here.md).
 
 > **AI agents / LLMs:** start with [`llms.txt`](./llms.txt) for a compact
 > machine-readable project summary, import patterns, and module index.
@@ -13,7 +13,8 @@ If you are new to this repository, start with [START_HERE.md](./START_HERE.md).
 
 - [Guidelines & Standards](guidelines/README.md) — code style, architecture, testing, git workflow
 - [Framework Overview](guidelines/framework-overview.md)
-- [Quick Reference](guidelines/QUICK_REFERENCE.md)
+- [Quick Reference](guidelines/quick-reference.md)
+- [Documentation Guidelines](documentation-guidelines.md)
 - [AI Context Pack](context/README.md)
 
 ## Module Docs
@@ -27,6 +28,11 @@ If you are new to this repository, start with [START_HERE.md](./START_HERE.md).
 - [Third-party / ORM](third-party/README.md)
 - [ESLint](eslint/README.md)
 - [Utils](utils/README.md)
+
+## Implementation Status Notes
+
+- `ServiceType.SERVER` is the currently runnable platform.
+- `ServiceType.CLI` and `ServiceType.DESKTOP` exist as contract shapes and currently throw on startup/entrypoint registration.
 
 ## Reference
 

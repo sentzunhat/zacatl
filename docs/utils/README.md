@@ -15,7 +15,7 @@ Shared utility helpers that are independent of services and platform wiring.
 Utilities for handling values that may or may not be present.
 
 ```typescript
-import { Optional, Nullable, Maybe } from '@sentzunhat/zacatl';
+import { Optional, Nullable, Maybe } from '@sentzunhat/zacatl/utils';
 
 // Optional<T> = T | undefined (regular JS optional)
 const opt: Optional<string> = undefined;

@@ -20,5 +20,5 @@ This guide is intentionally short. The **canonical implementation pattern** live
 
 ## Canonical Example Entry Points
 
-- [examples/express-mongodb-react/backend/src/index.ts](../../examples/express-mongodb-react/backend/src/index.ts)
-- [examples/fastify-sqlite-react/backend/src/index.ts](../../examples/fastify-sqlite-react/backend/src/index.ts)
+- [examples/express-mongodb-react/apps/backend/src/index.ts](../../examples/express-mongodb-react/apps/backend/src/index.ts)
+- [examples/fastify-sqlite-react/apps/backend/src/index.ts](../../examples/fastify-sqlite-react/apps/backend/src/index.ts)

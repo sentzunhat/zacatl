@@ -23,7 +23,7 @@ import {
   registerValue,
   resolveDependency,
 } from '@sentzunhat/zacatl/dependency-injection';
-import { inject, singleton } from '@sentzunhat/zacatl/third-party/tsyringe';
+import { inject, singleton } from '@sentzunhat/zacatl/third-party/dependency-injection/tsyringe';
 import { logger } from '@sentzunhat/zacatl/logs';
 
 const ENV_TOKEN = Symbol('ENV_CONFIG');
@@ -63,7 +63,7 @@ await worker.runOnce();
 
 ```typescript
 import { registerDependency, resolveDependency } from '@sentzunhat/zacatl/dependency-injection';
-import { singleton } from '@sentzunhat/zacatl/third-party/tsyringe';
+import { singleton } from '@sentzunhat/zacatl/third-party/dependency-injection/tsyringe';
 
 @singleton()
 class Calculator {
@@ -80,7 +80,7 @@ console.log(calculator.add(2, 3));
 
 ```typescript
 import { registerDependencies, resolveDependencies } from '@sentzunhat/zacatl/dependency-injection';
-import { singleton } from '@sentzunhat/zacatl/third-party/tsyringe';
+import { singleton } from '@sentzunhat/zacatl/third-party/dependency-injection/tsyringe';
 
 @singleton()
 class UserRepository {
@@ -116,7 +116,7 @@ import {
   registerValue,
   resolveDependency,
 } from '@sentzunhat/zacatl/dependency-injection';
-import { inject, singleton } from '@sentzunhat/zacatl/third-party/tsyringe';
+import { inject, singleton } from '@sentzunhat/zacatl/third-party/dependency-injection/tsyringe';
 
 const APP_CONFIG = Symbol('APP_CONFIG');
 
@@ -151,7 +151,7 @@ import {
 } from '@sentzunhat/zacatl/dependency-injection';
 import { InternalServerError } from '@sentzunhat/zacatl/error';
 import { logger } from '@sentzunhat/zacatl/logs';
-import { inject, singleton } from '@sentzunhat/zacatl/third-party/tsyringe';
+import { inject, singleton } from '@sentzunhat/zacatl/third-party/dependency-injection/tsyringe';
 
 const WORKER_OPTIONS = Symbol('WORKER_OPTIONS');
 
@@ -197,7 +197,7 @@ import {
   resolveDependency,
 } from '@sentzunhat/zacatl/dependency-injection';
 import { logger } from '@sentzunhat/zacatl/logs';
-import { singleton } from '@sentzunhat/zacatl/third-party/tsyringe';
+import { singleton } from '@sentzunhat/zacatl/third-party/dependency-injection/tsyringe';
 
 @singleton()
 class LegacyReader {

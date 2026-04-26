@@ -18,7 +18,7 @@ import {
   validateCommandSpec,
   CommandSpecSchema,
   RunnerPolicySchema,
-} from '@sentzunhat/zacatl';
+} from '@sentzunhat/zacatl/utils';
 ```
 
 ## Types
@@ -75,7 +75,7 @@ const result: CommandResult = {
 Executes a single command. Applies schema and policy validation, enforces timeout, and caps output.
 
 ```typescript
-import { runCommand, RunnerPolicySchema } from '@sentzunhat/zacatl';
+import { runCommand, RunnerPolicySchema } from '@sentzunhat/zacatl/utils';
 
 const policy = RunnerPolicySchema.parse({ inheritEnv: true });
 const result = await runCommand({ cmd: 'node', args: ['--version'] }, policy);
@@ -89,7 +89,7 @@ console.log(result.exitCode); // 0
 Runs a batch of commands in parallel, bounded by `maxConcurrency`. Results are returned in the same order as the input array.
 
 ```typescript
-import { executeCommands } from '@sentzunhat/zacatl';
+import { executeCommands } from '@sentzunhat/zacatl/utils';
 
 const results = await executeCommands(
   [
@@ -113,7 +113,7 @@ Validates a `CommandSpec` against a `RunnerPolicy` before execution. Useful when
 commands at an API boundary.
 
 ```typescript
-import { validateCommandSpec, RunnerPolicySchema } from '@sentzunhat/zacatl';
+import { validateCommandSpec, RunnerPolicySchema } from '@sentzunhat/zacatl/utils';
 
 const policy = RunnerPolicySchema.parse({ allowlist: ['npm', 'node'] });
 

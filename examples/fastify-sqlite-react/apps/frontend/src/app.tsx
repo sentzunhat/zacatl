@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 interface Greeting {
   id: string;
@@ -10,320 +10,226 @@ interface Greeting {
 const apiBase = import.meta.env.VITE_API_BASE ?? '';
 const tokenFromEnv = import.meta.env.VITE_API_TOKEN as string | undefined;
 
-interface ApiErrorShape {
-  error?: {
-    message?: string;
-  };
-  message?: string;
-}
-
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
-  const headers = new Headers(init?.headers);
-
-  if (tokenFromEnv && !headers.has('Authorization')) {
-    headers.set('Authorization', `Bearer ${tokenFromEnv}`);
-  }
-
-  if (init?.body != null && !headers.has('Content-Type')) {
-    headers.set('Content-Type', 'application/json');
-  }
-
-  if (init?.body == null && headers.has('Content-Type')) {
-    headers.delete('Content-Type');
-  }
-
   const response = await fetch(`${apiBase}${path}`, {
+    headers: {
+      ...(init?.body != null ? { 'Content-Type': 'application/json' } : {}),
+      ...(tokenFromEnv ? { Authorization: `Bearer ${tokenFromEnv}` } : {}),
+    },
     ...init,
-    headers,
   });
 
   if (!response.ok) {
-    try {
-      const errorJson = (await response.json()) as ApiErrorShape;
-      const errorBody = errorJson as ApiErrorShape;
-      const message =
-        errorBody.error?.message ?? errorBody.message ?? `Request failed (${response.status})`;
-      throw new Error(message);
-    } catch {
-      const message = await response.text();
-      throw new Error(message || `Request failed (${response.status})`);
-    }
+    const message = await response.text();
+    throw new Error(message || `Request failed (${response.status})`);
   }
 
-  const json = (await response.json()) as T;
-  return json;
+  return (await response.json()) as T;
 }
 
 export default function App() {
-  const hasLoadedOnMount = useRef(false);
   const [greetings, setGreetings] = useState<Greeting[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [filterLanguage, setFilterLanguage] = useState('');
   const [newMessage, setNewMessage] = useState('');
   const [newLanguage, setNewLanguage] = useState('en');
   const [randomLanguage, setRandomLanguage] = useState('en');
   const [randomGreeting, setRandomGreeting] = useState<Greeting | null>(null);
-  const [status, setStatus] = useState<string>('');
-  const [isLoading, setIsLoading] = useState(false);
 
-  const filteredLabel = useMemo(() => {
-    return filterLanguage.trim() ? filterLanguage.trim().toLowerCase() : 'all';
-  }, [filterLanguage]);
+  const subtitle = useMemo(
+    () => (filterLanguage ? `Showing greetings in "${filterLanguage}"` : 'Showing all greetings'),
+    [filterLanguage],
+  );
 
-  const loadGreetings = async (language?: string) => {
-    setIsLoading(true);
-    setStatus('Loading greetings...');
+  async function loadGreetings(language?: string) {
+    setLoading(true);
+    setError(null);
     try {
       const query = language ? `?language=${encodeURIComponent(language)}` : '';
       const data = await request<Greeting[]>(`/api/greetings${query}`);
-      setGreetings(Array.isArray(data) ? data : []);
-      setStatus('');
-    } catch (error) {
-      setStatus(`Failed to load greetings: ${(error as Error).message}`);
+      setGreetings(data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load greetings');
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
-  };
-
-  const handleCreate = async (event: React.FormEvent) => {
-    event.preventDefault();
-    if (!newMessage.trim() || !newLanguage.trim()) {
-      setStatus('Message and language are required.');
-      return;
-    }
-
-    try {
-      setIsLoading(true);
-      const created = await request<Greeting>('/api/greetings', {
-        method: 'POST',
-        body: JSON.stringify({
-          message: newMessage.trim(),
-          language: newLanguage.trim(),
-        }),
-      });
-      setGreetings((prev) => [created, ...prev]);
-      setNewMessage('');
-      setStatus('Greeting created.');
-    } catch (error) {
-      setStatus(`Failed to create greeting: ${(error as Error).message}`);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleDelete = async (id: string) => {
-    try {
-      setIsLoading(true);
-      await request<{ success: boolean }>(`/api/greetings/${id}`, {
-        method: 'DELETE',
-      });
-      setGreetings((prev) => prev.filter((item) => item.id !== id));
-      setStatus('Greeting deleted.');
-    } catch (error) {
-      setStatus(`Failed to delete greeting: ${(error as Error).message}`);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleRandom = async () => {
-    if (!randomLanguage.trim()) {
-      setStatus('Provide a language for random greeting.');
-      return;
-    }
-
-    try {
-      setIsLoading(true);
-      const data = await request<Greeting | null>(
-        `/api/greetings/random/${encodeURIComponent(randomLanguage.trim())}`,
-      );
-      setRandomGreeting(data);
-      if (!data) {
-        setStatus('No greetings found for that language.');
-      } else {
-        setStatus('');
-      }
-    } catch (error) {
-      setStatus(`Failed to load random greeting: ${(error as Error).message}`);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  }
 
   useEffect(() => {
-    if (hasLoadedOnMount.current) {
-      return;
-    }
-
-    hasLoadedOnMount.current = true;
     void loadGreetings();
   }, []);
 
+  async function handleCreate(event: React.FormEvent) {
+    event.preventDefault();
+    setError(null);
+    const message = newMessage.trim();
+    const language = newLanguage.trim();
+    if (!message || !language) { setError('Message and language are required.'); return; }
+    try {
+      const created = await request<Greeting>('/api/greetings', {
+        method: 'POST',
+        body: JSON.stringify({ message, language }),
+      });
+      setGreetings((prev) => [created, ...prev]);
+      setNewMessage('');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to create greeting');
+    }
+  }
+
+  async function handleDelete(id: string) {
+    setError(null);
+    try {
+      await request<unknown>(`/api/greetings/${id}`, { method: 'DELETE' });
+      setGreetings((prev) => prev.filter((g) => g.id !== id));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to delete greeting');
+    }
+  }
+
+  async function handleFilter(event: React.FormEvent) {
+    event.preventDefault();
+    await loadGreetings(filterLanguage || undefined);
+  }
+
+  async function handleRandom(event: React.FormEvent) {
+    event.preventDefault();
+    setError(null);
+    const language = randomLanguage.trim();
+    if (!language) { setError('Language is required for random greeting.'); return; }
+    try {
+      const data = await request<Greeting | null>(
+        `/api/greetings/random/${encodeURIComponent(language)}`,
+      );
+      setRandomGreeting(data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to fetch random greeting');
+    }
+  }
+
   return (
-    <main className="mx-auto flex min-h-screen max-w-5xl flex-col gap-6 px-6 py-10">
-      <header className="flex flex-col gap-2">
-        <p className="text-sm font-semibold uppercase tracking-[0.3em] text-blue-500">
-          Zacatl Fastify Example
-        </p>
-        <h1 className="text-3xl font-semibold text-slate-900">Fastify + SQLite Greetings</h1>
-        <p className="max-w-2xl text-slate-600">
-          Minimal React + Tailwind UI aligned with the simplified Mictlan architecture example. Uses
-          the same greeting service endpoints and DI patterns.
-        </p>
+    <div className="mx-auto flex max-w-6xl flex-col gap-6 px-6 py-10">
+      <header className="flex flex-col gap-4 rounded-2xl bg-gradient-to-r from-blue-900 to-blue-500 p-6 text-white md:flex-row md:items-center md:justify-between">
+        <div>
+          <p className="text-xs uppercase tracking-[0.2em] text-white/80">Zacatl • Fastify • SQLite</p>
+          <h1 className="text-3xl font-semibold">Greetings Dashboard</h1>
+          <p className="text-white/80">{subtitle}</p>
+        </div>
+        <button
+          className="rounded-full bg-white/20 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/30"
+          onClick={() => loadGreetings()}
+        >
+          Refresh
+        </button>
       </header>
 
-      {status && (
-        <div className="rounded-2xl bg-slate-200/70 px-4 py-3 text-sm text-slate-800">{status}</div>
-      )}
+      {error ? (
+        <div className="rounded-xl bg-red-100 px-4 py-3 text-sm font-semibold text-red-800">{error}</div>
+      ) : null}
 
-      <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-soft">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <h2 className="text-lg font-semibold text-slate-900">All greetings ({filteredLabel})</h2>
-          <button
-            className="rounded-full border border-blue-200 px-4 py-2 text-sm font-semibold text-blue-600 transition hover:-translate-y-0.5 hover:shadow-lg disabled:opacity-50"
-            onClick={() => loadGreetings(filterLanguage.trim() || undefined)}
-            disabled={isLoading}
-          >
-            Refresh
+      <section className="grid gap-5 md:grid-cols-3">
+        <form className="flex flex-col gap-4 rounded-2xl bg-white p-5 shadow-lg shadow-slate-200/60" onSubmit={handleCreate}>
+          <h2 className="text-lg font-semibold">Create greeting</h2>
+          <label className="text-sm font-medium text-slate-600">
+            Message
+            <input
+              className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+              value={newMessage}
+              onChange={(e) => setNewMessage(e.target.value)}
+              placeholder="Hello from Zacatl"
+              required
+            />
+          </label>
+          <label className="text-sm font-medium text-slate-600">
+            Language
+            <input
+              className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+              value={newLanguage}
+              onChange={(e) => setNewLanguage(e.target.value)}
+              placeholder="en"
+              required
+            />
+          </label>
+          <button type="submit" className="rounded-full bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700">
+            Add greeting
           </button>
-        </div>
-        <div className="mt-4 flex flex-wrap gap-3">
-          <input
-            className="min-w-[220px] flex-1 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm"
-            placeholder="Filter by language (optional)"
-            value={filterLanguage}
-            onChange={(event) => setFilterLanguage(event.target.value)}
-          />
-          <button
-            className="rounded-full bg-sky-500 px-4 py-2 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:shadow-lg disabled:opacity-50"
-            onClick={() => loadGreetings(filterLanguage.trim() || undefined)}
-            disabled={isLoading}
-          >
+        </form>
+
+        <form className="flex flex-col gap-4 rounded-2xl bg-white p-5 shadow-lg shadow-slate-200/60" onSubmit={handleFilter}>
+          <h2 className="text-lg font-semibold">Filter greetings</h2>
+          <label className="text-sm font-medium text-slate-600">
+            Language
+            <input
+              className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+              value={filterLanguage}
+              onChange={(e) => setFilterLanguage(e.target.value)}
+              placeholder="Leave empty for all"
+            />
+          </label>
+          <button type="submit" className="rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-800">
             Apply filter
           </button>
-        </div>
-        <div className="mt-6 grid gap-3">
-          {greetings.length === 0 ? (
-            <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600">
-              No greetings yet.
-            </div>
-          ) : (
-            greetings.map((greeting) => (
-              <article
-                key={greeting.id}
-                className="grid gap-2 rounded-xl border border-slate-200 bg-slate-50 p-4"
-              >
-                <div className="flex flex-wrap items-center gap-3">
-                  <span className="rounded-full bg-sky-100 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-sky-700">
-                    {greeting.language}
-                  </span>
-                  <strong className="text-slate-900">{greeting.message}</strong>
-                </div>
-                <div className="flex flex-wrap gap-3 text-xs text-slate-500">
-                  <span>ID: {greeting.id}</span>
-                  <span>{new Date(greeting.createdAt).toLocaleString()}</span>
-                </div>
-                <div>
-                  <button
-                    className="rounded-full border border-blue-200 px-3 py-1.5 text-xs font-semibold text-blue-600 transition hover:-translate-y-0.5 hover:shadow-md disabled:opacity-50"
-                    onClick={() => handleDelete(greeting.id)}
-                    disabled={isLoading}
-                  >
-                    Delete
-                  </button>
-                </div>
-              </article>
-            ))
-          )}
-        </div>
-      </section>
+        </form>
 
-      <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-soft">
-        <h2 className="text-lg font-semibold text-slate-900">Create greeting</h2>
-        <form className="mt-4 grid gap-4 md:grid-cols-2" onSubmit={handleCreate}>
-          <div>
-            <label className="text-sm font-semibold text-slate-700" htmlFor="message">
-              Message
-            </label>
-            <textarea
-              id="message"
-              rows={3}
-              className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm"
-              placeholder="Hello, Zacatl!"
-              value={newMessage}
-              onChange={(event) => setNewMessage(event.target.value)}
-            />
-          </div>
-          <div>
-            <label className="text-sm font-semibold text-slate-700" htmlFor="language">
-              Language
-            </label>
+        <form className="flex flex-col gap-4 rounded-2xl bg-white p-5 shadow-lg shadow-slate-200/60" onSubmit={handleRandom}>
+          <h2 className="text-lg font-semibold">Random greeting</h2>
+          <label className="text-sm font-medium text-slate-600">
+            Language
             <input
-              id="language"
-              className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm"
+              className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+              value={randomLanguage}
+              onChange={(e) => setRandomLanguage(e.target.value)}
               placeholder="en"
-              value={newLanguage}
-              onChange={(event) => setNewLanguage(event.target.value)}
+              required
             />
-            <div className="mt-4">
-              <button
-                type="submit"
-                className="rounded-full bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:shadow-lg disabled:opacity-50"
-                disabled={isLoading}
-              >
-                Create greeting
-              </button>
+          </label>
+          <button type="submit" className="rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-800">
+            Get random
+          </button>
+          {randomGreeting ? (
+            <div className="mt-3 rounded-xl bg-slate-100 p-3">
+              <p className="text-sm font-semibold">"{randomGreeting.message}"</p>
+              <span className="mt-2 inline-flex items-center rounded-full bg-sky-100 px-3 py-1 text-xs font-semibold text-sky-700">
+                {randomGreeting.language}
+              </span>
             </div>
-          </div>
+          ) : null}
         </form>
       </section>
 
-      <section className="rounded-2xl border border-amber-200 bg-amber-50/60 p-6 shadow-soft">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <h2 className="text-lg font-semibold text-slate-900">Random greeting</h2>
-          <button
-            className="rounded-full bg-sky-500 px-4 py-2 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:shadow-lg disabled:opacity-50"
-            onClick={handleRandom}
-            disabled={isLoading}
-          >
-            Fetch random
-          </button>
+      <section className="flex flex-col gap-4 rounded-2xl bg-white p-5 shadow-lg shadow-slate-200/60">
+        <div className="flex items-center justify-between gap-4">
+          <h2 className="text-lg font-semibold">All greetings</h2>
+          <span className="inline-flex items-center rounded-full bg-sky-100 px-3 py-1 text-xs font-semibold text-sky-700">
+            {greetings.length} total
+          </span>
         </div>
-        <div className="mt-4 grid gap-4 md:grid-cols-2">
-          <div>
-            <label className="text-sm font-semibold text-slate-700" htmlFor="random-language">
-              Language
-            </label>
-            <input
-              id="random-language"
-              className="mt-2 w-full rounded-xl border border-amber-200 bg-white px-3 py-2 text-sm"
-              placeholder="en"
-              value={randomLanguage}
-              onChange={(event) => setRandomLanguage(event.target.value)}
-            />
-          </div>
-          <div>
-            <label className="text-sm font-semibold text-slate-700">Result</label>
-            <div className="mt-2 grid min-h-[96px] gap-2 rounded-xl border border-amber-200 bg-white p-4 text-sm">
-              {randomGreeting ? (
-                <>
-                  <div className="flex flex-wrap items-center gap-3">
-                    <span className="rounded-full bg-sky-100 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-sky-700">
-                      {randomGreeting.language}
-                    </span>
-                    <strong className="text-slate-900">{randomGreeting.message}</strong>
-                  </div>
-                  <div className="flex flex-wrap gap-3 text-xs text-slate-500">
-                    <span>ID: {randomGreeting.id}</span>
-                    <span>{new Date(randomGreeting.createdAt).toLocaleString()}</span>
-                  </div>
-                </>
-              ) : (
-                <span className="text-slate-500">No random greeting loaded yet.</span>
-              )}
-            </div>
-          </div>
-        </div>
+        {loading ? (
+          <p className="text-sm text-slate-500">Loading…</p>
+        ) : greetings.length === 0 ? (
+          <p className="text-sm text-slate-500">No greetings yet. Create one to get started.</p>
+        ) : (
+          <ul className="flex flex-col gap-3">
+            {greetings.map((greeting) => (
+              <li key={greeting.id} className="flex items-center justify-between gap-4 rounded-xl bg-slate-50 p-4">
+                <div>
+                  <p className="text-sm font-semibold">{greeting.message}</p>
+                  <span className="mt-2 inline-flex items-center rounded-full bg-sky-100 px-3 py-1 text-xs font-semibold text-sky-700">
+                    {greeting.language}
+                  </span>
+                </div>
+                <button
+                  className="rounded-full bg-slate-100 px-3 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-200"
+                  onClick={() => handleDelete(greeting.id)}
+                >
+                  Delete
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
       </section>
-    </main>
+    </div>
   );
 }

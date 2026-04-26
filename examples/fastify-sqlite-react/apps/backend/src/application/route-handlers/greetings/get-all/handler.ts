@@ -7,8 +7,9 @@
  * - Type-safe array response
  */
 
-import { inject, singleton } from '@sentzunhat/zacatl/third-party/tsyringe';
-import { FastifyGetRouteHandler, type Request } from '@sentzunhat/zacatl/service';
+import { inject, singleton } from '@sentzunhat/zacatl/third-party/dependency-injection/tsyringe';
+import type { Request } from '@sentzunhat/zacatl/service/layers/application/entry-points/rest/fastify/handlers/abstract';
+import { GetRouteHandler } from '@sentzunhat/zacatl/service/layers/application/entry-points/rest/fastify/handlers/get-route-handler';
 import { GreetingServiceAdapter } from '../../../../domain/greetings/service';
 import {
   GreetingFilterQuerySchema,
@@ -18,7 +19,7 @@ import {
 import { toGreetingListResponse } from '../greeting.serializer';
 
 @singleton()
-export class GetAllGreetingsHandler extends FastifyGetRouteHandler<
+export class GetAllGreetingsHandler extends GetRouteHandler<
   void,
   GreetingFilterQuery,
   GreetingListResponse

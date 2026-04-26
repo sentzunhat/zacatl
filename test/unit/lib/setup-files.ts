@@ -35,7 +35,7 @@ if (typeof globalThis.File === 'undefined') {
         configurable: false,
       });
     }
-  } as any;
+  } as unknown as typeof File;
 }
 
 // /**

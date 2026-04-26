@@ -21,7 +21,12 @@ services:
   backend:
     build:
       context: ../..
-      dockerfile: examples/express-postgres-react/Dockerfile
+      dockerfile: examples/Dockerfile
+      args:
+        EXAMPLE: express-postgres-react
+        BACKEND: apps/backend
+        FRONTEND: apps/frontend
+        PORT: 8183
     image: zacatl-express-postgres
     container_name: express-postgres-backend
     ports:
@@ -37,9 +42,9 @@ services:
       test:
         [
           'CMD',
-          '/nodejs/bin/node',
+          'node',
           '-e',
-          "fetch('http://localhost:8183/greetings').catch(() => process.exit(1))",
+          "fetch('http://localhost:8183/api/greetings').catch(() => process.exit(1))",
         ]
       interval: 10s
       timeout: 5s

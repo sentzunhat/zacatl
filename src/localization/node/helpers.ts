@@ -5,7 +5,7 @@
 
 import fs from 'fs';
 
-import { BadRequestError } from '../../error/index';
+import { BadRequestError } from '../../error';
 
 /**
  * Type guard: check if value is a plain object.

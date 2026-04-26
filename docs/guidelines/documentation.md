@@ -374,9 +374,8 @@ const instance = new MyClass();
 
 ## Documentation
 
-- [Architecture](./docs/guidelines/framework-overview.md)
-- [API Reference](./docs/api.md)
-- [Examples](./examples/)
+- [Architecture](./framework-overview.md)
+- [Examples](../../examples/)
 
 ## License
 

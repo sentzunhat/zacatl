@@ -10,6 +10,19 @@
 // parser, plugins, and project are all provided by baseConfig (tseslint.configs.recommended).
 // naming-convention is an AST-based rule; it does not need type information.
 
+/**
+ * Single source of truth for "this exported class is abstract, extend it"
+ * role suffixes. A class ending in one of these is exempt from the
+ * Abstract/Base-prefix requirement below — its role noun already signals
+ * "extend me" (GetRouteHandler, BaseRepository's per-vendor siblings, etc.),
+ * so it doesn't also need an Abstract/Base prefix.
+ *
+ * Add new role suffixes here, not as a new standalone filter block — this
+ * is the one place that governs which suffixes get the exemption.
+ */
+const ABSTRACT_ROLE_SUFFIXES = ['Handler', 'Repository'];
+const abstractRoleSuffixRegex = `(${ABSTRACT_ROLE_SUFFIXES.join('|')})$`;
+
 const namingConventionsConfig = {
   files: ['src/**/*.ts'],
   rules: {
@@ -79,12 +92,20 @@ const namingConventionsConfig = {
             '(Fastify|Express|Mongoose|Sequelize|Pino|Console|Filesystem|Memory|Logger|Server|ORM|I18n|JSON|YAML|Config.*Loader).*Adapter$',
         },
       },
-      // Abstract classes - allow Abstract prefix
+      // Abstract classes - require an Abstract/Base prefix UNLESS the name
+      // already ends in one of ABSTRACT_ROLE_SUFFIXES (see that constant's
+      // doc comment) — those role suffixes are the other half of the same
+      // "this is abstract, extend it" signal, just expressed as a suffix
+      // instead of a prefix.
       {
         selector: 'class',
         modifiers: ['abstract', 'exported'],
         format: ['PascalCase'],
         prefix: ['Abstract', 'Base'],
+        filter: {
+          match: false,
+          regex: abstractRoleSuffixRegex,
+        },
       },
       // Error classes - require Error suffix
       {
@@ -108,15 +129,19 @@ const namingConventionsConfig = {
             '^(Service|Application|Infrastructure|Domain|CLI|Desktop|Server|PageModule|Provider)$',
         },
       },
-      // Route handlers - require Handler suffix
+      // Role-suffix classes (route handlers, repositories, ...) - the suffix
+      // itself is the "this is abstract, extend it" signal, so no
+      // Abstract/Base prefix is required. Driven by the single
+      // ABSTRACT_ROLE_SUFFIXES list above — add a new role there, not a new
+      // filter block here.
       {
         selector: 'class',
         modifiers: ['exported'],
         format: ['PascalCase'],
-        suffix: ['Handler'],
+        suffix: ABSTRACT_ROLE_SUFFIXES,
         filter: {
           match: true,
-          regex: 'Handler$',
+          regex: abstractRoleSuffixRegex,
         },
       },
       // All other exported classes must follow PascalCase

@@ -13,7 +13,7 @@ Both `providers` and `services` are valid options in the domain layer configurat
 Use `providers` for domain logic classes that **provide functionality** to other layers:
 
 ```typescript
-import { Service } from '@sentzunhat/zacatl';
+import { Service } from '@sentzunhat/zacatl/service';
 
 const service = new Service({
   layers: {
@@ -40,7 +40,7 @@ workflows as a semantic grouping in the domain layer:
 
 ```typescript
 import { registerDependencies, resolveDependencies } from '@sentzunhat/zacatl/dependency-injection';
-import { singleton } from '@sentzunhat/zacatl/third-party/tsyringe';
+import { singleton } from '@sentzunhat/zacatl/third-party/dependency-injection/tsyringe';
 
 @singleton()
 class MigrationService {}
@@ -91,7 +91,7 @@ domain: {
 All dependency injection uses three simple functions from one place:
 
 ```typescript
-import { registerDependencies, resolveDependencies, registerAndResolve } from '@sentzunhat/zacatl';
+import { registerDependencies, resolveDependencies, registerAndResolve } from '@sentzunhat/zacatl/dependency-injection';
 ```
 
 ## Usage Pattern
@@ -144,7 +144,7 @@ const hooks = registerAndResolve([AuthHook, LoggingHook]);
 ## Example: Building a Service
 
 ```typescript
-import { registerDependencies, resolveDependencies, Constructor } from '@sentzunhat/zacatl';
+import { registerDependencies, resolveDependencies, Constructor } from '@sentzunhat/zacatl/dependency-injection';
 
 // Infrastructure
 class UserRepository {
@@ -212,7 +212,7 @@ Current pattern:
 
 ```typescript
 // ✅ NEW: Just use the functions
-import { registerDependencies } from '@sentzunhat/zacatl';
+import { registerDependencies } from '@sentzunhat/zacatl/dependency-injection';
 
 class MyLayer {
   constructor(config) {
@@ -234,7 +234,7 @@ class MyLayer {
 Domain and Infrastructure layers use these functions internally:
 
 ```typescript
-import { Domain, Infrastructure } from '@sentzunhat/zacatl';
+import { Domain, Infrastructure } from '@sentzunhat/zacatl/service';
 
 // Infrastructure auto-uses registerDependencies
 const infra = new Infrastructure({

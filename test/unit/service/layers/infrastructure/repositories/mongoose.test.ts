@@ -1,13 +1,11 @@
 import { describe, it, expect, vi, beforeAll } from 'vitest';
 
-import { Schema } from '@zacatl/third-party/mongoose';
-import { singleton } from '@zacatl/third-party/tsyringe';
+import { Schema } from '@zacatl/third-party/databases/mongoose';
+import type { MongooseModel } from '@zacatl/third-party/databases/mongoose';
+import { singleton } from '@zacatl/third-party/dependency-injection/tsyringe';
 
-import {
-  MongooseRepository,
-  ORMType,
-} from '../../../../../../src/service/layers/infrastructure/repositories/mongoose';
-import type { MongooseModel } from '../../../../../../src/third-party/mongoose';
+import { BaseRepository } from '../../../../../../src/service/layers/infrastructure/repositories/mongoose/repository';
+import { ORMType } from '../../../../../../src/service/layers/infrastructure/repositories/types';
 import { connectToMongoServerAndRegisterDependency } from '../../../../helpers/database/mongo';
 
 interface UserTestDb {
@@ -25,7 +23,7 @@ const schemaUserTest = new Schema<UserTestDb>({
 });
 
 @singleton()
-class UserRepository extends MongooseRepository<UserTestDb, UserTestDb, UserTestOutput> {
+class UserRepository extends BaseRepository<UserTestDb, UserTestDb, UserTestOutput> {
   constructor() {
     super({
       type: ORMType.Mongoose,
@@ -35,7 +33,7 @@ class UserRepository extends MongooseRepository<UserTestDb, UserTestDb, UserTest
   }
 }
 
-describe('MongooseRepository', () => {
+describe('BaseRepository', () => {
   let repository: UserRepository;
 
   beforeAll(async (): Promise<void> => {
@@ -48,7 +46,7 @@ describe('MongooseRepository', () => {
       const msg = error instanceof Error ? error.message : String(error);
       if (msg?.includes('Mongoose is not installed')) {
         // eslint-disable-next-line no-console
-        console.log('Skipping MongooseRepository tests - running from TypeScript source');
+        console.log('Skipping BaseRepository tests - running from TypeScript source');
         return;
       }
       throw error;
@@ -58,14 +56,12 @@ describe('MongooseRepository', () => {
   describe('model initialization', () => {
     it('should create a model with provided name and schema', async () => {
       if (!repository) return;
-      // Initialize adapter by calling an async method first
-      await repository.create({ name: 'initialization-test' });
       const model = repository.model as MongooseModel<UserTestDb>;
       expect(model.modelName).toBe('MongooseUser');
       expect(model.schema).toBe(schemaUserTest);
     });
 
-    it('should be lazy-loaded (null until first access)', () => {
+    it('should expose the model immediately', () => {
       if (!repository) return;
       const model = repository.model;
       expect(model).toBeDefined();
@@ -145,7 +141,7 @@ describe('MongooseRepository', () => {
     it('should throw InternalServerError if toLean fails', async () => {
       if (!repository) return;
       const model = repository.model as MongooseModel<UserTestDb>;
-      vi.spyOn(model, 'create').mockResolvedValueOnce(null as any);
+      vi.spyOn(model, 'create').mockResolvedValueOnce(null as unknown as never);
 
       // This would only happen if toLean returned null after creation
       // In practice, this should not happen
