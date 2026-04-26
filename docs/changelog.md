@@ -2,6 +2,26 @@
 
 ---
 
+## [0.0.55] - 2026-04-25
+
+**Status**: Pending release
+
+### ✨ Improvements
+
+- **Mongo example parity hardening** — Aligned the Fastify + MongoDB + React example with the working SQLite reference by fixing workspace scripts, static frontend serving, and runtime path resolution for the `apps/*` layout.
+- **Mongo example startup initialization** — Added an explicit repository model initialization step after the Mongoose connection is established so example collections and indexes are ready before requests hit the API.
+
+### 🐛 Fixes
+
+- **Standalone Mongoose repository initialization** — Added `initializeModel()` to the standalone `MongooseRepository` base so framework consumers can safely trigger adapter-backed model setup outside the legacy base repository path.
+- **Mongo example defaults and docs drift** — Corrected the default MongoDB connection guidance, backend docs, and Docker usage notes so they match the current monorepo structure and validated local runtime flow.
+- **Published package audit cleanup** — Removed `sqlite3` from Zacatl's hard runtime dependencies and kept it as an optional peer/dev install, eliminating the published library's current `npm audit --omit=dev` findings while preserving SQLite driver availability for local development and Sequelize-based consumers.
+
+### 📚 Documentation
+
+- **Example release validation notes** — Documented the example runtime assumptions around local MongoDB containers, container-to-host connection strings on macOS, and the current separate-Mongo-container Docker workflow.
+- **Localization discovery docs alignment** — Clarified that installed Zacatl packages resolve built-in locale files automatically and that consumer services can layer additional translations from explicit and auto-discovered `locales/` directories.
+
 ## [0.0.54] - 2026-04-22
 
 **Status**: Pending release

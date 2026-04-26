@@ -10,21 +10,22 @@
     "npm": ">=11.0.0"
   },
   "workspaces": [
-    "backend",
-    "frontend"
+    "apps/backend",
+    "apps/frontend"
   ],
   "scripts": {
     "dev": "npm run backend:dev & npm run frontend:dev",
-    "backend:dev": "npm --prefix backend run dev",
-    "frontend:dev": "npm --prefix frontend run dev",
+    "backend:dev": "npm --prefix apps/backend run dev",
+    "frontend:dev": "npm --prefix apps/frontend run dev",
     "build": "npm run backend:build && npm run frontend:build",
-    "backend:build": "npm --prefix backend run build",
-    "frontend:build": "npm --prefix frontend run build",
-    "start": "npm --prefix backend run start",
+    "backend:build": "npm --prefix apps/backend run build",
+    "frontend:build": "npm --prefix apps/frontend run build",
+    "start": "npm --prefix apps/backend run start",
     "clean": "rm -rf apps/*/dist apps/*/node_modules"
   },
   "dependencies": {
     "@sentzunhat/zacatl": "file:../../",
+    "mongoose": "^9.0.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },

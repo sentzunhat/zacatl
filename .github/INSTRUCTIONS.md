@@ -12,7 +12,7 @@ This repository intentionally uses **both** folders:
 
 ## Agent Startup Expectations
 
-- On task start, agents should first review `START_HERE.md` for setup and workflow orientation, then `README.md` and relevant guidance in `docs/`, especially `docs/guidelines/`.
+- On task start, agents should first review `docs/START_HERE.md` for setup and workflow orientation, then `README.md` and relevant guidance in `docs/`, especially `docs/guidelines/`.
 - Treat documentation standards and coding standards in `docs/` as project source-of-truth before making changes.
 
 ## Current Files

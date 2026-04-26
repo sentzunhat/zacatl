@@ -5,7 +5,7 @@ When helping in this repository, prefer minimal and practical changes aligned wi
 ## Required Context Intake (Before Doing the Task)
 
 - Before implementing changes, review repository context in this order:
-  1. `START_HERE.md` (setup, daily workflow, and key commands)
+  1. `docs/START_HERE.md` (setup, daily workflow, and key commands)
   2. `README.md`
   3. `docs/README.md`
   4. `docs/guidelines/framework-overview.md`
@@ -61,12 +61,12 @@ This repository uses HAWP as a lightweight workflow method.
 
 Follow the repo-local HAWP guidance in:
 
-- `hawp/usage/INIT.md`
-- `hawp/usage/STATUS_REPORT.md`
+- `.hawp/usage/INIT.md`
+- `.hawp/usage/STATUS_REPORT.md`
 
-Use `hawp/usage/INIT.md` as the operating guide for how this repo applies HAWP in practice.
+Use `.hawp/usage/INIT.md` as the operating guide for how this repo applies HAWP in practice.
 
-Use `hawp/usage/STATUS_REPORT.md` when the user asks for a:
+Use `.hawp/usage/STATUS_REPORT.md` when the user asks for a:
 
 - status report
 - checkpoint summary
@@ -75,7 +75,7 @@ Use `hawp/usage/STATUS_REPORT.md` when the user asks for a:
 
 Saved status reports belong in:
 
-- `hawp/usage/status/`
+- `.hawp/usage/status/`
 
 Keep the repo-local HAWP layer lean.
 

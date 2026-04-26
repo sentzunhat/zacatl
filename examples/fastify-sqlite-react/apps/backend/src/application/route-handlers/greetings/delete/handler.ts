@@ -10,7 +10,7 @@
 import { inject, singleton } from '@sentzunhat/zacatl/third-party/tsyringe';
 import { FastifyDeleteRouteHandler, type Request } from '@sentzunhat/zacatl/service';
 import { GreetingServiceAdapter } from '../../../../domain/greetings/service';
-import { type GreetingIdParams } from '../greeting.schema.js';
+import { type GreetingIdParams } from '../greeting.schema';
 
 @singleton()
 export class DeleteGreetingHandler extends FastifyDeleteRouteHandler<

@@ -30,6 +30,15 @@ export abstract class AbstractMongooseRepository<D, I, O>
   }
 
   /**
+   * Initialize the Mongoose model so collection and index setup happen at startup.
+   */
+  public async initializeModel(): Promise<void> {
+    if ('initialize' in this.adapter && typeof this.adapter.initialize === 'function') {
+      await this.adapter.initialize();
+    }
+  }
+
+  /**
    * Find document by id and return lean output
    */
   async findById(id: string): Promise<O | null> {

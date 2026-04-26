@@ -53,7 +53,7 @@ See [express-sqlite-react](../express-sqlite-react/) for the same example using 
 ## Documentation
 
 - **Examples Catalog**: [../README.md](../README.md)
-- **Start Here**: [../../START_HERE.md](../../START_HERE.md)
+- **Start Here**: [../../docs/START_HERE.md](../../docs/START_HERE.md)
 - **Framework Overview**: [../../docs/guidelines/framework-overview.md](../../docs/guidelines/framework-overview.md)
 - **Framework Database Guide**: [../../docs/third-party/orm/database-setup.md](../../docs/third-party/orm/database-setup.md)
 - **Service Module**: [../../docs/service/README.md](../../docs/service/README.md)

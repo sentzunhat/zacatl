@@ -214,6 +214,36 @@ No manual `tsconfig paths` config is needed because builds use real files, not v
 
 (Note: paths are `build/esm/` and `build/cjs/` in published package; `build-src-esm/` and `build-src-cjs/` in development)
 
+### Development vs Publish Export Patterns
+
+Use this table as the quick reference for when export maps are generated, where
+they are written, and which command/script is responsible.
+
+| Context                               | Trigger                                                  | Output file                                            | Source script                                                                    |
+| ------------------------------------- | -------------------------------------------------------- | ------------------------------------------------------ | -------------------------------------------------------------------------------- |
+| Local development (default git state) | none                                                     | `package.json` (no `exports` map committed by default) | n/a                                                                              |
+| Local linked-package testing          | `npm run local:exports`                                  | root `package.json` (generated `exports`)              | [`scripts/dev/sync-local-exports.ts`](../../scripts/dev/sync-local-exports.ts)   |
+| Publish packaging                     | `npm run prepare-publish` (also used by publish scripts) | `publish/package.json` (publish `exports`)             | [`scripts/publish/prepare-publish.ts`](../../scripts/publish/prepare-publish.ts) |
+
+Command references in root scripts:
+
+- `local:exports`: [package.json](../../package.json)
+- `prepare-publish`: [package.json](../../package.json)
+- `publish:dry`, `publish:latest`, `publish:otp`: [package.json](../../package.json)
+
+Recommended verification flow:
+
+1. Build artifacts: `npm run build`
+2. Optional local subpath resolution test: `npm run local:exports`
+3. Generate publish metadata: `npm run prepare-publish`
+4. Validate publish package without release: `npm run publish:dry`
+
+Notes:
+
+- The publish contract for consumers is the generated `publish/package.json`.
+- Root `package.json` export entries are development-time helpers when you
+  explicitly generate them for local linking scenarios.
+
 ### Example Application (Consuming Zacatl)
 
 ```json
@@ -235,8 +265,8 @@ No manual `tsconfig paths` config is needed because builds use real files, not v
 
 **Key Differences:**
 
-- ✅ Only `@sentzunhat/zacatl` as dependency (not express, mongoose, sequelize, etc.)
-- ✅ Framework dependencies resolve through workspace (in monorepo) or library's node_modules
+- ✅ `@sentzunhat/zacatl` is enough for core usage
+- ✅ Add optional peers only for the adapters you use (`mongoose`, `sequelize`, `better-sqlite3`, `sqlite3`, `pg`)
 - ✅ Reduced `package.json` complexity and reproducible builds
 
 ---

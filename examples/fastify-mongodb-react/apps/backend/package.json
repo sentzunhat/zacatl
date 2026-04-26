@@ -1,0 +1,22 @@
+{
+  "name": "zacatl-fastify-mongodb-backend",
+  "version": "1.0.0",
+  "description": "Fastify + MongoDB backend using Zacatl framework",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "fastify-type-provider-zod": "^6.1.0",
+    "mongoose": "^9.0.0"
+  },
+  "scripts": {
+    "start": "node dist/index.js",
+    "dev": "tsx watch src/index.ts",
+    "build": "npm --prefix ../.. exec -- tsc -p tsconfig.json && node ../../../../build-scripts-esm/build/fix-esm.js dist",
+    "clean": "rm -rf dist"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.16",
+    "tsx": "^4.7.0",
+    "typescript": "^5.3.3"
+  }
+}

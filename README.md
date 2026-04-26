@@ -6,215 +6,27 @@
 [![TypeScript](https://img.shields.io/badge/%3C%2F%3E-TypeScript-3178c6.svg)](https://www.typescriptlang.org/)
 [![Node.js 24+](https://img.shields.io/badge/Node.js-24%2B-brightgreen.svg)](https://nodejs.org/)
 [![Build](https://github.com/sentzunhat/zacatl/actions/workflows/publish-dry.yml/badge.svg)](https://github.com/sentzunhat/zacatl/actions/workflows/publish-dry.yml)
-[![Tests: 459](https://img.shields.io/badge/Tests-459-blue.svg)](#tests)
-[![Coverage: 74.50%](https://img.shields.io/badge/Coverage-74.50%25-orange.svg)](https://img.shields.io/badge/Coverage-74.50%25-orange.svg)
+[![Tests: 461](https://img.shields.io/badge/Tests-461-blue.svg)](#tests)
+[![Coverage: 75.93%](https://img.shields.io/badge/Coverage-75.93%25-yellow.svg)](https://img.shields.io/badge/Coverage-75.94%25-yellow.svg)
 
-**Universal TypeScript framework for building CLI tools, desktop apps, APIs, and distributed systems.**
+**Universal TypeScript framework for building APIs, CLI tools, and distributed systems.**
 
-Zacatl enforces clean, layered architecture with dependency injection, validation, and comprehensive error handling—designed for both human developers and AI agents to collaborate effectively.
+Zacatl enforces layered (hexagonal) architecture with built-in dependency injection, type-safe validation, and structured error handling — designed for both human developers and AI agents to collaborate effectively.
 
-## ✨ Key Features
+## ✨ What You Get
 
-- **🎯 Multi-Context Architecture** - Single codebase for CLI, Desktop, and Server applications
-- **🏗️ Layered/Hexagonal Architecture** - Clean separation with Application, Domain, Infrastructure, and Platform layers
-- **💉 Dependency Injection** - Built-in DI container using `tsyringe`
-- **✅ Type-Safe Validation** - Full Zod schema support (with planned Yup and optional validation)
-- **🛡️ Structured Error Handling** - 7 custom error types with correlation IDs
-- **🗄️ Pluggable ORM Adapters** - Sequelize, Mongoose, built-in SQLite (Node 24+), or build your own
-- **🌐 Multi-Language Support** - Pluggable i18n with filesystem/memory adapters
-- **🔌 Adapter Pattern** - Easy integration with any database or service
-- **🧪 Comprehensive Testing** - See the badges above for the current test count and coverage; Vitest
-- **📝 Production Ready** - Structured logging, monitoring, and error tracking
+| Capability                  | Detail                                                         |
+| --------------------------- | -------------------------------------------------------------- |
+| 🏗️ Layered Architecture     | Strict Application → Domain → Infrastructure → Platform layers |
+| 💉 Dependency Injection     | Built-in DI container via `tsyringe`                           |
+| ✅ Type-Safe Validation     | Zod schema support; Yup and optional validation planned        |
+| 🛡️ Structured Errors        | 7 custom error types with correlation IDs                      |
+| 🗄️ Pluggable ORM Adapters   | Sequelize, Mongoose, built-in SQLite (Node 24+), or custom     |
+| 🌐 Internationalization     | Pluggable i18n with filesystem/memory adapters                 |
+| 📝 Production Observability | Structured logging and error tracking                          |
+| 🧪 Tested                   | Vitest — test count and coverage shown in badges above         |
 
-## 🎯 Multi-Context Support
-
-Build **CLI tools**, **Desktop apps**, and **HTTP servers** with the same architecture:
-
-> **Platform availability:** CLI and Desktop platform adapters are planned; the HTTP server platform is the primary supported runtime. See [Service Module](./docs/service/README.md) for platform status and availability.
-
-> **Runtime status:** `ServiceType.CLI` and `ServiceType.DESKTOP` are declared but currently stubbed at runtime. For non-HTTP scripts/workers today, prefer standalone DI helpers from `@sentzunhat/zacatl/dependency-injection`.
-
-```typescript
-import Fastify from 'fastify';
-import { Service, ServiceType, ServerType, ServerVendor } from '@sentzunhat/zacatl';
-
-const fastify = Fastify();
-
-// CLI Application shape (declared, not runnable yet)
-const cli = new Service({
-  type: ServiceType.CLI,
-  layers: {
-    application: { entryPoints: { cli: { commands: [...] } } },
-    domain: { services: [...] },
-    infrastructure: { repositories: [...] },
-  },
-  platforms: {
-    cli: { name: 'my-tool', version: '1.0.0' },
-  },
-});
-
-// Desktop Application shape (declared, not runnable yet)
-const desktop = new Service({
-  type: ServiceType.DESKTOP,
-  layers: {
-    application: { entryPoints: { ipc: { handlers: [...] } } },
-    domain: { services: [...] },
-    infrastructure: { repositories: [...] },
-  },
-  platforms: {
-    desktop: { window: { title: 'My App', width: 1024, height: 768 }, platform: 'neutralino' },
-  },
-});
-
-// HTTP Server (default)
-const server = new Service({
-  type: ServiceType.SERVER,
-  layers: {
-    application: { entryPoints: { rest: { hooks: [...], routes: [...] } } },
-    domain: { services: [...] },
-    infrastructure: { repositories: [...] },
-  },
-  platforms: {
-    server: {
-      name: 'my-service',
-      server: { type: ServerType.SERVER, vendor: ServerVendor.FASTIFY, instance: fastify }
-    },
-  },
-});
-```
-
-## Platform Support Status
-
-| Platform | Status              |
-| -------- | ------------------- |
-| Server   | Stable              |
-| CLI      | Planned (stub only) |
-| Desktop  | Planned (stub only) |
-
-## Service Configuration (notable options)
-
-- `run.auto`: When `true`, the `Service` will attempt to start automatically during `Service` construction. Defaults to `false` when omitted. This option is part of the `ConfigService` root config; see the `service` docs for full configuration examples.
-
-## Public API Surface
-
-The following modules are considered the stable, public surface of Zacatl:
-
-- `configuration`
-- `service`
-- `dependency-injection`
-- `error`
-- `logs`
-- `localization`
-- `third-party/*`
-
-## What Zacatl Does NOT Do
-
-- Zacatl is not an end-user UI framework; Desktop and CLI adapters are planned and currently implemented as minimal stubs.
-
-## Architectural Guarantees
-
-- Layered / hexagonal architecture with strict inward dependency flow.
-- Public API surface is stable; internal modules may change between minor versions.
-
-## 📖 Documentation
-
-Full documentation lives in **[`docs/`](./docs/README.md)**.
-
-New contributors can start with **[START_HERE.md](./START_HERE.md)** for a practical setup and daily workflow checklist.
-
-- **[Architecture Overview](./docs/guidelines/framework-overview.md)** - System design and module map
-- **[Release Notes](./docs/changelog.md)** - Version history and changes
-- **[Service Module](./docs/service/README.md)** - Service configuration and platform APIs
-- **[Dependency Injection](./docs/dependency-injection/README.md)** - DI patterns and container usage
-- **[Configuration](./docs/configuration/README.md)** - Configuration loading
-- **[Errors](./docs/error/README.md)** - Error types and usage
-- **[Logs](./docs/logs/README.md)** - Logging adapters and patterns
-- **[Localization](./docs/localization/README.md)** - i18n usage and adapters
-- **[Third-Party + ORM](./docs/third-party/README.md)** - Re-exports and ORM guidance
-- **[ESLint](./docs/eslint/README.md)** - Shared ESLint configuration
-- **[Utils](./docs/utils/README.md)** - Utility helpers and path aliases
-- **[Examples](./examples/)** - Production-ready example applications
-
-## 🌱 Ethical Use (Non-binding)
-
-Zacatl is licensed under the Apache License, Version 2.0 (permissive). Please don’t use it to harm people.
-
-## 🚀 Quick Start
-
-### Install
-
-```bash
-npm install @sentzunhat/zacatl
-```
-
-> All supported ORMs and platforms (`mongoose`, `sequelize`, `express`, `fastify`, `better-sqlite3`) are bundled — a single install is enough. Only SQL dialect drivers need a separate install:
-
-```bash
-npm install pg pg-hstore   # PostgreSQL
-npm install mysql2         # MySQL
-```
-
-Validate your environment with:
-
-```bash
-npm run check:peers
-```
-
-### Hello World HTTP Service
-
-```typescript
-import Fastify from 'fastify';
-import { Service, ServiceType, ServerType, ServerVendor } from '@sentzunhat/zacatl';
-
-const fastify = Fastify();
-
-const service = new Service({
-  type: ServiceType.SERVER,
-  layers: {
-    application: {
-      entryPoints: { rest: { hooks: [], routes: [] } },
-    },
-    domain: { services: [] },
-    infrastructure: { repositories: [] },
-  },
-  platforms: {
-    server: {
-      name: 'hello-service',
-      server: {
-        type: ServerType.SERVER,
-        vendor: ServerVendor.FASTIFY,
-        instance: fastify,
-      },
-    },
-  },
-});
-
-await service.start({ port: 3000 });
-```
-
-### CLI / Desktop Application
-
-```typescript
-import { registerDependency, resolveDependency } from '@sentzunhat/zacatl/dependency-injection';
-import { singleton } from '@sentzunhat/zacatl/third-party/tsyringe';
-
-@singleton()
-class MyService {
-  doSomething = async () => console.log('Hello from CLI!');
-}
-
-registerDependency(MyService, MyService);
-
-const myService = resolveDependency(MyService);
-await myService.doSomething();
-```
-
-For Service-based orchestration, keep runtime startup on `ServiceType.SERVER`
-until CLI/Desktop runtimes move beyond stub status.
-
-## 🏗️ Architecture Layers
-
-Zacatl implements **layered (hexagonal) architecture**:
+## 🏗️ Architecture
 
 ```
 ┌─────────────────────────────────────────┐
@@ -228,17 +40,31 @@ Zacatl implements **layered (hexagonal) architecture**:
 └─────────────────────────────────────────┘
 ```
 
-Each layer has a single responsibility, and dependencies flow strictly inward.
+Dependencies flow strictly inward. The public API surface is stable; internal modules may change between minor versions.
 
-## 💾 Database Adapters
+## 🎯 Platform Support
 
-### Sequelize
+| Platform      | Status              |
+| ------------- | ------------------- |
+| Server (HTTP) | Stable              |
+| CLI           | Planned (stub only) |
+| Desktop       | Planned (stub only) |
+
+> For non-HTTP scripts and workers today, use the standalone DI helpers from `@sentzunhat/zacatl/dependency-injection` directly.
+
+## 🚀 Quick Start
+
+```bash
+npm install @sentzunhat/zacatl
+```
+
+> Core server dependencies are installed with Zacatl. ORM/database adapters use optional peer dependencies (`mongoose`, `sequelize`, `better-sqlite3`, `sqlite3`, `pg`) that you install based on what your service uses.
 
 ```typescript
-import { Sequelize } from 'sequelize';
-import { Service } from '@sentzunhat/zacatl';
+import Fastify from 'fastify';
+import { Service, ServiceType, ServerType, ServerVendor } from '@sentzunhat/zacatl';
 
-const sequelize = new Sequelize('postgresql://user:pass@localhost/db');
+const fastify = Fastify();
 
 const service = new Service({
   type: ServiceType.SERVER,
@@ -249,224 +75,70 @@ const service = new Service({
   },
   platforms: {
     server: {
-      name: 'my-service',
-      server: {
-        type: ServerType.SERVER,
-        vendor: ServerVendor.FASTIFY,
-        instance: fastify,
-      },
-      databases: [
-        {
-          vendor: DatabaseVendor.SEQUELIZE,
-          instance: sequelize,
-        },
-      ],
+      name: 'hello-service',
+      server: { type: ServerType.SERVER, vendor: ServerVendor.FASTIFY, instance: fastify },
     },
   },
 });
+
+await service.start({ port: 3000 });
 ```
 
-### MongoDB (Mongoose)
+See [examples/](./examples/) for production-ready starters (Express, Fastify × SQLite, Postgres, MongoDB × React, Svelte).
 
-```typescript
-import mongoose from 'mongoose';
-import { Service } from '@sentzunhat/zacatl';
+## 📦 Public API Modules
 
-const service = new Service({
-  type: ServiceType.SERVER,
-  layers: {
-    application: { entryPoints: { rest: { hooks: [], routes: [] } } },
-    domain: { services: [] },
-    infrastructure: { repositories: [] },
-  },
-  platforms: {
-    server: {
-      name: 'my-service',
-      server: {
-        type: ServerType.SERVER,
-        vendor: ServerVendor.FASTIFY,
-        instance: fastify,
-      },
-      databases: [
-        {
-          vendor: DatabaseVendor.MONGOOSE,
-          instance: mongoose,
-          connectionString: 'mongodb://localhost/mydb',
-        },
-      ],
-    },
-  },
-});
-```
+| Module                 | Import path                               |
+| ---------------------- | ----------------------------------------- |
+| Service                | `@sentzunhat/zacatl`                      |
+| Configuration          | `@sentzunhat/zacatl/configuration`        |
+| Dependency Injection   | `@sentzunhat/zacatl/dependency-injection` |
+| Errors                 | `@sentzunhat/zacatl`                      |
+| Logs                   | `@sentzunhat/zacatl`                      |
+| Localization           | `@sentzunhat/zacatl`                      |
+| Third-party re-exports | `@sentzunhat/zacatl/third-party/*`        |
 
-### Custom Repository Pattern
+## 📖 Documentation
 
-Implement `IRepository<T>` for any database:
+Full docs live in **[`docs/`](./docs/README.md)**. New contributors start with **[START_HERE.md](./docs/START_HERE.md)**.
 
-```typescript
-import { IRepository } from '@sentzunhat/zacatl';
-
-class MyRepository<T> implements IRepository<T> {
-  findById = async (id: string): Promise<T | null> => {
-    /* ... */
-  };
-  findMany = async (filter: Record<string, unknown>): Promise<T[]> => {
-    /* ... */
-  };
-  create = async (data: T): Promise<T> => {
-    /* ... */
-  };
-  update = async (id: string, data: Partial<T>): Promise<void> => {
-    /* ... */
-  };
-  delete = async (id: string): Promise<void> => {
-    /* ... */
-  };
-  exists = async (id: string): Promise<boolean> => {
-    /* ... */
-  };
-}
-```
-
-## 🌐 Internationalization
-
-```typescript
-import { createI18n, FilesystemAdapter } from '@sentzunhat/zacatl';
-
-const i18n = createI18n();
-const greeting = i18n.t('greeting'); // Loads from src/localization/locales/
-
-await i18n.setLanguage('es');
-const saludo = i18n.t('greeting'); // Translations loaded automatically
-```
-
-Place translation files in `src/localization/locales/`:
-
-```json
-// en.json
-{ "greeting": "Hello {{name}}", "errors": { "notFound": "Not found" } }
-```
-
-```json
-// es.json
-{ "greeting": "Hola {{name}}", "errors": { "notFound": "No encontrado" } }
-```
-
-## ✅ Validation with Zod
-
-```typescript
-import { z } from 'zod';
-import { loadYML } from '@sentzunhat/zacatl/configuration';
-
-const AppConfigSchema = z.object({
-  server: z.object({
-    port: z.number().min(1).max(65535),
-    host: z.string(),
-  }),
-  logLevel: z.enum(['debug', 'info', 'warn', 'error']).default('info'),
-});
-
-const config = loadYML('./config/app.yaml', AppConfigSchema);
-```
-
-> **Coming Soon**: Yup support and optional validation for maximum flexibility. See [Roadmap: Schema Validation Flexibility](docs/roadmap/index.md#schema-validation-flexibility-v0040--v010).
-
-## 🛡️ Error Handling
-
-Zacatl includes 7 custom error types with built-in correlation IDs:
-
-```typescript
-import {
-  BadRequestError,
-  NotFoundError,
-  UnauthorizedError,
-  ForbiddenError,
-  ValidationError,
-  InternalServerError,
-  BadResourceError,
-} from '@sentzunhat/zacatl';
-
-throw new ValidationError({ message: 'Email is required' });
-throw new NotFoundError({ message: 'User not found', metadata: { userId: 123 } });
-```
+| Topic                 | Link                                                                             |
+| --------------------- | -------------------------------------------------------------------------------- |
+| Architecture Overview | [docs/guidelines/framework-overview.md](./docs/guidelines/framework-overview.md) |
+| Service Module        | [docs/service/README.md](./docs/service/README.md)                               |
+| Dependency Injection  | [docs/dependency-injection/README.md](./docs/dependency-injection/README.md)     |
+| Configuration         | [docs/configuration/README.md](./docs/configuration/README.md)                   |
+| Errors                | [docs/error/README.md](./docs/error/README.md)                                   |
+| Logs                  | [docs/logs/README.md](./docs/logs/README.md)                                     |
+| Localization          | [docs/localization/README.md](./docs/localization/README.md)                     |
+| Third-Party + ORM     | [docs/third-party/README.md](./docs/third-party/README.md)                       |
+| ESLint                | [docs/eslint/README.md](./docs/eslint/README.md)                                 |
+| Utils                 | [docs/utils/README.md](./docs/utils/README.md)                                   |
+| Release Notes         | [docs/changelog.md](./docs/changelog.md)                                         |
 
 ## 🧪 Testing
 
-Zacatl's test count and coverage are shown in the badges at the top of this README. Run the commands below to run tests and generate coverage:
-
 ```bash
 npm test                 # Run all tests
-npm run test:coverage   # Coverage report
-```
-
-## 📦 What's Included
-
-```
-src/
-├── configuration/              # Config loading & validation
-├── dependency-injection/       # DI container and helpers
-├── error/                      # Error types
-├── eslint/                     # Shared ESLint configs
-├── localization/               # i18n adapters and helpers
-├── logs/                       # Logging adapters
-├── service/                    # Service layers and platforms
-├── third-party/                # Re-exported dependencies
-└── utils/                      # Utility helpers
-```
-
-## 🛠️ Development
-
-### Building
-
-```bash
-npm run build      # Compile TypeScript to build-src-esm/ and build-src-cjs/
-npm run build:watch # Watch mode
-```
-
-### Code Quality
-
-```bash
-npm run lint       # Run ESLint
-npm run type:check # TypeScript checking
+npm run test:coverage    # Coverage report
 ```
 
 ## 📋 Requirements
 
-- **Node.js**: 24.14.0 or higher (LTS)
-- **npm**: 11.0.0 or higher (bundled with Node 24)
-- **TypeScript**: 5.9+ (we use 5.9.3)
+- **Node.js**: 24.14.0+ (LTS)
+- **npm**: 11.0.0+ (bundled with Node 24)
+- **TypeScript**: 5.9+
+
+## 🤝 Contributing
+
+1. Open an issue describing the change.
+2. Branch off it: `git checkout -b issue-<number>/type/description`
+3. Add tests, update docs, commit with [Conventional Commits](https://www.conventionalcommits.org/).
+
+See [CONTRIBUTING.md](./.github/CONTRIBUTING.md) for the full guide.
 
 ## 📄 License
 
 [Apache License 2.0](./LICENSE) © 2025 Zacatl Contributors
 
-## 🤝 Contributing
-
-1. Open an issue describing the change.
-2. Create a branch tied to it: `git checkout -b issue-<number>/type/description`
-   - Examples: `issue-42/feat/add-forbidden-error`, `issue-5/docs/update-readme`
-3. Add tests for your changes.
-4. Update documentation.
-5. Commit with [Conventional Commits](https://www.conventionalcommits.org/): `git commit -m 'feat(error): add ForbiddenError'`
-6. Push and open a PR referencing the issue.
-
-See [CONTRIBUTING.md](./CONTRIBUTING.md) for the full guide.
-
-> **Local install tip:** use `npm install --ignore-scripts` to skip lifecycle scripts when you only want to install deps.
-
-## 📞 Support
-
-- 📖 [Documentation](./docs/guidelines/framework-overview.md)
-- 🐛 [Issue Tracker](https://github.com/sentzunhat/zacatl/issues)
-- 💬 [Discussions](https://github.com/sentzunhat/zacatl/discussions)
-
-## 🙋 About
-
-Zacatl is built for developers who value clean architecture, type safety, and test-driven development. It's equally useful for humans and AI agents building production services.
-
-**Repository**: https://github.com/sentzunhat/zacatl
-**npm**: https://www.npmjs.com/package/@sentzunhat/zacatl
-
-## 🤖 Acknowledgments
-
-This framework was built with assistance from **GitHub Copilot** and friendly ML/LLM models, demonstrating effective human-AI collaboration in software development.
+> Zacatl is permissively licensed. Please don't use it to harm people.

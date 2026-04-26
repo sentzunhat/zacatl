@@ -220,7 +220,7 @@ it('should [expected behavior] when [condition]', () => {
 | Test structure        | `docs/guidelines/testing.md`       |
 | Comments              | `docs/guidelines/documentation.md` |
 | Commits & branches    | `docs/guidelines/git-workflow.md`  |
-| Contributing process  | `CONTRIBUTING.md`                  |
+| Contributing process  | `.github/CONTRIBUTING.md`          |
 | Test coverage roadmap | `docs/roadmap/testing-roadmap.md`  |
 
 ---

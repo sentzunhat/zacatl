@@ -1,4 +1,4 @@
-import { BaseRepository, ORMType } from '@sentzunhat/zacatl';
+import { SequelizeRepository } from '@sentzunhat/zacatl/service/layers/infrastructure/repositories/sequelize';
 import type { ModelStatic } from '@sentzunhat/zacatl/third-party/sequelize';
 import { singleton } from '@sentzunhat/zacatl/third-party/tsyringe';
 
@@ -8,12 +8,11 @@ import type { GreetingRepositoryPort } from './port';
 
 @singleton()
 export class GreetingRepositoryAdapter
-  extends BaseRepository<GreetingModel, CreateGreetingInput, Greeting>
+  extends SequelizeRepository<GreetingModel, CreateGreetingInput, Greeting>
   implements GreetingRepositoryPort
 {
   constructor() {
     super({
-      type: ORMType.Sequelize,
       model: GreetingModel,
     });
   }
@@ -26,7 +25,7 @@ export class GreetingRepositoryAdapter
     });
 
     return models
-      .map((model) => this.toLean(model))
-      .filter((item): item is Greeting => item !== null);
+      .map((model: GreetingModel) => this.toLean(model))
+      .filter((item: Greeting | null): item is Greeting => item !== null);
   }
 }

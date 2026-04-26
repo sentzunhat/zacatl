@@ -5,6 +5,7 @@
 import {
   DataTypes,
   SequelizeModel as Model,
+  type ModelStatic,
   type Sequelize,
 } from '@sentzunhat/zacatl/third-party/sequelize';
 import type { Greeting } from '../../../domain/entities/greeting';
@@ -18,7 +19,7 @@ export class GreetingModel extends Model implements Omit<Greeting, 'id'> {
 }
 
 export function initGreetingModel(sequelize: Sequelize): typeof GreetingModel {
-  GreetingModel.init(
+  (GreetingModel as unknown as ModelStatic<GreetingModel>).init(
     {
       id: {
         type: DataTypes.INTEGER,
