@@ -64,7 +64,10 @@ describe('PageServer', () => {
 
       await pageServer.configure();
 
-      const staticCall: StaticConfig = (adapter.registerStaticFiles as any).mock.calls[0][0];
+      const registerStaticFilesMock = adapter.registerStaticFiles as unknown as {
+        mock: { calls: unknown[][] };
+      };
+      const staticCall = registerStaticFilesMock.mock.calls[0]?.[0] as StaticConfig;
       expect(staticCall.prefix).toBeUndefined();
       expect(staticCall.root).toBe('./dist');
     });

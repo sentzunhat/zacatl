@@ -11,19 +11,19 @@ describe('Mongoose + mongodb-memory-server extended operations', () => {
     const uri = mongod.getUri();
     await mongoose.connect(uri, {});
 
-    const UserSchema = new mongoose.Schema({
+    const userSchema = new mongoose.Schema({
       email: { type: String, unique: true },
       name: String,
       meta: { type: { age: Number }, default: {} },
     });
 
-    const PostSchema = new mongoose.Schema({
+    const postSchema = new mongoose.Schema({
       title: String,
       author: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     });
 
-    mongoose.model('User', UserSchema);
-    mongoose.model('Post', PostSchema);
+    mongoose.model('User', userSchema);
+    mongoose.model('Post', postSchema);
     // Ensure indexes are created before tests that rely on unique constraints
     await mongoose.model('User').createIndexes();
   });
@@ -36,12 +36,12 @@ describe('Mongoose + mongodb-memory-server extended operations', () => {
   });
 
   it('supports unique index violations and validation', async () => {
-    const User = mongoose.model('User') as mongoose.Model<any>;
-    await User.create({ email: 'u1@example.com', name: 'U1' });
+    const userModel = mongoose.model('User') as mongoose.Model<unknown>;
+    await userModel.create({ email: 'u1@example.com', name: 'U1' });
     let threw = false;
     try {
-      await User.create({ email: 'u1@example.com', name: 'U2' });
-    } catch (err: any) {
+      await userModel.create({ email: 'u1@example.com', name: 'U2' });
+    } catch (err: unknown) {
       threw = true;
       expect(err).toBeTruthy();
     }
@@ -49,25 +49,29 @@ describe('Mongoose + mongodb-memory-server extended operations', () => {
   });
 
   it('supports populate, updateMany, aggregate and countDocuments', async () => {
-    const User = mongoose.model('User') as mongoose.Model<any>;
-    const Post = mongoose.model('Post') as mongoose.Model<any>;
+    const userModel = mongoose.model('User') as mongoose.Model<unknown>;
+    const postModel = mongoose.model('Post') as mongoose.Model<unknown>;
 
-    const u = await User.create({ email: 'pop@example.com', name: 'P', meta: { age: 30 } });
-    await Post.create({ title: 'one', author: u._id });
-    await Post.create({ title: 'two', author: u._id });
+    const user = await userModel.create({ email: 'pop@example.com', name: 'P', meta: { age: 30 } });
+    await postModel.create({ title: 'one', author: user._id });
+    await postModel.create({ title: 'two', author: user._id });
 
-    const posts = await Post.find({}).populate('author');
+    const posts = await postModel.find({}).populate('author');
     expect(posts.length).toBe(2);
-    expect(posts[0].author.email).toBe('pop@example.com');
+    expect(
+      ((posts[0] as Record<string, unknown>)['author'] as Record<string, unknown>)['email'],
+    ).toBe('pop@example.com');
 
-    await User.updateMany({ 'meta.age': { $gte: 30 } }, { $set: { 'meta.age': 31 } });
-    const updated = await User.findOne({ email: 'pop@example.com' });
-    expect(updated.meta.age).toBe(31);
+    await userModel.updateMany({ meta: { age: { $gte: 30 } } }, { $set: { meta: { age: 31 } } });
+    const updated = await userModel.findOne({ email: 'pop@example.com' });
+    expect(((updated as Record<string, unknown>)['meta'] as Record<string, unknown>)['age']).toBe(
+      31,
+    );
 
-    const agg = await Post.aggregate([{ $group: { _id: '$author', count: { $sum: 1 } } }]);
-    expect(agg[0].count).toBe(2);
+    const agg = await postModel.aggregate([{ $group: { _id: '$author', count: { $sum: 1 } } }]);
+    expect((agg[0] as Record<string, unknown>)['count']).toBe(2);
 
-    const c = await Post.countDocuments();
+    const c = await postModel.countDocuments();
     expect(c).toBe(2);
   });
 });

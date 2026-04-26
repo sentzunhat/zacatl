@@ -13,6 +13,13 @@ class TestGetRouteHandler extends GetRouteHandler<unknown, string, unknown> {
   }
 }
 
+type MockReply = {
+  send: {
+    (...args: unknown[]): unknown;
+    mock: { calls: unknown[][] };
+  };
+};
+
 describe('GetRouteHandler', () => {
   it('executes GET handler and sends raw response by default', async () => {
     const testHandler = new TestGetRouteHandler({
@@ -21,12 +28,11 @@ describe('GetRouteHandler', () => {
     });
 
     const fakeRequest = createFakeFastifyRequest() as Request<unknown, string>;
-    const fakeReply = createFakeFastifyReply() as unknown;
+    const fakeReply = createFakeFastifyReply() as MockReply;
 
-    await testHandler.execute(fakeRequest, fakeReply as any);
+    await testHandler.execute(fakeRequest, fakeReply as never);
 
-    const mockReply = fakeReply as Record<string, any>;
     // Handler sends raw data directly without status code manipulation
-    expect(mockReply['send']).toHaveBeenCalledWith('Test GET response');
+    expect(fakeReply.send).toHaveBeenCalledWith('Test GET response');
   });
 });

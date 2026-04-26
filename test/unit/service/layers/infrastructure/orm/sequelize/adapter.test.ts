@@ -5,15 +5,15 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 vi.mock('sequelize', () => {
   class Model {
     public static init(): void {}
-    public get(opts: any): any {
-      if (opts && opts.plain) return JSON.parse(JSON.stringify(this));
+    public get(opts?: { plain?: boolean }): unknown {
+      if (opts?.plain === true) return JSON.parse(JSON.stringify(this));
       return this;
     }
-    constructor(values: any) {
+    constructor(values: Record<string, unknown> = {}) {
       Object.assign(this, values);
     }
   }
-  return { Model };
+  return { ['Model']: Model };
 });
 
 import { SequelizeModel as Model } from '@zacatl/third-party/sequelize';
@@ -50,7 +50,7 @@ describe('SequelizeAdapter', () => {
   let adapter: SequelizeAdapter<MockModel, TestInput, TestOutput>;
   const mockConfig = {
     type: ORMType.Sequelize as const,
-    model: MockModel as any,
+    model: MockModel,
   };
 
   beforeEach(() => {

@@ -21,7 +21,7 @@ interface UserTestDb extends Model {
   updatedAt: Date;
 }
 
-let UserModel: ModelStatic<UserTestDb>;
+let userModel: ModelStatic<UserTestDb>;
 const MISSING_USER_ID = '00000000-0000-0000-0000-000000000000';
 
 const initializeSequelizeModel = async (): Promise<Sequelize> => {
@@ -31,9 +31,9 @@ const initializeSequelizeModel = async (): Promise<Sequelize> => {
     dialect: 'postgres',
     dialectModule: adapter,
     logging: false,
-  } as any);
+  } as ConstructorParameters<typeof Sequelize>[1]);
 
-  UserModel = sequelize.define(
+  userModel = sequelize.define(
     'SequelizeUser',
     {
       id: {
@@ -69,7 +69,7 @@ class UserTestRepository extends SequelizeRepository<
   UserTestDb
 > {
   constructor() {
-    super({ type: ORMType.Sequelize, model: UserModel });
+    super({ type: ORMType.Sequelize, model: userModel });
   }
 }
 
@@ -91,7 +91,7 @@ describe('SequelizeRepository', () => {
     it('should have model property set', () => {
       if (!repository) return;
       expect(repository.model).toBeDefined();
-      expect(repository.model).toBe(UserModel);
+      expect(repository.model).toBe(userModel);
     });
   });
 
@@ -157,7 +157,7 @@ describe('SequelizeRepository', () => {
 
     it('should call model.create with input', async () => {
       if (!repository) return;
-      const spyCreate = vi.spyOn(UserModel, 'create');
+      const spyCreate = vi.spyOn(userModel, 'create');
       const input = { name: 'Charlie' };
 
       await repository.create(input);
@@ -186,7 +186,7 @@ describe('SequelizeRepository', () => {
     it('should call model.findByPk', async () => {
       if (!repository) return;
       const created = await repository.create({ name: 'Eve' });
-      const spyFindByPk = vi.spyOn(UserModel, 'findByPk');
+      const spyFindByPk = vi.spyOn(userModel, 'findByPk');
 
       await repository.findById(created.id);
 

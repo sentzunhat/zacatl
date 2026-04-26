@@ -1,3 +1,4 @@
+import type { FastifyInstance } from 'fastify';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 import { z } from '@zacatl/third-party/zod';
@@ -5,9 +6,16 @@ import { z } from '@zacatl/third-party/zod';
 import type { RouteHandler, HookHandler } from '../../../../../../src/service/layers/application';
 import { FastifyApiAdapter } from '../../../../../../src/service/platforms/server/api/adapters';
 
+type MockFastifyServer = {
+  withTypeProvider: ReturnType<typeof vi.fn<() => MockFastifyServer>>;
+  route: ReturnType<typeof vi.fn>;
+  addHook: ReturnType<typeof vi.fn>;
+  register: ReturnType<typeof vi.fn<() => Promise<void>>>;
+};
+
 describe('FastifyApiAdapter', () => {
   let adapter: FastifyApiAdapter;
-  let mockServer: any;
+  let mockServer: MockFastifyServer;
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -17,7 +25,7 @@ describe('FastifyApiAdapter', () => {
       addHook: vi.fn(),
       register: vi.fn().mockResolvedValue(undefined),
     };
-    adapter = new FastifyApiAdapter(mockServer);
+    adapter = new FastifyApiAdapter(mockServer as unknown as FastifyInstance);
   });
 
   describe('registerRoute', () => {
@@ -29,7 +37,7 @@ describe('FastifyApiAdapter', () => {
           querystring: z.object({ skip: z.number().default(0) }),
         },
         execute: vi.fn(),
-      } as any;
+      } as unknown as RouteHandler;
 
       adapter.registerRoute(handler);
 
@@ -50,7 +58,7 @@ describe('FastifyApiAdapter', () => {
           body: z.object({ name: z.string(), email: z.string().email() }),
         },
         execute: vi.fn().mockResolvedValue({ id: '123' }),
-      } as any;
+      } as unknown as RouteHandler;
 
       adapter.registerRoute(handler);
 
@@ -67,7 +75,7 @@ describe('FastifyApiAdapter', () => {
         method: 'DELETE',
         url: '/api/users/:id',
         execute: vi.fn().mockResolvedValue({ deleted: true }),
-      } as any;
+      } as unknown as RouteHandler;
 
       adapter.registerRoute(handler);
 
@@ -88,7 +96,7 @@ describe('FastifyApiAdapter', () => {
           params: z.object({ id: z.string() }),
         },
         execute: vi.fn(),
-      } as any;
+      } as unknown as RouteHandler;
 
       adapter.registerRoute(handler);
 
@@ -106,7 +114,7 @@ describe('FastifyApiAdapter', () => {
         method: 'GET',
         url: '/test',
         execute: executeSpy,
-      } as any;
+      } as unknown as RouteHandler;
 
       adapter.registerRoute(handler);
 
@@ -120,7 +128,7 @@ describe('FastifyApiAdapter', () => {
       const handler: HookHandler = {
         name: 'preHandler',
         execute: vi.fn(),
-      } as any;
+      } as unknown as HookHandler;
 
       adapter.registerHook(handler);
 
@@ -131,7 +139,7 @@ describe('FastifyApiAdapter', () => {
       const handler: HookHandler = {
         name: 'onRequest',
         execute: vi.fn(),
-      } as any;
+      } as unknown as HookHandler;
 
       adapter.registerHook(handler);
 
@@ -142,12 +150,12 @@ describe('FastifyApiAdapter', () => {
       const handler1: HookHandler = {
         name: 'onRequest',
         execute: vi.fn(),
-      } as any;
+      } as unknown as HookHandler;
 
       const handler2: HookHandler = {
         name: 'preHandler',
         execute: vi.fn(),
-      } as any;
+      } as unknown as HookHandler;
 
       adapter.registerHook(handler1);
       adapter.registerHook(handler2);
@@ -239,7 +247,7 @@ describe('FastifyApiAdapter', () => {
           }),
         },
         execute: vi.fn(),
-      } as any;
+      } as unknown as RouteHandler;
 
       adapter.registerRoute(handler);
 
@@ -256,7 +264,7 @@ describe('FastifyApiAdapter', () => {
         method: 'GET',
         url: '/files/*',
         execute: vi.fn(),
-      } as any;
+      } as unknown as RouteHandler;
 
       adapter.registerRoute(handler);
 
@@ -277,7 +285,7 @@ describe('FastifyApiAdapter', () => {
           querystring: z.object({ filter: z.string().optional() }),
         },
         execute: vi.fn(),
-      } as any;
+      } as unknown as RouteHandler;
 
       adapter.registerRoute(handler);
 
@@ -297,7 +305,7 @@ describe('FastifyApiAdapter', () => {
         url: '/test',
         execute: executeSpy,
         userId: '123',
-      } as any;
+      } as unknown as RouteHandler;
 
       adapter.registerRoute(handler);
 

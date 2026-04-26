@@ -2,6 +2,7 @@ import { describe, it, expect, afterEach, beforeAll } from 'vitest';
 
 import { CustomError } from '@zacatl/error';
 
+import { DatabaseVendor } from '../../../../../../src/service/platforms/server/database/port';
 import { SqliteAdapter } from '../../../../../../src/service/platforms/server/database/sqlite-adapter';
 
 describe('SqliteAdapter', () => {
@@ -30,7 +31,7 @@ describe('SqliteAdapter', () => {
       adapter = new SqliteAdapter();
 
       await expect(
-        adapter.connect('TestService', { vendor: 'SQLITE' as any, connectionString: '' }),
+        adapter.connect('TestService', { vendor: DatabaseVendor.SQLITE, connectionString: '' }),
       ).rejects.toBeInstanceOf(CustomError);
     });
 
@@ -43,7 +44,7 @@ describe('SqliteAdapter', () => {
       adapter = new SqliteAdapter();
 
       await adapter.connect('TestService', {
-        vendor: 'SQLITE' as any,
+        vendor: DatabaseVendor.SQLITE,
         connectionString: ':memory:',
       });
 
@@ -67,7 +68,7 @@ describe('SqliteAdapter', () => {
       adapter = new SqliteAdapter();
 
       await adapter.connect('TestService', {
-        vendor: 'SQLITE' as any,
+        vendor: DatabaseVendor.SQLITE,
         connectionString: ':memory:',
       });
 
@@ -93,7 +94,7 @@ describe('SqliteAdapter', () => {
       adapter = new SqliteAdapter();
 
       await adapter.connect('TestService', {
-        vendor: 'SQLITE' as any,
+        vendor: DatabaseVendor.SQLITE,
         connectionString: ':memory:',
       });
 

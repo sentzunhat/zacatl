@@ -1,8 +1,8 @@
 import 'reflect-metadata';
 
 import { execSync } from 'child_process';
-
-import { globSync } from 'glob';
+import { readdirSync, statSync } from 'fs';
+import path from 'path';
 
 import { logger } from '../helpers/common/logger';
 import {
@@ -27,7 +27,23 @@ const getTypeScriptVersion = (): string => {
 
 const getTestFileCount = (): number => {
   try {
-    return globSync('test/**/*.test.ts').length;
+    const walk = (dir: string): number => {
+      let count = 0;
+      for (const entry of readdirSync(dir)) {
+        const fullPath = path.join(dir, entry);
+        const stats = statSync(fullPath);
+        if (stats.isDirectory()) {
+          count += walk(fullPath);
+          continue;
+        }
+        if (fullPath.endsWith('.test.ts')) {
+          count += 1;
+        }
+      }
+      return count;
+    };
+
+    return walk('test');
   } catch {
     return 0;
   }

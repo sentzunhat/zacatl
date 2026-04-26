@@ -77,10 +77,10 @@ describe('Export Strategy Verification', () => {
 
     it('should not load mongoose when importing Service from main', async () => {
       // Import only Service from main package
-      const { Service } = await import('../../../src/index.js');
+      const { Service: serviceConstructor } = await import('../../../src/index.js');
 
       // Verify Service was imported
-      expect(Service).toBeDefined();
+      expect(serviceConstructor).toBeDefined();
 
       // No mongoose properties in main exports
       const mainExports = await import('../../../src/index.js');
@@ -90,10 +90,10 @@ describe('Export Strategy Verification', () => {
 
     it('should not load sequelize when importing Service from main', async () => {
       // Import only Service from main package
-      const { Service } = await import('../../../src/index.js');
+      const { Service: serviceConstructor } = await import('../../../src/index.js');
 
       // Verify Service was imported
-      expect(Service).toBeDefined();
+      expect(serviceConstructor).toBeDefined();
 
       // No sequelize properties in main exports
       const mainExports = await import('../../../src/index.js');
@@ -129,9 +129,11 @@ describe('Export Strategy Verification', () => {
 
     it('should maintain minimal bundle size for users not needing ORMs', async () => {
       // Users who only need Service and DI don't get ORM dependencies
-      const { Service, resolveDependency } = await import('../../../src/index.js');
+      const { Service: serviceConstructor, resolveDependency } = await import(
+        '../../../src/index.js'
+      );
 
-      expect(Service).toBeDefined();
+      expect(serviceConstructor).toBeDefined();
       expect(resolveDependency).toBeDefined();
 
       // ORM subpaths are optional imports

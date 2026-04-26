@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 import { AbstractNodeSqliteRepository } from '../../../../../../../src/service/layers/infrastructure/repositories/nodesqlite/repository';
+import type { NodeSqliteRepositoryConfig } from '../../../../../../../src/service/layers/infrastructure/repositories/nodesqlite/types';
 
 interface UserInput {
   name: string;
@@ -39,7 +40,7 @@ describe('AbstractNodeSqliteRepository', () => {
 
     const config = {
       type: 'nodesqlite' as const,
-      database: mockDatabase as any,
+      database: mockDatabase as unknown as NodeSqliteRepositoryConfig['database'],
       tableName: 'users',
     };
 
@@ -187,7 +188,7 @@ describe('AbstractNodeSqliteRepository', () => {
 
   describe('exists', () => {
     it('should return true if user exists', async () => {
-      const stmt = { get: vi.fn().mockReturnValue({ '1': 1 }) };
+      const stmt = { get: vi.fn().mockReturnValue({ count: 1 }) };
       mockDatabase.prepare.mockReturnValueOnce(stmt);
 
       const result = await repository.exists('user-123');

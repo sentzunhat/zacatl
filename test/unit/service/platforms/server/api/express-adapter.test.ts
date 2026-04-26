@@ -1,8 +1,9 @@
 /* eslint-disable import/order */
+import type { Express } from 'express';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { z } from '@zacatl/third-party/zod';
 
-import type { RouteHandler } from '../../../../../../src/service/layers/application';
+import type { HookHandler, RouteHandler } from '../../../../../../src/service/layers/application';
 import { ExpressApiAdapter } from '../../../../../../src/service/platforms/server/api/adapters';
 
 // Mock http-proxy-middleware
@@ -14,9 +15,22 @@ import { createProxyMiddleware } from 'http-proxy-middleware';
 
 /* eslint-enable import/order */
 
+type MockExpressServer = Pick<
+  Express,
+  'get' | 'post' | 'put' | 'delete' | 'patch' | 'use' | 'all'
+> & {
+  get: ReturnType<typeof vi.fn>;
+  post: ReturnType<typeof vi.fn>;
+  put: ReturnType<typeof vi.fn>;
+  delete: ReturnType<typeof vi.fn>;
+  patch: ReturnType<typeof vi.fn>;
+  use: ReturnType<typeof vi.fn>;
+  all: ReturnType<typeof vi.fn>;
+};
+
 describe('ExpressApiAdapter', () => {
   let adapter: ExpressApiAdapter;
-  let mockServer: any;
+  let mockServer: MockExpressServer;
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -29,7 +43,7 @@ describe('ExpressApiAdapter', () => {
       use: vi.fn(),
       all: vi.fn(),
     };
-    adapter = new ExpressApiAdapter(mockServer);
+    adapter = new ExpressApiAdapter(mockServer as unknown as Express);
   });
 
   describe('registerRoute', () => {
@@ -37,8 +51,8 @@ describe('ExpressApiAdapter', () => {
       const handler: RouteHandler = {
         method: 'GET',
         url: '/test',
-        handler: vi.fn(),
-      } as any;
+        execute: vi.fn(),
+      } as unknown as RouteHandler;
 
       adapter.registerRoute(handler);
 
@@ -52,12 +66,12 @@ describe('ExpressApiAdapter', () => {
         schema: {
           body: z.object({ name: z.string() }),
         },
-        execute: vi.fn().mockImplementation(async (_req, reply: any) => {
+        execute: vi.fn().mockImplementation(async (_req, reply: { code: (statusCode: number) => { send: (payload: unknown) => unknown } }) => {
           // Handler calls reply.send() which translates to res.json()
           await reply.code(200).send({ success: true });
           return { success: true };
         }),
-      } as any;
+      } as unknown as RouteHandler;
 
       adapter.registerRoute(handler);
 
@@ -93,7 +107,7 @@ describe('ExpressApiAdapter', () => {
           body: z.object({ name: z.string() }),
         },
         execute: vi.fn(),
-      } as any;
+      } as unknown as RouteHandler;
 
       adapter.registerRoute(handler);
 
@@ -121,10 +135,10 @@ describe('ExpressApiAdapter', () => {
 
   describe('registerHook', () => {
     it('should register middleware for hooks', () => {
-      const handler: any = {
+      const handler: HookHandler = {
         name: 'onRequest',
         execute: vi.fn(),
-      };
+      } as unknown as HookHandler;
       adapter.registerHook(handler);
       expect(mockServer.use).toHaveBeenCalled();
     });

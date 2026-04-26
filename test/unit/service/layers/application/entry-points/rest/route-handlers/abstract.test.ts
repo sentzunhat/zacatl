@@ -14,6 +14,18 @@ import {
   createFakeFastifyRequest,
 } from '../../../../../../helpers/common/common';
 
+type TestRequest = Request<void, Record<string, string>, void>;
+type MockReply = {
+  code: {
+    (...args: unknown[]): unknown;
+    mock: { calls: unknown[][] };
+  };
+  send: {
+    (...args: unknown[]): unknown;
+    mock: { calls: unknown[][] };
+  };
+};
+
 class TestRouteHandler extends AbstractRouteHandler<
   void, // Body
   Record<string, string>, // Querystring
@@ -76,8 +88,8 @@ class HandlerWithCustomErrorHandling extends TestRouteHandler {
 
 describe('AbstractRouteHandler', () => {
   it('auto-sends the handler response data directly', async () => {
-    const fakeRequest = createFakeFastifyRequest() as Request<void, Record<string, string>, void>;
-    const fakeReply: any = createFakeFastifyReply();
+    const fakeRequest = createFakeFastifyRequest() as TestRequest;
+    const fakeReply = createFakeFastifyReply() as MockReply;
 
     const handler = new TestRouteHandler();
     const result = await handler.execute(fakeRequest, fakeReply);
@@ -87,8 +99,8 @@ describe('AbstractRouteHandler', () => {
   });
 
   it('handles NotFoundError with 404 status', async () => {
-    const fakeRequest = createFakeFastifyRequest() as Request<void, Record<string, string>, void>;
-    const fakeReply: any = createFakeFastifyReply();
+    const fakeRequest = createFakeFastifyRequest() as TestRequest;
+    const fakeReply = createFakeFastifyReply() as MockReply;
 
     const handler = new HandlerThatThrowsNotFound();
 
@@ -101,8 +113,8 @@ describe('AbstractRouteHandler', () => {
   });
 
   it('handles BadRequestError with 400 status', async () => {
-    const fakeRequest = createFakeFastifyRequest() as Request<void, Record<string, string>, void>;
-    const fakeReply: any = createFakeFastifyReply();
+    const fakeRequest = createFakeFastifyRequest() as TestRequest;
+    const fakeReply = createFakeFastifyReply() as MockReply;
 
     const handler = new (class extends TestRouteHandler {
       override async handler(): Promise<{ id: number; name: string }> {
@@ -122,8 +134,8 @@ describe('AbstractRouteHandler', () => {
   });
 
   it('handles ValidationError with 422 status', async () => {
-    const fakeRequest = createFakeFastifyRequest() as Request<void, Record<string, string>, void>;
-    const fakeReply: any = createFakeFastifyReply();
+    const fakeRequest = createFakeFastifyRequest() as TestRequest;
+    const fakeReply = createFakeFastifyReply() as MockReply;
 
     const handler = new (class extends TestRouteHandler {
       override async handler(): Promise<{ id: number; name: string }> {
@@ -143,8 +155,8 @@ describe('AbstractRouteHandler', () => {
   });
 
   it('handles UnauthorizedError with 401 status', async () => {
-    const fakeRequest = createFakeFastifyRequest() as Request<void, Record<string, string>, void>;
-    const fakeReply: any = createFakeFastifyReply();
+    const fakeRequest = createFakeFastifyRequest() as TestRequest;
+    const fakeReply = createFakeFastifyReply() as MockReply;
 
     const handler = new (class extends TestRouteHandler {
       override async handler(): Promise<{ id: number; name: string }> {
@@ -164,8 +176,8 @@ describe('AbstractRouteHandler', () => {
   });
 
   it('handles ForbiddenError with 403 status', async () => {
-    const fakeRequest = createFakeFastifyRequest() as Request<void, Record<string, string>, void>;
-    const fakeReply: any = createFakeFastifyReply();
+    const fakeRequest = createFakeFastifyRequest() as TestRequest;
+    const fakeReply = createFakeFastifyReply() as MockReply;
 
     const handler = new (class extends TestRouteHandler {
       override async handler(): Promise<{ id: number; name: string }> {
@@ -185,8 +197,8 @@ describe('AbstractRouteHandler', () => {
   });
 
   it('handles unknown errors with 500 status', async () => {
-    const fakeRequest = createFakeFastifyRequest() as Request<void, Record<string, string>, void>;
-    const fakeReply: any = createFakeFastifyReply();
+    const fakeRequest = createFakeFastifyRequest() as TestRequest;
+    const fakeReply = createFakeFastifyReply() as MockReply;
 
     const handler = new (class extends TestRouteHandler {
       override async handler(): Promise<{ id: number; name: string }> {
@@ -203,8 +215,8 @@ describe('AbstractRouteHandler', () => {
   });
 
   it('allows overriding handleError() for custom error handling', async () => {
-    const fakeRequest = createFakeFastifyRequest() as Request<void, Record<string, string>, void>;
-    const fakeReply: any = createFakeFastifyReply();
+    const fakeRequest = createFakeFastifyRequest() as TestRequest;
+    const fakeReply = createFakeFastifyReply() as MockReply;
 
     const handler = new HandlerWithCustomErrorHandling();
 

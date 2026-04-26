@@ -5,7 +5,7 @@ import { Sequelize, DataTypes } from '@zacatl/third-party/sequelize';
 
 describe('SequelizeRepository (pg-mem)', () => {
   let sequelize: Sequelize;
-  let UserModel: any;
+  let userModel: ReturnType<Sequelize['define']>;
 
   beforeAll(async () => {
     // Create an in-memory Postgres instance
@@ -17,9 +17,9 @@ describe('SequelizeRepository (pg-mem)', () => {
       dialect: 'postgres',
       dialectModule: pg,
       logging: false,
-    } as any);
+    } as ConstructorParameters<typeof Sequelize>[1]);
 
-    UserModel = sequelize.define(
+    userModel = sequelize.define(
       'SequelizeUserPg',
       {
         id: {
@@ -41,21 +41,22 @@ describe('SequelizeRepository (pg-mem)', () => {
   });
 
   it('creates and finds a record', async () => {
-    const created = await UserModel.create({ name: 'PgMemUser' });
+    const created = await userModel.create({ name: 'PgMemUser' });
     expect(created).toBeDefined();
-    const found = await UserModel.findByPk(created.id);
+    const found = await userModel.findByPk(created.get('id') as string);
     expect(found).not.toBeNull();
-    expect(found.name).toBe('PgMemUser');
+    expect(found?.get('name')).toBe('PgMemUser');
   });
 
   it('updates and deletes a record', async () => {
-    const created = await UserModel.create({ name: 'ToUpdate' });
-    await UserModel.update({ name: 'Updated' }, { where: { id: created.id } });
-    const updated = await UserModel.findByPk(created.id);
-    expect(updated.name).toBe('Updated');
+    const created = await userModel.create({ name: 'ToUpdate' });
+    const id = created.get('id') as string;
+    await userModel.update({ name: 'Updated' }, { where: { id } });
+    const updated = await userModel.findByPk(id);
+    expect(updated?.get('name')).toBe('Updated');
 
-    await UserModel.destroy({ where: { id: created.id } });
-    const gone = await UserModel.findByPk(created.id);
+    await userModel.destroy({ where: { id } });
+    const gone = await userModel.findByPk(id);
     expect(gone).toBeNull();
   });
 });

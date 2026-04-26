@@ -35,10 +35,9 @@ describe('BaseRepository', () => {
 
     try {
       repository = new UserRepository();
-    } catch (error: any) {
+    } catch (error: unknown) {
       // If mongoose adapter can't be loaded (running from TS source), skip these tests
-      if (error.message?.includes('Mongoose is not installed')) {
-        console.log('Skipping BaseRepository tests - running from TypeScript source');
+      if (error instanceof Error && error.message.includes('Mongoose is not installed')) {
         return;
       }
       throw error;

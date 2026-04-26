@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 
 import { NodeSqliteAdapter } from '../../../../../../../src/service/layers/infrastructure/orm/nodesqlite/adapter';
+import type { NodeSqliteRepositoryConfig } from '../../../../../../../src/service/layers/infrastructure/repositories/nodesqlite/types';
 
 interface TestInput {
   name: string;
@@ -40,7 +41,7 @@ describe('NodeSqliteAdapter', () => {
 
     const config = {
       type: 'nodesqlite' as const,
-      database: mockDatabase as any,
+      database: mockDatabase as unknown as NodeSqliteRepositoryConfig['database'],
       tableName: 'test_items',
     };
 
@@ -70,7 +71,7 @@ describe('NodeSqliteAdapter', () => {
 
       const config = {
         type: 'nodesqlite' as const,
-        database: mockDatabase as any,
+        database: mockDatabase as unknown as NodeSqliteRepositoryConfig['database'],
         tableName: 'test_items',
       };
 
@@ -244,7 +245,7 @@ describe('NodeSqliteAdapter', () => {
     });
 
     it('should return true when record exists', async () => {
-      const stmt = { get: vi.fn().mockReturnValue({ '1': 1 }) };
+      const stmt = { get: vi.fn().mockReturnValue({ count: 1 }) };
       mockDatabase.prepare.mockReturnValueOnce(stmt);
 
       const result = await adapter.exists('123');

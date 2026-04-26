@@ -2,21 +2,34 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 import { ExpressPageAdapter } from '../../../../../../src/service/platforms/server/page/adapters';
 
+type MockExpressServer = {
+  use: ReturnType<typeof vi.fn>;
+};
+
+type MiddlewareRequest = { path: string; method: string };
+type MiddlewareResponse = Record<string, unknown>;
+type MiddlewareNext = () => void;
+type MiddlewareHandler = (
+  req: MiddlewareRequest,
+  res: MiddlewareResponse,
+  next: MiddlewareNext,
+) => void;
+
 describe('ExpressPageAdapter', () => {
   let adapter: ExpressPageAdapter;
-  let mockServer: any;
-  let middlewareHandler: (req: any, res: any, next: any) => void;
+  let mockServer: MockExpressServer;
+  let middlewareHandler: MiddlewareHandler = () => {};
 
   beforeEach(() => {
     vi.clearAllMocks();
     mockServer = {
-      use: vi.fn((_, handler) => {
+      use: vi.fn((_: unknown, handler: unknown) => {
         if (typeof handler === 'function') {
-          middlewareHandler = handler;
+          middlewareHandler = handler as MiddlewareHandler;
         }
       }),
     };
-    adapter = new ExpressPageAdapter(mockServer);
+    adapter = new ExpressPageAdapter(mockServer as never);
   });
 
   describe('registerStaticFiles', () => {
@@ -38,10 +51,10 @@ describe('ExpressPageAdapter', () => {
 
   describe('registerSpaFallback', () => {
     beforeEach(() => {
-      mockServer.use = vi.fn((handler) => {
-        middlewareHandler = handler;
+      mockServer.use = vi.fn((handler: unknown) => {
+        middlewareHandler = handler as MiddlewareHandler;
       });
-      adapter = new ExpressPageAdapter(mockServer);
+      adapter = new ExpressPageAdapter(mockServer as never);
       adapter.registerSpaFallback('/api', '/dist/client');
     });
 

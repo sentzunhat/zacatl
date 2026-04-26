@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 
 import { InternalServerError } from '@zacatl/error';
 
+import type { IpcApplicationEntryPoints } from '../../../../../src/service/layers/application/types';
 import { Desktop } from '../../../../../src/service/platforms/desktop/desktop';
 
 describe('Desktop.start() — not implemented', () => {
@@ -25,7 +26,7 @@ describe('Desktop.start() — not implemented', () => {
   it('error reason guides users to SERVER runtime', async () => {
     const desktop = new Desktop(config);
     const err = await desktop.start().catch((e) => e);
-    expect((err as any).reason).toMatch(/ServiceType\.SERVER/);
+    expect((err as { reason?: string }).reason).toMatch(/ServiceType\.SERVER/);
   });
 
   it('stop() resolves without throwing', async () => {
@@ -42,16 +43,18 @@ describe('Desktop.registerEntrypoints() — not implemented', () => {
 
   it('throws an InternalServerError', async () => {
     const desktop = new Desktop(config);
+    const entryPoints: IpcApplicationEntryPoints = { handlers: [] };
 
-    await expect(desktop.registerEntrypoints({} as any)).rejects.toBeInstanceOf(
+    await expect(desktop.registerEntrypoints(entryPoints)).rejects.toBeInstanceOf(
       InternalServerError,
     );
   });
 
   it('error message mentions the window title', async () => {
     const desktop = new Desktop(config);
+    const entryPoints: IpcApplicationEntryPoints = { handlers: [] };
 
-    const err = await desktop.registerEntrypoints({} as any).catch((e) => e);
+    const err = await desktop.registerEntrypoints(entryPoints).catch((e) => e);
     expect((err as Error).message).toMatch(/Test App/);
   });
 });

@@ -1,3 +1,4 @@
+import type { Request as ExpressRequest, Response as ExpressResponse } from 'express';
 import { describe, it, expect, vi } from 'vitest';
 
 import {
@@ -16,10 +17,43 @@ import { AbstractRouteHandler } from '../../../../../../../../src/service/layers
  * Mirrors Fastify handler tests but uses Express Request/Response types.
  */
 
+type TestResponse = { id: number; name: string };
+type TestRequest = ExpressRequest<void, TestResponse, void, Record<string, string>>;
+type MockReply = Pick<ExpressResponse, 'headersSent'> & {
+  send: ReturnType<typeof vi.fn<(body?: unknown) => void>>;
+  status: ReturnType<typeof vi.fn<(statusCode: number) => MockReply>>;
+};
+type ZacatlErrorCtor = new (args: { message: string; reason: string }) => Error;
+
+const createMockRequest = (
+  overrides: Partial<TestRequest> = {},
+): TestRequest => ({
+  params: undefined,
+  query: {},
+  headers: {},
+  body: undefined,
+  ...overrides,
+}) as unknown as TestRequest;
+
+const createMockReply = (
+  overrides: Partial<MockReply> = {},
+): MockReply => {
+  const reply: MockReply = {
+    headersSent: false,
+    send: vi.fn<(body?: unknown) => void>(),
+    status: vi.fn<(statusCode: number) => MockReply>(),
+    ...overrides,
+  };
+
+  reply.status.mockReturnValue(reply);
+
+  return reply;
+};
+
 class TestExpressRouteHandler extends AbstractRouteHandler<
   void, // Body
   Record<string, string>, // Querystring
-  { id: number; name: string }, // Response type
+  TestResponse, // Response type
   void, // Params
   void // Headers
 > {
@@ -31,16 +65,13 @@ class TestExpressRouteHandler extends AbstractRouteHandler<
     });
   }
 
-  async handler(_: any): Promise<{ id: number; name: string }> {
+  async handler(_request: TestRequest): Promise<TestResponse> {
     return { id: 1, name: 'Test' };
   }
 }
 
 class ExpressHandlerThatThrowsNotFound extends TestExpressRouteHandler {
-  override async handler(_: any): Promise<{
-    id: number;
-    name: string;
-  }> {
+  override async handler(_request: TestRequest): Promise<TestResponse> {
     throw new NotFoundError({
       message: 'Resource not found',
       reason: 'test',
@@ -49,10 +80,7 @@ class ExpressHandlerThatThrowsNotFound extends TestExpressRouteHandler {
 }
 
 class ExpressHandlerWithCustomErrorHandling extends TestExpressRouteHandler {
-  override async handler(_: any): Promise<{
-    id: number;
-    name: string;
-  }> {
+  override async handler(_request: TestRequest): Promise<TestResponse> {
     throw new BadRequestError({
       message: 'Invalid input',
       reason: 'test',
@@ -76,17 +104,8 @@ class ExpressHandlerWithCustomErrorHandling extends TestExpressRouteHandler {
 
 describe('Express AbstractRouteHandler', () => {
   it('auto-sends the handler response data directly', async () => {
-    const mockRequest: any = {
-      params: {},
-      query: {},
-      headers: {},
-      body: {},
-    };
-
-    const mockReply: any = {
-      send: vi.fn().mockResolvedValue(undefined),
-      status: vi.fn().mockReturnThis(),
-    };
+    const mockRequest = createMockRequest();
+    const mockReply = createMockReply();
 
     const handler = new TestExpressRouteHandler();
     const result = await handler.execute(mockRequest, mockReply);
@@ -96,17 +115,8 @@ describe('Express AbstractRouteHandler', () => {
   });
 
   it('handles NotFoundError with 404 status', async () => {
-    const mockRequest: any = {
-      params: {},
-      query: {},
-      headers: {},
-      body: {},
-    };
-
-    const mockReply: any = {
-      send: vi.fn().mockResolvedValue(undefined),
-      status: vi.fn().mockReturnThis(),
-    };
+    const mockRequest = createMockRequest();
+    const mockReply = createMockReply();
 
     const handler = new ExpressHandlerThatThrowsNotFound();
 
@@ -120,7 +130,7 @@ describe('Express AbstractRouteHandler', () => {
 
   it('handles BadRequestError with 400 status', async () => {
     class BadRequestHandler extends TestExpressRouteHandler {
-      override async handler(_: any): Promise<any> {
+      override async handler(_request: TestRequest): Promise<TestResponse> {
         throw new BadRequestError({
           message: 'Bad request',
           reason: 'test',
@@ -128,17 +138,8 @@ describe('Express AbstractRouteHandler', () => {
       }
     }
 
-    const mockRequest: any = {
-      params: {},
-      query: {},
-      headers: {},
-      body: {},
-    };
-
-    const mockReply: any = {
-      send: vi.fn().mockResolvedValue(undefined),
-      status: vi.fn().mockReturnThis(),
-    };
+    const mockRequest = createMockRequest();
+    const mockReply = createMockReply();
 
     const handler = new BadRequestHandler();
 
@@ -149,7 +150,7 @@ describe('Express AbstractRouteHandler', () => {
 
   it('handles ValidationError with 422 status', async () => {
     class ValidationErrorHandler extends TestExpressRouteHandler {
-      override async handler(_: any): Promise<any> {
+      override async handler(_request: TestRequest): Promise<TestResponse> {
         throw new ValidationError({
           message: 'Validation failed',
           reason: 'test',
@@ -157,17 +158,8 @@ describe('Express AbstractRouteHandler', () => {
       }
     }
 
-    const mockRequest: any = {
-      params: {},
-      query: {},
-      headers: {},
-      body: {},
-    };
-
-    const mockReply: any = {
-      send: vi.fn().mockResolvedValue(undefined),
-      status: vi.fn().mockReturnThis(),
-    };
+    const mockRequest = createMockRequest();
+    const mockReply = createMockReply();
 
     const handler = new ValidationErrorHandler();
 
@@ -178,7 +170,7 @@ describe('Express AbstractRouteHandler', () => {
 
   it('handles UnauthorizedError with 401 status', async () => {
     class UnauthorizedHandler extends TestExpressRouteHandler {
-      override async handler(_: any): Promise<any> {
+      override async handler(_request: TestRequest): Promise<TestResponse> {
         throw new UnauthorizedError({
           message: 'Unauthorized',
           reason: 'test',
@@ -186,17 +178,8 @@ describe('Express AbstractRouteHandler', () => {
       }
     }
 
-    const mockRequest: any = {
-      params: {},
-      query: {},
-      headers: {},
-      body: {},
-    };
-
-    const mockReply: any = {
-      send: vi.fn().mockResolvedValue(undefined),
-      status: vi.fn().mockReturnThis(),
-    };
+    const mockRequest = createMockRequest();
+    const mockReply = createMockReply();
 
     const handler = new UnauthorizedHandler();
 
@@ -207,7 +190,7 @@ describe('Express AbstractRouteHandler', () => {
 
   it('handles ForbiddenError with 403 status', async () => {
     class ForbiddenHandler extends TestExpressRouteHandler {
-      override async handler(_: any): Promise<any> {
+      override async handler(_request: TestRequest): Promise<TestResponse> {
         throw new ForbiddenError({
           message: 'Forbidden',
           reason: 'test',
@@ -215,17 +198,8 @@ describe('Express AbstractRouteHandler', () => {
       }
     }
 
-    const mockRequest: any = {
-      params: {},
-      query: {},
-      headers: {},
-      body: {},
-    };
-
-    const mockReply: any = {
-      send: vi.fn().mockResolvedValue(undefined),
-      status: vi.fn().mockReturnThis(),
-    };
+    const mockRequest = createMockRequest();
+    const mockReply = createMockReply();
 
     const handler = new ForbiddenHandler();
 
@@ -236,36 +210,27 @@ describe('Express AbstractRouteHandler', () => {
 
   it('automatically maps Zacatl error types to correct status codes', async () => {
     const testCases = [
-      { ErrorType: NotFoundError, code: 404 },
-      { ErrorType: BadRequestError, code: 400 },
-      { ErrorType: ValidationError, code: 422 },
-      { ErrorType: UnauthorizedError, code: 401 },
-      { ErrorType: ForbiddenError, code: 403 },
+      { errorType: NotFoundError, code: 404 },
+      { errorType: BadRequestError, code: 400 },
+      { errorType: ValidationError, code: 422 },
+      { errorType: UnauthorizedError, code: 401 },
+      { errorType: ForbiddenError, code: 403 },
     ];
 
     for (const testCase of testCases) {
-      const HandlerClass = class extends TestExpressRouteHandler {
-        override async handler(_: any): Promise<any> {
-          throw new testCase.ErrorType({
+      const handlerClass = class extends TestExpressRouteHandler {
+        override async handler(_request: TestRequest): Promise<TestResponse> {
+          throw new (testCase.errorType as ZacatlErrorCtor)({
             message: 'Error',
             reason: 'test',
           });
         }
       };
 
-      const mockRequest: any = {
-        params: {},
-        query: {},
-        headers: {},
-        body: {},
-      };
+      const mockRequest = createMockRequest();
+      const mockReply = createMockReply();
 
-      const mockReply: any = {
-        send: vi.fn().mockResolvedValue(undefined),
-        status: vi.fn().mockReturnThis(),
-      };
-
-      const handler = new HandlerClass();
+      const handler = new handlerClass();
 
       await expect(handler.execute(mockRequest, mockReply)).rejects.toThrow();
       expect(mockReply.status).toHaveBeenCalledWith(testCase.code);
@@ -273,17 +238,8 @@ describe('Express AbstractRouteHandler', () => {
   });
 
   it('allows custom error handling via handleError override', async () => {
-    const mockRequest: any = {
-      params: {},
-      query: {},
-      headers: {},
-      body: {},
-    };
-
-    const mockReply: any = {
-      send: vi.fn().mockResolvedValue(undefined),
-      status: vi.fn().mockReturnThis(),
-    };
+    const mockRequest = createMockRequest();
+    const mockReply = createMockReply();
 
     const handler = new ExpressHandlerWithCustomErrorHandling();
 
@@ -297,17 +253,8 @@ describe('Express AbstractRouteHandler', () => {
   });
 
   it('removes statusCode from error response before sending', async () => {
-    const mockRequest: any = {
-      params: {},
-      query: {},
-      headers: {},
-      body: {},
-    };
-
-    const mockReply: any = {
-      send: vi.fn().mockResolvedValue(undefined),
-      status: vi.fn().mockReturnThis(),
-    };
+    const mockRequest = createMockRequest();
+    const mockReply = createMockReply();
 
     const handler = new ExpressHandlerThatThrowsNotFound();
 
@@ -320,22 +267,13 @@ describe('Express AbstractRouteHandler', () => {
 
   it('sends statusCode 500 for unrecognized error types', async () => {
     class UnrecognizedErrorHandler extends TestExpressRouteHandler {
-      override async handler(_: any): Promise<any> {
+      override async handler(_request: TestRequest): Promise<TestResponse> {
         throw new Error('Unrecognized error type');
       }
     }
 
-    const mockRequest: any = {
-      params: {},
-      query: {},
-      headers: {},
-      body: {},
-    };
-
-    const mockReply: any = {
-      send: vi.fn().mockResolvedValue(undefined),
-      status: vi.fn().mockReturnThis(),
-    };
+    const mockRequest = createMockRequest();
+    const mockReply = createMockReply();
 
     const handler = new UnrecognizedErrorHandler();
 
@@ -345,18 +283,8 @@ describe('Express AbstractRouteHandler', () => {
   });
 
   it('does not send twice when response already sent', async () => {
-    const mockRequest: any = {
-      params: {},
-      query: {},
-      headers: {},
-      body: {},
-    };
-
-    const mockReply: any = {
-      send: vi.fn().mockResolvedValue(undefined),
-      status: vi.fn().mockReturnThis(),
-      headersSent: true, // Simulate response already sent
-    };
+    const mockRequest = createMockRequest();
+    const mockReply = createMockReply({ headersSent: true });
 
     const handler = new TestExpressRouteHandler();
 
@@ -367,26 +295,22 @@ describe('Express AbstractRouteHandler', () => {
   });
 
   it('passes request to handler with correct context', async () => {
-    const handlerSpy = vi.fn();
+    const handlerSpy = vi.fn<(request: TestRequest) => void>();
 
     class SpyingHandler extends TestExpressRouteHandler {
-      override async handler(request: any) {
+      override async handler(request: TestRequest): Promise<TestResponse> {
         handlerSpy(request);
         return { id: 1, name: 'Test' };
       }
     }
 
-    const mockRequest: any = {
-      params: { id: '123' },
+    const mockRequest = createMockRequest({
+      params: undefined,
       query: { search: 'test' },
       headers: { authorization: 'Bearer token' },
-      body: { data: 'value' },
-    };
-
-    const mockReply: any = {
-      send: vi.fn().mockResolvedValue(undefined),
-      status: vi.fn().mockReturnThis(),
-    };
+      body: undefined,
+    });
+    const mockReply = createMockReply();
 
     const handler = new SpyingHandler();
 

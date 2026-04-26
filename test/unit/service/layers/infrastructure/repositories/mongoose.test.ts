@@ -145,7 +145,7 @@ describe('MongooseRepository', () => {
     it('should throw InternalServerError if toLean fails', async () => {
       if (!repository) return;
       const model = repository.model as MongooseModel<UserTestDb>;
-      vi.spyOn(model, 'create').mockResolvedValueOnce(null as any);
+      vi.spyOn(model, 'create').mockResolvedValueOnce(null as unknown as never);
 
       // This would only happen if toLean returned null after creation
       // In practice, this should not happen

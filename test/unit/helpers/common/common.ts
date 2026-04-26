@@ -10,7 +10,7 @@ export const createFakeFastifyRequest = (): Partial<FastifyRequest> => ({
   //   info: vi.fn(),
   //   error: vi.fn(),
   // },
-  server: {} as any,
+  server: {} as unknown as FastifyRequest['server'],
   body: {},
   // If your code calls these methods, stub them as needed.
   getValidationFunction: vi.fn(),

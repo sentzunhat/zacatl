@@ -15,7 +15,7 @@ const { mockPino, mockPinoInstance } = vi.hoisted(() => {
 });
 
 vi.mock('pino', () => ({
-  __esModule: true,
+  ['__esModule']: true,
   default: mockPino,
 }));
 
@@ -39,7 +39,7 @@ describe('PinoLoggerAdapter', () => {
   });
 
   it('initializes pino with destination if provided', () => {
-    const dest: any = {};
+    const dest: Record<string, unknown> = {};
     new PinoLoggerAdapter(undefined, dest);
     expect(mockPino).toHaveBeenCalledWith(expect.anything(), dest);
   });

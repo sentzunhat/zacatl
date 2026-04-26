@@ -2,21 +2,35 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 import { FastifyPageAdapter } from '../../../../../../src/service/platforms/server/page/adapters';
 
+type MockFastifyServer = {
+  register: ReturnType<typeof vi.fn>;
+  setNotFoundHandler: ReturnType<typeof vi.fn>;
+  sendFile: ReturnType<typeof vi.fn>;
+};
+
+type NotFoundRequest = {
+  raw: { url?: string };
+  method: string;
+  url?: string;
+};
+type NotFoundReply = Record<string, unknown>;
+type NotFoundHandler = (request: NotFoundRequest, reply: NotFoundReply) => Promise<void>;
+
 describe('FastifyPageAdapter', () => {
   let adapter: FastifyPageAdapter;
-  let mockServer: any;
-  let notFoundHandler: (request: any, reply: any) => Promise<void>;
+  let mockServer: MockFastifyServer;
+  let notFoundHandler: NotFoundHandler = async () => {};
 
   beforeEach(() => {
     vi.clearAllMocks();
     mockServer = {
       register: vi.fn(),
-      setNotFoundHandler: vi.fn((fn) => {
-        notFoundHandler = fn;
+      setNotFoundHandler: vi.fn((fn: unknown) => {
+        notFoundHandler = fn as NotFoundHandler;
       }),
       sendFile: vi.fn(),
     };
-    adapter = new FastifyPageAdapter(mockServer);
+    adapter = new FastifyPageAdapter(mockServer as never);
   });
 
   describe('registerStaticFiles', () => {

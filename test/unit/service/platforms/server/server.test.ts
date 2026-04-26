@@ -1,5 +1,8 @@
+import type { FastifyInstance } from 'fastify';
+
 import type { ConfigServer } from '../../../../../src/service/platforms/server';
 import { DatabaseVendor, Server } from '../../../../../src/service/platforms/server';
+import type { DatabaseInstance } from '../../../../../src/service/platforms/server/database/port';
 import {
   ServerVendor,
   ServerType as ServerType,
@@ -34,12 +37,12 @@ describe('Server', () => {
       server: {
         type: ServerType.SERVER,
         vendor: ServerVendor.FASTIFY,
-        instance: fakeFastify as any, // Cast as FastifyInstance
+        instance: fakeFastify as unknown as FastifyInstance,
       },
       databases: [
         {
           vendor: DatabaseVendor.MONGOOSE,
-          instance: fakeMongoose as any, // Cast as DatabaseInstance
+          instance: fakeMongoose as unknown as DatabaseInstance,
           connectionString: 'mongodb://localhost/test',
           onDatabaseConnected: vi.fn(),
         },
@@ -70,7 +73,11 @@ describe('Server', () => {
       const server = new Server(config);
 
       // Mock database configuration
-      vi.spyOn(server.getDatabaseServer() as any, 'configure').mockResolvedValue(undefined);
+      const databaseServer = server.getDatabaseServer();
+      if (databaseServer == null) {
+        throw new Error('DatabaseServer should be defined');
+      }
+      vi.spyOn(databaseServer, 'configure').mockResolvedValue(undefined);
 
       await server.start();
 
@@ -83,7 +90,11 @@ describe('Server', () => {
     it('should use override port if provided', async () => {
       const server = new Server(config);
 
-      vi.spyOn(server.getDatabaseServer() as any, 'configure').mockResolvedValue(undefined);
+      const databaseServer = server.getDatabaseServer();
+      if (databaseServer == null) {
+        throw new Error('DatabaseServer should be defined');
+      }
+      vi.spyOn(databaseServer, 'configure').mockResolvedValue(undefined);
 
       await server.start({ port: 9999 });
 

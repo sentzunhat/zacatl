@@ -7,7 +7,21 @@ import {
   createFakeFastifyRequest,
 } from '../../../../../../helpers/common/common';
 
-class TestPostRouteHandler extends PostRouteHandler<{}, {}, { id: number }, {}> {
+type EmptyObject = Record<string, never>;
+type PostRequest = Request<EmptyObject, EmptyObject, EmptyObject>;
+type MockReply = {
+  send: {
+    (...args: unknown[]): unknown;
+    mock: { calls: unknown[][] };
+  };
+};
+
+class TestPostRouteHandler extends PostRouteHandler<
+  EmptyObject,
+  EmptyObject,
+  { id: number },
+  EmptyObject
+> {
   constructor() {
     super({
       url: '/post-test',
@@ -15,7 +29,7 @@ class TestPostRouteHandler extends PostRouteHandler<{}, {}, { id: number }, {}> 
     });
   }
 
-  async handler(_: Request<{}, {}, {}>): Promise<{ id: number }> {
+  async handler(_: PostRequest): Promise<{ id: number }> {
     return { id: 1 };
   }
 }
@@ -24,13 +38,12 @@ describe('PostRouteHandler', () => {
   it('executes POST handler and sends raw response by default', async () => {
     const testHandler = new TestPostRouteHandler();
 
-    const fakeRequest = createFakeFastifyRequest() as Request<{}, {}, {}>;
-    const fakeReply = createFakeFastifyReply() as unknown;
+    const fakeRequest = createFakeFastifyRequest() as PostRequest;
+    const fakeReply = createFakeFastifyReply() as MockReply;
 
-    await testHandler.execute(fakeRequest, fakeReply as any);
+    await testHandler.execute(fakeRequest, fakeReply as never);
 
-    const mockReply = fakeReply as Record<string, any>;
     // Handler sends raw data directly without status code manipulation
-    expect(mockReply['send']).toHaveBeenCalledWith({ id: 1 });
+    expect(fakeReply.send).toHaveBeenCalledWith({ id: 1 });
   });
 });
