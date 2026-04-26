@@ -58,15 +58,13 @@ describe('Mongoose + mongodb-memory-server extended operations', () => {
 
     const posts = await postModel.find({}).populate('author');
     expect(posts.length).toBe(2);
-    expect(
-      ((posts[0] as Record<string, unknown>)['author'] as Record<string, unknown>)['email'],
-    ).toBe('pop@example.com');
+    const firstPostAuthor = posts[0]?.get('author') as { email?: string } | undefined;
+    expect(firstPostAuthor?.email).toBe('pop@example.com');
 
-    await userModel.updateMany({ meta: { age: { $gte: 30 } } }, { $set: { meta: { age: 31 } } });
+    await userModel.updateMany({ 'meta.age': { $gte: 30 } }, { $set: { 'meta.age': 31 } });
     const updated = await userModel.findOne({ email: 'pop@example.com' });
-    expect(((updated as Record<string, unknown>)['meta'] as Record<string, unknown>)['age']).toBe(
-      31,
-    );
+    const updatedMeta = updated?.get('meta') as { age?: number } | undefined;
+    expect(updatedMeta?.age).toBe(31);
 
     const agg = await postModel.aggregate([{ $group: { _id: '$author', count: { $sum: 1 } } }]);
     expect((agg[0] as Record<string, unknown>)['count']).toBe(2);

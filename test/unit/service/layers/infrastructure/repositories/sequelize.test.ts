@@ -227,7 +227,7 @@ describe('SequelizeRepository', () => {
 
     it('should call model.findAll', async () => {
       if (!repository) return;
-      const spyFindAll = vi.spyOn(UserModel, 'findAll');
+      const spyFindAll = vi.spyOn(userModel, 'findAll');
 
       await repository.findMany();
 
@@ -257,7 +257,7 @@ describe('SequelizeRepository', () => {
     it('should call model.update', async () => {
       if (!repository) return;
       const created = await repository.create({ name: 'Iris' });
-      const spyUpdate = vi.spyOn(UserModel, 'update');
+      const spyUpdate = vi.spyOn(userModel, 'update');
 
       await repository.update(created.id, { name: 'Irene' });
 
@@ -297,7 +297,7 @@ describe('SequelizeRepository', () => {
     it('should call model.destroy', async () => {
       if (!repository) return;
       const created = await repository.create({ name: 'Leo' });
-      const spyDestroy = vi.spyOn(UserModel, 'destroy');
+      const spyDestroy = vi.spyOn(userModel, 'destroy');
 
       await repository.delete(created.id);
 
@@ -323,7 +323,7 @@ describe('SequelizeRepository', () => {
     it('should call model.count', async () => {
       if (!repository) return;
       const created = await repository.create({ name: 'Nina' });
-      const spyCount = vi.spyOn(UserModel, 'count');
+      const spyCount = vi.spyOn(userModel, 'count');
 
       await repository.exists(created.id);
 
