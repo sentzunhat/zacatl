@@ -24,7 +24,7 @@ configureI18nNode({
   locales: {
     default: 'en',
     supported: ['en', 'es', 'fr'],
-    directories: ['./locales', './custom-locales'],
+    directories: ['./locales', './services/billing/locales'],
   },
   objectNotation: true, // Support nested keys like "errors.notFound"
   overrideBuiltIn: true, // Your translations override Zacatl's
@@ -36,18 +36,26 @@ console.log(greeting); // "Hello"
 
 ### Locales Resolution
 
-The localization module automatically detects the built-in locales directory at runtime. Resolution checks:
+The localization module automatically detects Zacatl's built-in locales directory at runtime and then merges in app or service locales from the current project tree.
 
-1. **Development**: Locales in `src/localization/locales/` (when running via `tsx`)
-2. **Built Packages**: Locales in `build-src-esm/localization/locales/` or `build-src-cjs/localization/locales/`
-3. **Installed Packages**: Locales in `node_modules/@sentzunhat/zacatl/build-src-esm/localization/locales/` (ESM) or `build-src-cjs/localization/locales/` (CommonJS)
-4. **Project Source**: Fallback to `src/localization/locales/` in the current working directory
+Built-in Zacatl locales are resolved from the first matching candidate, including:
+
+1. **Current package runtime layout**: `src/localization/locales/` or supported build output layouts next to the executing module
+2. **Installed package layouts**: `node_modules/@sentzunhat/zacatl/src/localization/locales/`, `build-src-esm/...`, `build-src-cjs/...`, `build/esm/...`, or `build/cjs/...`
+3. **Project-level fallbacks**: `src/localization/locales/`, `localization/locales/`, or a top-level `locales/` directory under the consumer project root
+
+Additional non-built-in locales are then merged from:
+
+1. **Explicit directories** passed in `locales.directories`
+2. **Auto-discovered service/app directories** named `locales` under the current working tree, such as `./locales`, `./src/locales`, `./services/orders/locales`, or `./services/billing/src/locales`
+
+By default, app and service keys override Zacatl's built-in keys when the same translation path exists.
 
 If automatic detection fails (rare cases), explicitly configure `builtInLocalesDir`:
 
 ```typescript
 configureI18nNode({
-  builtInLocalesDir: './node_modules/@sentzunhat/zacatl/build-src-esm/localization/locales',
+  builtInLocalesDir: './node_modules/@sentzunhat/zacatl/src/localization/locales',
   locales: {
     default: 'en',
     supported: ['en', 'es'],
@@ -57,7 +65,16 @@ configureI18nNode({
 
 ## Translation Files
 
-Create translation files in `src/localization/locales/`:
+Zacatl ships built-in translations in its own `src/localization/locales/` directory. Consumer services can add their own translations in any discovered `locales/` directory, or point at specific folders with `locales.directories`.
+
+Common service layouts include:
+
+- `./locales/en.json`
+- `./src/locales/en/errors/index.json`
+- `./services/orders/locales/en.json`
+- `./services/billing/src/locales/en/messages/welcome.json`
+
+Example locale file:
 
 **en.json**:
 
@@ -95,7 +112,7 @@ Create translation files in `src/localization/locales/`:
 const message = i18n.__('greeting', { name: 'John' });
 console.log(message); // "Hello John"
 
-await i18n.setLocale('es');
+i18n.setLocale('es');
 console.log(i18n.__('greeting', { name: 'Juan' })); // "Hola Juan"
 ```
 
@@ -114,7 +131,7 @@ configureI18nNode({
     supported: ['en', 'es', 'fr'],
     directories: [
       './locales',
-      './custom-locales', // Your custom translations
+      './services/billing/locales', // Your service-specific translations
     ],
   },
   objectNotation: true,
@@ -152,38 +169,36 @@ const localized = i18n.__('greeting', { name: 'John' });
 
 ## Detect User Language
 
-````typescript
-import { createI18n } from "@sentzunhat/zacatl";
-
-const i18n = createI18n in HTTP Handlers
-
 ```typescript
-import i18n from "@sentzunhat/zacatl/third-party/i18n";
+import i18n from '@sentzunhat/zacatl/third-party/i18n';
 
 // In Express middleware or Fastify hook
 app.use((req, res, next) => {
-  const lang = req.headers["accept-language"]?.split(",")[0] || "en";
+  const lang = req.headers['accept-language']?.split(',')[0] || 'en';
   i18n.setLocale(lang);
   next();
-}rors.notFound`, `users.welcome`
-✅ **Use interpolation** - `{{name}}` for dynamic values
-✅ **Set default language** - Fallback to English
-✅ **Keep keys consistent** - Same structure across languages
-❌ **Don't hardcode strings** - Always use translation keys
+});
+```
 
-## Supported Adapters
+## Best Practices
 
-| Adapter             | Use Case                        |
-| ------------------- | ------------------------------- |
-| `FilesystemAdapter` | Load from JSON files (default)  |
-| `MemoryAdapter`     | In-memory for testing           |
-| Custom              | API, database, or other sources |
+- Use nested keys like `errors.notFound` and `users.welcome`.
+- Use interpolation placeholders like `{{name}}`.
+- Set a default locale and keep it available in all deployments.
+- Keep locale key structure consistent across language files.
+- Avoid hardcoded user-facing strings in handlers/services.
+
+## Scope Notes
+
+- Use `configureI18nNode()` and the shared `i18n` instance from
+  `@sentzunhat/zacatl/third-party/i18n`.
+- Adapter abstractions such as `FilesystemAdapter`/`MemoryAdapter` are not part
+  of the current public localization API.
 
 i18n-node supports multiple data sources:
 
-| Source          | Setup                              |
-| --------------- | ---------------------------------- |
-| JSON files      | `directories: ["./locales"]` |
-| Built-in        | Zacatl's en.json and es.json       |
-| Combined        | Merge multiple directories
-````
+| Source     | Setup                                                |
+| ---------- | ---------------------------------------------------- |
+| JSON files | `directories: ["./locales"]`                         |
+| Built-in   | Zacatl's en.json and es.json                         |
+| Combined   | Merge explicit and discovered `locales/` directories |

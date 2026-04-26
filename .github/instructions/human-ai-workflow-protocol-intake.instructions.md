@@ -1,5 +1,5 @@
 ---
-applyTo: "hawp/**,**/hawp/**"
+applyTo: ".hawp/**,**/.hawp/**"
 ---
 
 # HAWP Modular Intake
@@ -16,8 +16,8 @@ Use this as a scoped, drop-in instruction when integrating HAWP into repos that 
 
 When a task asks for status, handoff, bounded review, audit, planning, or comparison output, resolve HAWP guidance in this order:
 
-1. `hawp/usage/INIT.md` and `hawp/usage/STATUS_REPORT.md` (repo-local operating layer)
-2. `hawp/README.md`, `hawp/SPEC.md`, and `hawp/AUTHORING_PATTERNS.md` (protocol reference)
+1. `.hawp/usage/INIT.md` and `.hawp/usage/STATUS_REPORT.md` (repo-local operating layer)
+2. `.hawp/README.md`, `.hawp/SPEC.md`, and `.hawp/AUTHORING_PATTERNS.md` (protocol reference)
 
 If a higher-priority path is missing, continue to the next source without failing.
 

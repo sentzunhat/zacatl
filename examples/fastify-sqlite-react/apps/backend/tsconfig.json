@@ -15,7 +15,9 @@
     "esModuleInterop": true,
     "paths": {
       "@sentzunhat/zacatl": ["../../../../build-src-esm/index.d.ts"],
-      "@sentzunhat/zacatl/*": ["../../../../build-src-esm/*"]
+      "@sentzunhat/zacatl/*": ["../../../../build-src-esm/*"],
+      "@zacatl": ["../../../../build-src-esm/index.d.ts"],
+      "@zacatl/*": ["../../../../build-src-esm/*"]
     }
   },
   "include": ["src/**/*"],

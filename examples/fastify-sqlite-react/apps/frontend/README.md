@@ -26,7 +26,7 @@ npm run dev
 
 - Example Root: [../README.md](../README.md)
 - Examples Catalog: [../../README.md](../../README.md)
-- Start Here: [../../../START_HERE.md](../../../START_HERE.md)
+- Start Here: [../../../docs/START_HERE.md](../../../docs/START_HERE.md)
 - Service Module: [../../../docs/service/README.md](../../../docs/service/README.md)
 
 ## Next Steps

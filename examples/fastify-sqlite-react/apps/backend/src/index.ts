@@ -4,7 +4,7 @@
  */
 
 import '@sentzunhat/zacatl/third-party/reflect-metadata';
-import sqlite3 from 'sqlite3';
+import sqlite3 from '@sentzunhat/zacatl/third-party/sqlite3';
 import {
   Fastify,
   serializerCompiler,

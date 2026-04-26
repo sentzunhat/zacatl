@@ -1,4 +1,4 @@
-import { Mongoose } from 'mongoose';
+import type { Mongoose } from 'mongoose';
 
 import { CustomError } from '@zacatl/error';
 
@@ -36,7 +36,7 @@ export class MongooseAdapter implements DatabaseServerPort {
       await onDatabaseConnected(mongoose);
     }
 
-    getContainer().register(Mongoose, {
+    getContainer().register(mongoose.constructor.name, {
       useValue: mongoose,
     });
   }

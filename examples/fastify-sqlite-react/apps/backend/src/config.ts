@@ -9,7 +9,7 @@ import { fileURLToPath } from 'url';
 import { existsSync } from 'node:fs';
 import { readFile, readdir } from 'node:fs/promises';
 import { dirname, extname, join } from 'path';
-import { ServiceType, ServerType, ServerVendor, DatabaseVendor } from '@sentzunhat/zacatl';
+import { ServiceType, ServerType, ServerVendor, DatabaseVendor } from '@sentzunhat/zacatl/service';
 import {
   GetAllGreetingsHandler,
   GetGreetingByIdHandler,

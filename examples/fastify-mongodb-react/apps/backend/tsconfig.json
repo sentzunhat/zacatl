@@ -1,0 +1,31 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "lib": ["ES2022"],
+    "moduleResolution": "bundler",
+    "outDir": "dist",
+    "baseUrl": ".",
+    "strict": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "declaration": true,
+    "esModuleInterop": true,
+    "paths": {
+      "@sentzunhat/zacatl": ["../../../build-src-esm/index.d.ts"],
+      "@sentzunhat/zacatl/*": ["../../../build-src-esm/*"],
+      "@zacatl": ["../../../build-src-esm/index.d.ts"],
+      "@zacatl/*": ["../../../build-src-esm/*"]
+    }
+  },
+  "include": ["src/**/*"],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "src/application/route-handlers/greeting/**/*",
+    "src/domain/services/**/*",
+    "src/infrastructure/repositories/**/*"
+  ]
+}

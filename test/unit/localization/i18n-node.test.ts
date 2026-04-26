@@ -99,4 +99,78 @@ describe('configureI18nNode', () => {
       fs.rmSync(projectDir, { recursive: true, force: true });
     }
   });
+
+  it('loads and merges nested locale files discovered across services', () => {
+    const projectRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'zacatl-services-root-'));
+    const builtInDir = fs.mkdtempSync(path.join(os.tmpdir(), 'zacatl-built-in-locales-'));
+    const serviceALocales = path.join(projectRoot, 'services', 'alpha', 'locales');
+    const serviceBLocales = path.join(projectRoot, 'services', 'beta', 'src', 'locales');
+
+    fs.mkdirSync(serviceALocales, { recursive: true });
+    fs.mkdirSync(serviceBLocales, { recursive: true });
+    fs.mkdirSync(path.join(serviceALocales, 'en', 'errors'), { recursive: true });
+    fs.mkdirSync(path.join(serviceBLocales, 'en', 'messages'), { recursive: true });
+
+    fs.writeFileSync(
+      path.join(builtInDir, 'en.json'),
+      JSON.stringify({ fallback: 'built-in-value', greeting: 'Hello' }),
+      'utf-8',
+    );
+    fs.writeFileSync(
+      path.join(serviceALocales, 'en', 'errors', 'index.json'),
+      JSON.stringify({ notFound: 'Not found from alpha' }),
+      'utf-8',
+    );
+    fs.writeFileSync(
+      path.join(serviceBLocales, 'en', 'messages', 'welcome.json'),
+      JSON.stringify({ title: 'Welcome from beta' }),
+      'utf-8',
+    );
+
+    try {
+      const cwdSpy = vi.spyOn(process, 'cwd').mockReturnValue(projectRoot);
+
+      configureI18nNode({
+        builtInLocalesDir: builtInDir,
+        locales: {
+          default: 'en',
+          supported: ['en'],
+        },
+      });
+
+      expect(i18n.__('fallback')).toBe('built-in-value');
+      expect(i18n.__('errors.notFound')).toBe('Not found from alpha');
+      expect(i18n.__('messages.welcome.title')).toBe('Welcome from beta');
+
+      cwdSpy.mockRestore();
+    } finally {
+      fs.rmSync(projectRoot, { recursive: true, force: true });
+      fs.rmSync(builtInDir, { recursive: true, force: true });
+    }
+  });
+
+  it('uses explicit service locales even when built-in locales are missing', () => {
+    const serviceLocales = fs.mkdtempSync(path.join(os.tmpdir(), 'zacatl-service-locales-'));
+
+    fs.writeFileSync(
+      path.join(serviceLocales, 'en.json'),
+      JSON.stringify({ fromService: 'service-value' }),
+      'utf-8',
+    );
+
+    try {
+      configureI18nNode({
+        builtInLocalesDir: path.join(serviceLocales, 'missing-built-in'),
+        locales: {
+          default: 'en',
+          supported: ['en'],
+          directories: [serviceLocales],
+        },
+      });
+
+      expect(i18n.__('fromService')).toBe('service-value');
+    } finally {
+      fs.rmSync(serviceLocales, { recursive: true, force: true });
+    }
+  });
 });

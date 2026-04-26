@@ -9,21 +9,20 @@ Zacatl standardizes on **Node.js 24.14.0 LTS+** with **npm**:
 
 > Upgrade: `nvm install 24.14.0 && nvm use 24.14.0`
 
-## What's Included (No Installation Needed)
+## What's Available After Install
 
-When you install `@sentzunhat/zacatl`, these are **already included**:
+When you install `@sentzunhat/zacatl`, core runtime modules are available.
+Some ORM/database integrations are optional peers and should be installed by usage.
 
 ### Core Dependencies
 
 ```typescript
+import { singleton, inject, container } from '@sentzunhat/zacatl/third-party/tsyringe';
+import { z } from '@sentzunhat/zacatl/third-party/zod';
 import {
-  singleton, // ✅ From tsyringe (re-exported)
-  inject, // ✅ From tsyringe (re-exported)
-  container, // ✅ From tsyringe (re-exported)
   Service, // ✅ Zacatl core
   resolveDependency, // ✅ Zacatl DI
   logger, // ✅ Pino logger
-  z, // ✅ Zod validation (re-exported)
 } from '@sentzunhat/zacatl';
 ```
 
@@ -56,11 +55,11 @@ import { BaseRepository, ORMType } from '@sentzunhat/zacatl';
 
 ---
 
-## ORM & Platform Dependencies (Bundled)
+## ORM And Platform Dependencies
 
-`mongoose`, `sequelize`, `express`, `fastify`, and `better-sqlite3` are bundled
-as `dependencies`. A single `npm install @sentzunhat/zacatl` is
-enough — no extra install step required.
+`express` and `fastify` are installed with Zacatl.
+ORM/database ecosystems are optional peer dependencies (`mongoose`, `sequelize`,
+`better-sqlite3`, `sqlite3`, `pg`) and should be installed based on usage.
 
 ORM and platform code is still **only loaded via subpath imports** to keep the
 main entry lean:
@@ -153,15 +152,14 @@ await service.start();
 **Install:**
 
 ```bash
-npm install @sentzunhat/zacatl
+npm install @sentzunhat/zacatl mongoose
 ```
 
 **Use:**
 
 ```typescript
 import { Service, singleton, BaseRepository, ORMType } from '@sentzunhat/zacatl';
-import { Schema } from '@sentzunhat/zacatl/third-party/mongoose';
-import mongoose from '@sentzunhat/zacatl/third-party/mongoose';
+import { mongoose, Schema } from '@sentzunhat/zacatl/third-party/mongoose';
 
 const UserSchema = new Schema({ name: String });
 
@@ -245,14 +243,14 @@ const service = new Service({
 
 | Feature               | Import From                                | Install Required?           |
 | --------------------- | ------------------------------------------ | --------------------------- |
-| `singleton` decorator | `@sentzunhat/zacatl`                       | ❌ No (included)            |
+| `singleton` decorator | `@sentzunhat/zacatl/third-party/tsyringe`  | ❌ No (included)            |
 | `Service`             | `@sentzunhat/zacatl`                       | ❌ No (included)            |
 | `BaseRepository`      | `@sentzunhat/zacatl`                       | ❌ No (included)            |
 | `logger`              | `@sentzunhat/zacatl`                       | ❌ No (included)            |
-| `z` (Zod)             | `@sentzunhat/zacatl`                       | ❌ No (included)            |
-| `mongoose`            | `@sentzunhat/zacatl/third-party/mongoose`  | ❌ No (bundled)             |
-| `Schema`              | `@sentzunhat/zacatl/third-party/mongoose`  | ❌ No (bundled)             |
-| `Sequelize`           | `@sentzunhat/zacatl/third-party/sequelize` | ❌ No (bundled)             |
+| `z` (Zod)             | `@sentzunhat/zacatl/third-party/zod`       | ❌ No (included)            |
+| `mongoose`            | `@sentzunhat/zacatl/third-party/mongoose`  | ✅ Yes (optional peer)      |
+| `Schema`              | `@sentzunhat/zacatl/third-party/mongoose`  | ✅ Yes (optional peer)      |
+| `Sequelize`           | `@sentzunhat/zacatl/third-party/sequelize` | ✅ Yes (optional peer)      |
 | Database drivers      | `pg`, `mysql2`, etc                        | ✅ Yes (if using Sequelize) |
 
 ---
@@ -300,26 +298,27 @@ import { Service, singleton, resolveDependency } from '@sentzunhat/zacatl';
 
 ### Core Runtime Dependencies
 
-| Package            | Version | Purpose                  |
-| ------------------ | ------- | ------------------------ |
-| `fastify`          | ^5.7.4  | Web framework            |
-| `pino`             | ^10.3.0 | Logging                  |
-| `pino-pretty`      | ^13.1.3 | Pretty log formatting    |
-| `zod`              | ^4.3.6  | Validation               |
-| `tsyringe`         | ^4.10.0 | Dependency injection     |
-| `reflect-metadata` | ^0.2.2  | DI metadata support      |
-| `uuid`             | ^13.0.0 | UUID generation          |
-| `i18n`             | ^0.15.3 | i18n support             |
-| `js-yaml`          | ^4.1.1  | YAML parsing             |
-| `config`           | ^4.1.1  | Configuration management |
+| Package            | Version | Purpose               |
+| ------------------ | ------- | --------------------- |
+| `fastify`          | ^5.7.4  | Web framework         |
+| `pino`             | ^10.3.0 | Logging               |
+| `pino-pretty`      | ^13.1.3 | Pretty log formatting |
+| `zod`              | ^4.3.6  | Validation            |
+| `tsyringe`         | ^4.10.0 | Dependency injection  |
+| `reflect-metadata` | ^0.2.2  | DI metadata support   |
+| `uuid`             | ^14.0.0 | UUID generation       |
+| `i18n`             | ^0.15.3 | i18n support          |
+| `js-yaml`          | ^4.1.1  | YAML parsing          |
 
 ### Optional Peer Dependencies
 
 | Package          | Version | When to Use                   |
 | ---------------- | ------- | ----------------------------- |
-| `mongoose`       | ^9.1.6  | MongoDB/Mongoose repositories |
+| `mongoose`       | ^9.0.0  | MongoDB/Mongoose repositories |
 | `sequelize`      | ^6.0.0  | SQL database ORM              |
-| `better-sqlite3` | ^12.6.2 | SQLite via Sequelize ORM      |
+| `better-sqlite3` | ^12.6.2 | SQLite ecosystem support      |
+| `sqlite3`        | ^5.1.7  | SQLite ecosystem support      |
+| `pg`             | ^8.18.0 | PostgreSQL ecosystem support  |
 
 ### Development Tools
 

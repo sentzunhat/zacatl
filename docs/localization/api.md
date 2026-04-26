@@ -1,6 +1,6 @@
 # Internationalization API Reference
 
-Multi-language support with i18n-node.
+Zacatl localization is built around `i18n-node` with catalog loading and merge helpers.
 
 ## Import
 
@@ -18,107 +18,130 @@ import type {
   LoadCatalogInput,
   MergeCatalogsInput,
 } from '@sentzunhat/zacatl';
+
+import i18n from '@sentzunhat/zacatl/third-party/i18n';
 ```
 
-## Filesystem Adapter
+## `configureI18nNode(input?)`
+
+Configures the shared i18n instance by merging built-in catalogs with optional
+project catalogs.
 
 ```typescript
-const i18n = createI18n(new FilesystemAdapter('./src/localization/locales'));
+const i18nInstance = configureI18nNode({
+  locales: {
+    default: 'en',
+    supported: ['en', 'es'],
+    directories: ['./locales', './services/orders/locales'],
+  },
+  objectNotation: true,
+  overrideBuiltIn: true,
+});
+
+i18nInstance.__('greeting');
 ```
 
-**Expected structure:** `localesDir/language.json`
-
-### `MemoryAdapter`
-
-In-memory translations (useful for testing).
+### `ConfigureI18nInput`
 
 ```typescript
-import { MemoryAdapter, createI18n } from '@sentzunhat/zacatl';
-
-const i18n = createI18n(
-  new MemoryAdapter({
-    en: { translation: { greeting: 'Hello' } },
-    es: { translation: { greeting: 'Hola' } },
-  }),
-);
+type ConfigureI18nInput = {
+  locales?: {
+    default?: string;
+    supported?: string[];
+    directories?: string[]; // Explicit locale roots to merge before auto-discovered locales/ folders
+  };
+  builtInLocalesDir?: string; // Override Zacatl built-in locale lookup for custom runtime layouts
+  objectNotation?: boolean;
+  overrideBuiltIn?: boolean;
+};
 ```
 
-## Custom Adapter
+Notes:
 
-Implement the `I18nPort` interface:
+- Built-in Zacatl locales are resolved from the package runtime, installed package paths under `node_modules/@sentzunhat/zacatl`, or project-level fallback paths.
+- Additional app or service locales are loaded from `locales.directories` and from auto-discovered `locales/` directories under the current working tree.
+- With the default `overrideBuiltIn: true`, app and service translations win over built-in keys.
+
+## `loadCatalog(input)`
+
+Loads locale JSON files from a single directory.
 
 ```typescript
-import type { I18nPort } from '@sentzunhat/zacatl';
-
-class MyAdapter implements I18nPort {
-  async init?() {
-    // Optional initialization
-  }
-
-  loadResources(language: string, namespace: string) {
-    // Load and return translations
-    return { greeting: 'Hello' };
-  }
-
-  saveResources?(language: string, namespace: string, resources: Record<string, unknown>) {
-    // Optional: Save translations
-  }
-}
+const catalog = loadCatalog({
+  localesDir: './locales',
+  supportedLocales: ['en', 'es'],
+});
 ```
 
-## Usage Examples
-
-### Basic Translation
+### `LoadCatalogInput`
 
 ```typescript
-i18n.t('welcome'); // "Welcome"
-
-await i18n.setLanguage('es');
-i18n.t('welcome'); // "Bienvenido"
+type LoadCatalogInput = {
+  localesDir: string;
+  supportedLocales: string[];
+};
 ```
 
-### With Variables (Interpolation)
+## `mergeCatalogs(input)`
+
+Merges a base catalog with additional catalogs.
 
 ```typescript
-// en.json: { "greeting": "Hello, {{name}}!" }
-i18n.t('greeting', { name: 'John' }); // "Hello, John!"
+const merged = mergeCatalogs({
+  base: builtInCatalog,
+  additions: [appCatalog],
+  overrideBuiltIn: true,
+});
 ```
 
-### Nested Keys (Object Notation)
+### `MergeCatalogsInput`
 
 ```typescript
-// en.json
-{
-  "errors": {
-    "notFound": "Resource not found",
-    "validation": "Invalid input"
-  }
-}
-
-i18n.t("errors.notFound"); // "Resource not found"
+type MergeCatalogsInput = {
+  base: I18nCatalogType;
+  additions: I18nCatalogType[];
+  overrideBuiltIn: boolean;
+};
 ```
 
-## File Structure
+## `resolveBuiltInLocalesDir()`
 
-```
-locales/
-├── en.json
-├── es.json
-└── fr.json
+Finds the built-in locales directory across supported runtime layouts.
+
+```typescript
+const builtInDir = resolveBuiltInLocalesDir();
 ```
 
-**Example `en.json`:**
+If your runtime layout is custom, set `builtInLocalesDir` in
+`configureI18nNode()`.
+
+This helper resolves Zacatl's own packaged locale files only. Consumer service locales are loaded separately through `locales.directories` and auto-discovery of `locales/` folders in the current project tree.
+
+## Usage
+
+```typescript
+configureI18nNode({
+  locales: {
+    default: 'en',
+    supported: ['en', 'es'],
+  },
+});
+
+i18n.setLocale('es');
+const message = i18n.__('errors.notFound');
+```
+
+## Locale File Shape
+
+`locales/<language>.json`
+
+Nested JSON files under `locales/<language>/...` are also supported and merged into dot-notation keys.
 
 ```json
 {
   "greeting": "Hello {{name}}",
   "errors": {
-    "notFound": "Not found",
-    "validation": "Invalid input"
+    "notFound": "Not found"
   }
 }
 ```
-
----
-
-**Next**: [Repository →](../service/repository.md)

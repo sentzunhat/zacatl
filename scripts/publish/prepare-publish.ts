@@ -240,6 +240,7 @@ interface PublishPkg {
   name?: string | undefined;
   version?: string | undefined;
   description?: string | undefined;
+  homepage?: string | undefined;
   license?: string | undefined;
   type?: string | undefined;
   keywords?: string[] | unknown;
@@ -261,6 +262,7 @@ const newPkg: PublishPkg = {
   name: typeof pkg['name'] === 'string' ? (pkg['name'] as string) : undefined,
   version: typeof pkg['version'] === 'string' ? (pkg['version'] as string) : undefined,
   description: typeof pkg['description'] === 'string' ? (pkg['description'] as string) : undefined,
+  homepage: typeof pkg['homepage'] === 'string' ? (pkg['homepage'] as string) : undefined,
   license: typeof pkg['license'] === 'string' ? (pkg['license'] as string) : undefined,
   type: 'module',
   keywords: Array.isArray(pkg['keywords']) ? (pkg['keywords'] as string[]) : undefined,

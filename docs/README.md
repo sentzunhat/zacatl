@@ -2,7 +2,7 @@
 
 All project documentation is organized here.
 
-If you are new to this repository, start with [START_HERE.md](../START_HERE.md).
+If you are new to this repository, start with [START_HERE.md](./START_HERE.md).
 
 > **AI agents / LLMs:** start with [`llms.txt`](./llms.txt) for a compact
 > machine-readable project summary, import patterns, and module index.
@@ -31,6 +31,7 @@ If you are new to this repository, start with [START_HERE.md](../START_HERE.md).
 ## Reference
 
 - [Dependencies reference](third-party/dependencies-reference.md)
+- [Dev vs Publish Export Patterns](service/dependency-exports.md#development-vs-publish-export-patterns)
 - [Changelog](changelog.md)
 - [Roadmap](roadmap/index.md)
 - [Skills: Version updates](skills/version-updates.md)

@@ -24,6 +24,7 @@
     "dev": "npm run stop:dev && (npm run backend:dev & npm run frontend:dev)",
     "build": "npm run backend:build && npm run frontend:build",
     "start": "npm run backend:start",
+    "test": "npm --prefix apps/backend run test",
     "clean": "rm -rf apps/backend/dist apps/frontend/dist apps/backend/node_modules apps/frontend/node_modules node_modules"
   },
   "dependencies": {

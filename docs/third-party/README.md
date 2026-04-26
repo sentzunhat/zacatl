@@ -32,8 +32,9 @@ const UserSchema = z.object({
 
 ## ORM Packages (Subpath Imports Only)
 
-ORM packages are bundled with Zacatl — no separate install needed.
-They are still accessed exclusively via subpath imports so the main entry stays lean:
+ORM integrations are exposed via subpath imports.
+Depending on which adapter you use, install the matching optional peer dependency
+in your consumer project.
 
 See [../third-party/orm/overview.md](../third-party/orm/overview.md) for full usage and examples.
 
@@ -73,25 +74,30 @@ src/third-party/
 
 Zacatl uses these third-party versions:
 
-### Bundled Dependencies (included with Zacatl)
+### Core Runtime Dependencies (installed with Zacatl)
 
 - **tsyringe**: ^4.10.0
 - **zod**: ^4.3.6
-- **mongoose**: ^9.0.0
-- **sequelize**: ^6.0.0
 - **express**: ^5.2.1
 - **fastify**: ^5.7.4
-- **better-sqlite3**: ^12.6.2
 - **pino**: ^10.3.0
 - All other utilities (uuid, i18n, js-yaml, http-proxy-middleware, reflect-metadata)
 
-### Not Bundled (install for your database choice)
+### Optional Peer Dependencies (install based on adapter usage)
 
-- **pg**: PostgreSQL driver
+- **mongoose**: ^9.0.0 (MongoDB adapter)
+- **sequelize**: ^6.0.0 (SQL adapter)
+- **better-sqlite3**: ^12.6.2 (SQLite ecosystem support)
+- **sqlite3**: ^5.1.7 (SQLite ecosystem support)
+- **pg**: ^8.18.0 (PostgreSQL ecosystem support)
+
+### Additional Drivers (not provided by Zacatl)
+
 - **mysql2**: MySQL driver
-- **sqlite3**: SQLite driver (optional; Node.js 24+ has built-in sqlite)
+- **pg-hstore**: PostgreSQL hstore support for Sequelize
 
-All bundled dependencies are automatically available via `@sentzunhat/zacatl/third-party/*` subpath imports. No separate `npm install` is required for any of them.
+Subpath imports are always available from `@sentzunhat/zacatl/third-party/*`.
+For optional peers, install the corresponding package in your service.
 
 ## Import Patterns
 
@@ -106,7 +112,7 @@ import { z } from '@sentzunhat/zacatl/third-party';
 ### Subpath Imports
 
 ```typescript
-// From subpath — no separate install needed
+// From subpath
 import { mongoose } from '@sentzunhat/zacatl/third-party/mongoose';
 import { Sequelize } from '@sentzunhat/zacatl/third-party/sequelize';
 ```
@@ -122,9 +128,9 @@ npm install sqlite3           # SQLite
 
 ## Dependency policy
 
-- ORMs (`mongoose`, `sequelize`) and platforms (`express`, `fastify`, `better-sqlite3`) are bundled as `dependencies` — no separate install needed.
-- SQL dialect drivers (`pg`, `mysql2`, `sqlite3`, etc.) are **not** bundled; install the one matching your database.
-- If you publish a consumer package, list dialect drivers in your own `dependencies` as appropriate.
+- Core web/runtime dependencies are installed transitively with Zacatl.
+- ORM/database ecosystems are declared as optional peers (`mongoose`, `sequelize`, `better-sqlite3`, `sqlite3`, `pg`); install only what your project uses.
+- SQL dialect extras (for example `mysql2`, `pg-hstore`) are not provided by Zacatl and must be installed by consumers when needed.
 
 Use `npm run check:peers` to validate your environment before publishing or releasing.
 
