@@ -143,7 +143,7 @@
     "pg": "^8.18.0",
     "pg-mem": "^2.1.0",
     "prettier": "^2.8.8",
-    "sqlite3": "^5.1.7",
+    "sqlite3": "^6.0.1",
     "tsc-alias": "^1.8.16",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3",
@@ -174,7 +174,7 @@
     "mongoose": "^9.0.0",
     "pg": "^8.18.0",
     "sequelize": "^6.0.0",
-    "sqlite3": "^5.1.7"
+    "sqlite3": "^6.0.1"
   },
   "peerDependenciesMeta": {
     "better-sqlite3": {
