@@ -75,7 +75,13 @@ HAWP is intentionally:
 - SPEC.md: v0.1 semantics, pipeline draft, principles, and non-goals.
 - types/shape.ts: locked TypeScript shape for v0.1.
 - AUTHORING_PATTERNS.md: compact guidance for recurring task types using the same six fields.
+- templates/: optional starter templates for micro tasks, standard shaping, status reports, and audits.
+- patterns/: optional quick-reference patterns for evidence discipline and non-findings.
+- reviews/: optional review artifacts for HAWP maintenance and scope checks.
 - examples/: concrete examples of applying the shape to real requests.
+- usage/GUARDRAIL_ADR.md: guardrail decision for improving HAWP without expanding core scope.
+
+Templates and patterns are optional usage aids. They do not expand the HAWP core protocol.
 
 ## Current status and non-goals
 

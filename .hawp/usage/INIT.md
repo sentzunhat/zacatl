@@ -29,6 +29,14 @@ Keep usage lightweight in v0.1.
 Do not introduce runtime architecture, compiler, validator, orchestration, persistence, or memory-engine assumptions.
 In v0.1, HAWP fields are framing aids and do not need separate per-field files or folders.
 
+Optional starter templates and patterns live in:
+
+- [../templates](../templates)
+- [../patterns](../patterns)
+- [../reviews](../reviews)
+
+These are optional usage aids. They do not expand the required HAWP core shape.
+
 ## Working Loop
 
 Shape the task with HAWP fields, execute in conversation/editor/agent flow, then write a status report when context should be preserved or shared.
@@ -62,3 +70,8 @@ When writing a status report, capture:
 - suggested next step
 
 Save reports over time in [status](status).
+
+## Guardrail ADR
+
+For improvement work that should preserve HAWP's lean scope, use [GUARDRAIL_ADR.md](GUARDRAIL_ADR.md).
+It frames review and adoption improvements as optional patterns, examples, and workflow discipline rather than schema expansion.
