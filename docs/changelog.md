@@ -2,6 +2,18 @@
 
 ---
 
+## [0.0.56] - 2026-04-26
+
+**Status**: Pending release
+
+### 🐛 Fixes
+
+- **Publish guard unblock** — Bumped `@sentzunhat/zacatl` from `0.0.55` to `0.0.56` so `prepublish:guard` no longer fails due to the already-published npm version.
+
+### 📚 Documentation
+
+- **Release notes alignment** — Added the `0.0.56` changelog entry to keep release metadata synchronized with `package.json`.
+
 ## [0.0.55] - 2026-04-25
 
 **Status**: Pending release
