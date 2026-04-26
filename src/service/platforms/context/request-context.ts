@@ -54,6 +54,6 @@ export const requestContext = new AsyncLocalStorage<RequestContext>();
  * );
  * ```
  */
-export function requestContextMixin(): Partial<RequestContext> {
+export const requestContextMixin = (): Partial<RequestContext> => {
   return requestContext.getStore() ?? {};
-}
+};
