@@ -4,7 +4,12 @@ Complete API reference for the server platform, including HTTP servers, page ser
 
 ## Overview
 
-The server platform provides infrastructure for building web applications with REST APIs, static file hosting, and database connectivity. It uses the **Hexagonal Architecture** (Ports and Adapters pattern) to abstract HTTP server implementations (Fastify, Express) and database vendors (Mongoose, Sequelize).
+The server platform provides infrastructure for building web applications with REST APIs, static file hosting, and database connectivity. It uses the **Hexagonal Architecture** (Ports and Adapters pattern) to abstract HTTP server implementations (Fastify, Express) and database vendors (Mongoose, Sequelize, SQLite).
+
+## Platform Status in Current `src`
+
+- `ServiceType.SERVER` is implemented and runnable.
+- `ServiceType.CLI` and `ServiceType.DESKTOP` are currently contract stubs and throw when started.
 
 ## Import
 
@@ -195,7 +200,7 @@ src/service/platforms/server/
 │   └── page-server.ts          # PageServer implementation
 ├── database/
 │   ├── port.ts                 # DatabaseServerPort interface
-│   ├── adapters.ts             # MongooseAdapter, SequelizeAdapter
+│   ├── adapters.ts             # MongooseAdapter, SequelizeAdapter, SQLiteAdapter
 │   └── database-server.ts      # DatabaseServer implementation
 ├── types/
 │   └── server-config.ts        # Configuration types
@@ -312,6 +317,11 @@ import { ExpressPageAdapter } from '@sentzunhat/zacatl/service/platforms/server/
 
 ## Examples
 
+SQLite can be used in two different ways:
+
+- Native `DatabaseVendor.SQLITE` (no ORM instance required)
+- Sequelize configured with SQLite dialect (`DatabaseVendor.SEQUELIZE`)
+
 ### Example 1: Fastify API Server (Basic)
 
 Simple REST API server with Fastify.
@@ -351,20 +361,18 @@ await service.start();
 
 ---
 
-### Example 2: Fastify with SQLite Database
+### Example 2: Fastify with Native SQLite Vendor
 
-Fastify server with Sequelize + SQLite.
+Fastify server with `DatabaseVendor.SQLITE` (no Sequelize instance).
 
 ```typescript
 import Fastify from 'fastify';
-import { Sequelize } from 'sequelize';
-import { Service, ServerVendor, ServerType, DatabaseVendor } from '@sentzunhat/zacatl';
+import { Service, ServiceType, ServerVendor, ServerType, DatabaseVendor } from '@sentzunhat/zacatl';
 
 const fastify = Fastify();
-const sequelize = new Sequelize('sqlite:database.sqlite');
 
 const service = new Service({
-  type: 'SERVER',
+  type: ServiceType.SERVER,
   platforms: {
     server: {
       name: 'fastify-sqlite',
@@ -376,13 +384,8 @@ const service = new Service({
       },
       databases: [
         {
-          vendor: DatabaseVendor.SEQUELIZE,
-          instance: sequelize,
-          connectionString: 'sqlite:database.sqlite',
-          onDatabaseConnected: async (db) => {
-            await (db as Sequelize).sync({ alter: true });
-            console.log('Database synchronized');
-          },
+          vendor: DatabaseVendor.SQLITE,
+          connectionString: 'app.db',
         },
       ],
     },
@@ -460,7 +463,7 @@ await service.start();
 
 ### Example 4: Full-Stack App with Page Server
 
-Fastify server with React SPA + API + Database.
+Fastify server with React SPA + API + Sequelize using SQLite dialect.
 
 ```typescript
 import Fastify from 'fastify';

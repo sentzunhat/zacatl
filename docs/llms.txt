@@ -17,7 +17,7 @@ Zacatl enforces four layers:
 Application  — use-cases, handlers, commands
 Domain       — ports, contracts, domain services
 Infrastructure — repository implementations (Mongoose / Sequelize / SQLite)
-Platforms    — server (Fastify / Express), CLI, Desktop
+Platforms    — server (Fastify / Express), CLI stub, Desktop stub
 ```
 
 Full architecture docs: [guidelines/architecture.md](guidelines/architecture.md)
@@ -28,9 +28,9 @@ Full architecture docs: [guidelines/architecture.md](guidelines/architecture.md)
 npm install @sentzunhat/zacatl
 ```
 
-All supported ORMs and platforms (`mongoose`, `sequelize`, `express`, `fastify`,
-`better-sqlite3`) are **bundled as dependencies** — no extra installs required.
-Only SQL dialect drivers (e.g. `pg`, `mysql2`) need a separate install.
+Core runtime packages such as `express` and `fastify` are installed with Zacatl.
+ORM/database ecosystems (`mongoose`, `sequelize`, `better-sqlite3`, `sqlite3`,
+`pg`) are optional peers and should be installed based on what your service uses.
 
 ## Core imports
 
@@ -99,7 +99,7 @@ src/
   logs/                  — pino logger adapter
   service/
     layers/              — application / domain / infrastructure
-    platforms/           — server (Fastify + Express), CLI, desktop
+    platforms/           — server (Fastify + Express), CLI stub, desktop stub
   third-party/           — thin re-export wrappers (mongoose, sequelize, etc.)
   utils/                 — command runner, optionals, path aliases
 ```

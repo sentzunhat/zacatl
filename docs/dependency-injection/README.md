@@ -19,7 +19,7 @@ Zacatl uses [tsyringe](https://github.com/microsoft/tsyringe) for dependency inj
 
 ---
 
-## Approach 1: Decorators (Recommended for Production)
+## Approach 1: Decorators (Standalone and Library Modules)
 
 **Best for:** Standard TypeScript apps compiled with `tsc`
 
@@ -397,9 +397,10 @@ class MyService {
   constructor(@inject(MyRepo) private repo: MyRepo) {}
 }
 
-// ✅ CLI tool with tsx - use helpers
-registerSingletonWithDependencies(MyRepo);
-registerSingletonWithDependencies(MyService, [MyRepo]);
+// ✅ Manual container wiring outside Service architecture
+registerSingleton(MyRepo, MyRepo);
+registerSingleton(MyService, MyService);
+const service = resolveDependency<MyService>(MyService);
 
 // ✅ Full REST API - use Service architecture
 const service = new Service({
@@ -526,10 +527,12 @@ class UserOrderCoordinator {
 
 ```typescript
 // Instead of decorators
-import { registerSingletonWithDependencies } from '@sentzunhat/zacatl';
+import { registerSingleton, resolveDependency } from '@sentzunhat/zacatl/dependency-injection';
 
-registerSingletonWithDependencies(MyRepository);
-registerSingletonWithDependencies(MyService, [MyRepository]);
+registerSingleton(MyRepository, MyRepository);
+registerSingleton(MyService, MyService);
+
+const service = resolveDependency<MyService>(MyService);
 ```
 
 ### Dependency Not Registered
@@ -540,23 +543,23 @@ registerSingletonWithDependencies(MyService, [MyRepository]);
 
 ```typescript
 // ✅ Correct order
-registerSingletonWithDependencies(Logger);
-registerSingletonWithDependencies(Database, [Logger]);
-registerSingletonWithDependencies(Service, [Database, Logger]);
+registerSingleton(Logger, Logger);
+registerSingleton(Database, Database);
+registerSingleton(Service, Service);
 ```
 
 ### Getting Different Instances
 
 **Problem:** Expecting singleton behavior but getting new instances
 
-**Solution:** Use `registerSingletonWithDependencies` not `registerWithDependencies`:
+**Solution:** Use `registerSingleton` not `registerDependency`:
 
 ```typescript
 // ✅ Singleton - same instance
-registerSingletonWithDependencies(MyService, []);
+registerSingleton(MyService, MyService);
 
 // ❌ Transient - new instances
-registerWithDependencies(MyService, []);
+registerDependency(MyService, MyService);
 ```
 
 ---
@@ -640,8 +643,8 @@ container.register(Database, {
 **After:**
 
 ```typescript
-registerSingletonWithDependencies(Logger);
-registerSingletonWithDependencies(Database, [Logger]);
+registerSingleton(Logger, Logger);
+registerSingleton(Database, Database);
 ```
 
 ---

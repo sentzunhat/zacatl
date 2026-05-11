@@ -370,7 +370,7 @@ npm install
 npm run build
 
 # Run examples to verify imports resolve
-npm run backend:start
+cd examples/fastify-sqlite-react && npm run dev
 ```
 
 ---

@@ -317,7 +317,7 @@ import { Service, singleton, resolveDependency } from '@sentzunhat/zacatl';
 | `mongoose`       | ^9.0.0  | MongoDB/Mongoose repositories |
 | `sequelize`      | ^6.0.0  | SQL database ORM              |
 | `better-sqlite3` | ^12.6.2 | SQLite ecosystem support      |
-| `sqlite3`        | ^5.1.7  | SQLite ecosystem support      |
+| `sqlite3`        | ^6.0.1  | SQLite ecosystem support      |
 | `pg`             | ^8.18.0 | PostgreSQL ecosystem support  |
 
 ### Development Tools

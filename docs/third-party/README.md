@@ -65,6 +65,7 @@ src/third-party/
 ├── pino.ts                   # Pino logger re-export (subpath only)
 ├── reflect-metadata.ts       # reflect-metadata side-effect import
 ├── sequelize.ts              # Sequelize re-export (subpath only)
+├── sqlite3.ts                # sqlite3 re-export (subpath only)
 ├── tsyringe.ts               # DI container re-export
 ├── uuid.ts                   # UUID utilities re-export (subpath only)
 └── zod.ts                    # Validation re-export (subpath only)
@@ -88,7 +89,7 @@ Zacatl uses these third-party versions:
 - **mongoose**: ^9.0.0 (MongoDB adapter)
 - **sequelize**: ^6.0.0 (SQL adapter)
 - **better-sqlite3**: ^12.6.2 (SQLite ecosystem support)
-- **sqlite3**: ^5.1.7 (SQLite ecosystem support)
+- **sqlite3**: ^6.0.1 (SQLite ecosystem support)
 - **pg**: ^8.18.0 (PostgreSQL ecosystem support)
 
 ### Additional Drivers (not provided by Zacatl)

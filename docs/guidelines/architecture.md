@@ -44,6 +44,7 @@ src/
 │   │   └── infrastructure/     # Repositories, adapters
 │   │       └── orm/
 │   │           ├── mongoose/   # Mongoose adapter & lazy loader
+│   │           ├── nodesqlite/ # Node sqlite adapter
 │   │           └── sequelize/  # Sequelize adapter & lazy loader
 │   └── service.ts              # Main Service class
 ├── third-party/                # Framework & library wrappers
@@ -51,6 +52,7 @@ src/
 │   ├── fastify.ts              # Fastify export
 │   ├── mongoose.ts             # Mongoose export
 │   ├── sequelize.ts            # Sequelize export
+│   ├── sqlite3.ts              # sqlite3 export
 │   ├── zod.ts                  # Zod export
 │   └── ...other libs
 └── utils/                      # Utility functions
@@ -101,9 +103,10 @@ src/
   utils/misc/types/  # Too deep
 ```
 
-### Max Folder Depth
+### Folder Depth in Practice
 
-Keep folder nesting to **3–4 levels deep**:
+Most modules stay around **3-4 levels deep**, but service entry-point and adapter
+paths are intentionally deeper to preserve clear boundaries.
 
 ```
 // ✅ Good (3 levels)
@@ -112,15 +115,15 @@ src/
     layers/
       application/
 
-// ❌ Too deep (5+ levels)
+// ✅ Expected deep path in current service module
 src/
   service/
     layers/
       application/
         entry-points/
           rest/
-            handlers/
-              concrete/
+            fastify/
+              handlers/
 ```
 
 ---
@@ -218,7 +221,7 @@ export class GreetingService {
 **Contains:**
 
 - Repository implementations
-- Database clients (Mongoose, Sequelize)
+- Database clients (Mongoose, Sequelize, node sqlite)
 - External API clients
 - Logger adapters
 

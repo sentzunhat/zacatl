@@ -100,7 +100,7 @@ See [examples/](./examples/) for production-ready starters (Express, Fastify × 
 
 ## 📖 Documentation
 
-Full docs live in **[`docs/`](./docs/README.md)**. New contributors start with **[START_HERE.md](./docs/START_HERE.md)**.
+Full docs live in **[`docs/`](./docs/README.md)**. New contributors start with **[START_HERE.md](./docs/start-here.md)**.
 
 | Topic                 | Link                                                                             |
 | --------------------- | -------------------------------------------------------------------------------- |

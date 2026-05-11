@@ -205,7 +205,7 @@ Comprehensive reference for the zacatl repository structure, conventions, tech s
 - docs/error/README.md
 - docs/eslint/README.md
 - docs/eslint/naming-conventions-guide.md
-- docs/guidelines/QUICK_REFERENCE.md
+- docs/guidelines/quick-reference.md
 - docs/guidelines/README.md
 - docs/guidelines/architecture.md
 - docs/guidelines/code-style.md
