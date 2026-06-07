@@ -336,26 +336,14 @@ import { BadRequestError, UnauthorizedError } from '@zacatl/error';
 - Single point for public vs. internal APIs
 - Easier refactoring (move files without breaking imports)
 
-### Barrel Annotation System
+### Module Entry Files
 
-Every `index.ts` barrel carries a one-line header that declares ownership:
+Prefer concrete entry files for public modules and keep imports pointed at the specific module
+file that owns the exports. This keeps module boundaries explicit and avoids directory-level
+index barrels.
 
-```typescript
-// @barrel-generated — do not edit manually
-// (generator rewrites this file on every run)
-
-// @barrel-manual
-// (custom shape — exports are maintained by hand)
-```
-
-**`@barrel-generated`** — The file is fully managed by `npm run barrels:generate`. Exports are
-always alphabetically sorted. Do not edit manually; your changes will be overwritten.
-
-**`@barrel-manual`** — The file has a custom shape (e.g. `export type`, backward-compat aliases,
-JSDoc header, or ORM isolation). The generator ignores it entirely.
-
-Use `npm run barrels:verify` to confirm no generated barrels have drifted from the committed state.
-This runs automatically in CI (`publish-dry.yml`), in `prepublish:only`, and in `publish:dry:ci`.
+When a module needs a small public façade, document it in the owning folder README instead of
+relying on generated barrel headers or automation.
 
 ### Per-Module Documentation
 
