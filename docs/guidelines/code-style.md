@@ -188,7 +188,7 @@ src/
 - File name should match primary export (e.g., `get-route-handler.ts` exports `GetRouteHandler`)
 - Test files: `<module>.test.ts`
 - Type definition files (if separate): `<module>.types.ts` or `types/`
-- Index files: `index.ts` for barrel exports
+- Entry files: concrete module files for public exports
 
 ### Enums
 
@@ -250,13 +250,13 @@ const items = ['item1', 'item2', 'item3']; // Missing trailing comma
 // ✅ Good
 const message = 'Hello, world!';
 const greeting = `Hello, ${name}!`;
-const path = 'src/services/index.ts';
+const path = 'src/services/service.ts';
 ```
 
 ```text
 // ❌ Avoid
 const message = "Hello, world!"; // Uses double quotes instead of single quotes
-const path = "src/services/index.ts";
+const path = "src/services/service.ts";
 ```
 
 ### Semicolons
@@ -678,8 +678,6 @@ Add `.prettierrc.json` or `prettier` key in `package.json`:
 Script names use a `<noun>:<verb>` pattern so related scripts sort together:
 
 ```
-barrels:generate    # Generate barrel files
-barrels:verify      # Verify barrel files match generated output
 build:src           # Build source only
 build:watch         # Watch mode build
 type:check          # Type-check all
