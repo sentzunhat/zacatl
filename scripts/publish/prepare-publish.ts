@@ -1,6 +1,8 @@
 import fs from 'fs';
 import path from 'path';
 
+import { pruneNestedBarrelIndexes } from './prune-barrels.js';
+
 const root = process.cwd();
 const pkgPath = path.join(root, 'package.json');
 const publishDir = path.join(root, 'publish');
@@ -72,6 +74,8 @@ const usedCjs = copyFirstExisting(cjsCandidates, buildCjsDest);
 if (usedEsm === null) console.warn('No ESM build source found in', esmCandidates);
 // eslint-disable-next-line no-console
 if (usedCjs === null) console.warn('No CJS build source found in', cjsCandidates);
+
+pruneNestedBarrelIndexes([buildEsmDest, buildCjsDest]);
 
 const binDir = path.join(buildDest, 'bin');
 fs.mkdirSync(binDir, { recursive: true });
