@@ -15,7 +15,7 @@ Optional (recommended): use the Node version from `.nvmrc`.
 npm run setup:dev
 ```
 
-This installs dependencies, checks peers, and regenerates barrel exports.
+This installs dependencies and checks peers.
 
 ## 3) Daily Workflow
 

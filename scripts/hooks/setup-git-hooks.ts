@@ -7,13 +7,6 @@ const PRE_COMMIT_HOOK = path.join(HOOKS_DIR, 'pre-commit');
 
 const hook = `#!/bin/bash
 
-# Regenerate barrel files and stage any updates automatically
-npm run barrels:generate --silent
-BAREL_CHANGES=$(git diff --name-only -- 'src/**/index.ts')
-if [ -n "\${BAREL_CHANGES}" ]; then
-    git add \${BAREL_CHANGES}
-fi
-
 # Prevent committing compiled files from src folder (excluding deletions)
 COMPILED_FILES=$(git diff --cached --name-only --diff-filter=AM | grep -E 'src/.*\\.(js|d\\.ts|js\\.map|d\\.ts\\.map)$' | grep -vE '\\.(mjs|cjs)$' || true)
 
