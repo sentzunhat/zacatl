@@ -192,8 +192,6 @@ it('should [expected behavior] when [condition]', () => {
 | `npm run lint:fix`         | Auto-fix lint issues                       |
 | `npm run type:check`       | TypeScript checking                        |
 | `npm run clean:build`      | Clean & rebuild                            |
-| `npm run barrels:generate` | Regenerate barrel `index.ts` files         |
-| `npm run barrels:verify`   | Verify barrels are up to date (used in CI) |
 
 ---
 
@@ -201,7 +199,7 @@ it('should [expected behavior] when [condition]', () => {
 
 - [ ] `npm run type:check` passes
 - [ ] `npm run lint` passes (or `npm run lint:fix`)
-- [ ] `npm run barrels:verify` passes (barrel `index.ts` files up to date)
+- [ ] Public entry files and exports are up to date
 - [ ] `npm test` passes
 - [ ] Tests added for new features/fixes
 - [ ] JSDoc added for public APIs
