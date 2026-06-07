@@ -1,0 +1,299 @@
+[
+  {
+    "source_project": "upstream-a",
+    "document": "upstream/archive/project-a/docs/documentation-guidelines.md",
+    "classification": "public_reusable_standard",
+    "action": "promoted",
+    "promotion_candidate": true,
+    "reason": "Reusable filename and source-of-truth rules align across projects",
+    "notes": "Merged into shared documentation guideline"
+  },
+  {
+    "source_project": "upstream-b",
+    "document": "upstream/archive/project-b/docs/documentation-guidelines.md",
+    "classification": "public_reusable_standard",
+    "action": "promoted",
+    "promotion_candidate": true,
+    "reason": "Cross-project documentation conventions",
+    "notes": "Merged into shared documentation guideline"
+  },
+  {
+    "source_project": "upstream-c",
+    "document": "upstream/archive/project-c/docs/documentation-guidelines.md",
+    "classification": "public_reusable_standard",
+    "action": "promoted",
+    "promotion_candidate": true,
+    "reason": "Adds reusable README exception and drift prevention guidance",
+    "notes": "Merged into shared documentation guideline"
+  },
+  {
+    "source_project": "upstream-b",
+    "document": "upstream/archive/project-b/docs/contributing.md#standards-precedence",
+    "classification": "public_reusable_standard",
+    "action": "promoted",
+    "promotion_candidate": true,
+    "reason": "Reusable tooling-code-doc precedence model",
+    "notes": "Promoted to standards/guidelines/README.md"
+  },
+  {
+    "source_project": "upstream-a",
+    "document": "upstream/archive/project-a/docs/backend-areas.md",
+    "classification": "private_shared_standard",
+    "action": "kept_private",
+    "promotion_candidate": false,
+    "reason": "Area inventory and boundaries are Project-specific",
+    "notes": "May inform future abstraction"
+  },
+  {
+    "source_project": "upstream-a",
+    "document": "upstream/archive/project-a/docs/build-and-env.md",
+    "classification": "private_shared_standard",
+    "action": "kept_private",
+    "promotion_candidate": false,
+    "reason": "Contains project runtime specifics",
+    "notes": "Generic parts already represented in shared standards"
+  },
+  {
+    "source_project": "upstream-a",
+    "document": "upstream/archive/project-a/docs/protected-routes.md",
+    "classification": "private_shared_standard",
+    "action": "kept_private",
+    "promotion_candidate": false,
+    "reason": "Route inventory is service-specific",
+    "notes": "Security-sensitive endpoint details"
+  },
+  {
+    "source_project": "upstream-a",
+    "document": "upstream/archive/project-a/docs/src-patterns.md",
+    "classification": "private_shared_standard",
+    "action": "kept_private",
+    "promotion_candidate": false,
+    "reason": "Runtime wiring and module composition are project-private",
+    "notes": "Candidate source for abstract patterns only"
+  },
+  {
+    "source_project": "upstream-b",
+    "document": "upstream/archive/project-b/docs/architecture.md",
+    "classification": "private_shared_standard",
+    "action": "kept_private",
+    "promotion_candidate": false,
+    "reason": "Architecture map is service-specific",
+    "notes": "Overlaps with existing shared architecture principles"
+  },
+  {
+    "source_project": "upstream-b",
+    "document": "upstream/archive/project-b/docs/file-organization.md",
+    "classification": "private_shared_standard",
+    "action": "kept_private",
+    "promotion_candidate": false,
+    "reason": "Contains project-specific area naming and structure specifics",
+    "notes": "Use as evidence only"
+  },
+  {
+    "source_project": "upstream-b",
+    "document": "upstream/archive/project-b/docs/src-context-map.md",
+    "classification": "private_shared_standard",
+    "action": "kept_private",
+    "promotion_candidate": false,
+    "reason": "Implementation-private runtime map",
+    "notes": "Not suitable as shared standard text"
+  },
+  {
+    "source_project": "upstream-b",
+    "document": "upstream/archive/project-b/docs/guides/inter-service-auth-contract-v1.md",
+    "classification": "private_shared_standard",
+    "action": "kept_private",
+    "promotion_candidate": false,
+    "reason": "Inter-service auth contract is sensitive and product-specific",
+    "notes": "Private shared reference only"
+  },
+  {
+    "source_project": "upstream-b",
+    "document": "upstream/archive/project-b/docs/guides/passport.md",
+    "classification": "project_specific_documentation",
+    "action": "rejected",
+    "promotion_candidate": false,
+    "reason": "Bounded-context implementation guide",
+    "notes": "Project-local truth"
+  },
+  {
+    "source_project": "upstream-b",
+    "document": "upstream/archive/project-b/docs/guides/tenancy.md",
+    "classification": "project_specific_documentation",
+    "action": "rejected",
+    "promotion_candidate": false,
+    "reason": "Domain-specific tenancy implementation",
+    "notes": "Project-local truth"
+  },
+  {
+    "source_project": "upstream-b",
+    "document": "upstream/archive/project-b/docs/v1-auth-proof-of-flow.md",
+    "classification": "project_specific_documentation",
+    "action": "rejected",
+    "promotion_candidate": false,
+    "reason": "Proof artifact, not stable standard",
+    "notes": "Historical/diagnostic value"
+  },
+  {
+    "source_project": "upstream-b",
+    "document": "upstream/archive/project-b/docs/launch-scope.md",
+    "classification": "project_specific_documentation",
+    "action": "rejected",
+    "promotion_candidate": false,
+    "reason": "Product launch scope document",
+    "notes": "Not a shared engineering standard"
+  },
+  {
+    "source_project": "upstream-a",
+    "document": "upstream/archive/project-a/docs/adr/2026-04-30-pricing-copy-live-product-tiers.md",
+    "classification": "project_specific_documentation",
+    "action": "rejected",
+    "promotion_candidate": false,
+    "reason": "Product/pricing ADR",
+    "notes": "Not reusable standard content"
+  },
+  {
+    "source_project": "upstream-a",
+    "document": "upstream/archive/project-a/docs/adr/2026-04-30-multicloud-provider-profile-settings-v1-mock.md",
+    "classification": "project_specific_documentation",
+    "action": "rejected",
+    "promotion_candidate": false,
+    "reason": "Provider/product implementation decision",
+    "notes": "Project-private"
+  },
+  {
+    "source_project": "upstream-c",
+    "document": "upstream/archive/project-c/docs/service/handler-best-practices.md",
+    "classification": "needs_human_review",
+    "action": "deferred",
+    "promotion_candidate": true,
+    "reason": "Contains reusable patterns mixed with framework-coupled runtime details",
+    "notes": "Framework candidate; extract abstraction-first"
+  },
+  {
+    "source_project": "upstream-c",
+    "document": "upstream/archive/project-c/docs/service/service-adapter-pattern.md",
+    "classification": "needs_human_review",
+    "action": "deferred",
+    "promotion_candidate": true,
+    "reason": "Architecture principles mixed with concrete framework assumptions",
+    "notes": "Promote principles, keep implementation specifics scoped"
+  },
+  {
+    "source_project": "upstream-c",
+    "document": "upstream/archive/project-c/docs/service/http-service-scaffold.md",
+    "classification": "needs_human_review",
+    "action": "deferred",
+    "promotion_candidate": true,
+    "reason": "Scaffold is tightly tied to framework tooling",
+    "notes": "Requires framework-agnostic rewrite before promotion"
+  },
+  {
+    "source_project": "upstream-c",
+    "document": "upstream/archive/project-c/docs/service/handler-registration.md",
+    "classification": "needs_human_review",
+    "action": "deferred",
+    "promotion_candidate": true,
+    "reason": "Candidate pattern is valid but currently implementation-coupled",
+    "notes": "Extract registration philosophy first"
+  },
+  {
+    "source_project": "upstream-c",
+    "document": "upstream/archive/project-c/docs/dependency-injection/patterns.md",
+    "classification": "needs_human_review",
+    "action": "deferred",
+    "promotion_candidate": true,
+    "reason": "DI guidance references framework helper APIs and concrete container behavior",
+    "notes": "Extract container-agnostic principles first"
+  },
+  {
+    "source_project": "upstream-c",
+    "document": "upstream/archive/project-c/docs/guidelines/architecture.md",
+    "classification": "duplicate_merged",
+    "action": "rejected",
+    "promotion_candidate": false,
+    "reason": "Already represented in shared architecture guidance",
+    "notes": "No additional promotion needed"
+  },
+  {
+    "source_project": "upstream-c",
+    "document": "upstream/archive/project-c/docs/guidelines/code-style.md",
+    "classification": "duplicate_merged",
+    "action": "rejected",
+    "promotion_candidate": false,
+    "reason": "Already represented in shared code-style guidance",
+    "notes": "No additional promotion needed"
+  },
+  {
+    "source_project": "upstream-c",
+    "document": "upstream/archive/project-c/docs/guidelines/testing.md",
+    "classification": "duplicate_merged",
+    "action": "rejected",
+    "promotion_candidate": false,
+    "reason": "Already represented in shared testing guidance",
+    "notes": "No additional promotion needed"
+  },
+  {
+    "source_project": "upstream-c",
+    "document": "upstream/archive/project-c/docs/guidelines/documentation.md",
+    "classification": "duplicate_merged",
+    "action": "rejected",
+    "promotion_candidate": false,
+    "reason": "Already represented in shared documentation guidance",
+    "notes": "No additional promotion needed"
+  },
+  {
+    "source_project": "upstream-c",
+    "document": "upstream/archive/project-c/docs/guidelines/git-workflow.md",
+    "classification": "duplicate_merged",
+    "action": "rejected",
+    "promotion_candidate": false,
+    "reason": "Already represented in shared git workflow guidance",
+    "notes": "No additional promotion needed"
+  },
+  {
+    "source_project": "upstream-a",
+    "document": "upstream/archive/project-a/docs/readme.md",
+    "classification": "project_specific_documentation",
+    "action": "kept_private",
+    "promotion_candidate": false,
+    "reason": "Project navigation index",
+    "notes": "Preserve README convention"
+  },
+  {
+    "source_project": "upstream-b",
+    "document": "upstream/archive/project-b/docs/readme.md",
+    "classification": "project_specific_documentation",
+    "action": "kept_private",
+    "promotion_candidate": false,
+    "reason": "Project navigation index",
+    "notes": "Preserve README convention"
+  },
+  {
+    "source_project": "upstream-c",
+    "document": "upstream/archive/project-c/docs/readme.md",
+    "classification": "project_specific_documentation",
+    "action": "kept_private",
+    "promotion_candidate": false,
+    "reason": "Project navigation index",
+    "notes": "Preserve README convention"
+  },
+  {
+    "source_project": "legacy",
+    "document": "old_docs/docs/**",
+    "classification": "outdated_deprecated",
+    "action": "ignored",
+    "promotion_candidate": false,
+    "reason": "Historical uppercase docs superseded by upstream archive and current standards",
+    "notes": "Evidence only"
+  },
+  {
+    "source_project": "legacy",
+    "document": "old_docs/upstream-archive/**",
+    "classification": "duplicate_merged",
+    "action": "ignored",
+    "promotion_candidate": false,
+    "reason": "Historical snapshots only",
+    "notes": "Evidence only"
+  }
+]

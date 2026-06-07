@@ -1,0 +1,500 @@
+{
+  "generated_on": "2026-05-11",
+  "entries": [
+    {
+      "old_path": "standards/README.md",
+      "new_path": "standards/README.md",
+      "classification": "public",
+      "export_eligible": false,
+      "hawp_absorbable": false,
+      "status": "retained",
+      "rationale": "Top-level governance index is public-safe but not an absorbable standard artifact"
+    },
+    {
+      "old_path": "standards/audits/2026-05-11-standards-boundary-analysis.md",
+      "new_path": "standards/audits/2026-05-11-standards-boundary-analysis.md",
+      "classification": "public",
+      "export_eligible": false,
+      "hawp_absorbable": false,
+      "status": "retained",
+      "rationale": "Historical audit evidence remains public audit material"
+    },
+    {
+      "old_path": "standards/audits/2026-05-11-standards-candidate-classification.md",
+      "new_path": "standards/audits/2026-05-11-standards-candidate-classification.md",
+      "classification": "public",
+      "export_eligible": false,
+      "hawp_absorbable": false,
+      "status": "retained",
+      "rationale": "Historical candidate classification retained for lineage"
+    },
+    {
+      "old_path": "standards/audits/BOUNDARY_SUMMARY.md",
+      "new_path": "standards/audits/BOUNDARY_SUMMARY.md",
+      "classification": "public",
+      "export_eligible": false,
+      "hawp_absorbable": false,
+      "status": "retained",
+      "rationale": "Audit summary remains public evidence"
+    },
+    {
+      "old_path": "standards/audits/source-docs-diff.md",
+      "new_path": "standards/audits/source-docs-diff.md",
+      "classification": "public",
+      "export_eligible": false,
+      "hawp_absorbable": false,
+      "status": "retained",
+      "rationale": "Diff evidence remains in audit layer"
+    },
+    {
+      "old_path": "standards/audits/standards-promotion-log.md",
+      "new_path": "standards/audits/standards-promotion-log.md",
+      "classification": "public",
+      "export_eligible": false,
+      "hawp_absorbable": false,
+      "status": "retained",
+      "rationale": "Promotion lineage remains in audit layer"
+    },
+    {
+      "old_path": "standards/audits/standards-reorg-audit.md",
+      "new_path": "standards/audits/standards-reorg-audit.md",
+      "classification": "public",
+      "export_eligible": false,
+      "hawp_absorbable": false,
+      "status": "retained",
+      "rationale": "Reorg baseline remains in audit layer"
+    },
+    {
+      "old_path": "standards/audits/export/standards-classification.json",
+      "new_path": "standards/public/exports/machine-readable/legacy-standards-classification.json",
+      "classification": "deprecated",
+      "export_eligible": false,
+      "hawp_absorbable": false,
+      "status": "moved",
+      "rationale": "Legacy export moved to new public machine-readable surface and superseded by updated boundary map"
+    },
+    {
+      "old_path": "standards/audits/export/standards-classification.csv",
+      "new_path": "standards/public/exports/machine-readable/legacy-standards-classification.csv",
+      "classification": "deprecated",
+      "export_eligible": false,
+      "hawp_absorbable": false,
+      "status": "moved",
+      "rationale": "Legacy export moved to new public machine-readable surface and superseded by updated boundary map"
+    },
+    {
+      "old_path": "standards/guidelines/README.md",
+      "new_path": "standards/public/guidelines/README.md",
+      "classification": "public",
+      "export_eligible": true,
+      "hawp_absorbable": false,
+      "status": "moved",
+      "rationale": "Reusable guideline index is public-safe"
+    },
+    {
+      "old_path": "standards/guidelines/architecture.md",
+      "new_path": "standards/public/guidelines/architecture.md",
+      "classification": "public",
+      "export_eligible": true,
+      "hawp_absorbable": true,
+      "status": "moved",
+      "rationale": "Architecture principles are abstraction-first and portable"
+    },
+    {
+      "old_path": "standards/guidelines/code-style.md",
+      "new_path": "standards/public/guidelines/code-style.md",
+      "classification": "public",
+      "export_eligible": true,
+      "hawp_absorbable": true,
+      "status": "moved",
+      "rationale": "Code style guidance is reusable across repositories"
+    },
+    {
+      "old_path": "standards/guidelines/documentation.md",
+      "new_path": "standards/public/guidelines/documentation.md",
+      "classification": "public",
+      "export_eligible": true,
+      "hawp_absorbable": true,
+      "status": "moved",
+      "rationale": "Documentation conventions are reusable and public-safe"
+    },
+    {
+      "old_path": "standards/guidelines/git-workflow.md",
+      "new_path": "standards/public/guidelines/git-workflow.md",
+      "classification": "public",
+      "export_eligible": true,
+      "hawp_absorbable": true,
+      "status": "moved",
+      "rationale": "Git workflow guidance is generic and portable"
+    },
+    {
+      "old_path": "standards/guidelines/mongodb-schema-design.md",
+      "new_path": "standards/public/guidelines/mongodb-schema-design.md",
+      "classification": "public",
+      "export_eligible": true,
+      "hawp_absorbable": false,
+      "status": "moved",
+      "rationale": "Public but technology-specific guidance kept shared-only for now"
+    },
+    {
+      "old_path": "standards/guidelines/security.md",
+      "new_path": "standards/private/security/security.md",
+      "classification": "private",
+      "export_eligible": false,
+      "hawp_absorbable": false,
+      "status": "moved",
+      "rationale": "Security posture details and assumptions remain private"
+    },
+    {
+      "old_path": "standards/guidelines/testing.md",
+      "new_path": "standards/public/guidelines/testing.md",
+      "classification": "public",
+      "export_eligible": true,
+      "hawp_absorbable": true,
+      "status": "moved",
+      "rationale": "Testing principles are generic and reusable"
+    },
+    {
+      "old_path": "standards/guidelines/adr-template.md",
+      "new_path": "standards/public/templates/ADR.template.md",
+      "classification": "duplicate",
+      "export_eligible": false,
+      "hawp_absorbable": true,
+      "status": "merged",
+      "rationale": "Duplicate ADR template merged into canonical template path"
+    },
+    {
+      "old_path": "standards/standards/auth/README.md",
+      "new_path": "standards/private/auth/README.md",
+      "classification": "private",
+      "export_eligible": false,
+      "hawp_absorbable": false,
+      "status": "moved",
+      "rationale": "Auth assumptions and internal model details are restricted"
+    },
+    {
+      "old_path": "standards/standards/auth/protected-routes.md",
+      "new_path": "standards/private/auth/protected-routes.md",
+      "classification": "private",
+      "export_eligible": false,
+      "hawp_absorbable": false,
+      "status": "moved",
+      "rationale": "Route protection and auth posture remain private"
+    },
+    {
+      "old_path": "standards/standards/database/README.md",
+      "new_path": "standards/public/standards/database/README.md",
+      "classification": "public",
+      "export_eligible": true,
+      "hawp_absorbable": false,
+      "status": "moved",
+      "rationale": "Database standards are public but not yet selected for HAWP absorbable export"
+    },
+    {
+      "old_path": "standards/standards/database/mongodb-schema-design.md",
+      "new_path": "standards/public/standards/database/mongodb-schema-design.md",
+      "classification": "public",
+      "export_eligible": true,
+      "hawp_absorbable": false,
+      "status": "moved",
+      "rationale": "MongoDB-specific standard kept shared-only pending broader abstraction"
+    },
+    {
+      "old_path": "standards/standards/docs/README.md",
+      "new_path": "standards/public/standards/docs/README.md",
+      "classification": "public",
+      "export_eligible": true,
+      "hawp_absorbable": false,
+      "status": "moved",
+      "rationale": "Documentation standards index is public-safe"
+    },
+    {
+      "old_path": "standards/standards/nodejs/README.md",
+      "new_path": "standards/public/standards/nodejs/README.md",
+      "classification": "public",
+      "export_eligible": true,
+      "hawp_absorbable": false,
+      "status": "moved",
+      "rationale": "Domain index retained as public shared standard"
+    },
+    {
+      "old_path": "standards/standards/nodejs/area-composition.md",
+      "new_path": "standards/public/standards/nodejs/area-composition.md",
+      "classification": "public",
+      "export_eligible": true,
+      "hawp_absorbable": true,
+      "status": "moved",
+      "rationale": "Layered composition pattern is reusable and abstraction-first"
+    },
+    {
+      "old_path": "standards/standards/nodejs/build-and-env.md",
+      "new_path": "standards/public/standards/nodejs/build-and-env.md",
+      "classification": "public",
+      "export_eligible": true,
+      "hawp_absorbable": true,
+      "status": "moved",
+      "rationale": "Build and environment guidance is broadly reusable"
+    },
+    {
+      "old_path": "standards/standards/nodejs/code-style.md",
+      "new_path": "standards/public/standards/nodejs/code-style.md",
+      "classification": "public",
+      "export_eligible": true,
+      "hawp_absorbable": true,
+      "status": "moved",
+      "rationale": "Node.js code-style standard is portable"
+    },
+    {
+      "old_path": "standards/standards/nodejs/git-workflow.md",
+      "new_path": "standards/public/standards/nodejs/git-workflow.md",
+      "classification": "public",
+      "export_eligible": true,
+      "hawp_absorbable": true,
+      "status": "moved",
+      "rationale": "Node.js git workflow standard is portable"
+    },
+    {
+      "old_path": "standards/standards/nodejs/project-structure.md",
+      "new_path": "standards/public/standards/nodejs/project-structure.md",
+      "classification": "public",
+      "export_eligible": true,
+      "hawp_absorbable": true,
+      "status": "moved",
+      "rationale": "Project structure pattern is reusable across repos"
+    },
+    {
+      "old_path": "standards/standards/product/README.md",
+      "new_path": "standards/private/product/README.md",
+      "classification": "private",
+      "export_eligible": false,
+      "hawp_absorbable": false,
+      "status": "moved",
+      "rationale": "Product launch/process strategy remains internal"
+    },
+    {
+      "old_path": "standards/standards/providers/README.md",
+      "new_path": "standards/private/providers/README.md",
+      "classification": "private",
+      "export_eligible": false,
+      "hawp_absorbable": false,
+      "status": "moved",
+      "rationale": "Provider integration assumptions remain internal"
+    },
+    {
+      "old_path": "standards/standards/framework-domain/README.md",
+      "new_path": "standards/public/standards/framework-domain/README.md",
+      "classification": "public",
+      "export_eligible": true,
+      "hawp_absorbable": false,
+      "status": "moved",
+      "rationale": "Framework domain guidance is public but not selected for absorbable export yet"
+    },
+    {
+      "old_path": "standards/standards/framework-domain/contract-testing.md",
+      "new_path": "standards/public/standards/framework-domain/contract-testing.md",
+      "classification": "public",
+      "export_eligible": true,
+      "hawp_absorbable": false,
+      "status": "moved",
+      "rationale": "Public framework guidance kept shared-only pending additional abstraction review"
+    },
+    {
+      "old_path": "standards/standards/framework-domain/dependency-registration.md",
+      "new_path": "standards/public/standards/framework-domain/dependency-registration.md",
+      "classification": "public",
+      "export_eligible": true,
+      "hawp_absorbable": false,
+      "status": "moved",
+      "rationale": "Public framework guidance kept shared-only pending additional abstraction review"
+    },
+    {
+      "old_path": "standards/standards/framework-domain/evidence-linked-documentation.md",
+      "new_path": "standards/public/standards/framework-domain/evidence-linked-documentation.md",
+      "classification": "public",
+      "export_eligible": true,
+      "hawp_absorbable": false,
+      "status": "moved",
+      "rationale": "Public framework guidance kept shared-only pending additional abstraction review"
+    },
+    {
+      "old_path": "standards/standards/framework-domain/handler-responsibilities.md",
+      "new_path": "standards/public/standards/framework-domain/handler-responsibilities.md",
+      "classification": "public",
+      "export_eligible": true,
+      "hawp_absorbable": false,
+      "status": "moved",
+      "rationale": "Public framework guidance kept shared-only pending additional abstraction review"
+    },
+    {
+      "old_path": "standards/standards/framework-domain/layered-composition.md",
+      "new_path": "standards/public/standards/framework-domain/layered-composition.md",
+      "classification": "public",
+      "export_eligible": true,
+      "hawp_absorbable": false,
+      "status": "moved",
+      "rationale": "Public framework guidance kept shared-only pending additional abstraction review"
+    },
+    {
+      "old_path": "standards/standards/framework-domain/service-boundaries.md",
+      "new_path": "standards/public/standards/framework-domain/service-boundaries.md",
+      "classification": "public",
+      "export_eligible": true,
+      "hawp_absorbable": false,
+      "status": "moved",
+      "rationale": "Public framework guidance kept shared-only pending additional abstraction review"
+    },
+    {
+      "old_path": "standards/templates/ADR.template.md",
+      "new_path": "standards/public/templates/ADR.template.md",
+      "classification": "public",
+      "export_eligible": true,
+      "hawp_absorbable": true,
+      "status": "moved",
+      "rationale": "Canonical ADR template is portable and absorbable"
+    },
+    {
+      "old_path": "standards/context/guidelines.yml",
+      "new_path": "standards/private/context/guidelines.yml",
+      "classification": "private",
+      "export_eligible": false,
+      "hawp_absorbable": false,
+      "status": "moved",
+      "rationale": "Internal AI context remains private"
+    },
+    {
+      "old_path": "standards/context/patterns.yml",
+      "new_path": "standards/private/context/patterns.yml",
+      "classification": "private",
+      "export_eligible": false,
+      "hawp_absorbable": false,
+      "status": "moved",
+      "rationale": "Internal AI context remains private"
+    },
+    {
+      "old_path": "standards/context/security.yml",
+      "new_path": "standards/private/context/security.yml",
+      "classification": "private",
+      "export_eligible": false,
+      "hawp_absorbable": false,
+      "status": "moved",
+      "rationale": "Internal AI context remains private"
+    },
+    {
+      "old_path": "standards/project-specific/README.md",
+      "new_path": "standards/project-specific/README.md",
+      "classification": "project-specific",
+      "export_eligible": false,
+      "hawp_absorbable": false,
+      "status": "created",
+      "rationale": "Boundary marker for project-local documentation scope"
+    },
+    {
+      "old_path": "standards/project-specific/example-a/README.md",
+      "new_path": "standards/project-specific/example-a/README.md",
+      "classification": "project-specific",
+      "export_eligible": false,
+      "hawp_absorbable": false,
+      "status": "created",
+      "rationale": "Pointer to Example project A local source of truth"
+    },
+    {
+      "old_path": "standards/project-specific/example-b/README.md",
+      "new_path": "standards/project-specific/example-b/README.md",
+      "classification": "project-specific",
+      "export_eligible": false,
+      "hawp_absorbable": false,
+      "status": "created",
+      "rationale": "Pointer to Example project B local source of truth"
+    },
+    {
+      "old_path": "standards/project-specific/example-c/README.md",
+      "new_path": "standards/project-specific/example-c/README.md",
+      "classification": "project-specific",
+      "export_eligible": false,
+      "hawp_absorbable": false,
+      "status": "created",
+      "rationale": "Pointer to Example project C local source of truth"
+    },
+    {
+      "old_path": "standards/public/context/README.md",
+      "new_path": "standards/public/context/README.md",
+      "classification": "public",
+      "export_eligible": false,
+      "hawp_absorbable": false,
+      "status": "created",
+      "rationale": "Reserved public context surface with no approved payload yet"
+    },
+    {
+      "old_path": "standards/private/internal-runtime/README.md",
+      "new_path": "standards/private/internal-runtime/README.md",
+      "classification": "private",
+      "export_eligible": false,
+      "hawp_absorbable": false,
+      "status": "created",
+      "rationale": "Reserved private runtime-coupled guidance surface"
+    },
+    {
+      "old_path": "standards/public/exports/hawp-absorbable/README.md",
+      "new_path": "standards/public/exports/hawp-absorbable/README.md",
+      "classification": "public",
+      "export_eligible": false,
+      "hawp_absorbable": false,
+      "status": "created",
+      "rationale": "Documents strict HAWP absorbable boundary policy"
+    },
+    {
+      "old_path": "standards/public/exports/hawp-absorbable/manifest.json",
+      "new_path": "standards/public/exports/hawp-absorbable/manifest.json",
+      "classification": "public",
+      "export_eligible": true,
+      "hawp_absorbable": false,
+      "status": "created",
+      "rationale": "Authoritative list of approved HAWP absorbable candidates"
+    },
+    {
+      "old_path": "upstream/archive/project-c/docs/service/handler-best-practices.md",
+      "new_path": "upstream/archive/project-c/docs/service/handler-best-practices.md",
+      "classification": "deferred-review",
+      "export_eligible": false,
+      "hawp_absorbable": false,
+      "status": "deferred",
+      "rationale": "Reusable guidance mixed with runtime-coupled framework details"
+    },
+    {
+      "old_path": "upstream/archive/project-c/docs/service/service-adapter-pattern.md",
+      "new_path": "upstream/archive/project-c/docs/service/service-adapter-pattern.md",
+      "classification": "deferred-review",
+      "export_eligible": false,
+      "hawp_absorbable": false,
+      "status": "deferred",
+      "rationale": "Pattern candidate contains framework implementation assumptions"
+    },
+    {
+      "old_path": "upstream/archive/project-c/docs/service/http-service-scaffold.md",
+      "new_path": "upstream/archive/project-c/docs/service/http-service-scaffold.md",
+      "classification": "deferred-review",
+      "export_eligible": false,
+      "hawp_absorbable": false,
+      "status": "deferred",
+      "rationale": "Scaffold remains framework-tooling coupled"
+    },
+    {
+      "old_path": "upstream/archive/project-c/docs/service/handler-registration.md",
+      "new_path": "upstream/archive/project-c/docs/service/handler-registration.md",
+      "classification": "deferred-review",
+      "export_eligible": false,
+      "hawp_absorbable": false,
+      "status": "deferred",
+      "rationale": "Registration guidance is implementation-coupled and requires abstraction"
+    },
+    {
+      "old_path": "upstream/archive/project-c/docs/dependency-injection/patterns.md",
+      "new_path": "upstream/archive/project-c/docs/dependency-injection/patterns.md",
+      "classification": "deferred-review",
+      "export_eligible": false,
+      "hawp_absorbable": false,
+      "status": "deferred",
+      "rationale": "DI guidance references framework helpers and runtime-specific behavior"
+    }
+  ]
+}

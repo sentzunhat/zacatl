@@ -1,0 +1,34 @@
+source_project,document,classification,action,promotion_candidate,reason,notes
+upstream-a,upstream/archive/project-a/docs/documentation-guidelines.md,public_reusable_standard,promoted,true,Cross-project reusable documentation naming and verification rules,Merged into shared documentation guideline
+upstream-b,upstream/archive/project-b/docs/documentation-guidelines.md,public_reusable_standard,promoted,true,Cross-project reusable documentation naming and verification rules,Merged into shared documentation guideline
+upstream-c,upstream/archive/project-c/docs/documentation-guidelines.md,public_reusable_standard,promoted,true,Reusable README exception and drift prevention guidance,Merged into shared documentation guideline
+upstream-b,upstream/archive/project-b/docs/contributing.md#standards-precedence,public_reusable_standard,promoted,true,Reusable precedence model between tooling code and prose,Promoted to shared standards guidance
+upstream-a,upstream/archive/project-a/docs/backend-areas.md,private_shared_standard,kept_private,false,Project-specific area boundaries and inventory,Use as evidence for abstraction only
+upstream-a,upstream/archive/project-a/docs/build-and-env.md,private_shared_standard,kept_private,false,Project runtime specifics,Generic subset already represented in shared standards
+upstream-a,upstream/archive/project-a/docs/protected-routes.md,private_shared_standard,kept_private,false,Service-specific endpoint inventory,Security-sensitive details
+upstream-a,upstream/archive/project-a/docs/src-patterns.md,private_shared_standard,kept_private,false,Project runtime composition specifics,Candidate source for abstract principles only
+upstream-b,upstream/archive/project-b/docs/architecture.md,private_shared_standard,kept_private,false,Service-specific architecture mapping,Overlaps with existing shared architecture principles
+upstream-b,upstream/archive/project-b/docs/file-organization.md,private_shared_standard,kept_private,false,Contains project-specific area naming and structure,Use as evidence only
+upstream-b,upstream/archive/project-b/docs/src-context-map.md,private_shared_standard,kept_private,false,Implementation-private wiring map,Not suitable as shared standard text
+upstream-b,upstream/archive/project-b/docs/guides/inter-service-auth-contract-v1.md,private_shared_standard,kept_private,false,Inter-service auth contract is sensitive and product-specific,Private shared reference only
+upstream-b,upstream/archive/project-b/docs/guides/passport.md,project_specific_documentation,rejected,false,Bounded-context implementation guide,Project-local truth
+upstream-b,upstream/archive/project-b/docs/guides/tenancy.md,project_specific_documentation,rejected,false,Domain-specific tenancy implementation,Project-local truth
+upstream-b,upstream/archive/project-b/docs/v1-auth-proof-of-flow.md,project_specific_documentation,rejected,false,Proof artifact not stable standard,Historical diagnostic value
+upstream-b,upstream/archive/project-b/docs/launch-scope.md,project_specific_documentation,rejected,false,Product launch scope document,Not a shared engineering standard
+upstream-a,upstream/archive/project-a/docs/adr/2026-04-30-pricing-copy-live-product-tiers.md,project_specific_documentation,rejected,false,Product and pricing ADR,Not reusable standard content
+upstream-a,upstream/archive/project-a/docs/adr/2026-04-30-multicloud-provider-profile-settings-v1-mock.md,project_specific_documentation,rejected,false,Provider product implementation decision,Project-private
+upstream-c,upstream/archive/project-c/docs/service/handler-best-practices.md,needs_human_review,deferred,true,Reusable patterns mixed with framework-coupled runtime details,Framework candidate; extract abstraction-first
+upstream-c,upstream/archive/project-c/docs/service/service-adapter-pattern.md,needs_human_review,deferred,true,Architecture principles mixed with concrete framework assumptions,Promote principles keep implementation specifics scoped
+upstream-c,upstream/archive/project-c/docs/service/http-service-scaffold.md,needs_human_review,deferred,true,Scaffold is tightly tied to framework tooling,Requires framework-agnostic rewrite before promotion
+upstream-c,upstream/archive/project-c/docs/service/handler-registration.md,needs_human_review,deferred,true,Valid candidate but implementation-coupled,Extract registration philosophy first
+upstream-c,upstream/archive/project-c/docs/dependency-injection/patterns.md,needs_human_review,deferred,true,DI guidance references framework helper APIs and concrete container behavior,Extract container-agnostic principles first
+upstream-c,upstream/archive/project-c/docs/guidelines/architecture.md,duplicate_merged,rejected,false,Already represented in shared architecture guidance,No additional promotion needed
+upstream-c,upstream/archive/project-c/docs/guidelines/code-style.md,duplicate_merged,rejected,false,Already represented in shared code-style guidance,No additional promotion needed
+upstream-c,upstream/archive/project-c/docs/guidelines/testing.md,duplicate_merged,rejected,false,Already represented in shared testing guidance,No additional promotion needed
+upstream-c,upstream/archive/project-c/docs/guidelines/documentation.md,duplicate_merged,rejected,false,Already represented in shared documentation guidance,No additional promotion needed
+upstream-c,upstream/archive/project-c/docs/guidelines/git-workflow.md,duplicate_merged,rejected,false,Already represented in shared git workflow guidance,No additional promotion needed
+upstream-a,upstream/archive/project-a/docs/readme.md,project_specific_documentation,kept_private,false,Project navigation index,Preserve README convention
+upstream-b,upstream/archive/project-b/docs/readme.md,project_specific_documentation,kept_private,false,Project navigation index,Preserve README convention
+upstream-c,upstream/archive/project-c/docs/readme.md,project_specific_documentation,kept_private,false,Project navigation index,Preserve README convention
+legacy,old_docs/docs/**,outdated_deprecated,ignored,false,Historical uppercase docs superseded by new docs and standards,Evidence only
+legacy,old_docs/upstream-archive/**,duplicate_merged,ignored,false,Historical snapshots only,Evidence only

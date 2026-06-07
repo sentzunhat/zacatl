@@ -1,0 +1,61 @@
+{
+  "generated_on": "2026-05-11",
+  "policy": "Only reviewed, portable, public-safe, reusable standards are listed here.",
+  "entries": [
+    {
+      "path": "public/guidelines/architecture.md",
+      "type": "guideline",
+      "status": "approved"
+    },
+    {
+      "path": "public/guidelines/code-style.md",
+      "type": "guideline",
+      "status": "approved"
+    },
+    {
+      "path": "public/guidelines/documentation.md",
+      "type": "guideline",
+      "status": "approved"
+    },
+    {
+      "path": "public/guidelines/git-workflow.md",
+      "type": "guideline",
+      "status": "approved"
+    },
+    {
+      "path": "public/guidelines/testing.md",
+      "type": "guideline",
+      "status": "approved"
+    },
+    {
+      "path": "public/standards/nodejs/project-structure.md",
+      "type": "standard",
+      "status": "approved"
+    },
+    {
+      "path": "public/standards/nodejs/area-composition.md",
+      "type": "standard",
+      "status": "approved"
+    },
+    {
+      "path": "public/standards/nodejs/build-and-env.md",
+      "type": "standard",
+      "status": "approved"
+    },
+    {
+      "path": "public/standards/nodejs/code-style.md",
+      "type": "standard",
+      "status": "approved"
+    },
+    {
+      "path": "public/standards/nodejs/git-workflow.md",
+      "type": "standard",
+      "status": "approved"
+    },
+    {
+      "path": "public/templates/ADR.template.md",
+      "type": "template",
+      "status": "approved"
+    }
+  ]
+}
