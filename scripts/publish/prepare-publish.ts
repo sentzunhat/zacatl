@@ -75,6 +75,8 @@ if (usedEsm === null) console.warn('No ESM build source found in', esmCandidates
 // eslint-disable-next-line no-console
 if (usedCjs === null) console.warn('No CJS build source found in', cjsCandidates);
 
+pruneNestedBarrelIndexes([buildEsmDest, buildCjsDest]);
+
 const binDir = path.join(buildDest, 'bin');
 fs.mkdirSync(binDir, { recursive: true });
 
