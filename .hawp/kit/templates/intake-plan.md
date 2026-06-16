@@ -1,6 +1,8 @@
 # Work Intake — Plan Template
 
 Use this template for plan files saved to `work/active/<ID>.md`.
+Fill it after the investigation task record (`work-intake.md`) exists —
+the Analysis section below carries the investigation findings forward.
 
 ---
 

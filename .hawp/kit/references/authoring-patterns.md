@@ -10,7 +10,7 @@ Use review tasks when the goal is to inspect a bounded target through a defined 
 
 - mission: name the review target, review lens, and what decision or prioritization the review should support
 - constraints: set scope limits, evidence bar, anti-drift rules, and what kinds of findings should be excluded
-- output: ask for a prioritized review artifact, not a generic summary
+- output: ask for a prioritized review artifact, not a generic summary; cap the *detailed* findings but keep an uncapped minor/deferred one-liner list, include a compact positive-confirmation element, and require an explicit surface sweep of the scoped units so coverage and balance are not lost (see Coverage and Balance)
 
 ## Audit Tasks
 
@@ -18,7 +18,7 @@ Use audit tasks when the work compares observed reality against an explicit stan
 
 - mission: name the audited target and the standard or baseline it should be checked against
 - constraints: require separation of direct observation from inference, name the proof basis for any standards claim, and keep the audit bounded to the stated scope
-- output: ask for drift-oriented results such as category, confidence, directly observed evidence, inference or uncertainty, significance, and a bounded action sequence
+- output: ask for drift-oriented results such as category, confidence, directly observed evidence, inference or uncertainty, significance, and a bounded action sequence; tier the findings (capped detailed findings plus an uncapped minor/deferred list), confirm the areas verified sound, and require an explicit surface sweep of the scoped units so the report stays both complete and balanced (see Coverage and Balance)
 
 ## Planning Tasks
 
@@ -142,6 +142,34 @@ Rules:
 - Keep them compact. They should improve trust, not overwhelm the report.
 - Do not write non-findings for every clean area inspected — reserve them for concerns likely to surface in review or follow-up.
 - Apply the same evidence discipline and confidence labeling used for findings.
+
+## Coverage and Balance
+
+A finding cap keeps a report focused, but a hard numeric cap alone can suppress valid items and make the report look less complete than the underlying investigation actually was. It can also skew the report toward problems only. Two authoring habits prevent both failure modes without reopening scope creep.
+
+**Tier the findings instead of using one flat cap.** Cap only the *primary* findings — the ones that carry full Observed / Inference / Significance detail — and allow an uncapped, compact *Minor / deferred* list of one-line items beneath them.
+
+- primary findings: capped (for example ≤7), full structure each
+- minor / deferred: uncapped one-liners, each naming the file or area and the issue in a single line
+- genuinely out-of-scope items still go under a separate "Out of scope, flagged only" list
+
+This preserves breadth of coverage while keeping the detailed section short and decision-useful.
+
+**State what is correct, not only what is broken.** A report that lists only problems gives a distorted picture and is harder to trust. Include a short positive-confirmation element so the reader sees the whole surface:
+
+- a compact "Verified correct" list of areas checked and found sound, and/or
+- non-findings for the specific concerns a reviewer would expect to surface
+
+Keep positives compact and evidence-backed — the goal is balance and trust, not padding. Do not confirm areas you did not actually inspect, and do not let the minor/deferred list become a dumping ground that dilutes signal.
+
+**Sweep the scoped surface before finalizing.** Tiering and positive confirmation only help if the investigation actually covered the scope. A bounded lens can quietly under-sweep — inspecting the obvious entry points and missing sibling files, configs, or contracts that are still in scope. Before writing findings, enumerate the concrete units inside scope and confirm each was looked at:
+
+- list the in-scope units — folders, entry points, shared modules, config files, and contract/spec docs — and treat that list as the coverage checklist
+- make the sweep visible in the artifact: name the units covered in the scope/method line or the "Verified correct" list, so a reader can see what was and was not inspected
+- when a unit was not inspected, say so explicitly (bounded-absence wording) rather than implying full coverage
+- a unit producing no finding is still swept: record it as verified-correct or a non-finding, not as silence
+
+This closes the gap where the cap is not the limiter — the *lens* is. It complements the tiering habit: the sweep finds the items, the minor/deferred list carries the smaller ones, and the positive-confirmation list accounts for the units that were sound.
 
 ## Split Rule for Mixed Findings
 

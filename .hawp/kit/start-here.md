@@ -71,14 +71,14 @@ HAWP is a **shaping protocol**, not a runtime. Better results come from stronger
 
 ### Learning & Examples
 
-- **Authoring guidance**: [authoring-patterns.md](authoring-patterns.md) — guidance for recurring task types
+- **Authoring guidance**: [references/authoring-patterns.md](references/authoring-patterns.md) — guidance for recurring task types
 - **Real examples**: [examples/](examples/) — seven concrete filled-in HAWP shapes
-- **Core spec**: [spec.md](spec.md) — v0.1 semantics, pipeline, and non-goals
+- **Core spec**: [references/spec.md](references/spec.md) — v0.1 semantics, pipeline, and non-goals
 
 ### Workflow Guides (Recommended Order)
 
 1. **[usage/init.md](usage/init.md)** — one-time setup for a new project
-2. **[usage/intake-workflow.md](usage/intake-workflow.md)** — intake loop for structured bug/task handling
+2. **[usage/intake-workflow.md](usage/intake-workflow.md)** — intake loop for structured bug/task handling (investigation task first, then plan, for every item)
 3. **[usage/status-report.md](usage/status-report.md)** — context handoff and session continuity
 
 ### Templates by Task Type

@@ -72,11 +72,11 @@ HAWP is intentionally:
 ## Repo layout
 
 - start-here.md: fastest on-ramp — copy-paste template and first-use notes.
-- spec.md: v0.1 semantics, pipeline draft, principles, and non-goals.
+- references/spec.md: v0.1 semantics, pipeline draft, principles, and non-goals.
 - types/shape.ts: locked TypeScript shape for v0.1.
-- authoring-patterns.md: compact guidance for recurring task types using the five required fields and optional checkpoint.
+- references/authoring-patterns.md: compact guidance for recurring task types using the five required fields and optional checkpoint.
 - templates/: optional starter templates for micro tasks, standard shaping, intake/bug planning, status reports, and audits.
-- references/: canonical policy references for recurring operational passes (for example backlog alignment and docs alignment).
+- references/: core spec, authoring guidance, and canonical policy references for recurring operational passes (for example backlog alignment and docs alignment).
 - patterns/: quick-links to standards/patterns/ (edit canonical standards copy only).
 - standards/: portable engineering standards; canonical folders are normative, standards/public/ is a read-only mirror.
 - reviews/: optional review artifacts for HAWP maintenance and scope checks.
@@ -92,7 +92,7 @@ Repo-local backlog, ADRs, status reports, and evidence live in `../work/` and ar
 ## Current status and non-goals
 
 Status: foundation pass for v0.1.
-The shape is the durable v0.1 contract, while the pipeline is draft guidance documented in SPEC.md rather than a runtime commitment.
+The shape is the durable v0.1 contract, while the pipeline is draft guidance documented in references/spec.md rather than a runtime commitment.
 HAWP v0.1 does not define or imply a runtime engine, compiler, validator, or persistence layer.
 Non-goals: no rules engine, no checkpoint schema, no runtime orchestration framework, and no persistence or scoring model yet.
 
@@ -100,7 +100,7 @@ Non-goals: no rules engine, no checkpoint schema, no runtime orchestration frame
 
 HAWP audit quality is improved through authoring guidance and examples, not schema changes.
 
-`authoring-patterns.md` contains the authoritative guidance for evidence discipline, audit taxonomy,
+`references/authoring-patterns.md` contains the authoritative guidance for evidence discipline, audit taxonomy,
 confidence labeling, standard proof requirements, non-finding format, anti-overreach boundaries,
 and the closing operational sequence.
 
