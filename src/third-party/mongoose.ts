@@ -21,4 +21,5 @@ export type {
   ObjectId,
   IfAny,
   PipelineStage,
+  QueryFilter,
 } from 'mongoose';

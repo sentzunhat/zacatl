@@ -1,13 +1,9 @@
-import { getContainer } from '@zacatl/dependency-injection';
 import { InternalServerError } from '@zacatl/error';
 import { configureI18nNode } from '@zacatl/localization';
-// Avoid importing heavy DB runtimes at module load. We register concrete
-// instance constructors at runtime so consumers that never use Sequelize
-// won't cause bundlers to traverse its deps.
 
 import { Layers } from './layers';
 import { Platforms } from './platforms/platforms';
-import { DatabaseVendor } from './platforms/server/database/port';
+import { registerOrmInstance } from './platforms/server/database/orm-instance';
 import { ServiceType } from './types';
 import type { ConfigService } from './types';
 
@@ -42,29 +38,11 @@ export class Service {
 
     const { layers, platforms, run } = config;
 
-    // Pre-register database instances BEFORE instantiating layers
-    // This ensures repositories can resolve database instances in their constructors
+    // Pre-register database instances BEFORE instantiating layers so that
+    // repositories can resolve them in their constructors via the DI container.
     if (platforms?.server?.databases != null) {
       for (const dbConfig of platforms.server.databases) {
-        if (dbConfig.vendor === DatabaseVendor.MONGOOSE && dbConfig.instance != null) {
-          // Register using the concrete instance constructor as the runtime
-          // token to avoid importing the Mongoose class at bundle time.
-          getContainer().register(
-            dbConfig.instance.constructor as unknown as new (...args: unknown[]) => unknown,
-            {
-              useValue: dbConfig.instance,
-            },
-          );
-        } else if (dbConfig.vendor === DatabaseVendor.SEQUELIZE && dbConfig.instance != null) {
-          // Register using the concrete instance constructor as the runtime
-          // token to avoid importing the Sequelize class at bundle time.
-          getContainer().register(
-            dbConfig.instance.constructor as unknown as new (...args: unknown[]) => unknown,
-            {
-              useValue: dbConfig.instance,
-            },
-          );
-        }
+        registerOrmInstance(dbConfig.vendor, dbConfig.instance);
       }
     }
 

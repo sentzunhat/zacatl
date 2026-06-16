@@ -24,7 +24,17 @@ Each row links to its plan file when one exists.
 
 ## Active Work
 
-_No active work._
+| ID       | Type        | Title                                                                | Status     | Plan                            |
+| -------- | ----------- | -------------------------------------------------------------------- | ---------- | ------------------------------- |
+| TASK-001 | improvement | Fix repository lifecycle typing and node:sqlite adapter type errors. | plan-ready | `.hawp/work/active/TASK-001.md` |
+
+---
+
+## Plan-Ready
+
+| ID       | Type        | Title                                                                | Status     | Plan                            |
+| -------- | ----------- | -------------------------------------------------------------------- | ---------- | ------------------------------- |
+| TASK-001 | improvement | Fix repository lifecycle typing and node:sqlite adapter type errors. | plan-ready | `.hawp/work/active/TASK-001.md` |
 
 ---
 

@@ -1,36 +1,48 @@
 import type { MongooseBaseRepositoryConfig, MongooseRepositoryModel } from './mongoose/types';
-import type { NodeSqliteRepositoryModel } from './nodesqlite/types';
+import type { NodeSqliteBaseRepositoryConfig, NodeSqliteRepositoryModel } from './nodesqlite/types';
 import type { SequelizeBaseRepositoryConfig, SequelizeRepositoryModel } from './sequelize/types';
 
 export type BaseRepositoryConfig<D extends object = object> =
   | MongooseBaseRepositoryConfig<D>
-  | SequelizeBaseRepositoryConfig<D>;
+  | SequelizeBaseRepositoryConfig<D>
+  | NodeSqliteBaseRepositoryConfig;
 
-/** ORM adapter interface - implemented by Mongoose and Sequelize adapters */
-export interface ORMPort<ModelType = unknown, InputType = unknown, OutputType = unknown> {
+/** ORM adapter interface - implemented by Mongoose, Sequelize, and node:sqlite adapters */
+export interface ORMPort<
+  ModelType = unknown,
+  InputType = unknown,
+  OutputType = unknown,
+  FilterType = Record<string, unknown>,
+> {
   readonly model: ModelType;
-  toLean(input: unknown): OutputType | null;
+  initialize(): Promise<void>;
   findById(id: string): Promise<OutputType | null>;
-  findMany(filter?: Record<string, unknown>): Promise<OutputType[]>;
+  findMany(filter?: FilterType): Promise<OutputType[]>;
   create(entity: InputType): Promise<OutputType>;
   update(id: string, update: Partial<InputType>): Promise<OutputType | null>;
   delete(id: string): Promise<OutputType | null>;
   exists(id: string): Promise<boolean>;
+  toLean(input: unknown): OutputType | null;
 }
 
 /**
  * Repository contract - public interface for consumers
  * Implemented by BaseRepository with ORM adapters
  */
-export interface RepositoryPort<ModelType = unknown, InputType = unknown, OutputType = unknown> {
-  readonly model?: ModelType;
-  toLean(input: unknown): OutputType | null;
+export interface RepositoryPort<
+  ModelType = unknown,
+  InputType = unknown,
+  OutputType = unknown,
+  FilterType = Record<string, unknown>,
+> {
+  readonly model: ModelType;
   findById(id: string): Promise<OutputType | null>;
-  findMany(filter?: Record<string, unknown>): Promise<OutputType[]>;
+  findMany(filter?: FilterType): Promise<OutputType[]>;
   create(entity: InputType): Promise<OutputType>;
   update(id: string, update: Partial<InputType>): Promise<OutputType | null>;
   delete(id: string): Promise<OutputType | null>;
   exists(id: string): Promise<boolean>;
+  toLean(input: unknown): OutputType | null;
 }
 
 // Re-export ORM-specific types and configs
@@ -51,6 +63,7 @@ export type {
   NodeSqliteRepositoryConfig,
   NodeSqliteRepositoryModel,
   NodeSqliteLean,
+  NodeSqliteLeanDocument,
 } from './nodesqlite/types';
 
 /** Union of all supported model types */

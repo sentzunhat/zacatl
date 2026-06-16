@@ -1,7 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
+import { clearContainer } from '../../../../../../../src/dependency-injection';
+import { NodeSqliteToken } from '../../../../../../../src/service/layers/infrastructure/orm/tokens';
 import { AbstractNodeSqliteRepository } from '../../../../../../../src/service/layers/infrastructure/repositories/nodesqlite/repository';
-import type { NodeSqliteRepositoryConfig } from '../../../../../../../src/service/layers/infrastructure/repositories/nodesqlite/types';
+import { ORMType } from '../../../../../../../src/service/layers/infrastructure/repositories/types';
+import { container } from '../../../../../../../src/third-party';
 
 interface UserInput {
   name: string;
@@ -29,19 +32,23 @@ describe('AbstractNodeSqliteRepository', () => {
   let repository: UserRepository;
 
   beforeEach(() => {
+    clearContainer();
     vi.clearAllMocks();
 
-    // Setup table existence check (called in adapter constructor)
-    const checkTableStmt = {
-      get: vi.fn().mockReturnValue(null), // Table doesn't exist
-    };
-    mockDatabase.prepare.mockReturnValueOnce(checkTableStmt);
+    mockDatabase.prepare.mockReturnValue({
+      get: vi.fn().mockReturnValue(undefined),
+      run: vi.fn(),
+      all: vi.fn().mockReturnValue([]),
+    });
     mockDatabase.exec.mockResolvedValue(undefined);
 
+    container.register(NodeSqliteToken, {
+      useValue: mockDatabase,
+    });
+
     const config = {
-      type: 'nodesqlite' as const,
-      database: mockDatabase as unknown as NodeSqliteRepositoryConfig['database'],
-      tableName: 'users',
+      type: ORMType.NodeSqlite as const,
+      name: 'users',
     };
 
     repository = new UserRepository(config);
@@ -67,14 +74,41 @@ describe('AbstractNodeSqliteRepository', () => {
     });
   });
 
+  const mockTableExists = (): void => {
+    mockDatabase.prepare.mockReturnValueOnce({
+      get: vi.fn().mockReturnValue({ name: 'users' }),
+    });
+  };
+
   describe('findById', () => {
+    beforeEach(() => {
+      mockTableExists();
+    });
+
     it('should find user by id', async () => {
-      const userData = { name: 'John', email: 'john@example.com' };
-      const stmt = { get: vi.fn().mockReturnValue({ data: JSON.stringify(userData) }) };
+      const userData = {
+        id: 'user-123',
+        name: 'John',
+        email: 'john@example.com',
+        createdAt: '2026-01-01T00:00:00.000Z',
+        updatedAt: '2026-01-02T00:00:00.000Z',
+      };
+      const stmt = {
+        get: vi.fn().mockReturnValue({
+          id: userData.id,
+          data: JSON.stringify({ name: userData.name, email: userData.email }),
+          createdAt: userData.createdAt,
+          updatedAt: userData.updatedAt,
+        }),
+      };
       mockDatabase.prepare.mockReturnValueOnce(stmt);
 
       const result = await repository.findById('user-123');
-      expect(result).toEqual(userData);
+      expect(result).toMatchObject({
+        id: userData.id,
+        name: userData.name,
+        email: userData.email,
+      });
       expect(stmt.get).toHaveBeenCalled();
     });
 
@@ -88,20 +122,47 @@ describe('AbstractNodeSqliteRepository', () => {
   });
 
   describe('findMany', () => {
+    beforeEach(() => {
+      mockTableExists();
+    });
+
     it('should find all users', async () => {
-      const user1 = { name: 'John', email: 'john@example.com' };
-      const user2 = { name: 'Jane', email: 'jane@example.com' };
+      const user1 = {
+        id: '1',
+        name: 'John',
+        email: 'john@example.com',
+        createdAt: '2026-01-01T00:00:00.000Z',
+        updatedAt: '2026-01-02T00:00:00.000Z',
+      };
+      const user2 = {
+        id: '2',
+        name: 'Jane',
+        email: 'jane@example.com',
+        createdAt: '2026-01-03T00:00:00.000Z',
+        updatedAt: '2026-01-04T00:00:00.000Z',
+      };
       const stmt = {
-        all: vi
-          .fn()
-          .mockReturnValue([{ data: JSON.stringify(user1) }, { data: JSON.stringify(user2) }]),
+        all: vi.fn().mockReturnValue([
+          {
+            id: user1.id,
+            data: JSON.stringify({ name: user1.name, email: user1.email }),
+            createdAt: user1.createdAt,
+            updatedAt: user1.updatedAt,
+          },
+          {
+            id: user2.id,
+            data: JSON.stringify({ name: user2.name, email: user2.email }),
+            createdAt: user2.createdAt,
+            updatedAt: user2.updatedAt,
+          },
+        ]),
       };
       mockDatabase.prepare.mockReturnValueOnce(stmt);
 
       const result = await repository.findMany();
       expect(result).toHaveLength(2);
-      expect(result[0]).toEqual(user1);
-      expect(result[1]).toEqual(user2);
+      expect(result[0]).toMatchObject({ id: user1.id, name: user1.name, email: user1.email });
+      expect(result[1]).toMatchObject({ id: user2.id, name: user2.name, email: user2.email });
     });
 
     it('should return empty array when no users exist', async () => {
@@ -114,10 +175,15 @@ describe('AbstractNodeSqliteRepository', () => {
   });
 
   describe('create', () => {
+    beforeEach(() => {
+      mockTableExists();
+    });
+
     it('should create a new user with timestamps', async () => {
       const input: UserInput = { name: 'John', email: 'john@example.com' };
       const stmt = { run: vi.fn() };
       mockDatabase.prepare.mockReturnValueOnce(stmt);
+      mockDatabase.exec.mockResolvedValue(undefined);
 
       const result = await repository.create(input);
 
@@ -131,11 +197,28 @@ describe('AbstractNodeSqliteRepository', () => {
   });
 
   describe('update', () => {
+    beforeEach(() => {
+      mockTableExists();
+    });
+
     it('should update user data', async () => {
-      const original = { name: 'John', email: 'john@example.com' };
+      const original = {
+        id: 'user-123',
+        name: 'John',
+        email: 'john@example.com',
+        createdAt: '2026-01-01T00:00:00.000Z',
+        updatedAt: '2026-01-02T00:00:00.000Z',
+      };
 
       // Setup findById
-      const findStmt = { get: vi.fn().mockReturnValue({ data: JSON.stringify(original) }) };
+      const findStmt = {
+        get: vi.fn().mockReturnValue({
+          id: original.id,
+          data: JSON.stringify({ name: original.name, email: original.email }),
+          createdAt: original.createdAt,
+          updatedAt: original.updatedAt,
+        }),
+      };
       mockDatabase.prepare.mockReturnValueOnce(findStmt);
 
       // Setup update
@@ -147,6 +230,7 @@ describe('AbstractNodeSqliteRepository', () => {
       expect(result).not.toBeNull();
       expect(result!.email).toBe('newemail@example.com');
       expect(result!.name).toBe('John'); // Unchanged
+      expect(result!.id).toBe(original.id);
       expect(updateStmt.run).toHaveBeenCalled();
     });
 
@@ -160,11 +244,27 @@ describe('AbstractNodeSqliteRepository', () => {
   });
 
   describe('delete', () => {
-    it('should delete user and return deleted data', async () => {
-      const userData = { name: 'John', email: 'john@example.com' };
+    beforeEach(() => {
+      mockTableExists();
+    });
 
+    it('should delete user and return deleted data', async () => {
+      const userData = {
+        id: 'user-123',
+        name: 'John',
+        email: 'john@example.com',
+        createdAt: '2026-01-01T00:00:00.000Z',
+        updatedAt: '2026-01-02T00:00:00.000Z',
+      };
       // Setup findById
-      const findStmt = { get: vi.fn().mockReturnValue({ data: JSON.stringify(userData) }) };
+      const findStmt = {
+        get: vi.fn().mockReturnValue({
+          id: userData.id,
+          data: JSON.stringify({ name: userData.name, email: userData.email }),
+          createdAt: userData.createdAt,
+          updatedAt: userData.updatedAt,
+        }),
+      };
       mockDatabase.prepare.mockReturnValueOnce(findStmt);
 
       // Setup delete
@@ -173,7 +273,11 @@ describe('AbstractNodeSqliteRepository', () => {
 
       const result = await repository.delete('user-123');
 
-      expect(result).toEqual(userData);
+      expect(result).toMatchObject({
+        id: userData.id,
+        name: userData.name,
+        email: userData.email,
+      });
       expect(deleteStmt.run).toHaveBeenCalledWith('user-123');
     });
 
@@ -187,6 +291,10 @@ describe('AbstractNodeSqliteRepository', () => {
   });
 
   describe('exists', () => {
+    beforeEach(() => {
+      mockTableExists();
+    });
+
     it('should return true if user exists', async () => {
       const stmt = { get: vi.fn().mockReturnValue({ count: 1 }) };
       mockDatabase.prepare.mockReturnValueOnce(stmt);

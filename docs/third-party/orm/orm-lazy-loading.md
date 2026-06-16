@@ -1,7 +1,7 @@
 # ORM Lazy Loading - Node.js Solutions & Implementation
 
 > **Historical reference:** This document captures the design decisions made in v0.0.23.
-> The chosen solutions (conditional exports, type-only imports, dynamic imports) are still in place.
+> The chosen solutions (conditional exports, type-only imports, and eager DI-backed adapters) are still in place.
 > As of v0.0.46, ORMs are bundled in `dependencies` — no separate install needed.
 >
 > **Version:** 0.0.23 (historical)
@@ -97,45 +97,32 @@ import type { Sequelize, DataTypes } from 'sequelize'; // Type-only
 
 ---
 
-### 🔄 **Solution 3: Dynamic Imports (ALREADY IN PLACE)**
+### 🔄 **Solution 3: Eager Adapter Factories (ALREADY IN PLACE)**
 
-**What:** Lazy-load modules at runtime using `await import()`
+**What:** Create adapters directly and resolve shared ORM instances through DI tokens.
 
 ```typescript
-// src/service/layers/infrastructure/orm/adapter-loader.ts
-export async function loadMongooseAdapter<D, I, O>(
-  config: MongooseRepositoryConfig<D>,
-): Promise<ORMAdapter<D, I, O>> {
-  try {
-    // Dynamic import - only loads when Mongoose is actually used
-    const adapters = await import('./adapters/mongoose-adapter');
-    return new adapters.MongooseAdapter<D, I, O>(config);
-  } catch (error: any) {
-    if (error.code === 'ERR_MODULE_NOT_FOUND') {
-      // Note: as of v0.0.46 mongoose is bundled — this branch should not trigger
-      throw new Error('Mongoose adapter could not be loaded.');
-    }
-    throw error;
-  }
-}
+// src/service/layers/infrastructure/orm/*/adapter-loader.ts
+// Mongoose, Sequelize, and node:sqlite repositories each return a concrete
+// adapter instance while the adapter resolves its ORM/database via DI.
 ```
 
 **When It Loads:**
 
-- Only when `BaseRepository` is instantiated with `ORMType.Mongoose`
-- Only when user actually creates a Mongoose repository
-- Graceful error if mongoose not installed
+- When a repository is instantiated for a given ORM
+- When the adapter first resolves its shared runtime instance
+- Graceful error if the optional ORM dependency cannot be resolved
 
 **Pros:**
 
-- ✅ Perfect for optional peer dependencies
+- ✅ No dynamic import wrapper overhead
 - ✅ Clear error messages when ORM missing
-- ✅ Works with ESM and CommonJS
+- ✅ Keeps repository factories simple
 
 **Cons:**
 
-- Async initialization required
-- Slightly more complex than static imports
+- Requires the ORM/database runtime to be registered in DI
+- Slightly more coupled to the service bootstrap
 
 ---
 

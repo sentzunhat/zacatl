@@ -17,8 +17,11 @@ vi.mock('sequelize', () => {
 });
 
 import { SequelizeModel as Model } from '@zacatl/third-party/sequelize';
+import { container } from '@zacatl/third-party/tsyringe';
 
+import { clearContainer } from '../../../../../../../src/dependency-injection';
 import { SequelizeAdapter } from '../../../../../../../src/service/layers/infrastructure/orm/sequelize/adapter';
+import { SequelizeToken } from '../../../../../../../src/service/layers/infrastructure/orm/tokens';
 
 import { ORMType } from '../../../../../../../src/service/layers/infrastructure/repositories/types';
 
@@ -46,16 +49,65 @@ interface TestOutput {
   updatedAt: Date;
 }
 
+const MODEL_NAME = 'MockModel';
+
 describe('SequelizeAdapter', () => {
   let adapter: SequelizeAdapter<MockModel, TestInput, TestOutput>;
   const mockConfig = {
     type: ORMType.Sequelize as const,
-    model: MockModel,
+    name: MODEL_NAME,
   };
 
   beforeEach(() => {
     vi.clearAllMocks();
+    clearContainer();
+    // Register a mock Sequelize instance in DI that returns MockModel by name
+    container.register(SequelizeToken, {
+      useValue: { model: (_name: string) => MockModel },
+    });
     adapter = new SequelizeAdapter(mockConfig);
+  });
+
+  describe('constructor / resolveModel', () => {
+    it('resolves model eagerly in constructor', () => {
+      expect(adapter.model).toBe(MockModel);
+    });
+
+    it('model property is readonly and stable', () => {
+      expect(adapter.model).toBe(adapter.model);
+    });
+
+    it('throws InternalServerError when DI token is not registered', () => {
+      clearContainer();
+
+      expect(() => new SequelizeAdapter(mockConfig)).toThrow(
+        'Sequelize instance not registered in DI container',
+      );
+    });
+
+    it('throws InternalServerError when Sequelize resolves to null from DI', () => {
+      clearContainer();
+      container.register(SequelizeToken, { useFactory: () => null as never });
+
+      expect(() => new SequelizeAdapter(mockConfig)).toThrow(
+        'Sequelize instance resolved to null from DI container',
+      );
+    });
+  });
+
+  describe('initialize', () => {
+    it('resolves without error (no-op hook)', async () => {
+      await expect(adapter.initialize()).resolves.toBeUndefined();
+    });
+
+    it('constructor fires initialize without blocking construction', () => {
+      const startTime = Date.now();
+      const localAdapter = new SequelizeAdapter(mockConfig);
+      const elapsed = Date.now() - startTime;
+
+      expect(localAdapter.model).toBeDefined();
+      expect(elapsed).toBeLessThan(50);
+    });
   });
 
   describe('toLean', () => {

@@ -70,7 +70,7 @@ MongoDB | PostgreSQL | Your Database
 ## Option 1: Mongoose
 
 ```typescript
-import { BaseRepository } from '@sentzunhat/zacatl';
+import { BaseRepository, ORMType } from '@sentzunhat/zacatl';
 import { Schema } from 'mongoose';
 
 const userSchema = new Schema(
@@ -84,7 +84,7 @@ const userSchema = new Schema(
 class UserRepository extends BaseRepository<User, CreateUser, UserDTO> {
   constructor() {
     super({
-      type: 'mongoose',
+      type: ORMType.Mongoose,
       name: 'User',
       schema: userSchema,
     });
@@ -101,7 +101,7 @@ class UserRepository extends BaseRepository<User, CreateUser, UserDTO> {
 ## Option 2: Sequelize
 
 ```typescript
-import { BaseRepository } from '@sentzunhat/zacatl';
+import { BaseRepository, ORMType } from '@sentzunhat/zacatl';
 import { Model } from 'sequelize';
 
 class ProductModel extends Model {
@@ -112,8 +112,8 @@ class ProductModel extends Model {
 class ProductRepository extends BaseRepository<ProductModel, CreateProduct, ProductDTO> {
   constructor() {
     super({
-      type: 'sequelize',
-      model: ProductModel,
+      type: ORMType.Sequelize,
+      name: 'Product',
     });
   }
 }
@@ -146,8 +146,8 @@ ProductModel.init(
 class ProductRepository extends BaseRepository<ProductModel, CreateProduct, ProductDTO> {
   constructor() {
     super({
-      type: 'sequelize',
-      model: ProductModel,
+      type: ORMType.Sequelize,
+      name: 'Product',
     });
   }
 
@@ -259,20 +259,23 @@ class UserRepository extends BaseRepository<User, CreateUser, UserDTO> {
 You can use different ORMs in the same application:
 
 ```typescript
-import { BaseRepository } from '@sentzunhat/zacatl';
+import { BaseRepository, ORMType } from '@sentzunhat/zacatl';
 import { createClient } from 'redis';
 
 // Users in MongoDB (Mongoose)
 class UserRepository extends BaseRepository<User, CreateUser, UserDTO> {
   constructor() {
-    super({ type: 'mongoose', name: 'User', schema: userSchema });
+    super({ type: ORMType.Mongoose, name: 'User', schema: userSchema });
   }
 }
 
 // Products in PostgreSQL (Sequelize)
-class ProductRepository extends BaseRepository<Product, CreateProduct, ProductDTO> {
+class ProductRepository extends BaseRepository<ProductModel, ProductInput, ProductOutput> {
   constructor() {
-    super({ type: 'sequelize', model: ProductModel });
+    super({
+      type: ORMType.Sequelize,
+      name: 'Product',
+    });
   }
 }
 
@@ -535,7 +538,7 @@ Instead of a factory layer, we keep BaseRepository as the main interface and mak
 ```typescript
 // Same API - user doesn't need to know about adapters
 const userRepo = new BaseRepository({
-  type: 'mongoose', // or 'sequelize'
+  type: ORMType.Mongoose, // or ORMType.Sequelize
   name: 'User',
   schema: userSchema,
 });

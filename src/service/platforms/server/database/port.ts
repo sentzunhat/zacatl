@@ -1,3 +1,5 @@
+import type { DatabaseSync } from 'node:sqlite';
+
 import type { Mongoose } from 'mongoose';
 import type { Sequelize } from 'sequelize';
 
@@ -9,7 +11,7 @@ export enum DatabaseVendor {
   SQLITE = 'SQLITE',
 }
 
-export type DatabaseInstance = Mongoose | Sequelize;
+export type DatabaseInstance = Mongoose | Sequelize | DatabaseSync;
 
 export type OnDatabaseConnectedFunction = Optional<
   (dbInstance: DatabaseInstance) => Promise<void> | void

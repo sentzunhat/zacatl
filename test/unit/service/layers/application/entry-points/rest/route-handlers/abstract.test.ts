@@ -1,5 +1,5 @@
-import { describe, it, expect } from 'vitest';
 import type { FastifyReply } from 'fastify';
+import { describe, it, expect } from 'vitest';
 
 import {
   BadRequestError,

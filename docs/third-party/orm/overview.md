@@ -25,7 +25,7 @@ graph TD
 ## Mongoose Example
 
 ```typescript
-import { BaseRepository } from '@sentzunhat/zacatl';
+import { BaseRepository, ORMType } from '@sentzunhat/zacatl';
 import { Schema } from 'mongoose';
 
 const userSchema = new Schema(
@@ -38,7 +38,7 @@ const userSchema = new Schema(
 
 class UserRepository extends BaseRepository<User, CreateUser, UserDTO> {
   constructor() {
-    super({ type: 'mongoose', name: 'User', schema: userSchema });
+    super({ type: ORMType.Mongoose, name: 'User', schema: userSchema });
   }
 
   async findByEmail(email: string) {
@@ -51,7 +51,7 @@ class UserRepository extends BaseRepository<User, CreateUser, UserDTO> {
 ## Sequelize Example
 
 ```typescript
-import { BaseRepository } from '@sentzunhat/zacatl';
+import { BaseRepository, ORMType } from '@sentzunhat/zacatl';
 import { Model } from 'sequelize';
 
 class ProductModel extends Model {
@@ -61,7 +61,10 @@ class ProductModel extends Model {
 
 class ProductRepository extends BaseRepository<ProductModel, CreateProduct, ProductDTO> {
   constructor() {
-    super({ type: 'sequelize', model: ProductModel });
+    super({
+      type: ORMType.Sequelize,
+      name: 'Product',
+    });
   }
 }
 ```
@@ -69,7 +72,7 @@ class ProductRepository extends BaseRepository<ProductModel, CreateProduct, Prod
 ## Node.js SQLite Example
 
 ```typescript
-import { BaseRepository } from '@sentzunhat/zacatl';
+import { BaseRepository, ORMType } from '@sentzunhat/zacatl';
 
 interface User {
   id: string;
@@ -78,10 +81,9 @@ interface User {
 }
 
 class UserRepository extends BaseRepository<User, CreateUser, UserDTO> {
-  constructor(database: DatabaseSync) {
+  constructor() {
     super({
-      type: 'nodesqlite',
-      database,
+      type: ORMType.NodeSqlite,
       tableName: 'users',
     });
   }

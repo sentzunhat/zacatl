@@ -5,8 +5,7 @@
     "lib": ["ESNext"],
     "module": "ESNext",
     "moduleResolution": "bundler",
-    "baseUrl": "./",
-    "rootDir": "./src",
+    "rootDir": "./",
 
     "types": ["vitest/globals", "node"],
     "resolveJsonModule": true,
@@ -79,11 +78,12 @@
       "@zacatl/third-party/sequelize": ["./src/third-party/sequelize.ts"],
       "@zacatl/third-party/reflect-metadata": ["./src/third-party/reflect-metadata.ts"],
       "@zacatl/third-party/eslint": ["./src/third-party/eslint.ts"],
-      "@zacatl/optionals": ["src/utils/optionals.ts"],
+      "@zacatl/optionals": ["./src/utils/optionals.ts"],
       "@zacatl/infrastructure": ["./src/service/layers/infrastructure/index.ts"],
       "@zacatl/domain": ["./src/service/layers/domain/index.ts"],
       "@zacatl/application": ["./src/service/layers/application/index.ts"],
-      "@zacatl/platform": ["./src/service/platforms/index.ts"]
+      "@zacatl/platform": ["./src/service/platforms/index.ts"],
+      "*": ["./*"]
     }
   },
   "include": ["src/**/*.ts", "src/**/*.js"],

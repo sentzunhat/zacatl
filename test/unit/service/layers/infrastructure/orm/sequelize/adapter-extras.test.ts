@@ -1,6 +1,10 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 
+import { container } from '@zacatl/third-party/tsyringe';
+
+import { clearContainer } from '../../../../../../../src/dependency-injection';
 import { SequelizeAdapter } from '../../../../../../../src/service/layers/infrastructure/orm/sequelize/adapter';
+import { SequelizeToken } from '../../../../../../../src/service/layers/infrastructure/orm/tokens';
 import { ORMType } from '../../../../../../../src/service/layers/infrastructure/repositories/types';
 
 interface Plain {
@@ -11,13 +15,25 @@ interface Plain {
 }
 
 describe('SequelizeAdapter Extras', () => {
+  beforeEach(() => {
+    clearContainer();
+    // Register a mock Sequelize instance in DI for each test
+    container.register(SequelizeToken, {
+      useValue: { model: (_name: string) => mockModel },
+    });
+  });
+
   it('exists() should handle array-like count responses', async () => {
     // Mock model with count returning an array (some dialects/ORM wrappers)
     const mockModel: { count: ReturnType<typeof vi.fn<() => Promise<number[]>>> } = {
       count: vi.fn().mockResolvedValueOnce([1, 2, 3]),
     };
 
-    const adapter = new SequelizeAdapter({ type: ORMType.Sequelize, model: mockModel as never });
+    container.register(SequelizeToken, {
+      useValue: { model: (_name: string) => mockModel },
+    });
+
+    const adapter = new SequelizeAdapter({ type: ORMType.Sequelize, name: 'MockModel' });
 
     const exists = await adapter.exists('any-id');
     expect(mockModel.count).toHaveBeenCalledWith({ where: { id: 'any-id' } });
@@ -34,7 +50,12 @@ describe('SequelizeAdapter Extras', () => {
 
     // Provide a model that is not used; adapter.toLean only checks instanceof Model at runtime,
     // but we can pass the instance directly and assert transformation occurs for plain objects too.
-    const adapter = new SequelizeAdapter({ type: ORMType.Sequelize, model: {} as never });
+    const dummyModel = {};
+    container.register(SequelizeToken, {
+      useValue: { model: (_name: string) => dummyModel },
+    });
+
+    const adapter = new SequelizeAdapter({ type: ORMType.Sequelize, name: 'DummyModel' });
 
     // When input is not a recognized Model, it will be treated as plain object — ensure it normalizes
     const result = adapter.toLean({ _id: 'abc', name: 'z' } as Plain) as Plain | null;
@@ -42,3 +63,6 @@ describe('SequelizeAdapter Extras', () => {
     expect(result!.id).toBe('abc');
   });
 });
+
+// placeholder to satisfy beforeEach reference; overridden per test
+const mockModel = {} as never;

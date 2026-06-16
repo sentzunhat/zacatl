@@ -1,46 +1,66 @@
+import type { Sequelize, WhereOptions } from '@zacatl/third-party/sequelize';
+import type { InjectionToken } from '@zacatl/third-party/tsyringe';
+
+import { getContainer, resolveDependency } from '../../../../../dependency-injection';
+import { InternalServerError } from '../../../../../error';
 import type {
   SequelizeRepositoryConfig,
   SequelizeRepositoryModel,
   ORMPort,
 } from '../../repositories/types';
+import { SequelizeToken } from '../tokens';
 
 /**
  * Sequelize ORM adapter - handles Sequelize-specific database operations
  */
-export class SequelizeAdapter<D extends object, I, O>
-  implements ORMPort<SequelizeRepositoryModel<D>, I, O>
+export class SequelizeAdapter<D extends object, I extends object, O extends object>
+  implements ORMPort<SequelizeRepositoryModel<D>, I, O, WhereOptions<D>>
 {
   public readonly model: SequelizeRepositoryModel<D>;
 
+  private readonly config: SequelizeRepositoryConfig<D>;
+
   constructor(config: SequelizeRepositoryConfig<D>) {
-    this.model = config.model;
+    this.config = config;
+    this.model = this.resolveModel();
+
+    void this.initialize().catch(console.error);
   }
 
-  public toLean(input: unknown): O | null {
-    if (input == null) return null;
+  public async initialize(): Promise<void> {
+    // Hook for future use: sync, migrations, etc.
+    // Called fire-and-forget from the constructor and can also be awaited explicitly
+    // via DatabaseServer.configure() for fail-fast startup validation.
+  }
 
-    interface WithGet {
-      get?: (opts?: { plain?: boolean }) => unknown;
+  private resolveModel(): SequelizeRepositoryModel<D> {
+    const token = SequelizeToken as InjectionToken<Sequelize>;
+
+    if (!getContainer().isRegistered(token)) {
+      throw new InternalServerError({
+        message: 'Sequelize instance not registered in DI container',
+        reason:
+          'SequelizeToken has not been bound to a Sequelize instance. ' +
+          'Ensure registerOrmInstance is called with DatabaseVendor.SEQUELIZE before using repositories.',
+        component: this.constructor.name,
+        operation: 'resolveModel',
+      });
     }
-    const maybeWithGet = input as unknown as WithGet | Record<string, unknown>;
-    const plain =
-      typeof maybeWithGet.get === 'function'
-        ? maybeWithGet.get({ plain: true })
-        : (input as Record<string, unknown>);
 
-    const idValue =
-      (plain as Record<string, unknown>)['id'] ?? (plain as Record<string, unknown>)['_id'];
-    const createdAtValue = (plain as Record<string, unknown>)['createdAt'];
-    const updatedAtValue = (plain as Record<string, unknown>)['updatedAt'];
+    const sequelize = resolveDependency<Sequelize>(token);
 
-    return {
-      ...(plain as O),
-      id: idValue !== undefined && idValue !== null ? String(idValue) : '',
-      createdAt:
-        createdAtValue != null ? new Date(createdAtValue as string | number | Date) : new Date(),
-      updatedAt:
-        updatedAtValue != null ? new Date(updatedAtValue as string | number | Date) : new Date(),
-    } as O;
+    if (sequelize == null) {
+      throw new InternalServerError({
+        message: 'Sequelize instance resolved to null from DI container',
+        reason:
+          'SequelizeToken resolved to a null value. ' +
+          'Ensure registerOrmInstance is called with a valid Sequelize instance.',
+        component: this.constructor.name,
+        operation: 'resolveModel',
+      });
+    }
+
+    return sequelize.model(this.config.name) as SequelizeRepositoryModel<D>;
   }
 
   async findById(id: string): Promise<O | null> {
@@ -48,9 +68,9 @@ export class SequelizeAdapter<D extends object, I, O>
     return this.toLean(entity);
   }
 
-  async findMany(filter: Record<string, unknown> = {}): Promise<O[]> {
+  async findMany(filter: WhereOptions<D> = {}): Promise<O[]> {
     const entities = await this.model.findAll({
-      where: filter as never,
+      where: filter,
     });
 
     return entities
@@ -91,5 +111,32 @@ export class SequelizeAdapter<D extends object, I, O>
       where: { id } as never,
     });
     return (Array.isArray(count) ? count.length : count) > 0;
+  }
+
+  public toLean(input: unknown): O | null {
+    if (input == null) return null;
+
+    interface WithGet {
+      get?: (opts?: { plain?: boolean }) => unknown;
+    }
+    const maybeWithGet = input as unknown as WithGet | Record<string, unknown>;
+    const plain =
+      typeof maybeWithGet.get === 'function'
+        ? maybeWithGet.get({ plain: true })
+        : (input as Record<string, unknown>);
+
+    const idValue =
+      (plain as Record<string, unknown>)['id'] ?? (plain as Record<string, unknown>)['_id'];
+    const createdAtValue = (plain as Record<string, unknown>)['createdAt'];
+    const updatedAtValue = (plain as Record<string, unknown>)['updatedAt'];
+
+    return {
+      ...(plain as O),
+      id: idValue !== undefined && idValue !== null ? String(idValue) : '',
+      createdAt:
+        createdAtValue != null ? new Date(createdAtValue as string | number | Date) : new Date(),
+      updatedAt:
+        updatedAtValue != null ? new Date(updatedAtValue as string | number | Date) : new Date(),
+    } as O;
   }
 }

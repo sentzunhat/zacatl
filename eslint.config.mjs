@@ -4,7 +4,7 @@ import { fileURLToPath } from 'url';
 import { FlatCompat } from '@eslint/eslintrc';
 import eslint from '@eslint/js';
 
-import { recommended as zacatlRecommended } from './src/eslint/index.mjs';
+import { zacatlSrcRecommended } from './eslint.src.config.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -30,11 +30,11 @@ const topIgnore = {
   ],
 };
 
-const testDefault = (await import('./eslint.test.config.mjs')).default ?? [];
+const testDefault = (await import('./eslint.test.config.mjs')).zacatlTestsRecommended ?? [];
 
 let scriptsDefault = [];
 try {
-  scriptsDefault = (await import('./scripts/eslint.config.mjs')).scriptsEslintConfig ?? [];
+  scriptsDefault = (await import('./scripts/eslint.config.mjs')).zacatlScriptsRecommended ?? [];
 } catch {
   scriptsDefault = [];
 }
@@ -42,7 +42,7 @@ try {
 export default [
   topIgnore,
   ...compat.config({}),
-  ...zacatlRecommended,
+  ...zacatlSrcRecommended,
   ...testDefault,
   ...scriptsDefault,
 ];

@@ -1,20 +1,21 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-const mockRegister = vi.fn();
-vi.mock(
-  '../../../../../../src/dependency-injection/container',
-  (): { getContainer: () => { register: typeof mockRegister } } => ({
-    getContainer: (): { register: typeof mockRegister } => ({ register: mockRegister }),
+vi.mock('@zacatl/dependency-injection', () => ({
+  registerValue: vi.fn(),
+  getContainer: (): { isRegistered: ReturnType<typeof vi.fn>; resolve: ReturnType<typeof vi.fn> } => ({
+    isRegistered: vi.fn(),
+    resolve: vi.fn(),
   }),
-);
+}));
 
+import { registerValue as mockRegisterValue } from '@zacatl/dependency-injection';
 import { CustomError } from '@zacatl/error';
 
+import { SequelizeAdapter } from '../../../../../../src/service/platforms/server/database/adapters/sequelize';
 import {
   DatabaseVendor,
   type DatabaseConfig,
 } from '../../../../../../src/service/platforms/server/database/port';
-import { SequelizeAdapter } from '../../../../../../src/service/platforms/server/database/sequelize-adapter';
 
 const makeSequelize = (
   overrides: Partial<{ authenticate: () => Promise<void> }> = {},
@@ -73,7 +74,7 @@ describe('SequelizeAdapter', () => {
         instance: fakeSequelize as DatabaseConfig['instance'],
       } as DatabaseConfig);
 
-      expect(mockRegister).toHaveBeenCalledOnce();
+      expect(mockRegisterValue).toHaveBeenCalledOnce();
     });
 
     it('calls onDatabaseConnected callback when provided', async () => {

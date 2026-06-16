@@ -58,14 +58,12 @@ describe('MongooseRepository', () => {
   describe('model initialization', () => {
     it('should create a model with provided name and schema', async () => {
       if (!repository) return;
-      // Initialize adapter by calling an async method first
-      await repository.create({ name: 'initialization-test' });
       const model = repository.model as MongooseModel<UserTestDb>;
       expect(model.modelName).toBe('MongooseUser');
       expect(model.schema).toBe(schemaUserTest);
     });
 
-    it('should be lazy-loaded (null until first access)', () => {
+    it('should expose the model immediately', () => {
       if (!repository) return;
       const model = repository.model;
       expect(model).toBeDefined();

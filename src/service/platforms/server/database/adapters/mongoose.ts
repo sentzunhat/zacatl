@@ -2,8 +2,8 @@ import type { Mongoose } from 'mongoose';
 
 import { CustomError } from '@zacatl/error';
 
-import { getContainer } from '../../../../../dependency-injection/container';
-import type { DatabaseServerPort, DatabaseConfig } from '../port';
+import { registerOrmInstance } from '../orm-instance';
+import { DatabaseVendor, type DatabaseServerPort, type DatabaseConfig } from '../port';
 
 export class MongooseAdapter implements DatabaseServerPort {
   async connect(serviceName: string, config: DatabaseConfig): Promise<void> {
@@ -36,12 +36,7 @@ export class MongooseAdapter implements DatabaseServerPort {
       await onDatabaseConnected(mongoose);
     }
 
-    getContainer().register(
-      mongoose.constructor as unknown as new (...args: unknown[]) => unknown,
-      {
-        useValue: mongoose,
-      },
-    );
+    registerOrmInstance(DatabaseVendor.MONGOOSE, mongoose);
   }
 
   async disconnect(): Promise<void> {
