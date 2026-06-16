@@ -2,7 +2,7 @@
 applyTo: "docs/**,README.md,CHANGELOG.md,.hawp/kit/**,.hawp/work/**"
 ---
 
-<!-- Generated from core/providers/shared/behaviors — edit shared source and run npm run providers:sync -->
+<!-- Generated from core/providers/shared/behaviors — edit shared source and run npm --prefix librarian run providers:sync -->
 
 # HAWP Docs Alignment
 
