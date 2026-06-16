@@ -1,8 +1,8 @@
 {
   "compilerOptions": {
-    "target": "ES2020",
-    "module": "ES2022",
-    "moduleResolution": "Node",
+    "target": "ES2022",
+    "module": "CommonJS",
+    "moduleResolution": "bundler",
     "outDir": "../build-scripts-cjs",
     "rootDir": ".",
     "esModuleInterop": true,
@@ -13,8 +13,9 @@
     "declaration": false,
     "resolveJsonModule": true,
     "allowJs": false,
-    "lib": ["ES2020"]
+    "types": ["node"],
+    "lib": ["ES2022"]
   },
   "include": ["**/*.ts", "**/*.js"],
-  "exclude": ["dev/parallel-runner.ts"]
+  "exclude": ["dev/parallel-runner.ts", "build/fix-esm.ts", "dev/generate-barrels.ts"]
 }

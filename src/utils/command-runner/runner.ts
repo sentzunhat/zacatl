@@ -59,8 +59,8 @@ export const runCommand = (spec: CommandSpec, policy: RunnerPolicy): Promise<Com
     let outputBytes = 0;
 
     const env: NodeJS.ProcessEnv = policy.inheritEnv
-      ? ({ ...process.env, ...(parsed.data.env ?? {}) } as NodeJS.ProcessEnv)
-      : ({ ...(parsed.data.env ?? {}) } as NodeJS.ProcessEnv);
+      ? ({ ...process.env, ...(parsed.data.env ?? {}) })
+      : ({ ...(parsed.data.env ?? {}) });
 
     const child = spawn(parsed.data.cmd, parsed.data.args, {
       shell: false,

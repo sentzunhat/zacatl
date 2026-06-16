@@ -4,7 +4,7 @@
 [![npm downloads](https://img.shields.io/npm/dm/@sentzunhat/zacatl.svg)](https://www.npmjs.com/package/@sentzunhat/zacatl)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0)
 [![TypeScript](https://img.shields.io/badge/%3C%2F%3E-TypeScript-3178c6.svg)](https://www.typescriptlang.org/)
-[![Node.js 24+](https://img.shields.io/badge/Node.js-24%2B-brightgreen.svg)](https://nodejs.org/)
+[![Node.js 26+](https://img.shields.io/badge/Node.js-26%2B-brightgreen.svg)](https://nodejs.org/)
 [![Build](https://github.com/sentzunhat/zacatl/actions/workflows/publish-dry.yml/badge.svg)](https://github.com/sentzunhat/zacatl/actions/workflows/publish-dry.yml)
 [![Tests: 461](https://img.shields.io/badge/Tests-461-blue.svg)](#tests)
 [![Coverage: 75.95%](https://img.shields.io/badge/Coverage-75.95%25-yellow.svg)](https://img.shields.io/badge/Coverage-75.95%25-yellow.svg)
@@ -125,7 +125,7 @@ npm run test:coverage    # Coverage report
 
 ## 📋 Requirements
 
-- **Node.js**: 24.14.0+ (LTS)
+- **Node.js**: 26.3.0+
 - **npm**: 11.0.0+ (bundled with Node 24)
 - **TypeScript**: 5.9+
 

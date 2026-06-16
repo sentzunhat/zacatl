@@ -12,6 +12,6 @@
     "clean": "rm -rf dist ../../database.sqlite"
   },
   "devDependencies": {
-    "vitest": "^4.0.18"
+    "vitest": "^4.1.9"
   }
 }
