@@ -66,9 +66,8 @@ export class SqliteAdapter implements DatabaseServerPort {
         // Dynamically import node:sqlite only when needed (on first connect call).
         // This defers the experimental warning until the adapter is actually used.
         const mod = await SqliteAdapter.loadModule();
-        // DatabaseSync opens the connection synchronously.
-        // defensive: true is the default in Node 24 — explicitly set for clarity.
-        this.db = new mod.DatabaseSync(connectionString, { defensive: true });
+        // Defensive: true is the default in Node 24 — explicitly set for clarity.
+        this.db = new mod.DatabaseSync(connectionString, { defensive: true } as any);
       }
 
       registerOrmInstance(DatabaseVendor.SQLITE, this.db);
