@@ -189,6 +189,7 @@ src/
 - Test files: `<module>.test.ts`
 - Type definition files (if separate): `<module>.types.ts` or `types/`
 - Entry files: concrete module files for public exports
+- Avoid `index.ts` barrels; prefer named module files and explicit subpath exports
 
 ### Enums
 
