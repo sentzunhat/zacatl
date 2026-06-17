@@ -48,6 +48,13 @@ Follow [docs/guidelines/git-workflow.md](../../docs/guidelines/git-workflow.md) 
 - Pull request guidelines
 - Scope classification
 
+## Copilot Cloud Agent PR Updates
+
+- If the task is already attached to an existing branch or pull request, update that branch instead of creating a new PR.
+- Use the built-in progress/report tool to commit and push changes back to the active branch or PR.
+- Do not use deprecated PR-creation flows or direct `git push` commands from the shell in cloud-agent sessions.
+- After the progress/report push succeeds, stop and return the work summary instead of attempting extra PR-creation steps.
+
 ## Source of Truth
 
 - For versioning and release procedures, use `docs/skills/version-updates.md`.
