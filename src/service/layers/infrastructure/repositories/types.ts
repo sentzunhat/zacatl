@@ -72,4 +72,4 @@ export type RepositoryModel<D extends object = object> =
   | SequelizeRepositoryModel<D>
   | NodeSqliteRepositoryModel;
 
-export { ORMType } from './mongoose/types';
+export { ORMType } from '../orm/types';

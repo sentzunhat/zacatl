@@ -1,6 +1,5 @@
 import type { DatabaseSync } from 'node:sqlite';
-
-import type { ORMType } from '../mongoose/types';
+import type { ORMType } from '../../orm/types';
 
 export type {
   LeanDocument,

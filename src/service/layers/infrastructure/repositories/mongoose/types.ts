@@ -1,10 +1,5 @@
 import type { MongooseModel, Schema } from '../../../../../third-party/mongoose';
-
-export enum ORMType {
-  Mongoose = 'mongoose',
-  Sequelize = 'sequelize',
-  NodeSqlite = 'nodesqlite',
-}
+import type { ORMType } from '../../orm/types';
 
 export type {
   WithMongooseMeta,
