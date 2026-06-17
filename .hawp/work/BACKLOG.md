@@ -24,9 +24,7 @@ Each row links to its plan file when one exists.
 
 ## Active Work
 
-| ID | Type | Title | Status | Plan |
-| --- | --- | --- | --- | --- |
-| `task-005` | `task` | Create pull request for update-dependencies branch | `in-progress` | [.hawp/work/active/task-005.md](active/task-005.md) |
+_No active work._
 
 ---
 
@@ -36,6 +34,7 @@ Keep this section short (for example last 5-10 items or last 14-30 days).
 
 | ID | Type | Title | Closed | Plan |
 | --- | --- | --- | --- | --- |
+| `task-005` | `task` | Create pull request for update-dependencies branch | 2026-06-17 | [.hawp/work/closed/2026/06/17/task-005.md](closed/2026/06/17/task-005.md) |
 | `CVE-001` | `improvement` | Add CVE-Lite CLI GitHub workflow | 2026-06-17 | [.hawp/work/closed/2026/06/17/CVE-001.md](closed/2026/06/17/CVE-001.md) |
 | `task-004` | Review and create pull request for update-hawp | `done` | | PR #19 created and approved |
 
