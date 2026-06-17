@@ -24,7 +24,9 @@ Each row links to its plan file when one exists.
 
 ## Active Work
 
-_No active work._
+| ID | Type | Title | Status | Plan |
+| --- | --- | --- | --- | --- |
+| `task-005` | `task` | Create pull request for update-dependencies branch | `in-progress` | [.hawp/work/active/task-005.md](active/task-005.md) |
 
 ---
 
