@@ -100,4 +100,8 @@ Update should not:
 
 Use your project's published install or update guide (from the HAWP distribution for your branch). Those guides are the operational source for copy-paste scripts.
 
+**Recommended path:** open the guide, review the **Install Command (Copy/Paste)** or **Update Command (Copy/Paste)** block, then run it in a terminal from the repository root.
+
+**Optional guide fetch:** some guides include a review-first helper that downloads the remote guide and writes the command block to a local script file under `/tmp`. Inspect that file before running it. Do not pipe remote content directly to `bash`.
+
 Do not treat files under `.hawp/kit/standards/public/` as install script sources.

@@ -9,13 +9,19 @@ It is built on top of the HAWP task-shaping protocol — keep it lean.
 
 ```
 1. INTAKE       You drop a bug or task (natural language is fine)
-2. ANALYZE      I investigate, shape it as a HAWP task, and fill the intake template
+2. INVESTIGATE  Every item becomes an investigation task first — I investigate,
+                shape it as a HAWP task, and fill the intake template
 3. PLAN         I write a plan file with root cause, options, and recommended fix
 4. REVIEW GATE  Auto-implement if low-risk; hold for your approval if risky
 5. IMPLEMENT    Execute the fix
 6. VERIFY       Confirm it works / document what is still unproven
 7. CLOSE        Move backlog row to Recently Closed; save status report if context matters
 ```
+
+**Investigation-first rule:** every task that enters through HAWP is made into an
+investigation task before anything else. No plan is written and no implementation
+starts until the investigation record exists. Planning is required for all items —
+the investigation output feeds the plan, and the plan feeds the review gate.
 
 ---
 
@@ -30,16 +36,18 @@ You can drop work in natural language, for example:
 I will:
 
 - Assign a backlog ID and add a row to [../../work/BACKLOG.md](../../work/BACKLOG.md) with status `inbox`
-- Move to analysis immediately unless you say "just log it"
+- Turn the item into an investigation task and move to it immediately unless you say "just log it"
 
 ---
 
-## Step 2 — Analyze
+## Step 2 — Investigate (required for every item)
 
-I investigate and produce a filled-in intake form (see `../templates/intake-plan.md`).
+Every incoming item becomes an investigation task before planning or implementation.
+I investigate and produce a filled-in intake form (see `../templates/work-intake.md`,
+which carries forward into `../templates/intake-plan.md`).
 The backlog row moves to `analyzing`.
 
-Analysis covers:
+The investigation covers:
 
 - Where the problem lives (files, lines)
 - Root cause (or most likely cause if not directly provable)
@@ -48,7 +56,10 @@ Analysis covers:
 
 ---
 
-## Step 3 — Plan
+## Step 3 — Plan (required for every item)
+
+Planning is not optional: every item gets a plan built from the investigation
+findings before any implementation starts.
 
 I write a plan file to `work/active/<ID>.md`.
 The backlog row moves to `plan-ready` and links to the plan file.
