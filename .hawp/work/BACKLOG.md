@@ -24,7 +24,9 @@ Each row links to its plan file when one exists.
 
 ## Active Work
 
-_No active work._
+| ID | Task | Status | Plan | Notes |
+| --- | --- | --- | --- | --- |
+| `task-004` | Review and create pull request for update-hawp | `in-progress` | | Finalizing PR and review |
 
 ---
 
