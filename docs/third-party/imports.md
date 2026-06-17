@@ -62,9 +62,13 @@ import { mongoose, Schema, type Mongoose } from '@sentzunhat/zacatl/third-party/
 import { mongoose, Schema, type Mongoose } from '@sentzunhat/zacatl/third-party/mongoose';
 import { BaseRepository, ORMType } from '@sentzunhat/zacatl';
 
-class UserRepository extends BaseRepository<UserModel, CreateUser, User> {
-  constructor() {
-    super({ type: ORMType.Mongoose, model: UserModel });
+class UserRepository extends BaseRepository<User, CreateUser, User> {
+  constructor(schema: Schema<User>) {
+    super({
+      type: ORMType.Mongoose,
+      name: 'User',
+      schema,
+    });
   }
 }
 ```
@@ -95,7 +99,10 @@ import { BaseRepository, ORMType } from '@sentzunhat/zacatl';
 
 class UserRepository extends BaseRepository<UserModel, CreateUser, User> {
   constructor() {
-    super({ type: ORMType.Sequelize, model: UserModel });
+    super({
+      type: ORMType.Sequelize,
+      name: 'User',
+    });
   }
 }
 ```
@@ -195,41 +202,62 @@ await mongoose.connect(url);
 
 ```typescript
 import type { Mongoose } from '@sentzunhat/zacatl/third-party/mongoose';
-import type { Sequelize } from '@sentzunhat/zacatl/third-party/sequelize';
+import type { ModelStatic } from '@sentzunhat/zacatl/third-party/sequelize';
 import { BaseRepository, ORMType } from '@sentzunhat/zacatl';
 
-type DatabaseInstance = Mongoose | Sequelize;
+interface UserModel {
+  id: string;
+  email: string;
+}
 
-export class UserRepository extends BaseRepository<User, DatabaseInstance> {
-  constructor(private db: DatabaseInstance) {
-    const isMongoose = (db: DatabaseInstance): db is Mongoose => {
-      return 'connect' in db;
-    };
+interface User {
+  id: string;
+  email: string;
+}
 
-    const config = isMongoose(db)
-      ? {
+interface CreateUser {
+  email: string;
+}
+
+declare const userSchema: object;
+
+type Runtime = 'mongoose' | 'sequelize';
+
+export class UserRepository extends BaseRepository<UserModel, CreateUser, User> {
+  constructor(runtime: Runtime) {
+    const config =
+      runtime === 'mongoose'
+        ? {
           type: ORMType.Mongoose,
-          instance: db,
           schema: userSchema,
           name: 'User',
         }
-      : {
+        : {
           type: ORMType.Sequelize,
-          instance: db,
-          model: UserModel,
+          name: 'User',
         };
 
     super(config);
+  }
+
+  async findByEmail(email: string): Promise<User | null> {
+    if (this.isMongoose()) {
+      const user = await (this.model as Mongoose['models'][string]).findOne({ email }).lean().exec();
+      return this.toLean(user);
+    }
+
+    const user = await (this.model as ModelStatic<UserModel>).findOne({ where: { email } });
+    return this.toLean(user);
   }
 }
 ```
 
 This approach:
 
-- ✅ Bundles **neither** mongoose nor sequelize by default
-- ✅ **Types work** regardless of which ORM is installed
-- ✅ **Lazy loading** at runtime when needed
-- ✅ **Clean imports** without workarounds
+- ✅ Keeps repository config aligned with the current DI-token based ORM resolution
+- ✅ Uses valid `BaseRepository` config for either supported ORM
+- ✅ Preserves clean type-only imports for optional dependencies
+- ✅ Keeps custom queries available through `this.model`
 
 ---
 

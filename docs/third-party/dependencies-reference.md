@@ -214,7 +214,10 @@ const UserModel = sequelize.define('User', {
 @singleton()
 class UserRepository extends BaseRepository<any, any, any> {
   constructor() {
-    super({ type: ORMType.Sequelize, model: UserModel });
+    super({
+      type: ORMType.Sequelize,
+      name: 'User',
+    });
   }
 }
 

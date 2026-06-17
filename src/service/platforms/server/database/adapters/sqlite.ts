@@ -2,6 +2,8 @@ import type { DatabaseSync } from 'node:sqlite';
 
 import { CustomError } from '@zacatl/error';
 
+import { registerOrmInstance } from '../orm-instance';
+import { DatabaseVendor } from '../port';
 import type { DatabaseConfig, DatabaseServerPort } from '../port';
 
 // Type alias for the dynamically imported node:sqlite module
@@ -47,7 +49,7 @@ export class SqliteAdapter implements DatabaseServerPort {
   }
 
   async connect(_serviceName: string, config: DatabaseConfig): Promise<void> {
-    const { connectionString } = config;
+    const { connectionString, instance, onDatabaseConnected } = config;
 
     if (connectionString == null || connectionString.length === 0) {
       throw new CustomError({
@@ -58,12 +60,22 @@ export class SqliteAdapter implements DatabaseServerPort {
     }
 
     try {
-      // Dynamically import node:sqlite only when needed (on first connect call).
-      // This defers the experimental warning until the adapter is actually used.
-      const mod = await SqliteAdapter.loadModule();
-      // DatabaseSync opens the connection synchronously.
-      // defensive: true is the default in Node 24 — explicitly set for clarity.
-      this.db = new mod.DatabaseSync(connectionString, { defensive: true });
+      if (instance != null && typeof (instance as DatabaseSync).prepare === 'function') {
+        this.db = instance as DatabaseSync;
+      } else {
+        // Dynamically import node:sqlite only when needed (on first connect call).
+        // This defers the experimental warning until the adapter is actually used.
+        const mod = await SqliteAdapter.loadModule();
+        // DatabaseSync opens the connection synchronously.
+        // defensive: true is the default in Node 24 — explicitly set for clarity.
+        this.db = new mod.DatabaseSync(connectionString, { defensive: true });
+      }
+
+      registerOrmInstance(DatabaseVendor.SQLITE, this.db);
+
+      if (onDatabaseConnected != null) {
+        await onDatabaseConnected(this.db);
+      }
     } catch (error: unknown) {
       throw new CustomError({
         message: `Failed to open SQLite database at "${connectionString}"`,

@@ -1,8 +1,10 @@
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import type { Connection } from 'mongoose';
 
-import { connect, Mongoose } from '@zacatl/third-party/mongoose';
+import { connect } from '@zacatl/third-party/mongoose';
 import { container } from '@zacatl/third-party/tsyringe';
+
+import { MongooseToken } from '../../../../src/service/layers/infrastructure/orm/tokens';
 
 const dbName = 'sentzunhat-zacatl';
 const dbVersion = '8.0.0';
@@ -48,7 +50,7 @@ export const connectToMongoServerAndRegisterDependency = async (): Promise<void>
 
   dbConnection = conn.connection;
 
-  container.register<Mongoose>(Mongoose, {
+  container.register(MongooseToken, {
     useValue: conn,
   });
 

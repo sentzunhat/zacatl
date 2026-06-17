@@ -61,7 +61,8 @@ describe('Mongoose + mongodb-memory-server extended operations', () => {
     const firstPostAuthor = posts[0]?.get('author') as { email?: string } | undefined;
     expect(firstPostAuthor?.email).toBe('pop@example.com');
 
-    await userModel.updateMany({ 'meta.age': { $gte: 30 } }, { $set: { 'meta.age': 31 } });
+    const metaAgePath = 'meta.age';
+    await userModel.updateMany({ [metaAgePath]: { $gte: 30 } }, { $set: { [metaAgePath]: 31 } });
     const updated = await userModel.findOne({ email: 'pop@example.com' });
     const updatedMeta = updated?.get('meta') as { age?: number } | undefined;
     expect(updatedMeta?.age).toBe(31);

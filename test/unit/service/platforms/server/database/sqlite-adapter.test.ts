@@ -2,8 +2,10 @@ import { describe, it, expect, afterEach, beforeAll } from 'vitest';
 
 import { CustomError } from '@zacatl/error';
 
+import { clearContainer, resolveDependency } from '../../../../../../src/dependency-injection';
+import { NodeSqliteToken } from '../../../../../../src/service/layers/infrastructure/orm/tokens';
+import { SqliteAdapter } from '../../../../../../src/service/platforms/server/database/adapters/sqlite';
 import { DatabaseVendor } from '../../../../../../src/service/platforms/server/database/port';
-import { SqliteAdapter } from '../../../../../../src/service/platforms/server/database/sqlite-adapter';
 
 describe('SqliteAdapter', () => {
   let adapter: SqliteAdapter;
@@ -24,6 +26,7 @@ describe('SqliteAdapter', () => {
     if (adapter) {
       await adapter.disconnect();
     }
+    clearContainer();
   });
 
   describe('connect()', () => {
@@ -49,6 +52,7 @@ describe('SqliteAdapter', () => {
       });
 
       expect(adapter.getDatabase()).toBeDefined();
+      expect(resolveDependency(NodeSqliteToken)).toBe(adapter.getDatabase());
     });
 
     it('getDatabase() returns undefined before connect is called', () => {

@@ -2,6 +2,18 @@
 
 ---
 
+## [Unreleased]
+
+**Status**: Pending release
+
+### 🔧 Architecture
+
+- **Unified ORM adapter loading** — Aligned the Mongoose, Sequelize, and node:sqlite repository adapters around eager factory creation, DI-token ORM resolution, and consistent repository entrypoints.
+
+### 📚 Documentation
+
+- **Repository/ORM docs cleanup** — Updated the repository and ORM docs to reflect BaseRepository's node:sqlite support and the Sequelize `name`-based model lookup flow.
+
 ## [0.0.56] - 2026-04-26
 
 **Status**: Pending release

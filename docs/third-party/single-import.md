@@ -228,7 +228,7 @@ export class ProductRepository extends BaseRepository<ProductModel, ProductInput
   constructor() {
     super({
       type: ORMType.Sequelize,
-      model: ProductModel,
+      name: 'Product',
     });
   }
 }

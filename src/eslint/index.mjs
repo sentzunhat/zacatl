@@ -12,8 +12,10 @@ import bestPracticesConfig from './best-practices.mjs';
 import fileNamingRules from './file-naming.mjs';
 import importsConfig from './imports.mjs';
 import namingConventions from './naming-conventions.mjs';
+import { zacatlScriptsRecommended } from './scripts.mjs';
 import solidConfig from './solid.mjs';
 import strictConfig from './strict.mjs';
+import { zacatlTestsRecommended } from './tests.mjs';
 import typeSafetyConfig from './type-safety.mjs';
 
 /**
@@ -52,6 +54,11 @@ export {
   solidConfig,
   recommended,
 };
+
+// Explicit alias for consistency with root config names
+export const srcRecommended = recommended;
+export const testsRecommended = zacatlTestsRecommended;
+export const scriptsRecommended = zacatlScriptsRecommended;
 
 // Default export for convenience
 export default recommended;

@@ -9,3 +9,4 @@
 export { createMongooseAdapter } from './mongoose/adapter-loader';
 export { createSequelizeAdapter } from './sequelize/adapter-loader';
 export { createNodeSqliteAdapter } from './nodesqlite';
+export { MongooseToken, SequelizeToken, NodeSqliteToken } from './tokens';

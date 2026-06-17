@@ -188,7 +188,7 @@ export class ProductRepository extends BaseRepository<ProductModel, ProductInput
   constructor() {
     super({
       type: ORMType.Sequelize, // ✅ Use enum
-      model: ProductModel,
+      name: 'Product',
     });
   }
 

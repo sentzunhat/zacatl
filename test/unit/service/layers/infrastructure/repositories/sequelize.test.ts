@@ -9,6 +9,8 @@ import {
 } from '@zacatl/third-party/sequelize';
 import { singleton } from '@zacatl/third-party/tsyringe';
 
+import { clearContainer, getContainer } from '../../../../../../src/dependency-injection/container';
+import { SequelizeToken } from '../../../../../../src/service/layers/infrastructure/orm/tokens';
 import {
   SequelizeRepository,
   ORMType,
@@ -21,7 +23,7 @@ interface UserTestDb extends Model {
   updatedAt: Date;
 }
 
-let userModel: ModelStatic<UserTestDb>;
+const MODEL_NAME = 'SequelizeUser';
 const MISSING_USER_ID = '00000000-0000-0000-0000-000000000000';
 
 const initializeSequelizeModel = async (): Promise<Sequelize> => {
@@ -33,8 +35,8 @@ const initializeSequelizeModel = async (): Promise<Sequelize> => {
     logging: false,
   } as ConstructorParameters<typeof Sequelize>[1]);
 
-  userModel = sequelize.define(
-    'SequelizeUser',
+  sequelize.define(
+    MODEL_NAME,
     {
       id: {
         type: DataTypes.UUID,
@@ -57,7 +59,7 @@ const initializeSequelizeModel = async (): Promise<Sequelize> => {
     {
       timestamps: true,
     },
-  ) as ModelStatic<UserTestDb>;
+  );
 
   return sequelize;
 };
@@ -69,27 +71,38 @@ class UserTestRepository extends SequelizeRepository<
   UserTestDb
 > {
   constructor() {
-    super({ type: ORMType.Sequelize, model: userModel });
+    super({ type: ORMType.Sequelize, name: MODEL_NAME });
   }
 }
 
 describe('SequelizeRepository', () => {
   let repository: UserTestRepository;
   let sequelize: Sequelize;
+  let userModel: ModelStatic<UserTestDb>;
 
   beforeAll(async (): Promise<void> => {
     sequelize = await initializeSequelizeModel();
     await sequelize.sync({ force: true });
+    // Register the Sequelize instance in DI so the adapter can resolve it
+    getContainer().register(SequelizeToken, { useValue: sequelize });
     repository = new UserTestRepository();
+    userModel = sequelize.model(MODEL_NAME) as ModelStatic<UserTestDb>;
   });
 
   afterAll(async (): Promise<void> => {
     await sequelize.close();
+    clearContainer();
   });
 
   describe('model access', () => {
-    it('should have model property set', () => {
+    it('should expose the model immediately', () => {
       if (!repository) return;
+      expect(repository.model).toBe(userModel);
+    });
+
+    it('should keep the resolved model available after operations', async () => {
+      if (!repository) return;
+      await repository.create({ name: 'Bootstrap' });
       expect(repository.model).toBeDefined();
       expect(repository.model).toBe(userModel);
     });

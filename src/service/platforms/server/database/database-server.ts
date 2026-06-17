@@ -1,6 +1,6 @@
 import { CustomError } from '@zacatl/error';
 
-import { createDatabaseAdapter } from './adapters';
+import { createDatabaseAdapter } from './adapters/index';
 import type { DatabaseConfig, DatabaseServerPort } from './port';
 
 /**

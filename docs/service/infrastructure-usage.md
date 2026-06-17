@@ -8,7 +8,16 @@
 
 ## Modular ORM System
 
-Your service supports **multiple ORMs simultaneously**. You can mix Mongoose (MongoDB), Sequelize (PostgreSQL/MySQL/SQLite), or any future ORM in the same application.
+Your service supports **multiple ORMs simultaneously**. You can mix Mongoose (MongoDB), Sequelize (PostgreSQL/MySQL/SQLite), and Node.js SQLite (`node:sqlite`) in the same application.
+
+## Which repository class should I use?
+
+- **Use `BaseRepository`** for repositories that may target Mongoose, Sequelize, or node:sqlite with the shared CRUD interface.
+- **Use ORM-specific abstract repositories** when your repository is tied to one ORM:
+  - `AbstractMongooseRepository`
+  - `AbstractSequelizeRepository`
+  - `AbstractNodeSqliteRepository`
+- **Use adapters directly** only for framework extension or low-level advanced integrations. For normal app repositories, prefer `BaseRepository` or ORM-specific abstract repositories.
 
 ## Architecture
 
@@ -133,6 +142,8 @@ export class UserRepository extends BaseRepository<UserDb, UserInput, UserOutput
 
 Uses the built-in `node:sqlite` module. No external package needed.
 
+For repository-style CRUD with normalized output, use `AbstractNodeSqliteRepository`.
+
 **Service config:**
 
 ```typescript
@@ -191,7 +202,7 @@ export class ProductRepository extends BaseRepository<ProductModel, ProductInput
   constructor() {
     super({
       type: ORMType.Sequelize,
-      model: ProductModel,
+      name: 'Product',
     });
   }
 
@@ -274,7 +285,7 @@ const service = new Service({
         ProductRepository,
         OrderRepository,
 
-        // SQLite repositories (same Sequelize adapter!)
+        // SQLite repositories (native node:sqlite repositories)
         CacheRepository,
       ],
     },
@@ -294,12 +305,13 @@ const service = new Service({
 
 ## Available ORM Adapters
 
-| Adapter          | Database                         | Status    |
-| ---------------- | -------------------------------- | --------- |
-| MongooseAdapter  | MongoDB                          | ✅ Ready  |
-| SequelizeAdapter | PostgreSQL, MySQL, SQLite, MSSQL | ✅ Ready  |
-| PrismaAdapter    | Multi-database                   | 🔜 Future |
-| TypeORMAdapter   | Multi-database                   | 🔜 Future |
+| Adapter           | Database                         | Status    |
+| ----------------- | -------------------------------- | --------- |
+| MongooseAdapter   | MongoDB                          | ✅ Ready  |
+| SequelizeAdapter  | PostgreSQL, MySQL, SQLite, MSSQL | ✅ Ready  |
+| NodeSqliteAdapter | SQLite (`node:sqlite`, Node 24+) | ✅ Ready  |
+| PrismaAdapter     | Multi-database                   | 🔜 Future |
+| TypeORMAdapter    | Multi-database                   | 🔜 Future |
 
 ## Creating Custom Adapters
 
