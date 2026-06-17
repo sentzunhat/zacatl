@@ -13,7 +13,6 @@ try {
   if (typeof g['crypto'] === 'undefined') {
     try {
       // Prefer webcrypto where available
-       
       const requireC = createRequire(import.meta.url);
       const nodeCrypto = requireC('crypto');
 

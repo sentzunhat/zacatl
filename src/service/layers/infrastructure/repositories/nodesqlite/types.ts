@@ -1,4 +1,5 @@
 import type { DatabaseSync } from 'node:sqlite';
+
 import type { ORMType } from '../../orm/types';
 
 export type {

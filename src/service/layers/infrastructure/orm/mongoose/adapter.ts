@@ -74,9 +74,8 @@ export class MongooseAdapter<D, I extends object, O extends object>
 
     // mongoose.model() is synchronous — registers the model with Mongoose's registry.
     // Async bootstrapping (createCollection, createIndexes, init) is handled via
-    // initialize(), which is kicked off fire-and-forget here and can also be called
-    // explicitly by DatabaseServer.configure() for fail-fast startup validation.
-    // name falls back to a uuid when not provided (e.g. in anonymous test repositories).
+    // initialize(), which can be called explicitly by DatabaseServer.configure()
+    // for fail-fast startup validation.
     return resolved.model<D>(name, schema);
   }
 

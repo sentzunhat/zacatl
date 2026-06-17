@@ -29,8 +29,8 @@ export class SequelizeAdapter<D extends object, I extends object, O extends obje
 
   public async initialize(): Promise<void> {
     // Hook for future use: sync, migrations, etc.
-    // Called fire-and-forget from the constructor and can also be awaited explicitly
-    // via DatabaseServer.configure() for fail-fast startup validation.
+    // Can be awaited explicitly via DatabaseServer.configure() for
+    // fail-fast startup validation when needed.
   }
 
   private resolveModel(): SequelizeRepositoryModel<D> {

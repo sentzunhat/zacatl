@@ -30,9 +30,9 @@ _No active work._
 
 ## Plan-Ready
 
-| ID       | Type        | Title                                                                | Status     | Plan                            |
-| -------- | ----------- | -------------------------------------------------------------------- | ---------- | ------------------------------- |
-| TASK-001 | improvement | Fix repository lifecycle typing and node:sqlite adapter type errors. | plan-ready | `.hawp/work/active/TASK-001.md` |
+| ID       | Type        | Title                                                                | Status     | Plan                                       |
+| -------- | ----------- | -------------------------------------------------------------------- | ---------- | ------------------------------------------ |
+| TASK-001 | improvement | Fix repository lifecycle typing and node:sqlite adapter type errors. | plan-ready | `.hawp/work/closed/2026/06/15/TASK-001.md` |
 
 ---
 
@@ -40,10 +40,10 @@ _No active work._
 
 Keep this section short (for example last 5-10 items or last 14-30 days).
 
-| ID | Type | Title | Closed | Plan |
-| --- | --- | --- | --- | --- |
-| `CVE-001` | `improvement` | Add CVE-Lite CLI GitHub workflow | 2026-06-17 | [.hawp/work/closed/2026/06/17/CVE-001.md](closed/2026/06/17/CVE-001.md) |
-| `task-004` | Review and create pull request for update-hawp | `done` | | PR #19 created and approved |
+| ID         | Type                                           | Title                            | Closed     | Plan                                                                    |
+| ---------- | ---------------------------------------------- | -------------------------------- | ---------- | ----------------------------------------------------------------------- |
+| `CVE-001`  | `improvement`                                  | Add CVE-Lite CLI GitHub workflow | 2026-06-17 | [.hawp/work/closed/2026/06/17/CVE-001.md](closed/2026/06/17/CVE-001.md) |
+| `task-004` | Review and create pull request for update-hawp | `done`                           |            | PR #19 created and approved                                             |
 
 ---
 

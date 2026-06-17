@@ -84,7 +84,7 @@ class UserRepository extends BaseRepository<User, CreateUser, UserDTO> {
   constructor() {
     super({
       type: ORMType.NodeSqlite,
-      tableName: 'users',
+      name: 'users',
     });
   }
 }

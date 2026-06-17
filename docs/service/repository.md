@@ -221,9 +221,7 @@ async getUserById(id: string): Promise<User | null> {
 ### ORM-Specific Queries
 
 ```typescript
-// Initialize the repository once after the ORM connection is ready
-await this.userRepo.initializeModel();
-
+// After the ORM connection is ready, use the provider-specific model directly.
 // Sequelize
 const active = await(this.model as ModelStatic<UserModel>).findAll({
   where: { isActive: true },
