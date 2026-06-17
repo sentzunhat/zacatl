@@ -126,8 +126,8 @@ npm run test:coverage    # Coverage report
 ## 📋 Requirements
 
 - **Node.js**: 26.3.0+
-- **npm**: 11.0.0+ (bundled with Node 24)
-- **TypeScript**: 5.9+
+- **npm**: 11.0.0+ (bundled with Node 26)
+- **TypeScript**: 6.0+
 
 ## 🤝 Contributing
 
