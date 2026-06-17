@@ -24,7 +24,9 @@ Each row links to its plan file when one exists.
 
 ## Active Work
 
-_No active work._
+| ID | Type | Status | Title | Plan |
+| --- | --- | --- | --- | --- |
+| `CVE-001` | `improvement` | `in-progress` | Add CVE-Lite CLI GitHub workflow | [.hawp/work/active/CVE-001.md](active/CVE-001.md) |
 
 ---
 
