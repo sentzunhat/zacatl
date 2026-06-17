@@ -192,15 +192,15 @@ export class MongooseAdapter<D, I extends object, O extends object>
         base.createdAt instanceof Date
           ? base.createdAt
           : base.createdAt != null
-          ? new Date(base.createdAt as string | number)
+          ? new Date(base.createdAt)
           : new Date(),
       updatedAt:
         base.updatedAt instanceof Date
           ? base.updatedAt
           : base.updatedAt != null
-          ? new Date(base.updatedAt as string | number)
+          ? new Date(base.updatedAt)
           : new Date(),
-    } as O;
+    };
 
     return result;
   }

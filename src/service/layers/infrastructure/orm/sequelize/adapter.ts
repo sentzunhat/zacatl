@@ -136,6 +136,6 @@ export class SequelizeAdapter<D extends object, I extends object, O extends obje
         createdAtValue != null ? new Date(createdAtValue as string | number | Date) : new Date(),
       updatedAt:
         updatedAtValue != null ? new Date(updatedAtValue as string | number | Date) : new Date(),
-    } as O;
+    };
   }
 }

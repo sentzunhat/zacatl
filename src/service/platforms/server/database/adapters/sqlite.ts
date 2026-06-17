@@ -43,7 +43,7 @@ export class SqliteAdapter implements DatabaseServerPort {
 
   private static async loadModule(): Promise<SqliteModule> {
     if (!this._moduleCached) {
-      this._moduleCached = import('node:sqlite') as Promise<SqliteModule>;
+      this._moduleCached = import('node:sqlite');
     }
     return this._moduleCached;
   }

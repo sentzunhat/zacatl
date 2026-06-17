@@ -126,7 +126,7 @@ export const mergeStaticCatalogs = (input: MergeStaticCatalogsInput): I18nStatic
   ]);
 
   for (const locale of locales) {
-    const baseLocale = base[locale] ?? ({} as Record<string, unknown>);
+    const baseLocale: Record<string, unknown> = base[locale] ?? {};
 
     const additionsLocale = additions.reduce<Record<string, unknown>>(
       (acc: Record<string, unknown>, addition: Record<string, unknown>) => {

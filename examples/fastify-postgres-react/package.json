@@ -4,9 +4,9 @@
   "description": "Full-stack monorepo: Fastify + PostgreSQL backend with React frontend",
   "private": true,
   "type": "module",
-  "packageManager": "npm@11.9.0",
+  "packageManager": "npm@11.17.0",
   "engines": {
-    "node": ">=24.0.0",
+    "node": ">=26.3.0",
     "npm": ">=11.0.0"
   },
   "workspaces": [
@@ -31,14 +31,14 @@
     "react-dom": "^18.3.1"
   },
   "devDependencies": {
-    "@types/node": "^20.11.16",
+    "@types/node": "^25.9.3",
     "@types/react": "^18.2.66",
     "@types/react-dom": "^18.2.22",
     "@vitejs/plugin-react": "^6.0.1",
     "autoprefixer": "^10.4.19",
     "postcss": "^8.4.38",
     "tailwindcss": "^3.4.4",
-    "typescript": "^5.3.3",
-    "vite": "^8.0.9"
+    "typescript": "^6.0.3",
+    "vite": "^8.0.16"
   }
 }

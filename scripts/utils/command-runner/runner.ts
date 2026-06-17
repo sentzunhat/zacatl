@@ -1,6 +1,6 @@
 import { spawn } from 'child_process';
 
-import type { CommandSpec, CommandResult, RunnerPolicy } from './types';
+import type { CommandSpec, CommandResult, RunnerPolicy } from './types.js';
 
 /** Grace period between SIGTERM and SIGKILL when a timeout fires. */
 const SIGKILL_GRACE_MS = 2000;
