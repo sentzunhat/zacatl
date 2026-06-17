@@ -24,9 +24,7 @@ Each row links to its plan file when one exists.
 
 ## Active Work
 
-| ID | Task | Status | Plan | Notes |
-| --- | --- | --- | --- | --- |
-| `task-004` | Review and create pull request for update-hawp | `in-progress` | | Finalizing PR and review |
+_No active work._
 
 ---
 
@@ -34,7 +32,9 @@ Each row links to its plan file when one exists.
 
 Keep this section short (for example last 5-10 items or last 14-30 days).
 
-_No recently closed items._
+| ID | Task | Status | Plan | Notes |
+| --- | --- | --- | --- | --- |
+| `task-004` | Review and create pull request for update-hawp | `done` | | PR #19 created and approved |
 
 ---
 
