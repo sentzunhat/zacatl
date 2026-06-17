@@ -315,12 +315,13 @@ Platforms → (orchestrates all layers)
 
 ## Module Organization
 
-### Index.ts Pattern (Barrel Exports)
+### Named Module Files
 
-Every meaningful folder has an `index.ts` that re-exports public APIs:
+Every meaningful folder should expose a named module file and avoid adding new
+`index.ts` barrels:
 
 ```typescript
-// src/error/index.ts
+// src/error/error.ts
 export * from './bad-request';
 export * from './unauthorized';
 export * from './custom';
@@ -332,9 +333,9 @@ import { BadRequestError, UnauthorizedError } from '@zacatl/error';
 
 **Benefits:**
 
-- Cleaner imports (`from "@zacatl/error"` vs `from "@zacatl/error/bad-request"`)
-- Single point for public vs. internal APIs
-- Easier refactoring (move files without breaking imports)
+- Prefer explicit module files over barrel files
+- Keep public subpaths stable in package exports
+- Make folder-level entrypoints opt-in rather than implicit
 
 ### Module Entry Files
 
