@@ -219,6 +219,10 @@ No manual `tsconfig paths` config is needed because builds use real files, not v
 
 (Note: paths are `build/esm/` and `build/cjs/` in published package; `build-src-esm/` and `build-src-cjs/` in development)
 
+Nested `index.*` barrel files are pruned from the published tarball. Consumers
+should import explicit leaf modules or named entry files that are exported from
+`publish/package.json`.
+
 ### Development vs Publish Export Patterns
 
 Use this table as the quick reference for when export maps are generated, where

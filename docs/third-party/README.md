@@ -54,7 +54,6 @@ import { mongoose, Sequelize } from '@sentzunhat/zacatl';
 
 ```
 src/third-party/
-├── index.ts                  # Re-exports tsyringe, zod (in main package)
 ├── eslint.ts                 # ESLint plugins re-export (subpath only)
 ├── express.ts                # Express re-export (subpath only)
 ├── fastify.ts                # Fastify + ZodTypeProvider + serializerCompiler/validatorCompiler
@@ -70,6 +69,9 @@ src/third-party/
 ├── uuid.ts                   # UUID utilities re-export (subpath only)
 └── zod.ts                    # Validation re-export (subpath only)
 ```
+
+> Prefer the explicit subpath files above; new `index.ts` barrels should not be
+> added for third-party modules.
 
 ## Version Compatibility
 
