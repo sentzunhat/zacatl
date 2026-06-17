@@ -2,6 +2,7 @@ dependency_security:
   baseline:
     - 'Run npm audit on root before release'
     - 'Audit example lockfiles in examples/*'
+    - 'OWASP CVE-Lite scan on push, PR, and weekly schedule'
 
   remediation:
     - 'Prefer non-breaking updates first'

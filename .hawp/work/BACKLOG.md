@@ -32,7 +32,9 @@ _No active work._
 
 Keep this section short (for example last 5-10 items or last 14-30 days).
 
-_No recently closed items._
+| ID | Type | Title | Closed | Plan |
+| --- | --- | --- | --- | --- |
+| `CVE-001` | `improvement` | Add CVE-Lite CLI GitHub workflow | 2026-06-17 | [.hawp/work/closed/2026/06/17/CVE-001.md](closed/2026/06/17/CVE-001.md) |
 
 ---
 
