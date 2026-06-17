@@ -23,7 +23,6 @@ export class NodeSqliteAdapter<I extends object, O extends object>
   implements ORMPort<NodeSqliteRepositoryModel, I, O, Partial<O>>
 {
   public readonly model: NodeSqliteRepositoryModel;
-
   private readonly config: NodeSqliteRepositoryConfig;
 
   constructor(config: NodeSqliteRepositoryConfig) {
@@ -31,10 +30,6 @@ export class NodeSqliteAdapter<I extends object, O extends object>
     this.model = this.resolveModel();
 
     void this.initialize().catch(console.error);
-  }
-
-  public async initialize(): Promise<void> {
-    this.ensureTableExists();
   }
 
   private resolveModel(): NodeSqliteRepositoryModel {
@@ -58,6 +53,10 @@ export class NodeSqliteAdapter<I extends object, O extends object>
     }
 
     return resolved;
+  }
+
+  private async initialize(): Promise<void> {
+    this.ensureTableExists();
   }
 
   private getTableName(): string {
@@ -111,8 +110,6 @@ export class NodeSqliteAdapter<I extends object, O extends object>
 
   async findById(id: string): Promise<O | null> {
     try {
-      this.ensureTableExists();
-
       const stmt = this.model.prepare(
         `SELECT id, data, createdAt, updatedAt FROM ${this.getTableName()} WHERE id = ?`,
       );
@@ -137,8 +134,6 @@ export class NodeSqliteAdapter<I extends object, O extends object>
 
   async findMany(filter: Partial<O> = {}): Promise<O[]> {
     try {
-      this.ensureTableExists();
-
       const stmt = this.model.prepare(
         `SELECT id, data, createdAt, updatedAt FROM ${this.getTableName()}`,
       );
@@ -177,8 +172,6 @@ export class NodeSqliteAdapter<I extends object, O extends object>
     try {
       const id = uuidv4();
       const now = new Date();
-
-      this.ensureTableExists();
 
       const stmt = this.model.prepare(
         `INSERT INTO ${this.getTableName()} (id, data, createdAt, updatedAt) VALUES (?, ?, ?, ?)`,
@@ -262,8 +255,6 @@ export class NodeSqliteAdapter<I extends object, O extends object>
 
   async exists(id: string): Promise<boolean> {
     try {
-      this.ensureTableExists();
-
       const stmt = this.model.prepare(`SELECT 1 FROM ${this.getTableName()} WHERE id = ? LIMIT 1`);
       return (stmt.get(id) as { '1': number } | undefined) != null;
     } catch (err: unknown) {

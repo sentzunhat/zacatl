@@ -27,18 +27,14 @@ import type { RepositoryPort, ORMPort } from '../types';
 export abstract class AbstractNodeSqliteRepository<I extends object, O extends object>
   implements RepositoryPort<NodeSqliteRepositoryModel, I, O, Partial<O>>
 {
-  public get model(): NodeSqliteRepositoryModel {
-    return this.adapter.model;
-  }
-
   private readonly adapter: ORMPort<NodeSqliteRepositoryModel, I, O, Partial<O>>;
 
   constructor(config: NodeSqliteRepositoryConfig) {
     this.adapter = createNodeSqliteAdapter<I, O>(config);
   }
 
-  public toLean(input: unknown): O | null {
-    return this.adapter.toLean(input);
+  public get model(): NodeSqliteRepositoryModel {
+    return this.adapter.model;
   }
 
   async findById(id: string): Promise<O | null> {
@@ -63,5 +59,9 @@ export abstract class AbstractNodeSqliteRepository<I extends object, O extends o
 
   async exists(id: string): Promise<boolean> {
     return this.adapter.exists(id);
+  }
+
+  public toLean(input: unknown): O | null {
+    return this.adapter.toLean(input);
   }
 }

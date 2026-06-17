@@ -13,14 +13,14 @@ import type { RepositoryPort, ORMPort } from '../types';
 export abstract class AbstractMongooseRepository<D, I extends object, O extends object>
   implements RepositoryPort<MongooseRepositoryModel<D>, I, O, QueryFilter<D>>
 {
-  public get model(): MongooseRepositoryModel<D> {
-    return this.adapter.model;
-  }
-
   private readonly adapter: ORMPort<MongooseRepositoryModel<D>, I, O, QueryFilter<D>>;
 
   constructor(config: MongooseRepositoryConfig<D>) {
     this.adapter = createMongooseAdapter<D, I, O>(config);
+  }
+
+  public get model(): MongooseRepositoryModel<D> {
+    return this.adapter.model;
   }
 
   async findById(id: string): Promise<O | null> {

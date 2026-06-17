@@ -17,7 +17,6 @@ export class SequelizeAdapter<D extends object, I extends object, O extends obje
   implements ORMPort<SequelizeRepositoryModel<D>, I, O, WhereOptions<D>>
 {
   public readonly model: SequelizeRepositoryModel<D>;
-
   private readonly config: SequelizeRepositoryConfig<D>;
 
   constructor(config: SequelizeRepositoryConfig<D>) {
@@ -25,12 +24,6 @@ export class SequelizeAdapter<D extends object, I extends object, O extends obje
     this.model = this.resolveModel();
 
     void this.initialize().catch(console.error);
-  }
-
-  public async initialize(): Promise<void> {
-    // Hook for future use: sync, migrations, etc.
-    // Can be awaited explicitly via DatabaseServer.configure() for
-    // fail-fast startup validation when needed.
   }
 
   private resolveModel(): SequelizeRepositoryModel<D> {
@@ -61,6 +54,12 @@ export class SequelizeAdapter<D extends object, I extends object, O extends obje
     }
 
     return sequelize.model(this.config.name) as SequelizeRepositoryModel<D>;
+  }
+
+  public async initialize(): Promise<void> {
+    // Hook for future use: sync, migrations, etc.
+    // Can be awaited explicitly via DatabaseServer.configure() for
+    // fail-fast startup validation when needed.
   }
 
   async findById(id: string): Promise<O | null> {

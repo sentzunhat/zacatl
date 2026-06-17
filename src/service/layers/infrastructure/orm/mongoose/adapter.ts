@@ -18,7 +18,6 @@ export class MongooseAdapter<D, I extends object, O extends object>
   implements ORMPort<MongooseRepositoryModel<D>, I, O, QueryFilter<D>>
 {
   public readonly model: MongooseRepositoryModel<D>;
-
   private readonly config: MongooseRepositoryConfig<D>;
 
   constructor(config: MongooseRepositoryConfig<D>) {
@@ -26,12 +25,6 @@ export class MongooseAdapter<D, I extends object, O extends object>
     this.model = this.resolveModel();
 
     void this.initialize().catch(console.error);
-  }
-
-  public async initialize(): Promise<void> {
-    await this.model.createCollection();
-    await this.model.createIndexes();
-    await this.model.init();
   }
 
   private resolveModel(): MongooseRepositoryModel<D> {
@@ -77,6 +70,12 @@ export class MongooseAdapter<D, I extends object, O extends object>
     // initialize(), which can be called explicitly by DatabaseServer.configure()
     // for fail-fast startup validation.
     return resolved.model<D>(name, schema);
+  }
+
+  private async initialize(): Promise<void> {
+    await this.model.createCollection();
+    await this.model.createIndexes();
+    await this.model.init();
   }
 
   async findById(id: string): Promise<O | null> {

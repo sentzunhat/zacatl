@@ -15,7 +15,6 @@ export interface ORMPort<
   FilterType = Record<string, unknown>,
 > {
   readonly model: ModelType;
-  initialize(): Promise<void>;
   findById(id: string): Promise<OutputType | null>;
   findMany(filter?: FilterType): Promise<OutputType[]>;
   create(entity: InputType): Promise<OutputType>;

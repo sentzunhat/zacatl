@@ -16,18 +16,14 @@ export abstract class AbstractSequelizeRepository<
   O extends object,
 > implements RepositoryPort<SequelizeRepositoryModel<D>, I, O, WhereOptions<D>>
 {
-  public get model(): SequelizeRepositoryModel<D> {
-    return this.adapter.model;
-  }
-
   private readonly adapter: ORMPort<SequelizeRepositoryModel<D>, I, O, WhereOptions<D>>;
 
   constructor(config: SequelizeRepositoryConfig<D>) {
     this.adapter = createSequelizeAdapter<D, I, O>(config);
   }
 
-  public toLean(input: unknown): O | null {
-    return this.adapter.toLean(input);
+  public get model(): SequelizeRepositoryModel<D> {
+    return this.adapter.model;
   }
 
   async findById(id: string): Promise<O | null> {
@@ -52,5 +48,9 @@ export abstract class AbstractSequelizeRepository<
 
   async exists(id: string): Promise<boolean> {
     return this.adapter.exists(id);
+  }
+
+  public toLean(input: unknown): O | null {
+    return this.adapter.toLean(input);
   }
 }
