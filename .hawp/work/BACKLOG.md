@@ -24,9 +24,7 @@ Each row links to its plan file when one exists.
 
 ## Active Work
 
-| ID | Task | Status | Plan | Notes |
-| --- | --- | --- | --- | --- |
-| `task-004` | Review and create pull request for update-hawp | `in-progress` | | Finalizing PR and review |
+_No active work._
 
 ---
 
@@ -37,6 +35,7 @@ Keep this section short (for example last 5-10 items or last 14-30 days).
 | ID | Type | Title | Closed | Plan |
 | --- | --- | --- | --- | --- |
 | `CVE-001` | `improvement` | Add CVE-Lite CLI GitHub workflow | 2026-06-17 | [.hawp/work/closed/2026/06/17/CVE-001.md](closed/2026/06/17/CVE-001.md) |
+| `task-004` | Review and create pull request for update-hawp | `done` | | PR #19 created and approved |
 
 ---
 
