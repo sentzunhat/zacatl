@@ -24,9 +24,7 @@ Each row links to its plan file when one exists.
 
 ## Active Work
 
-| ID | Type | Status | Title | Plan |
-| --- | --- | --- | --- | --- |
-| `CVE-001` | `improvement` | `in-progress` | Add CVE-Lite CLI GitHub workflow | [.hawp/work/active/CVE-001.md](active/CVE-001.md) |
+_No active work._
 
 ---
 
@@ -34,7 +32,9 @@ Each row links to its plan file when one exists.
 
 Keep this section short (for example last 5-10 items or last 14-30 days).
 
-_No recently closed items._
+| ID | Type | Title | Closed | Plan |
+| --- | --- | --- | --- | --- |
+| `CVE-001` | `improvement` | Add CVE-Lite CLI GitHub workflow | 2026-06-17 | [.hawp/work/closed/2026/06/17/CVE-001.md](closed/2026/06/17/CVE-001.md) |
 
 ---
 
