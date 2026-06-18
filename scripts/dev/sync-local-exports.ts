@@ -24,7 +24,7 @@
 import fs from 'fs';
 import path from 'path';
 
-import { measureTime } from '../utils/index.js';
+import { measureTime } from '../utils/measure-time.js';
 
 const root = process.cwd();
 const buildEsmDir = path.join(root, 'build-src-esm');
