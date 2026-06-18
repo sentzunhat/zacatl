@@ -4,7 +4,7 @@ import path from 'path';
 import { dirname } from 'path';
 import { fileURLToPath } from 'url';
 
-import { measureTime } from '../utils/index.js';
+import { measureTime } from '../utils/measure-time.js';
 
 const findRepoRoot = (startDir: string): string => {
   let cur = startDir;
@@ -78,17 +78,23 @@ const fixFile = (filePath: string): boolean => {
 
   patterns.forEach((pattern) => {
     content = content.replace(pattern, (match, importPath: string) => {
-      if (importPath.endsWith('.json')) return match;
+      // Skip if already has extension or is a directory import that should resolve to index.js
+      if (importPath.endsWith('.js') || importPath.endsWith('.json')) return match;
+
       const resolvedPath = path.resolve(fileDir, importPath);
-      if (fs.existsSync(resolvedPath) && fs.statSync(resolvedPath).isDirectory()) {
-        return match
-          .replace(`"${importPath}"`, `"${importPath}/index.js"`)
-          .replace(`'${importPath}'`, `'${importPath}/index.js'`);
-      } else {
-        return match
-          .replace(`"${importPath}"`, `"${importPath}.js"`)
-          .replace(`'${importPath}'`, `'${importPath}.js'`);
+
+      // Check if .js file exists
+      if (fs.existsSync(`${resolvedPath}.js`)) {
+        return match.replace(importPath, `${importPath}.js`);
       }
+
+      // Check if directory with index.js exists
+      if (fs.existsSync(path.join(resolvedPath, 'index.js'))) {
+        return match.replace(importPath, `${importPath}/index.js`);
+      }
+
+      // Default: add .js extension
+      return match.replace(importPath, `${importPath}.js`);
     });
   });
 
@@ -96,27 +102,20 @@ const fixFile = (filePath: string): boolean => {
     fs.writeFileSync(filePath, content, 'utf-8');
     return true;
   }
+
   return false;
 };
 
-const main = async (): Promise<void> => {
-  await measureTime({
-    name: 'fix-esm',
-    fn: async () => {
-      try {
-        const files = walkDir(distDir);
-        let fixed = 0;
-        for (const file of files) if (fixFile(file)) fixed++;
-        // eslint-disable-next-line no-console
-        console.log(`✓ Fixed ESM exports: ${fixed} file(s) updated`);
-      } catch (error: unknown) {
-        const msg = error instanceof Error ? error.message : String(error);
-        // eslint-disable-next-line no-console
-        console.error(`✗ Error fixing ESM exports: ${msg}`);
-        process.exit(1);
-      }
-    },
-  });
-};
+await measureTime({
+  name: 'fix-esm',
+  fn: () => {
+    const files = walkDir(distDir);
+    let fixedCount = 0;
+    for (const file of files) {
+      if (fixFile(file)) fixedCount++;
+    }
 
-void main();
+    // eslint-disable-next-line no-console
+    console.log(`✓ Fixed ESM imports in ${fixedCount} files`);
+  },
+});
