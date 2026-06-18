@@ -11,6 +11,7 @@
 
 import * as fs from 'node:fs';
 import * as path from 'node:path';
+import { pathToFileURL } from 'node:url';
 
 import { measureTime } from '../utils/measure-time.js';
 
@@ -71,4 +72,8 @@ const main = async (): Promise<void> => {
   });
 };
 
-void main();
+const isCli = process.argv[1] !== undefined && import.meta.url === pathToFileURL(process.argv[1]).href;
+
+if (isCli) {
+  void main();
+}
