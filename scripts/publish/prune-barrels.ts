@@ -12,7 +12,7 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 
-import { measureTime } from '../utils/index.js';
+import { measureTime } from '../utils/measure-time.js';
 
 const shouldPrune = (rootDir: string, filePath: string): boolean => {
   const rel = path.relative(rootDir, filePath);
