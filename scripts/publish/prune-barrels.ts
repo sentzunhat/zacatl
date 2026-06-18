@@ -3,7 +3,7 @@
  * prune-barrels.ts
  *
  * Removes nested barrel `index.*` files from a built publish tree while
- * preserving the top-level package entrypoints for `build/esm` and `build/cjs`.
+ * preserving package entrypoints that are still intentionally exported.
  *
  * Usage:
  *   npx tsx scripts/publish/prune-barrels.ts publish/build/esm publish/build/cjs
@@ -15,27 +15,74 @@ import { pathToFileURL } from 'node:url';
 
 import { measureTime } from '../utils/measure-time.js';
 
-const shouldPrune = (rootDir: string, filePath: string): boolean => {
+const normalizePath = (value: string): string => value.replace(/\\/g, '/').replace(/^\.\//, '');
+
+const collectExportTargets = (value: unknown, targets: Set<string>): void => {
+  if (typeof value === 'string') {
+    targets.add(normalizePath(value));
+    return;
+  }
+
+  if (Array.isArray(value)) {
+    for (const item of value) collectExportTargets(item, targets);
+    return;
+  }
+
+  if (value !== null && typeof value === 'object') {
+    for (const item of Object.values(value as Record<string, unknown>)) {
+      collectExportTargets(item, targets);
+    }
+  }
+};
+
+export const getExportTargets = (packageJsonPath = path.resolve('package.json')): Set<string> => {
+  if (!fs.existsSync(packageJsonPath)) return new Set();
+
+  const pkg = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8')) as Record<string, unknown>;
+  const targets = new Set<string>();
+
+  collectExportTargets(pkg.main, targets);
+  collectExportTargets(pkg.module, targets);
+  collectExportTargets(pkg.types, targets);
+  collectExportTargets(pkg.exports, targets);
+
+  return targets;
+};
+
+const shouldPrune = (rootDir: string, filePath: string, exportTargets: ReadonlySet<string>): boolean => {
   const rel = path.relative(rootDir, filePath);
   if (!rel || rel.startsWith('..')) return false;
+
+  const rootName = path.basename(rootDir);
+  const buildName = path.basename(path.dirname(rootDir));
+  const publishRel = normalizePath(path.join(buildName, rootName, rel));
+  const sourceRel = normalizePath(
+    path.join(rootName === 'esm' ? 'build-src-esm' : 'build-src-cjs', rel),
+  );
+
+  if (exportTargets.has(publishRel) || exportTargets.has(sourceRel)) return false;
 
   const parts = rel.split(path.sep);
   const isNestedBarrel = parts.length > 2;
   return isNestedBarrel && path.basename(filePath).startsWith('index.');
 };
 
-const pruneTree = (rootDir: string, currentDir: string = rootDir): number => {
+const pruneTree = (
+  rootDir: string,
+  exportTargets: ReadonlySet<string>,
+  currentDir: string = rootDir,
+): number => {
   if (!fs.existsSync(currentDir)) return 0;
 
   let removed = 0;
   for (const entry of fs.readdirSync(currentDir, { withFileTypes: true })) {
     const full = path.join(currentDir, entry.name);
     if (entry.isDirectory()) {
-      removed += pruneTree(rootDir, full);
+      removed += pruneTree(rootDir, exportTargets, full);
       continue;
     }
 
-    if (entry.isFile() && shouldPrune(rootDir, full)) {
+    if (entry.isFile() && shouldPrune(rootDir, full, exportTargets)) {
       fs.rmSync(full, { force: true });
       removed += 1;
       // eslint-disable-next-line no-console
@@ -46,8 +93,10 @@ const pruneTree = (rootDir: string, currentDir: string = rootDir): number => {
   return removed;
 };
 
-export const pruneNestedBarrelIndexes = (rootDirs: readonly string[]): number =>
-  rootDirs.reduce((total, rootDir) => total + pruneTree(rootDir), 0);
+export const pruneNestedBarrelIndexes = (
+  rootDirs: readonly string[],
+  exportTargets: ReadonlySet<string> = getExportTargets(),
+): number => rootDirs.reduce((total, rootDir) => total + pruneTree(rootDir, exportTargets), 0);
 
 const main = async (): Promise<void> => {
   const targets = process.argv.slice(2);
