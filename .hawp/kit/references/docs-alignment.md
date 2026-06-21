@@ -53,6 +53,17 @@ Scoring guide:
 - 40–69: moderate drift
 - 0–39: severe misalignment
 
+### Change-size guidance
+
+Use size estimates to decide whether to patch immediately or defer:
+
+- `SMALL` — targeted text fixes, command updates, link repairs, and minor clarifications.
+- `MEDIUM` — section edits, example refreshes, cross-link cleanup, and short new docs content.
+- `LARGE` — broad reference updates, architecture or API rewrites, and multi-section restructures.
+- `EXTRA_LARGE` — new feature guides, major docs restructuring, or multi-doc rewrite efforts.
+
+Apply small and medium changes directly. For large or extra-large items, surface them up front with a dedicated work summary and keep patching separate.
+
 ### 2. Simplicity Pass
 
 Use when: docs are structurally present but need targeted cleanup — outdated commands, broken paths, redundant sections, over-complicated phrasing.

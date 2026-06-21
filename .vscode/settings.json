@@ -76,6 +76,7 @@
     "hexagonal",
     "microframework",
     "mongoose",
+    "NODESQLITE",
     "pino",
     "postbuild",
     "sequelize",

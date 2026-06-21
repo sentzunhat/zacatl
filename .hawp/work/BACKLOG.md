@@ -32,6 +32,8 @@ _No active work._
 
 | ID       | Type        | Title                                                                | Status     | Plan                                       |
 | -------- | ----------- | -------------------------------------------------------------------- | ---------- | ------------------------------------------ |
+| TASK-003 | improvement | Update unit tests to use new @zacatl/\* import paths                 | plan-ready | `.hawp/work/active/TASK-003.md`            |
+| TASK-002 | improvement | Automate tsconfig path generation for @zacatl/\* package imports     | plan-ready | `.hawp/work/active/TASK-002.md`            |
 | TASK-001 | improvement | Fix repository lifecycle typing and node:sqlite adapter type errors. | plan-ready | `.hawp/work/closed/2026/06/15/TASK-001.md` |
 
 ---
@@ -42,6 +44,7 @@ Keep this section short (for example last 5-10 items or last 14-30 days).
 
 | ID         | Type                                           | Title                            | Closed     | Plan                                                                    |
 | ---------- | ---------------------------------------------- | -------------------------------- | ---------- | ----------------------------------------------------------------------- |
+| `AUDIT-001` | `audit`                                      | Production readiness stabilization audit for Zacatl | 2026-06-20 | [.hawp/work/closed/2026/06/20/AUDIT-001.md](closed/2026/06/20/AUDIT-001.md) |
 | `CVE-001`  | `improvement`                                  | Add CVE-Lite CLI GitHub workflow | 2026-06-17 | [.hawp/work/closed/2026/06/17/CVE-001.md](closed/2026/06/17/CVE-001.md) |
 | `task-004` | Review and create pull request for update-hawp | `done`                           |            | PR #19 created and approved                                             |
 

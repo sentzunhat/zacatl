@@ -63,10 +63,11 @@ Required output:
 1. repo context summary
 2. documentation drift report
 3. cleanup candidate report (`Safe to remove`, `Safe to keep`, `Deferred`) with evidence
-4. minimal change plan
-5. patch summary (modified/deleted files + why safe)
-6. deferred items and reasons
-7. verification checklist
+4. size estimate for each cleanup candidate
+5. minimal change plan
+6. patch summary (modified/deleted files + why safe)
+7. deferred items and reasons
+8. verification checklist
 
 Verification checklist must cover:
 

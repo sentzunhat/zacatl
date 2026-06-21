@@ -9,7 +9,8 @@ Mission:
 
 - treat `src/**` as the authoritative reference
 - compare implementation against `docs/**` and key root files
-- produce deterministic, machine-readable output suitable for automation
+- apply small and medium documentation fixes directly when safe
+- identify and surface larger or extra-large work items before editing
 - propose documentation changes only (no source refactors)
 
 Canonical reference:
@@ -70,6 +71,13 @@ Compare `codeStructure` vs `docsClaims` and classify each finding as one of:
 - `VERSION_MISMATCH`
 - `RUNTIME_MISMATCH`
 
+Add a `changeSize` estimate for each finding:
+
+- `SMALL`
+- `MEDIUM`
+- `LARGE`
+- `EXTRA_LARGE`
+
 Return:
 
 ```json
@@ -80,7 +88,8 @@ Return:
       "item": "",
       "evidenceFromCode": "",
       "evidenceFromDocs": "",
-      "confidence": "HIGH"
+      "confidence": "HIGH",
+      "changeSize": "SMALL"
     }
   ]
 }
@@ -135,5 +144,6 @@ Strict rules:
 - do not hallucinate missing code
 - do not rewrite code
 - only propose documentation changes
+- use change-size categories to decide whether to patch or defer
 - keep output deterministic
 - avoid motivational language

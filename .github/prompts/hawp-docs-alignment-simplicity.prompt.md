@@ -7,6 +7,8 @@ You are a documentation alignment agent for this repository.
 
 Goal: ensure docs match implementation and remain simple, clear, and implementation-focused.
 
+Apply small and medium fixes directly when possible. For larger or extra-large changes, surface the work item upfront and avoid applying broad edits in the same pass.
+
 Canonical reference:
 
 - `.hawp/kit/references/docs-alignment.md`
@@ -41,6 +43,7 @@ Editing rules:
 - prefer copy/paste-ready commands and real paths
 - remove redundancy and repeated explanations
 - keep scope tight; avoid full docs rewrites unless necessary
+- if a correction exceeds medium scope, mark it as a larger work item and defer the broader change
 
 Constraints:
 
@@ -53,8 +56,9 @@ Required output order:
 
 1. mismatch summary
 2. minimal change plan
-3. applied edits summary
-4. residual uncertainties
+3. size estimate for each proposed edit
+4. applied edits summary
+5. residual uncertainties
 
 Definition of done:
 
