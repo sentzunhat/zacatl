@@ -21,7 +21,7 @@ export interface DatabaseConfig {
   vendor: DatabaseVendor;
   /**
    * The ORM/database instance (Mongoose or Sequelize).
-   * Not required for `SQLITE` — the adapter opens the file internally
+   * Not required for `NODESQLITE` — the adapter opens the file internally
    * using `connectionString` as the file path (or `':memory:'`).
    */
   instance?: DatabaseInstance;
@@ -38,6 +38,6 @@ export interface DatabaseConfig {
  * Abstracts database implementations (Mongoose, Sequelize)
  */
 export interface DatabaseServerPort {
-  connect(serviceName: string, config: DatabaseConfig): Promise<void>;
+  connect(service: { name: string }, config: DatabaseConfig): Promise<void>;
   disconnect?(): Promise<void>;
 }

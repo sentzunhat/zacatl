@@ -1,6 +1,5 @@
 import { getContainer, registerValue } from '@zacatl/dependency-injection';
 import { InternalServerError } from '@zacatl/error';
-import type { InjectionToken } from '@zacatl/third-party/tsyringe';
 
 import { DatabaseVendor, type DatabaseInstance } from './port';
 import {
@@ -8,6 +7,8 @@ import {
   NodeSqliteToken,
   SequelizeToken,
 } from '../../../layers/infrastructure/orm/tokens';
+
+import type { InjectionToken } from '#/third-party/dependency-injection/tsyringe.js';
 
 /**
  * ORM instance helper shared by database adapters and service bootstrap.

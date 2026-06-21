@@ -1,5 +1,5 @@
-import { type QueryFilter, type Mongoose } from '@zacatl/third-party/mongoose';
-import type { InjectionToken } from '@zacatl/third-party/tsyringe';
+import { type QueryFilter, type Mongoose } from '@sentzunhat/zacatl/third-party/databases/mongoose';
+import type { InjectionToken } from '@sentzunhat/zacatl/third-party/dependency-injection/tsyringe';
 
 import { getContainer, resolveDependency } from '../../../../../dependency-injection';
 import { InternalServerError } from '../../../../../error';

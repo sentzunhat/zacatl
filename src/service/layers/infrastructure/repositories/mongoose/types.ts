@@ -1,4 +1,4 @@
-import type { MongooseModel, Schema } from '../../../../../third-party/mongoose';
+import type { MongooseModel, Schema } from '../../../../../third-party/databases/mongoose';
 import type { ORMType } from '../../orm/types';
 
 export type {

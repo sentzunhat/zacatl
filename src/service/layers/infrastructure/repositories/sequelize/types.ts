@@ -1,4 +1,7 @@
-import type { ModelStatic, SequelizeModel as Model } from '../../../../../third-party/sequelize';
+import type {
+  ModelStatic,
+  SequelizeModel as Model,
+} from '../../../../../third-party/databases/sequelize';
 import type { ORMType } from '../../orm/types';
 export type { LeanDocument } from '../../orm/sequelize/types';
 

@@ -1,6 +1,3 @@
-import type { Sequelize, WhereOptions } from '@zacatl/third-party/sequelize';
-import type { InjectionToken } from '@zacatl/third-party/tsyringe';
-
 import { getContainer, resolveDependency } from '../../../../../dependency-injection';
 import { InternalServerError } from '../../../../../error';
 import type {
@@ -9,6 +6,9 @@ import type {
   ORMPort,
 } from '../../repositories/types';
 import { SequelizeToken } from '../tokens';
+
+import type { Sequelize, WhereOptions } from '#/third-party/databases/sequelize.js';
+import type { InjectionToken } from '#/third-party/dependency-injection/tsyringe.js';
 
 /**
  * Sequelize ORM adapter - handles Sequelize-specific database operations
