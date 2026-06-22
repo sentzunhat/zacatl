@@ -53,7 +53,7 @@ export class SequelizeAdapter<D extends object, I extends object, O extends obje
       });
     }
 
-    return sequelize.model(this.config.name) as SequelizeRepositoryModel<D>;
+    return sequelize.model(this.config.name);
   }
 
   private async initialize(): Promise<void> {
@@ -77,7 +77,18 @@ export class SequelizeAdapter<D extends object, I extends object, O extends obje
 
   async create(entity: I): Promise<O> {
     const document = await this.model.create(entity as never);
-    return this.toLean(document) as O;
+    const lean = this.toLean(document);
+
+    if (lean == null) {
+      throw new InternalServerError({
+        message: 'Failed to create record',
+        reason: 'Document was created but toLean returned null',
+        component: this.constructor.name,
+        operation: 'create',
+      });
+    }
+
+    return lean;
   }
 
   async update(id: string, update: Partial<I>): Promise<O | null> {

@@ -309,7 +309,7 @@ export class NodeSqliteAdapter<I extends object, O extends object>
       const updatedAtValue = plain['updatedAt'];
 
       return {
-        ...(plain as O),
+        ...plain,
         id: idValue != null ? String(idValue) : '',
         createdAt:
           createdAtValue instanceof Date

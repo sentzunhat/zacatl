@@ -12,6 +12,7 @@
     "strictNullChecks": true,
     "declaration": false,
     "resolveJsonModule": true,
+    "ignoreDeprecations": "6.0",
     "allowJs": false,
     "types": ["node"],
     "lib": ["ES2022"]
