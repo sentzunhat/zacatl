@@ -7,7 +7,7 @@
   "scripts": {
     "start": "node dist/index.js",
     "dev": "npm run build && npm run start",
-    "build": "rm -rf dist && npm --prefix ../.. exec -- tsc -p tsconfig.json && node ../../../../build-scripts-esm/build/fix-esm.js dist",
+    "build": "rm -rf dist && npx tsc -p tsconfig.json && node ../../../../build-scripts-esm/build/fix-esm.js dist && node ../../../../scripts/build/rewrite-runtime-aliases.js dist @zacatl/ @sentzunhat/zacatl/",
     "test": "vitest run",
     "clean": "rm -rf dist ../../database.sqlite"
   },

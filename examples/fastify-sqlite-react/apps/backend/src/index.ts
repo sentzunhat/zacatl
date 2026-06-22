@@ -3,16 +3,17 @@
  * Entry Point
  */
 
-import '@sentzunhat/zacatl/third-party/reflect-metadata';
-import sqlite3 from '@sentzunhat/zacatl/third-party/sqlite3';
+import '@zacatl/third-party/reflect-metadata';
+import sqlite3 from '@zacatl/third-party/sqlite3';
 import {
   Fastify,
   serializerCompiler,
   validatorCompiler,
-} from '@sentzunhat/zacatl/third-party/fastify';
-import { Sequelize, type SequelizeOptions } from '@sentzunhat/zacatl/third-party/sequelize';
-import { Service } from '@sentzunhat/zacatl/service';
+} from '@zacatl/third-party/fastify';
+import { Sequelize, type SequelizeOptions } from '@zacatl/third-party/sequelize';
+import { Service } from '@zacatl/service';
 import { API_PREFIX, config, createServiceConfig, registerFrontendRoutes } from './config';
+import { initGreetingModel } from './infrastructure/greetings/models/greeting.model';
 
 type FastifyError = Error & {
   statusCode?: number;
@@ -155,6 +156,8 @@ const main = async () => {
       storage: config.databaseUrl.replace('sqlite:', ''),
     });
     activeSequelize = sequelize;
+
+    initGreetingModel(sequelize);
 
     // Register frontend static routes at root
     await registerFrontendRoutes(fastify);

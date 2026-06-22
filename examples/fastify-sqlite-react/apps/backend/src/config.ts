@@ -3,13 +3,13 @@
  * Simple, centralized configuration for the Fastify + SQLite example
  */
 
-import type { FastifyInstance } from '@sentzunhat/zacatl/third-party/fastify';
-import type { Sequelize } from '@sentzunhat/zacatl/third-party/sequelize';
+import type { FastifyInstance } from '@zacatl/third-party/fastify';
+import type { Sequelize } from '@zacatl/third-party/sequelize';
 import { fileURLToPath } from 'url';
 import { existsSync } from 'node:fs';
 import { readFile, readdir } from 'node:fs/promises';
 import { dirname, extname, join } from 'path';
-import { ServiceType, ServerType, ServerVendor, DatabaseVendor } from '@sentzunhat/zacatl/service';
+import { ServiceType, ServerType, ServerVendor, DatabaseVendor } from '@zacatl/service';
 import {
   GetAllGreetingsHandler,
   GetGreetingByIdHandler,
@@ -18,7 +18,6 @@ import {
   GetRandomGreetingHandler,
 } from './application/route-handlers/greetings';
 import { hookHandlers } from './application/hook-handlers';
-import { initGreetingModel } from './infrastructure/greetings/models/greeting.model';
 import { repositories } from './infrastructure/greetings/repositories/repositories';
 import { GreetingServiceAdapter } from './domain/greetings/service';
 
@@ -146,7 +145,6 @@ export const createServiceConfig = (fastify: FastifyInstance, sequelize: Sequeli
             connectionString: config.databaseUrl,
             onDatabaseConnected: async (db: unknown) => {
               const sequelizeDb = db as Sequelize;
-              initGreetingModel(sequelizeDb);
               await sequelizeDb.sync({ alter: true });
             },
           },
