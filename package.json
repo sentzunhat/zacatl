@@ -1060,5 +1060,13 @@
       "import": "./build-src-esm/utils/optionals.js",
       "require": "./build-src-cjs/utils/optionals.js"
     }
+  },
+  "allowScripts": {
+    "better-sqlite3@12.11.1": true,
+    "esbuild@0.28.1": true,
+    "fsevents@2.3.3": true,
+    "mongodb-memory-server@11.2.0": true,
+    "sqlite3@6.0.1": true,
+    "unrs-resolver@1.12.2": true
   }
 }
