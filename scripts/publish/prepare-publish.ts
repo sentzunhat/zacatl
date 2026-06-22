@@ -1,6 +1,8 @@
 import fs from 'fs';
 import path from 'path';
 
+import { getExportTargets, pruneNestedBarrelIndexes } from './prune-barrels.js';
+
 const root = process.cwd();
 const pkgPath = path.join(root, 'package.json');
 const publishDir = path.join(root, 'publish');
@@ -391,5 +393,9 @@ if ((newPkg.bin as Record<string, string>)['zacatl-fix-esm'] === undefined) {
 if (!newPkg['files']) newPkg['files'] = ['build', 'package.json'];
 
 fs.writeFileSync(publishPkgPath, JSON.stringify(newPkg, null, 2) + '\n');
+
+const exportTargets = getExportTargets(publishPkgPath);
+pruneNestedBarrelIndexes([buildEsmDest, buildCjsDest], exportTargets);
+
 // eslint-disable-next-line no-console
 console.log('Wrote', publishPkgPath);

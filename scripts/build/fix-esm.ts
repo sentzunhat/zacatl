@@ -4,7 +4,7 @@ import path from 'path';
 import { dirname } from 'path';
 import { fileURLToPath } from 'url';
 
-import { measureTime } from '../utils/index.js';
+import { measureTime } from '../utils/measure-time.js';
 
 const findRepoRoot = (startDir: string): string => {
   let cur = startDir;

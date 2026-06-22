@@ -191,6 +191,11 @@ await service.start({ port: 4000 });
 - `build-src-esm/` → `build/esm/`
 - `build-src-cjs/` → `build/cjs/`
 
+Before writing the export map, `prepare-publish.ts` prunes nested `index.*`
+barrels from `publish/build/{esm,cjs}` unless they are still exported entry
+points. That keeps the tarball focused on the public surface without deleting
+subpaths that `publish/package.json` still exposes.
+
 **Local development**: The root `package.json` **does NOT** include an exports map. Consuming examples and applications resolve subpath imports via direct file system access:
 
 ```

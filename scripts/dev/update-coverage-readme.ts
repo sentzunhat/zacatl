@@ -2,7 +2,7 @@
 import fs from 'fs/promises';
 import path from 'path';
 
-import { measureTime } from '../utils/index.js';
+import { measureTime } from '../utils/measure-time.js';
 
 const main = async (): Promise<void> => {
   await measureTime({
