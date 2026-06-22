@@ -32,6 +32,10 @@ _No active work._
 
 | ID       | Type        | Title                                                                | Status     | Plan                                       |
 | -------- | ----------- | -------------------------------------------------------------------- | ---------- | ------------------------------------------ |
+| STAB-009 | improvement | Audit dependency approvals and optionalize prunable runtime packages | plan-ready | `.hawp/work/active/STAB-009.md`           |
+| STAB-008 | improvement | Audit import extensions and TypeScript resolution for code files     | plan-ready | `.hawp/work/active/STAB-008.md`           |
+| STAB-007 | improvement | Review ESLint config hierarchy and import-order baseline             | plan-ready | `.hawp/work/active/STAB-007.md`           |
+| STAB-006 | improvement | Audit type safety and lint suppressions for production readiness     | plan-ready | `.hawp/work/active/STAB-006.md`           |
 | STAB-001 | improvement | Align CI Node version with package engine baseline                   | plan-ready | `.hawp/work/active/STAB-001.md`           |
 | TASK-003 | improvement | Update unit tests to use new @zacatl/\* import paths                 | plan-ready | `.hawp/work/active/TASK-003.md`            |
 | TASK-002 | improvement | Automate tsconfig path generation for @zacatl/\* package imports     | plan-ready | `.hawp/work/active/TASK-002.md`            |
