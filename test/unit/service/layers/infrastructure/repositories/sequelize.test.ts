@@ -6,8 +6,8 @@ import {
   Sequelize,
   SequelizeModel as Model,
   ModelStatic,
-} from '@zacatl/third-party/sequelize';
-import { singleton } from '@zacatl/third-party/tsyringe';
+} from '@zacatl/third-party/databases/sequelize';
+import { singleton } from '@zacatl/third-party/dependency-injection/tsyringe';
 
 import { clearContainer, getContainer } from '../../../../../../src/dependency-injection/container';
 import { SequelizeToken } from '../../../../../../src/service/layers/infrastructure/orm/tokens';

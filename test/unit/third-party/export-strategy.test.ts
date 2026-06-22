@@ -17,7 +17,7 @@ import { describe, it, expect } from 'vitest';
 describe('Export Strategy Verification', () => {
   describe('Core Requirements', () => {
     it('should NOT export ORMs from main package (bug fix)', async () => {
-      const mainExports = await import('../../../src/index.js');
+      const mainExports = await import('../../../src/index');
 
       // Core exports should work
       expect(mainExports.Service).toBeDefined();
@@ -32,7 +32,7 @@ describe('Export Strategy Verification', () => {
     });
 
     it('should provide DI utilities from main package', async () => {
-      const mainExports = await import('../../../src/index.js');
+      const mainExports = await import('../../../src/index');
 
       expect(mainExports.resolveDependency).toBeDefined();
       expect(mainExports.registerDependency).toBeDefined();
@@ -41,7 +41,7 @@ describe('Export Strategy Verification', () => {
     });
 
     it('should provide dedicated Mongoose subpath', async () => {
-      const mongooseExports = await import('../../../src/third-party/mongoose.js');
+      const mongooseExports = await import('@zacatl/third-party/databases/mongoose');
 
       expect(mongooseExports.mongoose).toBeDefined();
       expect(mongooseExports.Schema).toBeDefined();
@@ -51,7 +51,7 @@ describe('Export Strategy Verification', () => {
     });
 
     it('should provide dedicated Sequelize subpath', async () => {
-      const sequelizeExports = await import('../../../src/third-party/sequelize.js');
+      const sequelizeExports = await import('@zacatl/third-party/databases/sequelize');
 
       expect(sequelizeExports.Sequelize).toBeDefined();
       expect(sequelizeExports.DataTypes).toBeDefined();
@@ -62,14 +62,14 @@ describe('Export Strategy Verification', () => {
 
   describe('Subpath-Only Import Strategy', () => {
     it('should require subpath imports for Mongoose access', async () => {
-      const mongooseExports = await import('../../../src/third-party/mongoose.js');
+      const mongooseExports = await import('@zacatl/third-party/databases/mongoose');
       expect(mongooseExports.mongoose).toBeDefined();
       expect(mongooseExports.Schema).toBeDefined();
       expect(mongooseExports.Model).toBeDefined();
     });
 
     it('should require subpath imports for Sequelize access', async () => {
-      const sequelizeExports = await import('../../../src/third-party/sequelize.js');
+      const sequelizeExports = await import('@zacatl/third-party/databases/sequelize');
       expect(sequelizeExports.Sequelize).toBeDefined();
       expect(sequelizeExports.DataTypes).toBeDefined();
       expect(sequelizeExports.SequelizeModel).toBeDefined();
@@ -77,26 +77,26 @@ describe('Export Strategy Verification', () => {
 
     it('should not load mongoose when importing Service from main', async () => {
       // Import only Service from main package
-      const { Service: serviceConstructor } = await import('../../../src/index.js');
+      const { Service: serviceConstructor } = await import('../../../src/index');
 
       // Verify Service was imported
       expect(serviceConstructor).toBeDefined();
 
       // No mongoose properties in main exports
-      const mainExports = await import('../../../src/index.js');
+      const mainExports = await import('../../../src/index');
       expect('mongoose' in mainExports).toBe(false);
       expect('Schema' in mainExports).toBe(false);
     });
 
     it('should not load sequelize when importing Service from main', async () => {
       // Import only Service from main package
-      const { Service: serviceConstructor } = await import('../../../src/index.js');
+      const { Service: serviceConstructor } = await import('../../../src/index');
 
       // Verify Service was imported
       expect(serviceConstructor).toBeDefined();
 
       // No sequelize properties in main exports
-      const mainExports = await import('../../../src/index.js');
+      const mainExports = await import('../../../src/index');
       expect('Sequelize' in mainExports).toBe(false);
       expect('DataTypes' in mainExports).toBe(false);
     });
@@ -105,16 +105,16 @@ describe('Export Strategy Verification', () => {
   describe('Benefits of Subpath Strategy', () => {
     it('should enable tree-shaking of unused ORMs', async () => {
       // Subpath imports allow bundlers to tree-shake unused ORMs
-      const mongooseExports = await import('../../../src/third-party/mongoose.js');
+      const mongooseExports = await import('@zacatl/third-party/databases/mongoose');
       expect(mongooseExports.mongoose).toBeDefined();
 
-      const sequelizeExports = await import('../../../src/third-party/sequelize.js');
+      const sequelizeExports = await import('@zacatl/third-party/databases/sequelize');
       expect(sequelizeExports.Sequelize).toBeDefined();
     });
 
     it('should provide clean imports without re-exports from main', async () => {
       // Main package exports both Service and DI utilities
-      const mainExports = await import('../../../src/index.js');
+      const mainExports = await import('../../../src/index');
 
       expect(mainExports.Service).toBeDefined();
       expect(mainExports.resolveDependency).toBeDefined();
@@ -137,7 +137,7 @@ describe('Export Strategy Verification', () => {
       expect(resolveDependency).toBeDefined();
 
       // ORM subpaths are optional imports
-      const mongooseExports = await import('../../../src/third-party/mongoose.js');
+      const mongooseExports = await import('@zacatl/third-party/databases/mongoose');
       expect(mongooseExports.mongoose).toBeDefined();
     });
   });

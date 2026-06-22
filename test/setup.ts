@@ -1,4 +1,4 @@
-import '@zacatl/third-party/reflect-metadata'; // required by tsyringe (use project shim)
+import '@zacatl/third-party/dependency-injection/reflect-metadata'; // required by tsyringe (use project shim)
 import * as diagnostics from 'diagnostics_channel';
 import { createRequire } from 'module';
 

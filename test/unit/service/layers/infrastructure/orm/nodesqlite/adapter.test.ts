@@ -1,10 +1,10 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 
-import { clearContainer } from '../../../../../../../src/dependency-injection';
-import { NodeSqliteAdapter } from '../../../../../../../src/service/layers/infrastructure/orm/nodesqlite/adapter';
-import { NodeSqliteToken } from '../../../../../../../src/service/layers/infrastructure/orm/tokens';
-import { ORMType } from '../../../../../../../src/service/layers/infrastructure/repositories/types';
-import { container } from '../../../../../../../src/third-party';
+import { clearContainer } from '@zacatl/dependency-injection';
+import { NodeSqliteAdapter } from '@zacatl/service/layers/infrastructure/orm/nodesqlite/adapter';
+import { NodeSqliteToken } from '@zacatl/service/layers/infrastructure/orm/tokens';
+import { ORMType } from '@zacatl/service/layers/infrastructure/repositories/types';
+import { container } from '@zacatl/third-party/dependency-injection/tsyringe';
 
 interface TestInput {
   name: string;
@@ -27,12 +27,6 @@ describe('NodeSqliteAdapter', () => {
   };
 
   let adapter: NodeSqliteAdapter<TestInput, TestOutput>;
-  const mockTableExists = (): void => {
-    mockDatabase.prepare.mockReturnValueOnce({
-      get: vi.fn().mockReturnValue({ name: 'test_items' }),
-    });
-  };
-
   beforeEach(() => {
     clearContainer();
     vi.clearAllMocks();
@@ -65,7 +59,7 @@ describe('NodeSqliteAdapter', () => {
     vi.clearAllMocks();
   });
 
-  describe('initialize', () => {
+  describe('constructor bootstrap', () => {
     it('should create the table when it does not exist', async () => {
       // Override default: table does not exist on this call
       mockDatabase.prepare.mockReturnValueOnce({
@@ -73,8 +67,14 @@ describe('NodeSqliteAdapter', () => {
       });
       mockDatabase.exec.mockReturnValue(undefined);
 
-      await adapter.initialize();
+      const localAdapter = new NodeSqliteAdapter<TestInput, TestOutput>({
+        type: ORMType.NodeSqlite as const,
+        name: 'test_items',
+      });
 
+      await new Promise((resolve) => setImmediate(resolve));
+
+      expect(localAdapter.model).toBe(mockDatabase);
       expect(mockDatabase.prepare).toHaveBeenCalledWith(
         expect.stringContaining('SELECT name FROM sqlite_master'),
       );
@@ -85,13 +85,18 @@ describe('NodeSqliteAdapter', () => {
       // Default mock already returns table exists; clear call counts from constructor
       vi.clearAllMocks();
 
-      await adapter.initialize();
+      new NodeSqliteAdapter<TestInput, TestOutput>({
+        type: ORMType.NodeSqlite as const,
+        name: 'test_items',
+      });
+
+      await new Promise((resolve) => setImmediate(resolve));
 
       expect(mockDatabase.prepare).toHaveBeenCalled();
       expect(mockDatabase.exec).not.toHaveBeenCalled();
     });
 
-    it('constructor fires initialize and resolves model eagerly', () => {
+    it('constructor resolves model eagerly', () => {
       expect(adapter.model).toBe(mockDatabase);
     });
   });
@@ -135,7 +140,6 @@ describe('NodeSqliteAdapter', () => {
 
   describe('findById', () => {
     it('should return null when record not found', async () => {
-      mockTableExists();
       const stmt = { get: vi.fn().mockReturnValue(undefined) };
       mockDatabase.prepare.mockReturnValueOnce(stmt);
 
@@ -145,7 +149,6 @@ describe('NodeSqliteAdapter', () => {
     });
 
     it('should return parsed record when found', async () => {
-      mockTableExists();
       const data = {
         id: '123',
         name: 'John',
@@ -176,7 +179,6 @@ describe('NodeSqliteAdapter', () => {
 
   describe('findMany', () => {
     it('should return empty array when no records exist', async () => {
-      mockTableExists();
       const stmt = { all: vi.fn().mockReturnValue([]) };
       mockDatabase.prepare.mockReturnValueOnce(stmt);
 
@@ -185,7 +187,6 @@ describe('NodeSqliteAdapter', () => {
     });
 
     it('should return array of parsed records', async () => {
-      mockTableExists();
       const data1 = {
         id: '1',
         name: 'John',
@@ -230,7 +231,6 @@ describe('NodeSqliteAdapter', () => {
   describe('create', () => {
     it('should create record with id, timestamps', async () => {
       const input: TestInput = { name: 'John', email: 'john@example.com' };
-      mockTableExists();
       const stmt = { run: vi.fn() };
       mockDatabase.prepare.mockReturnValueOnce(stmt);
       mockDatabase.exec.mockResolvedValue(undefined);
@@ -248,7 +248,6 @@ describe('NodeSqliteAdapter', () => {
 
   describe('update', () => {
     it('should return null when record not found', async () => {
-      mockTableExists();
       // Setup findById to return null
       const findStmt = { get: vi.fn().mockReturnValue(undefined) };
       mockDatabase.prepare.mockReturnValueOnce(findStmt);
@@ -258,7 +257,6 @@ describe('NodeSqliteAdapter', () => {
     });
 
     it('should update record and return updated data', async () => {
-      mockTableExists();
       const original = {
         id: '123',
         name: 'John',
@@ -299,7 +297,6 @@ describe('NodeSqliteAdapter', () => {
 
   describe('delete', () => {
     it('should return null when record not found', async () => {
-      mockTableExists();
       const findStmt = { get: vi.fn().mockReturnValue(undefined) };
       mockDatabase.prepare.mockReturnValueOnce(findStmt);
 
@@ -308,7 +305,6 @@ describe('NodeSqliteAdapter', () => {
     });
 
     it('should delete record and return deleted data', async () => {
-      mockTableExists();
       const data = {
         id: '123',
         name: 'John',
@@ -341,7 +337,6 @@ describe('NodeSqliteAdapter', () => {
 
   describe('exists', () => {
     it('should return false when record does not exist', async () => {
-      mockTableExists();
       const stmt = { get: vi.fn().mockReturnValue(undefined) };
       mockDatabase.prepare.mockReturnValueOnce(stmt);
 
@@ -350,7 +345,6 @@ describe('NodeSqliteAdapter', () => {
     });
 
     it('should return true when record exists', async () => {
-      mockTableExists();
       const stmt = { get: vi.fn().mockReturnValue({ count: 1 }) };
       mockDatabase.prepare.mockReturnValueOnce(stmt);
 

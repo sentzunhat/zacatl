@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-import { container } from '@zacatl/third-party/tsyringe';
+import { container } from '@zacatl/third-party/dependency-injection/tsyringe';
 
 import { clearContainer } from '../../../../../../../src/dependency-injection';
 import { SequelizeAdapter } from '../../../../../../../src/service/layers/infrastructure/orm/sequelize/adapter';

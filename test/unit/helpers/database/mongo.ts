@@ -1,8 +1,8 @@
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import type { Connection } from 'mongoose';
 
+import { container } from '@zacatl/third-party/dependency-injection/tsyringe';
 import { connect } from '@zacatl/third-party/mongoose';
-import { container } from '@zacatl/third-party/tsyringe';
 
 import { MongooseToken } from '../../../../src/service/layers/infrastructure/orm/tokens';
 

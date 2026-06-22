@@ -1,3 +1,6 @@
+import type { Sequelize, WhereOptions } from '@zacatl/third-party/databases/sequelize';
+import type { InjectionToken } from '@zacatl/third-party/dependency-injection/tsyringe';
+
 import { getContainer, resolveDependency } from '../../../../../dependency-injection';
 import { InternalServerError } from '../../../../../error';
 import type {
@@ -6,9 +9,6 @@ import type {
   ORMPort,
 } from '../../repositories/types';
 import { SequelizeToken } from '../tokens';
-
-import type { Sequelize, WhereOptions } from '#/third-party/databases/sequelize.js';
-import type { InjectionToken } from '#/third-party/dependency-injection/tsyringe.js';
 
 /**
  * Sequelize ORM adapter - handles Sequelize-specific database operations
@@ -56,10 +56,8 @@ export class SequelizeAdapter<D extends object, I extends object, O extends obje
     return sequelize.model(this.config.name) as SequelizeRepositoryModel<D>;
   }
 
-  public async initialize(): Promise<void> {
+  private async initialize(): Promise<void> {
     // Hook for future use: sync, migrations, etc.
-    // Can be awaited explicitly via DatabaseServer.configure() for
-    // fail-fast startup validation when needed.
   }
 
   async findById(id: string): Promise<O | null> {

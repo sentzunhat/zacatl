@@ -1,4 +1,4 @@
-import type { QueryFilter } from '@zacatl/third-party/mongoose';
+import type { QueryFilter } from '@zacatl/third-party/databases/mongoose';
 
 import { MongooseAdapter } from './adapter';
 import type {

@@ -1,7 +1,7 @@
 import { newDb } from 'pg-mem';
 import { beforeEach, afterEach, describe, expect, it } from 'vitest';
 
-import { Sequelize, DataTypes } from '@zacatl/third-party/sequelize';
+import { Sequelize, DataTypes } from '@zacatl/third-party/databases/sequelize';
 
 describe('Sequelize + pg-mem extended operations', () => {
   let db: ReturnType<typeof newDb> | undefined;

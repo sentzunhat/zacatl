@@ -1,10 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-import { clearContainer } from '../../../../../../../src/dependency-injection';
-import { NodeSqliteToken } from '../../../../../../../src/service/layers/infrastructure/orm/tokens';
-import { AbstractNodeSqliteRepository } from '../../../../../../../src/service/layers/infrastructure/repositories/nodesqlite/repository';
-import { ORMType } from '../../../../../../../src/service/layers/infrastructure/repositories/types';
-import { container } from '../../../../../../../src/third-party';
+import { clearContainer } from '@zacatl/dependency-injection';
+import { NodeSqliteToken } from '@zacatl/service/layers/infrastructure/orm/tokens';
+import { AbstractNodeSqliteRepository } from '@zacatl/service/layers/infrastructure/repositories/nodesqlite/repository';
+import { ORMType } from '@zacatl/service/layers/infrastructure/repositories/types';
+import { container } from '@zacatl/third-party/dependency-injection/tsyringe';
 
 interface UserInput {
   name: string;
@@ -74,17 +74,7 @@ describe('AbstractNodeSqliteRepository', () => {
     });
   });
 
-  const mockTableExists = (): void => {
-    mockDatabase.prepare.mockReturnValueOnce({
-      get: vi.fn().mockReturnValue({ name: 'users' }),
-    });
-  };
-
   describe('findById', () => {
-    beforeEach(() => {
-      mockTableExists();
-    });
-
     it('should find user by id', async () => {
       const userData = {
         id: 'user-123',
@@ -122,10 +112,6 @@ describe('AbstractNodeSqliteRepository', () => {
   });
 
   describe('findMany', () => {
-    beforeEach(() => {
-      mockTableExists();
-    });
-
     it('should find all users', async () => {
       const user1 = {
         id: '1',
@@ -175,10 +161,6 @@ describe('AbstractNodeSqliteRepository', () => {
   });
 
   describe('create', () => {
-    beforeEach(() => {
-      mockTableExists();
-    });
-
     it('should create a new user with timestamps', async () => {
       const input: UserInput = { name: 'John', email: 'john@example.com' };
       const stmt = { run: vi.fn() };
@@ -197,10 +179,6 @@ describe('AbstractNodeSqliteRepository', () => {
   });
 
   describe('update', () => {
-    beforeEach(() => {
-      mockTableExists();
-    });
-
     it('should update user data', async () => {
       const original = {
         id: 'user-123',
@@ -244,10 +222,6 @@ describe('AbstractNodeSqliteRepository', () => {
   });
 
   describe('delete', () => {
-    beforeEach(() => {
-      mockTableExists();
-    });
-
     it('should delete user and return deleted data', async () => {
       const userData = {
         id: 'user-123',
@@ -291,10 +265,6 @@ describe('AbstractNodeSqliteRepository', () => {
   });
 
   describe('exists', () => {
-    beforeEach(() => {
-      mockTableExists();
-    });
-
     it('should return true if user exists', async () => {
       const stmt = { get: vi.fn().mockReturnValue({ count: 1 }) };
       mockDatabase.prepare.mockReturnValueOnce(stmt);

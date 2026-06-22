@@ -10,20 +10,30 @@ export default defineConfig({
   resolve: {
     extensions: ['.ts', '.tsx', '.js', '.mjs', '.json'],
     alias: {
+      // More specific paths must come first to prevent less specific matches
+      '@zacatl/third-party/mongoose': path.resolve(
+        __dirname,
+        './src/third-party/databases/mongoose',
+      ),
+      '@zacatl/third-party/sequelize': path.resolve(
+        __dirname,
+        './src/third-party/databases/sequelize',
+      ),
+      '@zacatl/optionals': path.resolve(__dirname, './src/utils/optionals.ts'),
+      '@zacatl/orm': path.resolve(__dirname, './src/service/layers/infrastructure/orm'),
+      '@zacatl/infrastructure': path.resolve(__dirname, './src/service/layers/infrastructure'),
+      '@zacatl/domain': path.resolve(__dirname, './src/service/layers/domain'),
+      '@zacatl/application': path.resolve(__dirname, './src/service/layers/application'),
+      '@zacatl/platform': path.resolve(__dirname, './src/service/platforms'),
+      // Generic paths after specific ones
       '@zacatl/configuration': path.resolve(__dirname, './src/configuration'),
       '@zacatl/dependency-injection': path.resolve(__dirname, './src/dependency-injection'),
       '@zacatl/error': path.resolve(__dirname, './src/error'),
       '@zacatl/localization': path.resolve(__dirname, './src/localization'),
       '@zacatl/logs': path.resolve(__dirname, './src/logs'),
-      '@zacatl/orm': path.resolve(__dirname, './src/service/layers/infrastructure/orm'),
       '@zacatl/service': path.resolve(__dirname, './src/service'),
       '@zacatl/utils': path.resolve(__dirname, './src/utils'),
       '@zacatl/third-party': path.resolve(__dirname, './src/third-party'),
-      '@zacatl/optionals': path.resolve(__dirname, './src/utils/optionals.ts'),
-      '@zacatl/infrastructure': path.resolve(__dirname, './src/service/layers/infrastructure'),
-      '@zacatl/domain': path.resolve(__dirname, './src/service/layers/domain'),
-      '@zacatl/application': path.resolve(__dirname, './src/service/layers/application'),
-      '@zacatl/platform': path.resolve(__dirname, './src/service/platforms'),
     },
   },
   test: {

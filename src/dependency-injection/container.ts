@@ -1,7 +1,7 @@
-import '../third-party/reflect-metadata';
+import '@zacatl/third-party/dependency-injection/reflect-metadata';
 import { InternalServerError } from '@zacatl/error';
-import { container as tsyringeContainer } from '@zacatl/third-party/tsyringe';
-import type { InjectionToken } from '@zacatl/third-party/tsyringe';
+import { container as tsyringeContainer } from '@zacatl/third-party/dependency-injection/tsyringe';
+import type { InjectionToken } from '@zacatl/third-party/dependency-injection/tsyringe';
 
 import type { Constructor } from '../service/layers/types';
 

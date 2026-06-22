@@ -133,7 +133,7 @@ describe('MongooseAdapter', () => {
     });
   });
 
-  describe('initialize', () => {
+  describe('constructor bootstrap', () => {
     it('calls createCollection, createIndexes, and init on the model', async () => {
       const adapter = new MongooseAdapter<TestInput, TestInput, TestOutput>({
         type: ORMType.Mongoose,
@@ -141,8 +141,9 @@ describe('MongooseAdapter', () => {
         schema: mockSchema as never,
       });
 
-      await adapter.initialize();
+      await new Promise((resolve) => setImmediate(resolve));
 
+      expect(adapter.model).toBe(mockModel);
       expect(mockModel.createCollection).toHaveBeenCalled();
       expect(mockModel.createIndexes).toHaveBeenCalled();
       expect(mockModel.init).toHaveBeenCalled();

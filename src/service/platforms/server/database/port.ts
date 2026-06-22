@@ -38,6 +38,6 @@ export interface DatabaseConfig {
  * Abstracts database implementations (Mongoose, Sequelize)
  */
 export interface DatabaseServerPort {
-  connect(service: { name: string }, config: DatabaseConfig): Promise<void>;
+  connect(serviceName: string, config: DatabaseConfig): Promise<void>;
   disconnect?(): Promise<void>;
 }

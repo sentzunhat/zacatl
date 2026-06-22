@@ -1,5 +1,5 @@
-import { type QueryFilter, type Mongoose } from '@sentzunhat/zacatl/third-party/databases/mongoose';
-import type { InjectionToken } from '@sentzunhat/zacatl/third-party/dependency-injection/tsyringe';
+import { type QueryFilter, type Mongoose } from '@zacatl/third-party/databases/mongoose';
+import type { InjectionToken } from '@zacatl/third-party/dependency-injection/tsyringe';
 
 import { getContainer, resolveDependency } from '../../../../../dependency-injection';
 import { InternalServerError } from '../../../../../error';
@@ -66,9 +66,8 @@ export class MongooseAdapter<D, I extends object, O extends object>
     }
 
     // mongoose.model() is synchronous — registers the model with Mongoose's registry.
-    // Async bootstrapping (createCollection, createIndexes, init) is handled via
-    // initialize(), which can be called explicitly by DatabaseServer.configure()
-    // for fail-fast startup validation.
+    // Async bootstrapping (createCollection, createIndexes, init) is handled
+    // internally during construction.
     return resolved.model<D>(name, schema);
   }
 

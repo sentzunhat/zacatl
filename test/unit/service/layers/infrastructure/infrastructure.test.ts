@@ -1,4 +1,4 @@
-import { container } from '@zacatl/third-party/tsyringe';
+import { container } from '@zacatl/third-party/dependency-injection/tsyringe';
 
 import type { ConfigInfrastructure } from '../../../../../src/service/layers/infrastructure';
 import { Infrastructure } from '../../../../../src/service/layers/infrastructure';

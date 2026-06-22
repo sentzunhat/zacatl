@@ -1,8 +1,8 @@
+import type { QueryFilter } from '@zacatl/third-party/databases/mongoose';
+
 import type { MongooseRepositoryConfig, MongooseRepositoryModel } from './types';
 import { createMongooseAdapter } from '../../orm';
 import type { RepositoryPort, ORMPort } from '../types';
-
-import type { QueryFilter } from '#/third-party/databases/mongoose.js';
 
 /**
  * Standalone Mongoose Repository - delegates to MongooseAdapter

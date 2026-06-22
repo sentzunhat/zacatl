@@ -1,7 +1,7 @@
 {
   "name": "@sentzunhat/zacatl",
   "type": "module",
-  "version": "0.0.56",
+  "version": "0.0.57",
   "packageManager": "npm@11.17.0",
   "repository": {
     "type": "git",

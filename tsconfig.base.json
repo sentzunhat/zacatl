@@ -2,11 +2,15 @@
   "compilerOptions": {
     "incremental": false,
     "target": "ESNext",
-    "lib": ["ESNext"],
+    "lib": [
+      "ESNext"
+    ],
     "module": "ESNext",
     "moduleResolution": "bundler",
     "rootDir": "./src",
-    "types": ["node"],
+    "types": [
+      "node"
+    ],
     "resolveJsonModule": true,
     "allowImportingTsExtensions": false,
     "experimentalDecorators": true,
@@ -50,31 +54,534 @@
     "allowUnreachableCode": false,
     "skipLibCheck": true,
     "paths": {
-      "@zacatl": ["./src/index.ts"],
-      "@zacatl/service": ["./src/service/index.ts"],
-      "@zacatl/third-party/fastify": ["./src/third-party/fastify.ts"],
-      "@zacatl/configuration": ["./src/configuration/index.ts"],
-      "@zacatl/dependency-injection": ["./src/dependency-injection/index.ts"],
-      "@zacatl/error": ["./src/error/index.ts"],
-      "@zacatl/localization": ["./src/localization/index.ts"],
-      "@zacatl/logs": ["./src/logs/index.ts"],
-      "@zacatl/utils": ["./src/utils/index.ts"],
-      "@zacatl/third-party": ["./src/third-party/index.ts"],
-      "@zacatl/third-party/uuid": ["./src/third-party/uuid.ts"],
-      "@zacatl/third-party/i18n": ["./src/third-party/i18n.ts"],
-      "@zacatl/third-party/tsyringe": ["./src/third-party/tsyringe.ts"],
-      "@zacatl/third-party/pino": ["./src/third-party/pino.ts"],
-      "@zacatl/third-party/js-yaml": ["./src/third-party/js-yaml.ts"],
-      "@zacatl/third-party/zod": ["./src/third-party/zod.ts"],
-      "@zacatl/third-party/mongoose": ["./src/third-party/mongoose.ts"],
-      "@zacatl/third-party/sequelize": ["./src/third-party/sequelize.ts"],
-      "@zacatl/third-party/reflect-metadata": ["./src/third-party/reflect-metadata.ts"],
-      "@zacatl/third-party/eslint": ["./src/third-party/eslint.ts"],
-      "@zacatl/optionals": ["./src/utils/optionals.ts"],
-      "@zacatl/infrastructure": ["./src/service/layers/infrastructure/index.ts"],
-      "@zacatl/domain": ["./src/service/layers/domain/index.ts"],
-      "@zacatl/application": ["./src/service/layers/application/index.ts"],
-      "@zacatl/platform": ["./src/service/platforms/index.ts"]
+      "@zacatl/configuration": [
+        "./src/configuration/index.ts"
+      ],
+      "@zacatl/configuration/json": [
+        "./src/configuration/json.ts"
+      ],
+      "@zacatl/configuration/yml": [
+        "./src/configuration/yml.ts"
+      ],
+      "@zacatl/dependency-injection": [
+        "./src/dependency-injection/index.ts"
+      ],
+      "@zacatl/dependency-injection/container": [
+        "./src/dependency-injection/container.ts"
+      ],
+      "@zacatl/error": [
+        "./src/error/index.ts"
+      ],
+      "@zacatl/error/bad-request": [
+        "./src/error/bad-request.ts"
+      ],
+      "@zacatl/error/bad-resource": [
+        "./src/error/bad-resource.ts"
+      ],
+      "@zacatl/error/custom": [
+        "./src/error/custom.ts"
+      ],
+      "@zacatl/error/forbidden": [
+        "./src/error/forbidden.ts"
+      ],
+      "@zacatl/error/internal-server": [
+        "./src/error/internal-server.ts"
+      ],
+      "@zacatl/error/not-found": [
+        "./src/error/not-found.ts"
+      ],
+      "@zacatl/error/unauthorized": [
+        "./src/error/unauthorized.ts"
+      ],
+      "@zacatl/error/validation": [
+        "./src/error/validation.ts"
+      ],
+      "@zacatl/localization": [
+        "./src/localization/index.ts"
+      ],
+      "@zacatl/localization/i18n-node": [
+        "./src/localization/i18n-node.ts"
+      ],
+      "@zacatl/localization/node/core": [
+        "./src/localization/node/core.ts"
+      ],
+      "@zacatl/localization/node/helpers": [
+        "./src/localization/node/helpers.ts"
+      ],
+      "@zacatl/localization/node/types": [
+        "./src/localization/node/types.ts"
+      ],
+      "@zacatl/logs": [
+        "./src/logs/index.ts"
+      ],
+      "@zacatl/logs/console": [
+        "./src/logs/console/index.ts"
+      ],
+      "@zacatl/logs/console/adapter": [
+        "./src/logs/console/adapter.ts"
+      ],
+      "@zacatl/logs/console/config": [
+        "./src/logs/console/config.ts"
+      ],
+      "@zacatl/logs/console/default": [
+        "./src/logs/console/default.ts"
+      ],
+      "@zacatl/logs/console/types": [
+        "./src/logs/console/types.ts"
+      ],
+      "@zacatl/logs/pino": [
+        "./src/logs/pino/index.ts"
+      ],
+      "@zacatl/logs/pino/adapter": [
+        "./src/logs/pino/adapter.ts"
+      ],
+      "@zacatl/logs/pino/config": [
+        "./src/logs/pino/config.ts"
+      ],
+      "@zacatl/logs/pino/default": [
+        "./src/logs/pino/default.ts"
+      ],
+      "@zacatl/logs/pino/types": [
+        "./src/logs/pino/types.ts"
+      ],
+      "@zacatl/logs/types": [
+        "./src/logs/types.ts"
+      ],
+      "@zacatl/service": [
+        "./src/service/index.ts"
+      ],
+      "@zacatl/service/layers": [
+        "./src/service/layers/index.ts"
+      ],
+      "@zacatl/service/layers/application": [
+        "./src/service/layers/application/index.ts"
+      ],
+      "@zacatl/service/layers/application/application": [
+        "./src/service/layers/application/application.ts"
+      ],
+      "@zacatl/service/layers/application/entry-points": [
+        "./src/service/layers/application/entry-points/index.ts"
+      ],
+      "@zacatl/service/layers/application/entry-points/rest": [
+        "./src/service/layers/application/entry-points/rest/index.ts"
+      ],
+      "@zacatl/service/layers/application/entry-points/rest/common": [
+        "./src/service/layers/application/entry-points/rest/common/index.ts"
+      ],
+      "@zacatl/service/layers/application/entry-points/rest/common/handler": [
+        "./src/service/layers/application/entry-points/rest/common/handler.ts"
+      ],
+      "@zacatl/service/layers/application/entry-points/rest/common/http-methods": [
+        "./src/service/layers/application/entry-points/rest/common/http-methods.ts"
+      ],
+      "@zacatl/service/layers/application/entry-points/rest/common/request": [
+        "./src/service/layers/application/entry-points/rest/common/request.ts"
+      ],
+      "@zacatl/service/layers/application/entry-points/rest/common/schema": [
+        "./src/service/layers/application/entry-points/rest/common/schema.ts"
+      ],
+      "@zacatl/service/layers/application/entry-points/rest/express": [
+        "./src/service/layers/application/entry-points/rest/express/index.ts"
+      ],
+      "@zacatl/service/layers/application/entry-points/rest/express/handlers": [
+        "./src/service/layers/application/entry-points/rest/express/handlers/index.ts"
+      ],
+      "@zacatl/service/layers/application/entry-points/rest/express/handlers/abstract": [
+        "./src/service/layers/application/entry-points/rest/express/handlers/abstract.ts"
+      ],
+      "@zacatl/service/layers/application/entry-points/rest/express/handlers/delete-route-handler": [
+        "./src/service/layers/application/entry-points/rest/express/handlers/delete-route-handler.ts"
+      ],
+      "@zacatl/service/layers/application/entry-points/rest/express/handlers/get-route-handler": [
+        "./src/service/layers/application/entry-points/rest/express/handlers/get-route-handler.ts"
+      ],
+      "@zacatl/service/layers/application/entry-points/rest/express/handlers/patch-route-handler": [
+        "./src/service/layers/application/entry-points/rest/express/handlers/patch-route-handler.ts"
+      ],
+      "@zacatl/service/layers/application/entry-points/rest/express/handlers/post-route-handler": [
+        "./src/service/layers/application/entry-points/rest/express/handlers/post-route-handler.ts"
+      ],
+      "@zacatl/service/layers/application/entry-points/rest/express/handlers/put-route-handler": [
+        "./src/service/layers/application/entry-points/rest/express/handlers/put-route-handler.ts"
+      ],
+      "@zacatl/service/layers/application/entry-points/rest/fastify": [
+        "./src/service/layers/application/entry-points/rest/fastify/index.ts"
+      ],
+      "@zacatl/service/layers/application/entry-points/rest/fastify/handlers": [
+        "./src/service/layers/application/entry-points/rest/fastify/handlers/index.ts"
+      ],
+      "@zacatl/service/layers/application/entry-points/rest/fastify/handlers/abstract": [
+        "./src/service/layers/application/entry-points/rest/fastify/handlers/abstract.ts"
+      ],
+      "@zacatl/service/layers/application/entry-points/rest/fastify/handlers/delete-route-handler": [
+        "./src/service/layers/application/entry-points/rest/fastify/handlers/delete-route-handler.ts"
+      ],
+      "@zacatl/service/layers/application/entry-points/rest/fastify/handlers/generics": [
+        "./src/service/layers/application/entry-points/rest/fastify/handlers/generics.ts"
+      ],
+      "@zacatl/service/layers/application/entry-points/rest/fastify/handlers/get-route-handler": [
+        "./src/service/layers/application/entry-points/rest/fastify/handlers/get-route-handler.ts"
+      ],
+      "@zacatl/service/layers/application/entry-points/rest/fastify/handlers/patch-route-handler": [
+        "./src/service/layers/application/entry-points/rest/fastify/handlers/patch-route-handler.ts"
+      ],
+      "@zacatl/service/layers/application/entry-points/rest/fastify/handlers/post-route-handler": [
+        "./src/service/layers/application/entry-points/rest/fastify/handlers/post-route-handler.ts"
+      ],
+      "@zacatl/service/layers/application/entry-points/rest/fastify/handlers/put-route-handler": [
+        "./src/service/layers/application/entry-points/rest/fastify/handlers/put-route-handler.ts"
+      ],
+      "@zacatl/service/layers/application/entry-points/rest/fastify/handlers/route-handler": [
+        "./src/service/layers/application/entry-points/rest/fastify/handlers/route-handler.ts"
+      ],
+      "@zacatl/service/layers/application/entry-points/rest/hook-handlers": [
+        "./src/service/layers/application/entry-points/rest/hook-handlers/index.ts"
+      ],
+      "@zacatl/service/layers/application/entry-points/rest/hook-handlers/hook-handler": [
+        "./src/service/layers/application/entry-points/rest/hook-handlers/hook-handler.ts"
+      ],
+      "@zacatl/service/layers/application/types": [
+        "./src/service/layers/application/types/index.ts"
+      ],
+      "@zacatl/service/layers/domain": [
+        "./src/service/layers/domain/index.ts"
+      ],
+      "@zacatl/service/layers/domain/domain": [
+        "./src/service/layers/domain/domain.ts"
+      ],
+      "@zacatl/service/layers/domain/ports": [
+        "./src/service/layers/domain/ports/index.ts"
+      ],
+      "@zacatl/service/layers/domain/ports/domain": [
+        "./src/service/layers/domain/ports/domain.ts"
+      ],
+      "@zacatl/service/layers/domain/ports/provider": [
+        "./src/service/layers/domain/ports/provider.ts"
+      ],
+      "@zacatl/service/layers/domain/ports/service": [
+        "./src/service/layers/domain/ports/service.ts"
+      ],
+      "@zacatl/service/layers/domain/types": [
+        "./src/service/layers/domain/types/index.ts"
+      ],
+      "@zacatl/service/layers/infrastructure": [
+        "./src/service/layers/infrastructure/index.ts"
+      ],
+      "@zacatl/service/layers/infrastructure/infrastructure": [
+        "./src/service/layers/infrastructure/infrastructure.ts"
+      ],
+      "@zacatl/service/layers/infrastructure/orm": [
+        "./src/service/layers/infrastructure/orm/index.ts"
+      ],
+      "@zacatl/service/layers/infrastructure/orm/mongoose": [
+        "./src/service/layers/infrastructure/orm/mongoose/index.ts"
+      ],
+      "@zacatl/service/layers/infrastructure/orm/mongoose/adapter": [
+        "./src/service/layers/infrastructure/orm/mongoose/adapter.ts"
+      ],
+      "@zacatl/service/layers/infrastructure/orm/mongoose/adapter-loader": [
+        "./src/service/layers/infrastructure/orm/mongoose/adapter-loader.ts"
+      ],
+      "@zacatl/service/layers/infrastructure/orm/mongoose/types": [
+        "./src/service/layers/infrastructure/orm/mongoose/types.ts"
+      ],
+      "@zacatl/service/layers/infrastructure/orm/nodesqlite": [
+        "./src/service/layers/infrastructure/orm/nodesqlite/index.ts"
+      ],
+      "@zacatl/service/layers/infrastructure/orm/nodesqlite/adapter": [
+        "./src/service/layers/infrastructure/orm/nodesqlite/adapter.ts"
+      ],
+      "@zacatl/service/layers/infrastructure/orm/nodesqlite/adapter-loader": [
+        "./src/service/layers/infrastructure/orm/nodesqlite/adapter-loader.ts"
+      ],
+      "@zacatl/service/layers/infrastructure/orm/nodesqlite/types": [
+        "./src/service/layers/infrastructure/orm/nodesqlite/types.ts"
+      ],
+      "@zacatl/service/layers/infrastructure/orm/sequelize": [
+        "./src/service/layers/infrastructure/orm/sequelize/index.ts"
+      ],
+      "@zacatl/service/layers/infrastructure/orm/sequelize/adapter": [
+        "./src/service/layers/infrastructure/orm/sequelize/adapter.ts"
+      ],
+      "@zacatl/service/layers/infrastructure/orm/sequelize/adapter-loader": [
+        "./src/service/layers/infrastructure/orm/sequelize/adapter-loader.ts"
+      ],
+      "@zacatl/service/layers/infrastructure/orm/sequelize/types": [
+        "./src/service/layers/infrastructure/orm/sequelize/types.ts"
+      ],
+      "@zacatl/service/layers/infrastructure/orm/tokens": [
+        "./src/service/layers/infrastructure/orm/tokens/index.ts"
+      ],
+      "@zacatl/service/layers/infrastructure/orm/tokens/mongoose": [
+        "./src/service/layers/infrastructure/orm/tokens/mongoose.ts"
+      ],
+      "@zacatl/service/layers/infrastructure/orm/tokens/nodesqlite": [
+        "./src/service/layers/infrastructure/orm/tokens/nodesqlite.ts"
+      ],
+      "@zacatl/service/layers/infrastructure/orm/tokens/sequelize": [
+        "./src/service/layers/infrastructure/orm/tokens/sequelize.ts"
+      ],
+      "@zacatl/service/layers/infrastructure/orm/types": [
+        "./src/service/layers/infrastructure/orm/types.ts"
+      ],
+      "@zacatl/service/layers/infrastructure/repositories": [
+        "./src/service/layers/infrastructure/repositories/index.ts"
+      ],
+      "@zacatl/service/layers/infrastructure/repositories/abstract": [
+        "./src/service/layers/infrastructure/repositories/abstract.ts"
+      ],
+      "@zacatl/service/layers/infrastructure/repositories/mongoose": [
+        "./src/service/layers/infrastructure/repositories/mongoose/index.ts"
+      ],
+      "@zacatl/service/layers/infrastructure/repositories/mongoose/repository": [
+        "./src/service/layers/infrastructure/repositories/mongoose/repository.ts"
+      ],
+      "@zacatl/service/layers/infrastructure/repositories/mongoose/types": [
+        "./src/service/layers/infrastructure/repositories/mongoose/types.ts"
+      ],
+      "@zacatl/service/layers/infrastructure/repositories/nodesqlite": [
+        "./src/service/layers/infrastructure/repositories/nodesqlite/index.ts"
+      ],
+      "@zacatl/service/layers/infrastructure/repositories/nodesqlite/repository": [
+        "./src/service/layers/infrastructure/repositories/nodesqlite/repository.ts"
+      ],
+      "@zacatl/service/layers/infrastructure/repositories/nodesqlite/types": [
+        "./src/service/layers/infrastructure/repositories/nodesqlite/types.ts"
+      ],
+      "@zacatl/service/layers/infrastructure/repositories/sequelize": [
+        "./src/service/layers/infrastructure/repositories/sequelize/index.ts"
+      ],
+      "@zacatl/service/layers/infrastructure/repositories/sequelize/repository": [
+        "./src/service/layers/infrastructure/repositories/sequelize/repository.ts"
+      ],
+      "@zacatl/service/layers/infrastructure/repositories/sequelize/types": [
+        "./src/service/layers/infrastructure/repositories/sequelize/types.ts"
+      ],
+      "@zacatl/service/layers/infrastructure/repositories/types": [
+        "./src/service/layers/infrastructure/repositories/types.ts"
+      ],
+      "@zacatl/service/layers/infrastructure/types": [
+        "./src/service/layers/infrastructure/types/index.ts"
+      ],
+      "@zacatl/service/layers/layers": [
+        "./src/service/layers/layers.ts"
+      ],
+      "@zacatl/service/layers/types": [
+        "./src/service/layers/types/index.ts"
+      ],
+      "@zacatl/service/platforms": [
+        "./src/service/platforms/index.ts"
+      ],
+      "@zacatl/service/platforms/cli": [
+        "./src/service/platforms/cli/index.ts"
+      ],
+      "@zacatl/service/platforms/cli/cli": [
+        "./src/service/platforms/cli/cli.ts"
+      ],
+      "@zacatl/service/platforms/cli/types": [
+        "./src/service/platforms/cli/types.ts"
+      ],
+      "@zacatl/service/platforms/context": [
+        "./src/service/platforms/context/index.ts"
+      ],
+      "@zacatl/service/platforms/context/request-context": [
+        "./src/service/platforms/context/request-context.ts"
+      ],
+      "@zacatl/service/platforms/desktop": [
+        "./src/service/platforms/desktop/index.ts"
+      ],
+      "@zacatl/service/platforms/desktop/desktop": [
+        "./src/service/platforms/desktop/desktop.ts"
+      ],
+      "@zacatl/service/platforms/desktop/types": [
+        "./src/service/platforms/desktop/types.ts"
+      ],
+      "@zacatl/service/platforms/platforms": [
+        "./src/service/platforms/platforms.ts"
+      ],
+      "@zacatl/service/platforms/server": [
+        "./src/service/platforms/server/index.ts"
+      ],
+      "@zacatl/service/platforms/server/api": [
+        "./src/service/platforms/server/api/index.ts"
+      ],
+      "@zacatl/service/platforms/server/api/adapters": [
+        "./src/service/platforms/server/api/adapters.ts"
+      ],
+      "@zacatl/service/platforms/server/api/adapters/express": [
+        "./src/service/platforms/server/api/adapters/express.ts"
+      ],
+      "@zacatl/service/platforms/server/api/adapters/fastify": [
+        "./src/service/platforms/server/api/adapters/fastify.ts"
+      ],
+      "@zacatl/service/platforms/server/api/api-server": [
+        "./src/service/platforms/server/api/api-server.ts"
+      ],
+      "@zacatl/service/platforms/server/api/express-adapter": [
+        "./src/service/platforms/server/api/express-adapter.ts"
+      ],
+      "@zacatl/service/platforms/server/api/fastify-adapter": [
+        "./src/service/platforms/server/api/fastify-adapter.ts"
+      ],
+      "@zacatl/service/platforms/server/api/port": [
+        "./src/service/platforms/server/api/port.ts"
+      ],
+      "@zacatl/service/platforms/server/api/schema-helper": [
+        "./src/service/platforms/server/api/schema-helper.ts"
+      ],
+      "@zacatl/service/platforms/server/database": [
+        "./src/service/platforms/server/database/index.ts"
+      ],
+      "@zacatl/service/platforms/server/database/adapters": [
+        "./src/service/platforms/server/database/adapters/index.ts"
+      ],
+      "@zacatl/service/platforms/server/database/adapters/mongoose": [
+        "./src/service/platforms/server/database/adapters/mongoose.ts"
+      ],
+      "@zacatl/service/platforms/server/database/adapters/sequelize": [
+        "./src/service/platforms/server/database/adapters/sequelize.ts"
+      ],
+      "@zacatl/service/platforms/server/database/adapters/sqlite": [
+        "./src/service/platforms/server/database/adapters/sqlite.ts"
+      ],
+      "@zacatl/service/platforms/server/database/database-server": [
+        "./src/service/platforms/server/database/database-server.ts"
+      ],
+      "@zacatl/service/platforms/server/database/orm-instance": [
+        "./src/service/platforms/server/database/orm-instance.ts"
+      ],
+      "@zacatl/service/platforms/server/database/port": [
+        "./src/service/platforms/server/database/port.ts"
+      ],
+      "@zacatl/service/platforms/server/page": [
+        "./src/service/platforms/server/page/index.ts"
+      ],
+      "@zacatl/service/platforms/server/page/adapters": [
+        "./src/service/platforms/server/page/adapters.ts"
+      ],
+      "@zacatl/service/platforms/server/page/adapters/express": [
+        "./src/service/platforms/server/page/adapters/express.ts"
+      ],
+      "@zacatl/service/platforms/server/page/adapters/fastify": [
+        "./src/service/platforms/server/page/adapters/fastify.ts"
+      ],
+      "@zacatl/service/platforms/server/page/express-page-adapter": [
+        "./src/service/platforms/server/page/express-page-adapter.ts"
+      ],
+      "@zacatl/service/platforms/server/page/fastify-page-adapter": [
+        "./src/service/platforms/server/page/fastify-page-adapter.ts"
+      ],
+      "@zacatl/service/platforms/server/page/page-server": [
+        "./src/service/platforms/server/page/page-server.ts"
+      ],
+      "@zacatl/service/platforms/server/page/port": [
+        "./src/service/platforms/server/page/port.ts"
+      ],
+      "@zacatl/service/platforms/server/server": [
+        "./src/service/platforms/server/server.ts"
+      ],
+      "@zacatl/service/platforms/server/types": [
+        "./src/service/platforms/server/types/index.ts"
+      ],
+      "@zacatl/service/platforms/server/types/server-config": [
+        "./src/service/platforms/server/types/server-config.ts"
+      ],
+      "@zacatl/service/platforms/types": [
+        "./src/service/platforms/types/index.ts"
+      ],
+      "@zacatl/service/service": [
+        "./src/service/service.ts"
+      ],
+      "@zacatl/service/types": [
+        "./src/service/types/index.ts"
+      ],
+      "@zacatl/third-party": [
+        "./src/third-party/index.ts"
+      ],
+      "@zacatl/third-party/databases/mongoose": [
+        "./src/third-party/databases/mongoose.ts"
+      ],
+      "@zacatl/third-party/databases/nodesqlite": [
+        "./src/third-party/databases/nodesqlite.ts"
+      ],
+      "@zacatl/third-party/databases/sequelize": [
+        "./src/third-party/databases/sequelize.ts"
+      ],
+      "@zacatl/third-party/databases/sqlite3": [
+        "./src/third-party/databases/sqlite3.ts"
+      ],
+      "@zacatl/third-party/dependency-injection/reflect-metadata": [
+        "./src/third-party/dependency-injection/reflect-metadata.ts"
+      ],
+      "@zacatl/third-party/dependency-injection/tsyringe": [
+        "./src/third-party/dependency-injection/tsyringe.ts"
+      ],
+      "@zacatl/third-party/eslint": [
+        "./src/third-party/eslint.ts"
+      ],
+      "@zacatl/third-party/express": [
+        "./src/third-party/express.ts"
+      ],
+      "@zacatl/third-party/fastify": [
+        "./src/third-party/fastify.ts"
+      ],
+      "@zacatl/third-party/http-proxy-middleware": [
+        "./src/third-party/http-proxy-middleware.ts"
+      ],
+      "@zacatl/third-party/i18n": [
+        "./src/third-party/i18n.ts"
+      ],
+      "@zacatl/third-party/js-yaml": [
+        "./src/third-party/js-yaml.ts"
+      ],
+      "@zacatl/third-party/pino": [
+        "./src/third-party/pino.ts"
+      ],
+      "@zacatl/third-party/uuid": [
+        "./src/third-party/uuid.ts"
+      ],
+      "@zacatl/third-party/zod": [
+        "./src/third-party/zod.ts"
+      ],
+      "@zacatl/utils": [
+        "./src/utils/index.ts"
+      ],
+      "@zacatl/utils/command-runner": [
+        "./src/utils/command-runner/index.ts"
+      ],
+      "@zacatl/utils/command-runner/execute-commands": [
+        "./src/utils/command-runner/execute-commands.ts"
+      ],
+      "@zacatl/utils/command-runner/policy": [
+        "./src/utils/command-runner/policy.ts"
+      ],
+      "@zacatl/utils/command-runner/runner": [
+        "./src/utils/command-runner/runner.ts"
+      ],
+      "@zacatl/utils/command-runner/types": [
+        "./src/utils/command-runner/types.ts"
+      ],
+      "@zacatl/utils/encode-decode": [
+        "./src/utils/encode-decode.ts"
+      ],
+      "@zacatl/utils/error-guards": [
+        "./src/utils/error-guards.ts"
+      ],
+      "@zacatl/utils/hmac": [
+        "./src/utils/hmac.ts"
+      ],
+      "@zacatl/utils/measure-execution-time": [
+        "./src/utils/measure-execution-time.ts"
+      ],
+      "@zacatl/utils/optionals": [
+        "./src/utils/optionals.ts"
+      ],
+      "@zacatl/third-party/mongoose": [
+        "./src/third-party/databases/mongoose.ts"
+      ],
+      "@zacatl/third-party/sequelize": [
+        "./src/third-party/databases/sequelize.ts"
+      ]
     }
   }
 }

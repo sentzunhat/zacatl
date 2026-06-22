@@ -1,13 +1,13 @@
 import { describe, it, expect, vi, beforeAll } from 'vitest';
 
-import { Schema } from '@zacatl/third-party/mongoose';
-import { singleton } from '@zacatl/third-party/tsyringe';
+import { Schema } from '@zacatl/third-party/databases/mongoose';
+import type { MongooseModel } from '@zacatl/third-party/databases/mongoose';
+import { singleton } from '@zacatl/third-party/dependency-injection/tsyringe';
 
 import {
   MongooseRepository,
   ORMType,
 } from '../../../../../../src/service/layers/infrastructure/repositories/mongoose';
-import type { MongooseModel } from '../../../../../../src/third-party/mongoose';
 import { connectToMongoServerAndRegisterDependency } from '../../../../helpers/database/mongo';
 
 interface UserTestDb {

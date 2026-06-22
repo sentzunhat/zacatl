@@ -1,7 +1,7 @@
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 
-import { mongoose, Schema } from '@zacatl/third-party/mongoose';
+import { mongoose, Schema } from '@zacatl/third-party/databases/mongoose';
 
 describe('MongooseRepository (mongodb-memory-server)', () => {
   let mongoServer: MongoMemoryServer;

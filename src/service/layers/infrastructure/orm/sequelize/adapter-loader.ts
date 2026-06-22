@@ -1,4 +1,4 @@
-import type { WhereOptions } from '@zacatl/third-party/sequelize';
+import type { WhereOptions } from '@zacatl/third-party/databases/sequelize';
 
 import { SequelizeAdapter } from './adapter';
 import type {

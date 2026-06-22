@@ -2,7 +2,7 @@
 
 ---
 
-## [Unreleased]
+## [0.0.57] - 2026-06-21
 
 **Status**: Pending release
 

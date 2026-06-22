@@ -1,4 +1,4 @@
-import type { InjectionToken } from '@zacatl/third-party/tsyringe';
+import type { InjectionToken } from '@zacatl/third-party/dependency-injection/tsyringe';
 
 import { resolveDependency } from '../../../../../dependency-injection';
 import { InternalServerError } from '../../../../../error';

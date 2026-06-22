@@ -16,8 +16,8 @@ vi.mock('sequelize', () => {
   return { ['Model']: Model };
 });
 
-import { SequelizeModel as Model } from '@zacatl/third-party/sequelize';
-import { container } from '@zacatl/third-party/tsyringe';
+import { SequelizeModel as Model } from '@zacatl/third-party/databases/sequelize';
+import { container } from '@zacatl/third-party/dependency-injection/tsyringe';
 
 import { clearContainer } from '../../../../../../../src/dependency-injection';
 import { SequelizeAdapter } from '../../../../../../../src/service/layers/infrastructure/orm/sequelize/adapter';
@@ -95,12 +95,8 @@ describe('SequelizeAdapter', () => {
     });
   });
 
-  describe('initialize', () => {
-    it('resolves without error (no-op hook)', async () => {
-      await expect(adapter.initialize()).resolves.toBeUndefined();
-    });
-
-    it('constructor fires initialize without blocking construction', () => {
+  describe('constructor bootstrap', () => {
+    it('constructor returns immediately with the resolved model available', () => {
       const startTime = Date.now();
       const localAdapter = new SequelizeAdapter(mockConfig);
       const elapsed = Date.now() - startTime;
