@@ -23,7 +23,7 @@ For fast onboarding context (What / How / Why + API/Security/Performance), see
 ### Language & Tools
 
 - **Language**: TypeScript (strict mode)
-- **Runtime**: Node.js 24.14.0 LTS+
+- **Runtime**: Node.js 26.3.0+
 - **Package Manager**: npm 11.0.0+
 - **Build**: TypeScript compiler (tsc) + path alias resolution (tsc-alias) + ESM fixing (fix-esm.ts)
 - **Testing**: Vitest

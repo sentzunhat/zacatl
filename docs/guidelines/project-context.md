@@ -5,7 +5,7 @@ Comprehensive reference for the zacatl repository structure, conventions, tech s
 ## stack
 
 - Languages: TypeScript (ESM), JavaScript/MJS (tooling), Markdown, YAML, JSON.
-- Runtime/build: Node.js 24.14.0 LTS+, npm, TypeScript compiler, tsc-alias, fix-esm.ts.
+- Runtime/build: Node.js 26.3.0+, npm, TypeScript 6, tsc-alias, fix-esm.ts.
 - Frameworks/libs: Fastify + Express adapters, tsyringe (DI), Zod, Sequelize, Mongoose, Pino, i18n, UUID, js-yaml.
 - Testing/linting: Vitest, ESLint (flat config).
 - Architecture: layered/hexagonal with ports/adapters, DI container, repositories, REST handlers.

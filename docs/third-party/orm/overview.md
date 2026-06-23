@@ -20,7 +20,7 @@ graph TD
 
 - Mongoose (MongoDB)
 - Sequelize (PostgreSQL, MySQL, SQLite via `sequelize` package)
-- Node.js SQLite (`node:sqlite` module — Node 24+ only, no external package required)
+- Node.js SQLite (`node:sqlite` module — Node 26+ only, no external package required)
 
 ## Mongoose Example
 

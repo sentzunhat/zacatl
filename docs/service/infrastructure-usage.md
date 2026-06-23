@@ -138,7 +138,7 @@ export class UserRepository extends BaseRepository<UserDb, UserInput, UserOutput
 }
 ```
 
-#### Option B: Using Native SQLite (Node 24 — No External Package)
+#### Option B: Using Native SQLite (Node 26 — No External Package)
 
 Uses the built-in `node:sqlite` module. No external package needed.
 
@@ -309,7 +309,7 @@ const service = new Service({
 | ----------------- | -------------------------------- | --------- |
 | MongooseAdapter   | MongoDB                          | ✅ Ready  |
 | SequelizeAdapter  | PostgreSQL, MySQL, SQLite, MSSQL | ✅ Ready  |
-| NodeSqliteAdapter | SQLite (`node:sqlite`, Node 24+) | ✅ Ready  |
+| NodeSqliteAdapter | SQLite (`node:sqlite`, Node 26+) | ✅ Ready  |
 | PrismaAdapter     | Multi-database                   | 🔜 Future |
 | TypeORMAdapter    | Multi-database                   | 🔜 Future |
 

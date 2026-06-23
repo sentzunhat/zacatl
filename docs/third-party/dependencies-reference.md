@@ -2,12 +2,12 @@
 
 ## Runtime Support
 
-Zacatl standardizes on **Node.js 24.14.0 LTS+** with **npm**:
+Zacatl standardizes on **Node.js 26.3.0+** with **npm**:
 
-- **Node.js 24.14.0+** (minimum): Required for stable `node:sqlite`, improved `AsyncLocalStorage`, and native subpath imports
+- **Node.js 26.3.0+** (minimum): Required for the current branch baseline and publish/tooling flow
 - **npm 11+**: Deterministic installs using `package-lock.json`
 
-> Upgrade: `nvm install 24.14.0 && nvm use 24.14.0`
+> Upgrade: `nvm install 26.3.0 && nvm use 26.3.0`
 
 ## What's Available After Install
 
@@ -80,7 +80,7 @@ npm install sqlite3           # SQLite via Sequelize ORM
 npm install tedious           # MSSQL
 ```
 
-### For Native SQLite (Node 24 Built-in — No Install Needed)
+### For Native SQLite (Node 26 Built-in — No Install Needed)
 
 Use `DatabaseVendor.SQLITE` — no external package required. Powered by the built-in `node:sqlite` module:
 
@@ -328,7 +328,7 @@ import { Service, singleton, resolveDependency } from '@sentzunhat/zacatl';
 | Tool         | Version      |
 | ------------ | ------------ |
 | `typescript` | ^5.9.3       |
-| `node`       | 24.14.0 LTS+ |
+| `node`       | 26.3.0+ |
 | `npm`        | 11.0.0+      |
 
 ---
@@ -336,7 +336,7 @@ import { Service, singleton, resolveDependency } from '@sentzunhat/zacatl';
 ## Version Info
 
 - **Zacatl:** see `package.json`
-- **Node.js:** 24.14.0 LTS+
+- **Node.js:** 26.3.0+
 - **TypeScript:** 5.9.3+ (recommended)
 
 ---

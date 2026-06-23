@@ -41,7 +41,7 @@ try {
   // noop
 }
 
-// Node 24 changed diagnostics_channel API; libraries like fastify/pino call
+// Node 26 changed diagnostics_channel API; libraries like fastify/pino call
 // `tracingChannel` which may not exist or may be non-callable in some
 // environments. Provide a robust fallback for both ESM and CommonJS views
 // so tests don't crash when libraries call `diagnostics.tracingChannel()`.

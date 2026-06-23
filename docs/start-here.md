@@ -4,7 +4,7 @@ A minimal guide for working on this repository.
 
 ## 1) Prerequisites
 
-- Node.js 24.14.0+
+- Node.js 26.3.0+
 - npm 11+
 
 Optional (recommended): use `nvm` with the Node version from `.nvmrc`.

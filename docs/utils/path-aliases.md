@@ -105,7 +105,7 @@ import { logger } from '@zacatl/logs';
 
 ## Native Subpath Imports (`#/*`)
 
-Node 24 native subpath imports are configured in `package.json` alongside the TypeScript path aliases:
+Node 26 native subpath imports are configured in `package.json` alongside the TypeScript path aliases:
 
 ```json
 {
@@ -122,7 +122,7 @@ import { UserService } from '#/application/user.service';
 import { requestContext } from '#/service/platforms/context';
 ```
 
-> **Note:** `#/*` imports require Node 24.14.0+ and are for internal module use within the repository. They are not exported in the published package.
+> **Note:** `#/*` imports require Node 26.3.0+ and are for internal module use within the repository. They are not exported in the published package.
 
 ## Usage in Your Project
 

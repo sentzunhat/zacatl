@@ -122,7 +122,7 @@
 
 ### ✨ Features
 
-- **Built-in SQLite ORM adapter** — Added Node.js built-in sqlite module adapter (Node 24+) with dynamic module loading. Eliminates experimental warnings through lazy-loading pattern, provides zero external dependencies, and offers type-safe repository operations. Matches feature parity with Mongoose and Sequelize adapters.
+- **Built-in SQLite ORM adapter** — Added Node.js built-in sqlite module adapter (Node 26+) with dynamic module loading. Eliminates experimental warnings through lazy-loading pattern, provides zero external dependencies, and offers type-safe repository operations. Matches feature parity with Mongoose and Sequelize adapters.
 
 ### 🔧 Improvements
 
@@ -166,7 +166,7 @@
 
 ### ✨ Features
 
-- **Node:sqlite ORM adapter** — Added complete ORM implementation for Node.js built-in sqlite module (Node 24+). Includes `NodeSqliteAdapter`, lazy-loading factory, type-safe repository class, and comprehensive unit tests. Follows same architecture as Mongoose and Sequelize adapters with prepared statements and defensive mode security.
+- **Node:sqlite ORM adapter** — Added complete ORM implementation for Node.js built-in sqlite module (Node 26+). Includes `NodeSqliteAdapter`, lazy-loading factory, type-safe repository class, and comprehensive unit tests. Follows same architecture as Mongoose and Sequelize adapters with prepared statements and defensive mode security.
 
 ### 🔧 Improvements
 
@@ -178,7 +178,7 @@
 
 - **ESLint config simplification** — Refactored root ESLint configuration to use Zacatl's recommended config directly, reducing complexity and improving maintainability. Removed manual config normalization logic.
 
-- **Node 24.14.0 LTS** — Updated `.nvmrc` to Node 24.14.0 (latest LTS point release) and bumped npm requirement to 11.0.0+ in documentation.
+- **Node 26.3.0** — Updated `.nvmrc` to Node 26.3.0 and bumped npm requirement to 11.0.0+ in documentation.
 
 ### 📚 Documentation
 
@@ -217,12 +217,12 @@
 
 ### ✨ New
 
-- **Node 24 LTS standardization** — Bumped `engines.node` to `>=24.14.0` (LTS point release). Added
+- **Node 26 baseline standardization** — Bumped `engines.node` to `>=26.3.0`. Added
   native `imports` field (`"#/*": "./src/*"`) to `package.json` for Node-native subpath imports,
   removing the need for TypeScript path-alias hacks in consuming projects.
 
 - **Built-in SQLite adapter (`node:sqlite`)** — Added `DatabaseVendor.SQLITE` and
-  `src/service/platforms/server/database/sqlite-adapter.ts` using the Node 24 built-in
+  `src/service/platforms/server/database/sqlite-adapter.ts` using the Node 26 built-in
   `node:sqlite` (`DatabaseSync`). Defensive mode is enabled by default. No external SQLite
   package or native bindings required. `instance` is now optional in `DatabaseConfig` — only
   needed for Mongoose / Sequelize.
@@ -525,7 +525,7 @@ Three Express examples targeting parity with existing Fastify examples:
 
 Each example will include:
 
-- Docker multi-stage build with distroless Node.js 24
+- Docker multi-stage build with distroless Node.js 26
 - ESM build pipeline using `fix-esm.mjs`
 - Same monorepo structure as Fastify examples (apps/backend, apps/frontend)
 - Verified end-to-end with live API calls and DB persistence

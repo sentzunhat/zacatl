@@ -14,7 +14,7 @@ interface SqliteModule {
 /**
  * SQLite adapter using the Node.js built-in `node:sqlite` module.
  *
- * Defensive mode is enabled by default in Node 24+, which blocks SQL
+ * Defensive mode is enabled by default in Node 26+, which blocks SQL
  * language features that can corrupt the database file.
  *
  * The `connectionString` is used as the SQLite file path.
@@ -66,7 +66,7 @@ export class SqliteAdapter implements DatabaseServerPort {
         // Dynamically import node:sqlite only when needed (on first connect call).
         // This defers the experimental warning until the adapter is actually used.
         const mod = await SqliteAdapter.loadModule();
-        // Defensive: true is the default in Node 24 — explicitly set for clarity.
+        // Defensive: true is the default in Node 26 — explicitly set for clarity.
         this.db = new mod.DatabaseSync(connectionString, { defensive: true });
       }
 

@@ -5,7 +5,7 @@ A catalog of standalone, production-ready server applications demonstrating diff
 > **🤖 For Agents:** See [AGENTS.md](./AGENTS.md) - Comprehensive guidance for building parallel platform examples.
 > **🐳 For Docker:** See [DOCKER.md](./DOCKER.md) - Complete Docker deployment guide and architecture explanation.
 > **💾 For Databases:** Use [dev-env](../dev-env/) to run MongoDB + PostgreSQL containers for local development.
-> **Note**: Examples use **Node.js 24+** with **npm**.
+> **Note**: Examples use **Node.js 26+** with **npm**.
 > **📦 Dependencies:** All examples import from `@sentzunhat/zacatl` exports—see [Unified Dependency Strategy](../docs/service/dependency-exports.md) for details.
 
 ### Choose Your Framework & Database

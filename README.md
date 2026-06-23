@@ -21,7 +21,7 @@ Zacatl enforces layered (hexagonal) architecture with built-in dependency inject
 | 💉 Dependency Injection     | Built-in DI container via `tsyringe`                           |
 | ✅ Type-Safe Validation     | Zod schema support; Yup and optional validation planned        |
 | 🛡️ Structured Errors        | 7 custom error types with correlation IDs                      |
-| 🗄️ Pluggable ORM Adapters   | Sequelize, Mongoose, built-in SQLite (Node 24+), or custom     |
+| 🗄️ Pluggable ORM Adapters   | Sequelize, Mongoose, built-in SQLite (Node 26+), or custom     |
 | 🌐 Internationalization     | Pluggable i18n with filesystem/memory adapters                 |
 | 📝 Production Observability | Structured logging and error tracking                          |
 | 🧪 Tested                   | Vitest — test count and coverage shown in badges above         |

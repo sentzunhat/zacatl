@@ -1,6 +1,6 @@
 // @barrel-generated
 /**
- * Request context module — AsyncLocalStorage-based request scoping for Node 24+.
+ * Request context module — AsyncLocalStorage-based request scoping for Node 26+.
  *
  * ## Quick start
  *

@@ -107,7 +107,7 @@ type PageServerConfig = {
 
 ### `DatabaseConfig`
 
-Database connection configuration supporting Mongoose (MongoDB), Sequelize (SQL), and the Node 24 built-in SQLite.
+Database connection configuration supporting Mongoose (MongoDB), Sequelize (SQL), and the Node 26 built-in SQLite.
 
 ```typescript
 type DatabaseConfig = {
@@ -163,7 +163,7 @@ Database vendor/ORM.
 enum DatabaseVendor {
   MONGOOSE = 'MONGOOSE', // MongoDB via Mongoose
   SEQUELIZE = 'SEQUELIZE', // SQL databases via Sequelize
-  SQLITE = 'SQLITE', // SQLite via Node 24 built-in node:sqlite (no external package)
+  SQLITE = 'SQLITE', // SQLite via Node 26 built-in node:sqlite (no external package)
 }
 ```
 

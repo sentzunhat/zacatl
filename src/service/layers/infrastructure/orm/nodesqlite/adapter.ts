@@ -14,7 +14,7 @@ import { NodeSqliteToken } from '../tokens';
  * Node.js SQLite ORM Adapter (node:sqlite)
  *
  * Provides CRUD and query operations for SQLite tables using the built-in
- * node:sqlite module available in Node.js 24+.
+ * node:sqlite module available in Node.js 26+.
  *
  * Uses prepared statements for type safety and performance.
  * Defensive mode is enabled by default to prevent database corruption.
@@ -86,7 +86,7 @@ export class NodeSqliteAdapter<I extends object, O extends object>
 
       if (exists == null) {
         // Create table with standard fields if it doesn't exist.
-        // Defensive mode is enabled by default in Node 24+ — SQL language features
+        // Defensive mode is enabled by default in Node 26+ — SQL language features
         // that can corrupt the database file are blocked.
         database.exec(`
           CREATE TABLE IF NOT EXISTS ${name} (

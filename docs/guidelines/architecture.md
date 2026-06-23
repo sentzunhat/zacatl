@@ -37,7 +37,7 @@ src/
 │   │   │       └── adapters/   # Mongoose, Sequelize & SQLite DB adapters
 │   │   ├── cli/                # CLI platform
 │   │   ├── desktop/            # Desktop platform
-│   │   └── context/            # AsyncLocalStorage request context (Node 24)
+│   │   └── context/            # AsyncLocalStorage request context (Node 26)
 │   ├── layers/                 # Application, Domain, Infrastructure
 │   │   ├── application/        # Use cases, handlers, ports
 │   │   ├── domain/             # Business logic, services
