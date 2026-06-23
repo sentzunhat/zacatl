@@ -11,7 +11,7 @@
   "scripts": {
     "start": "node dist/index.js",
     "dev": "tsx watch src/index.ts",
-    "build": "npm --prefix ../.. exec -- tsc -p tsconfig.json && node ../../../../build-scripts-esm/build/fix-esm.js dist",
+    "build": "npx tsc -p tsconfig.json && node ../../../../build-scripts-esm/build/fix-esm.js dist",
     "clean": "rm -rf dist"
   },
   "devDependencies": {

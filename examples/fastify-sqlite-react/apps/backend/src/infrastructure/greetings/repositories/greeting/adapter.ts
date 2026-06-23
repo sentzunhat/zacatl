@@ -1,6 +1,6 @@
-import { SequelizeRepository } from '@sentzunhat/zacatl/service/layers/infrastructure/repositories/sequelize';
-import type { ModelStatic } from '@sentzunhat/zacatl/third-party/sequelize';
-import { singleton } from '@sentzunhat/zacatl/third-party/tsyringe';
+import { SequelizeRepository } from '@zacatl/service/layers/infrastructure/repositories/sequelize';
+import type { ModelStatic } from '@zacatl/third-party/sequelize';
+import { singleton } from '@zacatl/third-party/tsyringe';
 
 import type { CreateGreetingInput, Greeting } from '../../../../domain/entities/greeting.js';
 import { GreetingModel } from '../../models/greeting.model';
@@ -13,7 +13,7 @@ export class GreetingRepositoryAdapter
 {
   constructor() {
     super({
-      model: GreetingModel,
+      name: GreetingModel.name,
     });
   }
 

@@ -7,7 +7,7 @@ import {
   SequelizeModel as Model,
   type ModelStatic,
   type Sequelize,
-} from '@sentzunhat/zacatl/third-party/sequelize';
+} from '@zacatl/third-party/sequelize';
 import type { Greeting } from '../../../domain/entities/greeting';
 
 export class GreetingModel extends Model implements Omit<Greeting, 'id'> {

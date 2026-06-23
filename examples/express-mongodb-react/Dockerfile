@@ -1,6 +1,6 @@
 # Build from repository root: docker build -f examples/express-mongodb-react/Dockerfile .
 # Note: Requires `npm run build` to be run locally first
-FROM node:24-slim AS builder
+FROM node:26-slim AS builder
 WORKDIR /app
 
 COPY build-src-esm ./build-src-esm
@@ -22,7 +22,7 @@ RUN npm prune --omit=dev
 WORKDIR /app/examples/express-mongodb-react
 RUN npm prune --omit=dev
 
-FROM gcr.io/distroless/nodejs24-debian12:nonroot
+FROM node:26-bookworm-slim
 WORKDIR /app
 ENV NODE_ENV=production
 

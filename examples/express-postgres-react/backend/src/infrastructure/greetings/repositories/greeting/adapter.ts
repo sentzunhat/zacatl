@@ -13,7 +13,7 @@ export class GreetingRepositoryAdapter
 {
   constructor() {
     super({
-      model: GreetingModel,
+      name: GreetingModel.name,
     });
   }
 

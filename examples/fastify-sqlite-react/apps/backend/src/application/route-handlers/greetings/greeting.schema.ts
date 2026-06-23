@@ -7,7 +7,7 @@
  * - Self-documenting API contracts
  */
 
-import { z } from '@sentzunhat/zacatl/third-party/zod';
+import { z } from '@zacatl/third-party/zod';
 
 // ===== Request Schemas =====
 

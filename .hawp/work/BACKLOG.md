@@ -32,6 +32,8 @@ _No active work._
 
 | ID       | Type        | Title                                                                | Status     | Plan                                       |
 | -------- | ----------- | -------------------------------------------------------------------- | ---------- | ------------------------------------------ |
+| STAB-010 | improvement | Verify examples and Docker builds under Node 26 and TypeScript 6     | plan-ready | `.hawp/work/active/STAB-010.md`           |
+| STAB-012 | improvement | Simplify fastify-sqlite-react using Mawiltia starter and barrel pruning | plan-ready | `.hawp/work/active/STAB-012.md`           |
 | STAB-009 | improvement | Audit dependency approvals and optionalize prunable runtime packages | plan-ready | `.hawp/work/active/STAB-009.md`           |
 | STAB-008 | improvement | Audit import extensions and TypeScript resolution for code files     | plan-ready | `.hawp/work/active/STAB-008.md`           |
 | STAB-007 | improvement | Review ESLint config hierarchy and import-order baseline             | plan-ready | `.hawp/work/active/STAB-007.md`           |
@@ -48,6 +50,7 @@ Keep this section short (for example last 5-10 items or last 14-30 days).
 
 | ID         | Type                                           | Title                            | Closed     | Plan                                                                    |
 | ---------- | ---------------------------------------------- | -------------------------------- | ---------- | ----------------------------------------------------------------------- |
+| `STAB-011` | `improvement`                                  | Integrate export-aware barrel pruning and local exports sync | 2026-06-21 | [.hawp/work/closed/2026/06/21/STAB-011.md](closed/2026/06/21/STAB-011.md) |
 | `AUDIT-001` | `audit`                                      | Production readiness stabilization audit for Zacatl | 2026-06-20 | [.hawp/work/closed/2026/06/20/AUDIT-001.md](closed/2026/06/20/AUDIT-001.md) |
 | `STAB-005` | `improvement`                                | Align database server port contract and adapter signatures | 2026-06-21 | [.hawp/work/closed/2026/06/21/STAB-005.md](closed/2026/06/21/STAB-005.md) |
 | `STAB-004` | `improvement`                                | Repair CJS script tsconfig and moduleResolution mismatch | 2026-06-21 | [.hawp/work/closed/2026/06/21/STAB-004.md](closed/2026/06/21/STAB-004.md) |

@@ -1,5 +1,5 @@
-import { singleton } from '@sentzunhat/zacatl/third-party/tsyringe';
-import type { HookHandler } from '@sentzunhat/zacatl/service';
+import { singleton } from '@zacatl/third-party/tsyringe';
+import type { HookHandler } from '@zacatl/service';
 
 /**
  * Minimal session hook example.

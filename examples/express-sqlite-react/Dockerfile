@@ -1,6 +1,6 @@
 # Build from repository root: docker build -f examples/express-sqlite-react/Dockerfile .
 # Note: Requires `npm run build` to be run locally first
-FROM node:24-slim AS builder
+FROM node:26-slim AS builder
 WORKDIR /app
 
 RUN apt-get update && apt-get install -y python3 make g++ && rm -rf /var/lib/apt/lists/*
@@ -24,7 +24,7 @@ RUN npm prune --omit=dev
 WORKDIR /app/examples/express-sqlite-react
 RUN npm prune --omit=dev
 
-FROM gcr.io/distroless/nodejs24-debian12:nonroot
+FROM node:26-bookworm-slim
 WORKDIR /app
 ENV NODE_ENV=production
 

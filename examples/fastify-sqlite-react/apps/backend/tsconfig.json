@@ -6,6 +6,8 @@
     "moduleResolution": "bundler",
     "outDir": "dist",
     "baseUrl": ".",
+    "rootDir": "src",
+    "ignoreDeprecations": "6.0",
     "strict": true,
     "skipLibCheck": true,
     "resolveJsonModule": true,
@@ -14,10 +16,22 @@
     "declaration": true,
     "esModuleInterop": true,
     "paths": {
-      "@sentzunhat/zacatl": ["../../../../build-src-esm/index.d.ts"],
-      "@sentzunhat/zacatl/*": ["../../../../build-src-esm/*"],
       "@zacatl": ["../../../../build-src-esm/index.d.ts"],
-      "@zacatl/*": ["../../../../build-src-esm/*"]
+      "@zacatl/*": ["../../../../build-src-esm/*"],
+      "@zacatl/third-party": ["../../../../build-src-esm/third-party/index.d.ts"],
+      "@zacatl/third-party/tsyringe": [
+        "../../../../build-src-esm/third-party/dependency-injection/tsyringe.d.ts"
+      ],
+      "@zacatl/third-party/reflect-metadata": [
+        "../../../../build-src-esm/third-party/dependency-injection/reflect-metadata.d.ts"
+      ],
+      "@zacatl/third-party/sequelize": [
+        "../../../../build-src-esm/third-party/databases/sequelize.d.ts"
+      ],
+      "@zacatl/third-party/sqlite3": [
+        "../../../../build-src-esm/third-party/databases/sqlite3.d.ts"
+      ],
+      "@zacatl/third-party/*": ["../../../../build-src-esm/third-party/*"]
     }
   },
   "include": ["src/**/*"],

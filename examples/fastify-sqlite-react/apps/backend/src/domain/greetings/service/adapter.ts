@@ -8,8 +8,8 @@
  * as long as it implements the GreetingRepositoryPort interface.
  */
 
-import { inject, singleton } from '@sentzunhat/zacatl/third-party/tsyringe';
-import { BadRequestError, NotFoundError } from '@sentzunhat/zacatl/error';
+import { inject, singleton } from '@zacatl/third-party/tsyringe';
+import { BadRequestError, NotFoundError } from '@zacatl/error';
 import type { Greeting, CreateGreetingInput } from '../../entities/greeting';
 import { GreetingRepositoryAdapter } from '../../../infrastructure/greetings/repositories/greeting/adapter';
 import type { GreetingServicePort } from './port';

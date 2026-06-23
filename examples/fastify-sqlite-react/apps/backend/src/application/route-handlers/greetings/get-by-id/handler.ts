@@ -7,8 +7,8 @@
  * - Type-safe params
  */
 
-import { inject, singleton } from '@sentzunhat/zacatl/third-party/tsyringe';
-import { FastifyGetRouteHandler, type Request } from '@sentzunhat/zacatl/service';
+import { inject, singleton } from '@zacatl/third-party/tsyringe';
+import { FastifyGetRouteHandler, type Request } from '@zacatl/service';
 import { GreetingServiceAdapter } from '../../../../domain/greetings/service';
 import { type GreetingIdParams, type GreetingResponse } from '../greeting.schema';
 import { toGreetingResponse } from '../greeting.serializer';

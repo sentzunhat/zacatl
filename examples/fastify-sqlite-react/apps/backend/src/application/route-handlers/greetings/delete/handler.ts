@@ -7,8 +7,8 @@
  * - Simple success response
  */
 
-import { inject, singleton } from '@sentzunhat/zacatl/third-party/tsyringe';
-import { FastifyDeleteRouteHandler, type Request } from '@sentzunhat/zacatl/service';
+import { inject, singleton } from '@zacatl/third-party/tsyringe';
+import { FastifyDeleteRouteHandler, type Request } from '@zacatl/service';
 import { GreetingServiceAdapter } from '../../../../domain/greetings/service';
 import { type GreetingIdParams } from '../greeting.schema';
 

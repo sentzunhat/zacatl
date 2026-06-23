@@ -1,9 +1,10 @@
 # Build from repository root: docker build -f examples/fastify-mongodb-react/Dockerfile .
 # This Dockerfile builds framework artifacts and the example in-container.
-FROM node:24-bookworm-slim AS builder
+FROM node:26-bookworm-slim AS builder
 WORKDIR /app
 
 COPY package.json package-lock.json ./
+COPY tsconfig.base.json ./
 COPY tsconfig.json tsconfig.cjs.json ./
 COPY build-scripts-esm ./build-scripts-esm
 COPY src ./src
@@ -35,13 +36,13 @@ RUN rm -rf node_modules/@sentzunhat/zacatl \
   && mkdir -p node_modules/@sentzunhat/zacatl/node_modules \
   && cp -R /app/node_modules/. node_modules/@sentzunhat/zacatl/node_modules/
 
-FROM gcr.io/distroless/nodejs24-debian12:nonroot
+FROM node:26-bookworm-slim
 WORKDIR /app/examples/fastify-mongodb-react/apps/backend
 ENV NODE_ENV=production
 
-COPY --chown=nonroot:nonroot --from=builder /app/examples/fastify-mongodb-react/node_modules /app/examples/fastify-mongodb-react/node_modules
-COPY --chown=nonroot:nonroot --from=builder /app/examples/fastify-mongodb-react/apps/backend/dist ./dist
-COPY --chown=nonroot:nonroot --from=builder /app/examples/fastify-mongodb-react/apps/frontend/dist ../frontend/dist
+COPY --from=builder /app/examples/fastify-mongodb-react/node_modules /app/examples/fastify-mongodb-react/node_modules
+COPY --from=builder /app/examples/fastify-mongodb-react/apps/backend/dist ./dist
+COPY --from=builder /app/examples/fastify-mongodb-react/apps/frontend/dist ../frontend/dist
 
 EXPOSE 8082
 CMD ["dist/index.js"]

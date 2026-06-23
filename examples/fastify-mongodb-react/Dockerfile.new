@@ -1,5 +1,5 @@
 # Build from repository root: docker build -f examples/fastify-mongodb-react/Dockerfile .
-FROM node:24-slim AS builder
+FROM node:26-slim AS builder
 WORKDIR /app
 
 # Install dependencies first
@@ -7,6 +7,7 @@ COPY package.json package-lock.json ./
 RUN npm ci
 
 # Copy source and scripts
+COPY tsconfig.base.json ./
 COPY tsconfig.json tsconfig.cjs.json ./
 COPY src ./src
 COPY scripts ./scripts
@@ -28,7 +29,7 @@ RUN npm prune --omit=dev
 WORKDIR /app/examples/fastify-mongodb-react
 RUN npm prune --omit=dev
 
-FROM gcr.io/distroless/nodejs24-debian12:nonroot
+FROM node:26-bookworm-slim
 WORKDIR /app
 ENV NODE_ENV=production
 
@@ -40,7 +41,7 @@ COPY --from=builder /app/build-src-esm ./node_modules/@sentzunhat/zacatl/build-s
 COPY --from=builder /app/build-src-cjs ./node_modules/@sentzunhat/zacatl/build-src-cjs
 COPY --from=builder /app/package.json ./node_modules/@sentzunhat/zacatl/package.json
 COPY --from=builder /app/node_modules ./node_modules/@sentzunhat/zacatl/node_modules
-COPY --from(builder /app/src/localization/locales ./node_modules/@sentzunhat/zacatl/src/localization/locales
+COPY --from=builder /app/src/localization/locales ./node_modules/@sentzunhat/zacatl/src/localization/locales
 COPY --from=builder /app/src/eslint ./node_modules/@sentzunhat/zacatl/src/eslint
 
 EXPOSE 8082

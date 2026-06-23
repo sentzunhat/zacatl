@@ -1,4 +1,4 @@
-import type { HookHandler } from '@sentzunhat/zacatl/service';
+import type { HookHandler } from '@zacatl/service';
 
 import { SessionHookHandler } from './session/handler';
 

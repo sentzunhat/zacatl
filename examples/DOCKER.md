@@ -102,13 +102,13 @@ Each example includes:
 ### Multi-Stage Dockerfile
 
 ```dockerfile
-# Stage 1: Builder (node:24-slim)
+# Stage 1: Builder (node:26-slim)
 # - Install build tools (python3, make, g++)
 # - Build framework (zacatl)
 # - Build example backend + frontend
 # - Rebuild native modules (sqlite3)
 
-# Stage 2: Runtime (distroless)
+# Stage 2: Runtime (node:26-bookworm-slim)
 # - Copy compiled code only
 # - Copy framework build into node_modules
 # - Copy framework dependencies

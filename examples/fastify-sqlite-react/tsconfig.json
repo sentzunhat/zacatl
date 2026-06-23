@@ -6,6 +6,7 @@
     "moduleResolution": "bundler",
     "outDir": "./dist",
     "baseUrl": ".",
+    "ignoreDeprecations": "6.0",
     "strict": true,
     "skipLibCheck": true,
     "resolveJsonModule": true,
@@ -15,6 +16,8 @@
     "paths": {
       "@sentzunhat/zacatl": ["../../build-src-esm/index.d.ts"],
       "@sentzunhat/zacatl/*": ["../../build-src-esm/*"],
+      "@sentzunhat/zacatl/third-party": ["../../build-src-esm/third-party/index.d.ts"],
+      "@sentzunhat/zacatl/third-party/*": ["../../build-src-esm/third-party/*"],
       "@zacatl": ["../../build-src-esm/index.d.ts"],
       "@zacatl/*": ["../../build-src-esm/*"]
     }
