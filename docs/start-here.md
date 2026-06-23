@@ -7,7 +7,7 @@ A minimal guide for working on this repository.
 - Node.js 24.14.0+
 - npm 11+
 
-Optional (recommended): use the Node version from `.nvmrc`.
+Optional (recommended): use `nvm` with the Node version from `.nvmrc`.
 
 ## 2) First-Time Setup
 

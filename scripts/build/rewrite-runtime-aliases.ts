@@ -1,17 +1,19 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
+import { measureTime } from '../utils/measure-time.js';
+
 const [, , rootDirArg] = process.argv;
 
 if (rootDirArg == null) {
   // eslint-disable-next-line no-console
-  console.error('Usage: node rewrite-runtime-aliases.js <rootDir>');
+  console.error('Usage: node rewrite-runtime-aliases.ts <rootDir>');
   process.exit(1);
 }
 
 const rootDir = path.resolve(process.cwd(), rootDirArg);
 const fileExtensions = new Set(['.js', '.mjs', '.cjs']);
-const replacements = [
+const replacements: ReadonlyArray<readonly [string, string]> = [
   ['@zacatl/third-party/reflect-metadata', '@sentzunhat/zacatl/third-party/dependency-injection/reflect-metadata'],
   ['@zacatl/third-party/tsyringe', '@sentzunhat/zacatl/third-party/dependency-injection/tsyringe'],
   ['@zacatl/third-party/sequelize', '@sentzunhat/zacatl/third-party/databases/sequelize'],
@@ -24,7 +26,7 @@ const replacements = [
   ['@zacatl/third-party/', '@sentzunhat/zacatl/third-party/'],
 ];
 
-const rewriteFile = (filePath) => {
+const rewriteFile = (filePath: string): void => {
   const content = fs.readFileSync(filePath, 'utf8');
   let nextContent = content;
 
@@ -37,7 +39,7 @@ const rewriteFile = (filePath) => {
   }
 };
 
-const walk = (dir) => {
+const walk = (dir: string): void => {
   for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
     const fullPath = path.join(dir, entry.name);
     if (entry.isDirectory()) {
@@ -48,4 +50,13 @@ const walk = (dir) => {
   }
 };
 
-walk(rootDir);
+const main = async (): Promise<void> => {
+  await measureTime({
+    name: 'rewrite-runtime-aliases',
+    fn: async () => {
+      walk(rootDir);
+    },
+  });
+};
+
+void main();

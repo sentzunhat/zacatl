@@ -60,14 +60,14 @@ export class SqliteAdapter implements DatabaseServerPort {
     }
 
     try {
-      if (instance != null && typeof (instance as DatabaseSync).prepare === 'function') {
-        this.db = instance as DatabaseSync;
+      if (instance != null && SqliteAdapter.isDatabaseSync(instance)) {
+        this.db = instance;
       } else {
         // Dynamically import node:sqlite only when needed (on first connect call).
         // This defers the experimental warning until the adapter is actually used.
         const mod = await SqliteAdapter.loadModule();
         // Defensive: true is the default in Node 24 — explicitly set for clarity.
-        this.db = new mod.DatabaseSync(connectionString, { defensive: true } as any);
+        this.db = new mod.DatabaseSync(connectionString, { defensive: true });
       }
 
       registerOrmInstance(DatabaseVendor.SQLITE, this.db);
@@ -98,5 +98,14 @@ export class SqliteAdapter implements DatabaseServerPort {
    */
   getDatabase(): DatabaseSync | undefined {
     return this.db;
+  }
+
+  private static isDatabaseSync(value: unknown): value is DatabaseSync {
+    return (
+      typeof value === 'object' &&
+      value !== null &&
+      'prepare' in value &&
+      typeof (value as { prepare?: unknown }).prepare === 'function'
+    );
   }
 }

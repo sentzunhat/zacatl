@@ -58,7 +58,7 @@ This guide covers formatting, naming conventions, and language-specific rules fo
 - **Package Manager**: npm 11.0.0+
 - **Module System**: ESM source with dual ESM/CJS build outputs for distribution
 
-> **Upgrade note**: run `nvm install 24.14.0 && nvm use 24.14.0` (or equivalent) if your local Node is below 24.14.0.
+> **Upgrade note**: run `nvm install 24.14.0 && nvm use 24.14.0` if your local Node is below 24.14.0. If you use another version manager, mirror the same install/use flow.
 
 ### Build Process
 
