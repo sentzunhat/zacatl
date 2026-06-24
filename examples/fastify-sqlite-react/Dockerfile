@@ -29,15 +29,28 @@ RUN npm prune --omit=dev
 # Materialize local Zacatl package files in example node_modules so runtime does not
 # depend on workspace symlink targets outside the copied example tree.
 RUN rm -rf node_modules/@sentzunhat/zacatl \
-  && rm -rf node_modules/@zacatl \
   && mkdir -p node_modules/@sentzunhat/zacatl \
-  && mkdir -p node_modules/@zacatl \
   && cp -R /app/publish/. node_modules/@sentzunhat/zacatl/ \
-  && cp -R /app/publish/. node_modules/@zacatl/ \
   && mkdir -p node_modules/@sentzunhat/zacatl/node_modules \
-  && mkdir -p node_modules/@zacatl/node_modules \
   && cp -R /app/node_modules/. node_modules/@sentzunhat/zacatl/node_modules/ \
-  && cp -R /app/node_modules/. node_modules/@zacatl/node_modules/ \
+  && mkdir -p node_modules/@sentzunhat/zacatl/build/esm/third-party \
+  && mkdir -p node_modules/@sentzunhat/zacatl/build/cjs/third-party \
+  && cp -R node_modules/@sentzunhat/zacatl/build/esm/third-party/dependency-injection/reflect-metadata.* \
+    node_modules/@sentzunhat/zacatl/build/esm/third-party/ \
+  && cp -R node_modules/@sentzunhat/zacatl/build/esm/third-party/dependency-injection/tsyringe.* \
+    node_modules/@sentzunhat/zacatl/build/esm/third-party/ \
+  && cp -R node_modules/@sentzunhat/zacatl/build/esm/third-party/databases/sequelize.* \
+    node_modules/@sentzunhat/zacatl/build/esm/third-party/ \
+  && cp -R node_modules/@sentzunhat/zacatl/build/esm/third-party/databases/sqlite3.* \
+    node_modules/@sentzunhat/zacatl/build/esm/third-party/ \
+  && cp -R node_modules/@sentzunhat/zacatl/build/cjs/third-party/dependency-injection/reflect-metadata.* \
+    node_modules/@sentzunhat/zacatl/build/cjs/third-party/ \
+  && cp -R node_modules/@sentzunhat/zacatl/build/cjs/third-party/dependency-injection/tsyringe.* \
+    node_modules/@sentzunhat/zacatl/build/cjs/third-party/ \
+  && cp -R node_modules/@sentzunhat/zacatl/build/cjs/third-party/databases/sequelize.* \
+    node_modules/@sentzunhat/zacatl/build/cjs/third-party/ \
+  && cp -R node_modules/@sentzunhat/zacatl/build/cjs/third-party/databases/sqlite3.* \
+    node_modules/@sentzunhat/zacatl/build/cjs/third-party/ \
   && rm -f /app/examples/fastify-sqlite-react/database.sqlite
 
 FROM node:26-bookworm-slim

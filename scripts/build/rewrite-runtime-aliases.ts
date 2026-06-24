@@ -14,11 +14,11 @@ if (rootDirArg == null) {
 const rootDir = path.resolve(process.cwd(), rootDirArg);
 const fileExtensions = new Set(['.js', '.mjs', '.cjs']);
 const replacements: ReadonlyArray<readonly [string, string]> = [
-  ['@zacatl/third-party/reflect-metadata', '@sentzunhat/zacatl/third-party/dependency-injection/reflect-metadata'],
-  ['@zacatl/third-party/tsyringe', '@sentzunhat/zacatl/third-party/dependency-injection/tsyringe'],
-  ['@zacatl/third-party/sequelize', '@sentzunhat/zacatl/third-party/databases/sequelize'],
-  ['@zacatl/third-party/sqlite3', '@sentzunhat/zacatl/third-party/databases/sqlite3'],
-  ['@zacatl/third-party/mongoose', '@sentzunhat/zacatl/third-party/databases/mongoose'],
+  ['@zacatl/third-party/reflect-metadata', '@sentzunhat/zacatl/third-party/reflect-metadata'],
+  ['@zacatl/third-party/tsyringe', '@sentzunhat/zacatl/third-party/tsyringe'],
+  ['@zacatl/third-party/sequelize', '@sentzunhat/zacatl/third-party/sequelize'],
+  ['@zacatl/third-party/sqlite3', '@sentzunhat/zacatl/third-party/sqlite3'],
+  ['@zacatl/third-party/mongoose', '@sentzunhat/zacatl/third-party/mongoose'],
   ['@zacatl/service/', '@sentzunhat/zacatl/service/'],
   ['@zacatl/error/', '@sentzunhat/zacatl/error/'],
   ['@zacatl/service', '@sentzunhat/zacatl/service'],
