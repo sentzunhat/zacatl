@@ -14,3 +14,8 @@ constraints: |
 
 output: |
   Updated workflow configuration and a brief verification note in the follow-up report or commit message.
+
+verification: |
+  2026-06-29T00:44Z PR #35 head 5d8502e0e91916d011d62b19c9f727e2cacd0582 completed Peer install check run 85 successfully and Publish (dry-run) run 58 successfully, but OWASP CVE-Lite Dependency Scan run 14 failed in the `Scan directories for vulnerabilities` step. The run uploaded `cve-lite-reports` artifact 7940317506 for direct evidence capture.
+
+  Remediation applied on branch `stability/review-20260628-2340`: `.github/workflows/cve-scan.yml` now uses Node 26.3.0, matching the package engine baseline, and prints bounded matching report tails when CVE-Lite still fails so the next run exposes exact failing package-lock evidence in the job log as well as the artifact.
