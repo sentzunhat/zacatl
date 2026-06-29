@@ -1,16 +1,13 @@
-name: Refresh example lockfile evidence
+name: Refresh example lockfiles
 
 on:
-  pull_request:
-    branches: [main]
-    paths:
-      - 'examples/**/package.json'
-      - 'examples/**/package-lock.json'
-      - '.github/workflows/refresh-example-lockfiles.yml'
+  push:
+    branches:
+      - stability/review-20260628-2340
   workflow_dispatch: {}
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   refresh-lockfiles:
@@ -18,6 +15,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: stability/review-20260628-2340
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -40,16 +39,17 @@ jobs:
             )
           done < <(find examples -name package-lock.json -not -path '*/node_modules/*' -print0)
 
-      - name: Record changed lockfiles
+      - name: Commit refreshed lockfiles
+        shell: bash
         run: |
-          git diff --name-only -- 'examples/**/package-lock.json' | tee refreshed-lockfiles.txt
-          test -s refreshed-lockfiles.txt
+          set -euo pipefail
+          if git diff --quiet -- 'examples/**/package-lock.json'; then
+            echo "No example lockfile changes to commit."
+            exit 0
+          fi
 
-      - name: Upload refreshed lockfiles
-        uses: actions/upload-artifact@v4
-        with:
-          name: refreshed-example-lockfiles
-          path: |
-            examples/**/package-lock.json
-            refreshed-lockfiles.txt
-          if-no-files-found: error
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -- 'examples/**/package-lock.json'
+          git commit -m "chore: refresh example dependency lockfiles"
+          git push origin HEAD:stability/review-20260628-2340
