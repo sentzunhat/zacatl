@@ -1,0 +1,55 @@
+name: Refresh example lockfile evidence
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'examples/**/package.json'
+      - 'examples/**/package-lock.json'
+      - '.github/workflows/refresh-example-lockfiles.yml'
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  refresh-lockfiles:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '26.3.0'
+          cache: 'npm'
+          cache-dependency-path: |
+            examples/**/package-lock.json
+
+      - name: Refresh example package locks without lifecycle scripts
+        shell: bash
+        run: |
+          set -euo pipefail
+          while IFS= read -r -d '' lockfile; do
+            dir=$(dirname "$lockfile")
+            echo "Refreshing $dir/package-lock.json"
+            (
+              cd "$dir"
+              npm install --package-lock-only --ignore-scripts --no-audit --no-fund
+            )
+          done < <(find examples -name package-lock.json -not -path '*/node_modules/*' -print0)
+
+      - name: Record changed lockfiles
+        run: |
+          git diff --name-only -- 'examples/**/package-lock.json' | tee refreshed-lockfiles.txt
+          test -s refreshed-lockfiles.txt
+
+      - name: Upload refreshed lockfiles
+        uses: actions/upload-artifact@v4
+        with:
+          name: refreshed-example-lockfiles
+          path: |
+            examples/**/package-lock.json
+            refreshed-lockfiles.txt
+          if-no-files-found: error
