@@ -38,7 +38,7 @@ describe('SequelizeAdapter', () => {
       await expect(
         adapter.connect('svc', {
           vendor: DatabaseVendor.SEQUELIZE,
-          connectionString: 'postgres://localhost/db',
+          connection: { url: 'postgres://localhost/db' },
         } as DatabaseConfig),
       ).rejects.toBeInstanceOf(CustomError);
     });
@@ -47,7 +47,7 @@ describe('SequelizeAdapter', () => {
       await expect(
         adapter.connect('svc', {
           vendor: DatabaseVendor.SEQUELIZE,
-          connectionString: 'postgres://localhost/db',
+          connection: { url: 'postgres://localhost/db' },
           instance: { notAuthenticate: true } as unknown as DatabaseConfig['instance'],
         } as DatabaseConfig),
       ).rejects.toBeInstanceOf(CustomError);
@@ -58,7 +58,7 @@ describe('SequelizeAdapter', () => {
 
       await adapter.connect('svc', {
         vendor: DatabaseVendor.SEQUELIZE,
-        connectionString: 'postgres://localhost/db',
+        connection: { url: 'postgres://localhost/db' },
         instance: fakeSequelize as DatabaseConfig['instance'],
       } as DatabaseConfig);
 
@@ -70,7 +70,7 @@ describe('SequelizeAdapter', () => {
 
       await adapter.connect('svc', {
         vendor: DatabaseVendor.SEQUELIZE,
-        connectionString: 'postgres://localhost/db',
+        connection: { url: 'postgres://localhost/db' },
         instance: fakeSequelize as DatabaseConfig['instance'],
       } as DatabaseConfig);
 
@@ -83,7 +83,7 @@ describe('SequelizeAdapter', () => {
 
       await adapter.connect('svc', {
         vendor: DatabaseVendor.SEQUELIZE,
-        connectionString: 'postgres://localhost/db',
+        connection: { url: 'postgres://localhost/db' },
         instance: fakeSequelize as DatabaseConfig['instance'],
         onDatabaseConnected: onConnected,
       } as DatabaseConfig);

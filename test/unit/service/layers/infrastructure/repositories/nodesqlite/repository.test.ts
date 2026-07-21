@@ -52,6 +52,10 @@ describe('BaseRepository', () => {
     };
 
     repository = new UserRepository(config);
+
+    // Trigger lazy init so ensureTableExists runs during beforeEach,
+    // keeping each test's mockReturnValueOnce for its own SQL statement.
+    void repository.model;
   });
 
   describe('constructor', () => {

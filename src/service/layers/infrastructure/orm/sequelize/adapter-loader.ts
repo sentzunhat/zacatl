@@ -17,7 +17,7 @@ import type {
  * @returns ORMPort implementation for Sequelize
  */
 export const createSequelizeAdapter = <D extends object, I extends object, O extends object>(
-  config: SequelizeRepositoryConfig<D>,
+  config: SequelizeRepositoryConfig,
 ): ORMPort<SequelizeRepositoryModel<D>, I, O, WhereOptions<D>> => {
   return new SequelizeAdapter<D, I, O>(config);
 };

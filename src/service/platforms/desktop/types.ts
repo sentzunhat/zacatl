@@ -1,7 +1,7 @@
 /**
  * Configuration for Desktop-type services
  */
-export interface ConfigDesktop {
+export interface DesktopConfig {
   /** Window configuration */
   window: {
     /** Window title */

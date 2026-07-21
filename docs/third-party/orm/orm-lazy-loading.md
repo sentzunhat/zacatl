@@ -2,7 +2,10 @@
 
 > **Historical reference:** This document captures the design decisions made in v0.0.23.
 > The chosen solutions (conditional exports, type-only imports, and eager DI-backed adapters) are still in place.
-> As of v0.0.46, ORMs are bundled in `dependencies` — no separate install needed.
+> Historical note: as of v0.0.46, ORMs were bundled in `dependencies`.
+> Current note: as of v0.0.57, ORM/database ecosystems are optional peers;
+> install `mongoose`/`mongodb` or `sequelize` plus a dialect driver only when
+> your service uses that adapter.
 >
 > **Version:** 0.0.23 (historical)
 > **Date:** January 31, 2026

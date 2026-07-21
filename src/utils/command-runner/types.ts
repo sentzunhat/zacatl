@@ -23,14 +23,17 @@ export type CommandSpec = z.infer<typeof commandSpecSchema>;
 /**
  * Policy controls applied before and during each command execution.
  *
- * All fields are optional; safe defaults are applied by `RunnerPolicySchema`.
+ * Resource-control fields are optional and receive safe defaults. Command
+ * execution requires a non-empty `allowlist` unless trusted code explicitly
+ * sets `allowUnrestrictedCommands` to `true`.
  *
  * @property timeoutMs      - Hard timeout per command in milliseconds (default 30 000)
  * @property maxOutputBytes - Combined stdout+stderr byte cap (default 1 048 576)
  * @property maxConcurrency - Max parallel commands in a batch (default 4)
- * @property allowlist      - When non-empty, only these `cmd` values are permitted
+ * @property allowlist      - Only these exact `cmd` values are permitted
+ * @property allowUnrestrictedCommands - Explicitly permit any executable (trusted input only)
  * @property denyPatterns   - Regex strings; any matching argument is rejected
- * @property cwdPrefix      - All `cwd` values must start with this path prefix
+ * @property cwdPrefix      - Existing canonical root that must contain every `cwd`
  * @property inheritEnv     - Whether to inherit the parent process environment
  */
 export const runnerPolicySchema = z.object({
@@ -38,6 +41,7 @@ export const runnerPolicySchema = z.object({
   maxOutputBytes: z.number().int().positive().default(1_048_576),
   maxConcurrency: z.number().int().min(1).default(4),
   allowlist: z.array(z.string()).optional(),
+  allowUnrestrictedCommands: z.boolean().default(false),
   denyPatterns: z.array(z.string()).optional(),
   cwdPrefix: z.string().optional(),
   inheritEnv: z.boolean().default(false),

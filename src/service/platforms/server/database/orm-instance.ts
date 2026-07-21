@@ -2,10 +2,10 @@ import { getContainer, registerValue } from '@zacatl/dependency-injection';
 import { InternalServerError } from '@zacatl/error';
 import type { InjectionToken } from '@zacatl/third-party/dependency-injection/tsyringe';
 
-import { DatabaseVendor, type DatabaseInstance } from './port';
-import { MongooseToken } from '../../../layers/infrastructure/orm/tokens/mongoose';
-import { NodeSqliteToken } from '../../../layers/infrastructure/orm/tokens/nodesqlite';
-import { SequelizeToken } from '../../../layers/infrastructure/orm/tokens/sequelize';
+import { type DatabaseVendor, type DatabaseInstance } from './port';
+import { createDatabaseToken } from '../../../layers/infrastructure/orm/tokens/factory';
+
+export { createDatabaseToken } from '../../../layers/infrastructure/orm/tokens/factory';
 
 /**
  * ORM instance helper shared by database adapters and service bootstrap.
@@ -33,23 +33,18 @@ export const getOrmInstance = <T>(token: InjectionToken<unknown>): T => {
 
 export const registerOrmInstance = (
   vendor: DatabaseVendor,
+  connection: { url: string; name?: string } | undefined,
   instance: DatabaseInstance | undefined,
 ): void => {
   if (instance == null) {
     return;
   }
 
-  switch (vendor) {
-    case DatabaseVendor.MONGOOSE:
-      registerValue(MongooseToken as InjectionToken<DatabaseInstance>, instance);
-      break;
-    case DatabaseVendor.SEQUELIZE:
-      registerValue(SequelizeToken as InjectionToken<DatabaseInstance>, instance);
-      break;
-    case DatabaseVendor.SQLITE:
-      registerValue(NodeSqliteToken as InjectionToken<DatabaseInstance>, instance);
-      break;
-    default:
-      break;
-  }
+  // Repositories resolve the unnamed default connection by vendor. A URL is
+  // not a stable public connection name and would make default registrations
+  // impossible to resolve (for example, `:memory:` versus `SQLITE`).
+  const tokenKey = connection?.name ?? vendor;
+  const token = createDatabaseToken(vendor, tokenKey);
+
+  registerValue(token as InjectionToken<DatabaseInstance>, instance);
 };

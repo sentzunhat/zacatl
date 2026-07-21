@@ -29,8 +29,8 @@ npm install @sentzunhat/zacatl
 ```
 
 Core runtime packages such as `express` and `fastify` are installed with Zacatl.
-ORM/database ecosystems (`mongoose`, `sequelize`, `better-sqlite3`, `sqlite3`,
-`pg`) are optional peers and should be installed based on what your service uses.
+ORM/database ecosystems (`mongoose`, `sequelize`, `sqlite3`, `pg`, `mongodb`)
+are optional peers and should be installed based on what your service uses.
 
 ## Core imports
 
@@ -81,10 +81,10 @@ evaluates ORM or framework code unless explicitly imported:
 
 ```typescript
 // ✅ Only loads Mongoose at runtime
-import { mongoose } from "@sentzunhat/zacatl/third-party/mongoose";
+import { mongoose } from "@sentzunhat/zacatl/third-party/databases/mongoose";
 
 // ✅ Only loads Sequelize at runtime
-import { Sequelize } from "@sentzunhat/zacatl/third-party/sequelize";
+import { Sequelize } from "@sentzunhat/zacatl/third-party/databases/sequelize";
 ```
 
 ## Source layout

@@ -576,7 +576,7 @@ describe('CustomError', () => {
     expect(error.correlationId).not.toBe(error.id);
   });
 
-  it('toJSON() should include correlationId and structured metadata', () => {
+  it('toJSON() should expose only safe public fields', () => {
     const metadata = { user: 'u1' };
     const error = new TestError({
       message: 'Test message',
@@ -587,12 +587,11 @@ describe('CustomError', () => {
 
     const json = error.toJSON();
 
-    expect(json.message).toBe('Test message');
-    expect(json.name).toBe('TestError');
-    expect(json.code).toBe(400);
-    expect(json.reason).toBe('Bad Input');
-    expect(json.metadata).toEqual(metadata);
-    expect(json.correlationId).toBeDefined();
+    expect(json).toEqual({
+      message: 'Test message',
+      code: 400,
+      correlationId: error.correlationId,
+    });
   });
 });
 ```

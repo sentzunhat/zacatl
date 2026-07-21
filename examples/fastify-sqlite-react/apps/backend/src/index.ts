@@ -96,8 +96,13 @@ const main = async () => {
         return;
       }
 
-      // Send clean error response
-      await reply.status(statusCode).send(error);
+      // Send an explicit public response; never serialize the raw error.
+      await reply.status(statusCode).send({
+        error: {
+          message: statusCode >= 500 ? 'Internal Server Error' : error.message,
+          statusCode,
+        },
+      });
     });
 
     // Initialize Sequelize with explicit dialact module for ESM compatibility

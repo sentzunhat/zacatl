@@ -61,7 +61,7 @@ The port is specified in the `platforms.server.port` configuration.
 ## Configuration Interface
 
 ```typescript
-interface ConfigService {
+interface ServiceConfig {
   type?: 'SERVER' | 'CLI' | 'DESKTOP';
 
   layers?: {
@@ -89,7 +89,7 @@ interface ConfigService {
   };
 
   platforms?: {
-    server?: ConfigServer; // See Server Platform API reference
+    server?: ServerConfig; // See Server Platform API reference
     cli?: {
       name: string;
       version: string;
@@ -122,10 +122,10 @@ interface ConfigService {
 
 ## Server Platform Configuration
 
-The `platforms.server` property uses the `ConfigServer` type, which includes:
+The `platforms.server` property uses the `ServerConfig` type, which includes:
 
 ```typescript
-type ConfigServer = {
+type ServerConfig = {
   name: string;
   server: HttpServerConfig;
   databases: Array<DatabaseConfig>;

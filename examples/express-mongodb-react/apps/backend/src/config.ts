@@ -17,6 +17,7 @@ import { GetAllGreetingsHandler } from './application/route-handlers/greetings/g
 import { GetGreetingByIdHandler } from './application/route-handlers/greetings/get-by-id/handler';
 import { CreateGreetingHandler } from './application/route-handlers/greetings/create/handler';
 import { DeleteGreetingHandler } from './application/route-handlers/greetings/delete/handler';
+import { UpdateGreetingHandler } from './application/route-handlers/greetings/update/handler';
 import { GetRandomGreetingHandler } from './application/route-handlers/greetings/get-random/handler';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -41,6 +42,7 @@ export function createServiceConfig(app: Application, mongoose: Mongoose) {
     GetGreetingByIdHandler,
     CreateGreetingHandler,
     DeleteGreetingHandler,
+    UpdateGreetingHandler,
     GetRandomGreetingHandler,
   ] as unknown as ApplicationRestRoutes;
 
@@ -58,12 +60,14 @@ export function createServiceConfig(app: Application, mongoose: Mongoose) {
         },
         page: {
           staticDir: join(rootDir, 'apps/frontend/dist'),
+          // Content-hashed bundles cache long at the edge; index.html stays no-cache
+          cache: { maxAge: '1y', immutable: true },
         },
         databases: [
           {
             vendor: DatabaseVendor.MONGOOSE,
             instance: mongoose,
-            connectionString: config.mongoUri,
+            connection: { url: config.mongoUri },
           },
         ],
       },

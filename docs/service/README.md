@@ -14,7 +14,7 @@ The server platform provides infrastructure for building web applications with R
 ## Import
 
 ```typescript
-import { ConfigServer, ServerVendor, ServerType, DatabaseVendor } from '@sentzunhat/zacatl/service';
+import { ServerConfig, ServerVendor, ServerType, DatabaseVendor } from '@sentzunhat/zacatl/service';
 ```
 
 ---
@@ -33,12 +33,12 @@ All HTTP frameworks, databases, and utilities used by the server platform are **
 
 ## Configuration Types
 
-### `ConfigServer`
+### `ServerConfig`
 
 Main configuration object for the server platform.
 
 ```typescript
-type ConfigServer = {
+type ServerConfig = {
   name: string;
   server: HttpServerConfig;
   databases: Array<DatabaseConfig>;
@@ -110,10 +110,15 @@ type PageServerConfig = {
 Database connection configuration supporting Mongoose (MongoDB), Sequelize (SQL), and the Node 22.5+ built-in SQLite.
 
 ```typescript
+interface DatabaseConnection {
+  url: string; // connection URI, file path, or ':memory:'
+  name?: string; // optional connection name for multi-database setups
+}
+
 type DatabaseConfig = {
   vendor: DatabaseVendor; // "MONGOOSE" | "SEQUELIZE" | "SQLITE"
+  connection: DatabaseConnection;
   instance?: DatabaseInstance; // Mongoose | Sequelize — not required for SQLITE
-  connectionString: string;
   onDatabaseConnected?: (dbInstance: DatabaseInstance) => Promise<void> | void;
 };
 ```
@@ -121,9 +126,10 @@ type DatabaseConfig = {
 **Properties:**
 
 - `vendor` - Database vendor: `MONGOOSE`, `SEQUELIZE`, or `SQLITE`
+- `connection.url` - For SQLite: a file path (e.g. `'app.db'`) or `':memory:'`. For others: the full connection URI.
+- `connection.name` - Optional. Names the connection for multi-database setups: repositories reference it via `connection: { name: '...' }` in their config. Omit for a single database per vendor.
 - `instance` - The Mongoose or Sequelize instance. **Not required for `SQLITE`** — the adapter opens the file internally.
-- `connectionString` - For SQLite: a file path (e.g. `'app.db'`) or `':memory:'`. For others: the full connection URI.
-- `onDatabaseConnected` - Optional callback invoked after successful connection for `MONGOOSE` and `SEQUELIZE` adapters (use for model initialization, syncing, etc.). It is not currently invoked by the `SQLITE` adapter.
+- `onDatabaseConnected` - Optional callback invoked after successful connection (use for model initialization, syncing, etc.).
 
 ---
 
@@ -175,7 +181,7 @@ import { DatabaseVendor } from '@sentzunhat/zacatl/service';
 databases: [
   {
     vendor: DatabaseVendor.SQLITE,
-    connectionString: 'app.db', // or ':memory:'
+    connection: { url: 'app.db' }, // or ':memory:'
   },
 ];
 ```
@@ -385,7 +391,7 @@ const service = new Service({
       databases: [
         {
           vendor: DatabaseVendor.SQLITE,
-          connectionString: 'app.db',
+          connection: { url: 'app.db' },
         },
       ],
     },
@@ -492,7 +498,7 @@ const service = new Service({
         {
           vendor: DatabaseVendor.SEQUELIZE,
           instance: sequelize,
-          connectionString: 'sqlite:database.sqlite',
+          connection: { url: 'sqlite:database.sqlite' },
           onDatabaseConnected: async (db) => {
             await (db as Sequelize).sync();
           },
@@ -609,7 +615,7 @@ const service = new Service({
         {
           vendor: DatabaseVendor.MONGOOSE,
           instance: mongoose,
-          connectionString: 'mongodb://localhost:27017/mydb',
+          connection: { url: 'mongodb://localhost:27017/mydb' },
           onDatabaseConnected: async () => {
             console.log('MongoDB connected');
           },
@@ -617,7 +623,7 @@ const service = new Service({
         {
           vendor: DatabaseVendor.SEQUELIZE,
           instance: sequelize,
-          connectionString: 'postgres://localhost:5432/mydb',
+          connection: { url: 'postgres://localhost:5432/mydb' },
           onDatabaseConnected: async (db) => {
             await (db as Sequelize).sync();
             console.log('PostgreSQL connected');

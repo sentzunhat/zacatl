@@ -27,13 +27,11 @@
   },
   "dependencies": {
     "@sentzunhat/zacatl": "file:../../",
+    "sequelize": "^6.37.8",
     "sqlite3": "^6.0.1"
   },
   "devDependencies": {
     "@types/node": "^26.1.1",
     "typescript": "^6.0.3"
-  },
-  "overrides": {
-    "uuid": "^14.0.0"
   }
 }

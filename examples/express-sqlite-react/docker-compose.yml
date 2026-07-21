@@ -1,10 +1,14 @@
 services:
   backend:
+    extends:
+      file: ../compose/databases/sqlite.yml
+      service: backend
     build:
       context: ../..
       dockerfile: examples/Dockerfile
       args:
         EXAMPLE: express-sqlite-react
+        DATABASE_DRIVER: sqlite3
         BACKEND: apps/backend
         FRONTEND: apps/frontend
         PORT: 8181
@@ -13,24 +17,20 @@ services:
     ports:
       - '8181:8181'
     environment:
-      - NODE_ENV=production
-      - PORT=8181
-      - DATABASE_URL=sqlite:database.sqlite
+      NODE_ENV: production
+      PORT: 8181
+      HEALTHCHECK_PATH: /api/greetings
     volumes:
-      - ./data:/app/data
+      - ${ZACATL_EXAMPLE_SQLITE_DATA_DIR:-./data}:/app/data
     healthcheck:
       test:
         [
           'CMD',
-          'node',
+          '/nodejs/bin/node',
           '-e',
-          "fetch('http://localhost:8181/api/greetings').catch(() => process.exit(1))",
+          "const path=process.env.HEALTHCHECK_PATH||'/greetings'; const url=`http://127.0.0.1:$${process.env.PORT || '8181'}$${path}`; const controller=new AbortController(); const timer=setTimeout(() => controller.abort(), 4000); fetch(url, { signal: controller.signal }).then((r) => { clearTimeout(timer); if (!r.ok) process.exit(1); }).catch(() => process.exit(1));",
         ]
       interval: 10s
       timeout: 5s
       retries: 3
       start_period: 10s
-    restart: unless-stopped
-
-volumes:
-  data:

@@ -1,13 +1,13 @@
 import { resolveDependencies } from '@zacatl/dependency-injection';
 import { InternalServerError } from '@zacatl/error';
 
-import type { ConfigApplication } from './types';
-import { getContainer } from '../../../dependency-injection/container';
+import type { ApplicationConfig } from './types';
+import { ensureRegisteredSingleton } from '../../../dependency-injection/container';
 
 export class Application {
-  protected config: ConfigApplication;
+  protected config: ApplicationConfig;
 
-  constructor(config: ConfigApplication) {
+  constructor(config: ApplicationConfig) {
     this.config = config;
 
     this.register();
@@ -28,25 +28,18 @@ export class Application {
 
     const { hooks: restHooks, routes: restRoutes } = restEntryPoints;
 
-    // Register handlers as singletons.
-    // If a handler is decorated with @singleton() it is already registered on
-    // module load, so we skip re-registration to avoid overwriting the existing
-    // singleton instance. @injectable() handlers are not self-registered, so
-    // the framework registers them here. Both decorators produce singletons —
-    // use whichever reads better in your codebase.
+    // Register handlers as singletons. @injectable() handlers are not
+    // self-registered, so the framework registers them here; @singleton()
+    // handlers already registered on module load are left untouched.
     if (restHooks != null && restHooks.length > 0) {
       for (const hook of restHooks) {
-        if (!getContainer().isRegistered(hook)) {
-          getContainer().registerSingleton(hook, hook);
-        }
+        ensureRegisteredSingleton(hook);
       }
     }
 
     if (restRoutes != null && restRoutes.length > 0) {
       for (const route of restRoutes) {
-        if (!getContainer().isRegistered(route)) {
-          getContainer().registerSingleton(route, route);
-        }
+        ensureRegisteredSingleton(route);
       }
     }
 

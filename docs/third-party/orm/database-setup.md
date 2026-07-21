@@ -7,8 +7,9 @@ Connect Zacatl to Sequelize or Mongoose.
 ### Install
 
 ```bash
-# sequelize is bundled — only the dialect driver is needed:
-npm install pg pg-hstore
+# Sequelize is an optional peer in Zacatl 0.0.57+.
+# Install Sequelize plus the dialect driver your service uses:
+npm install sequelize pg pg-hstore
 ```
 
 ### Setup
@@ -110,8 +111,10 @@ const service = new Service({
 ### Install
 
 ```bash
-# mongoose is bundled — no install needed.
-# Use via subpath import:
+# Mongoose is an optional peer in Zacatl 0.0.57+.
+npm install mongoose mongodb
+
+# Then use via subpath import:
 # import mongoose from '@sentzunhat/zacatl/third-party/databases/mongoose';
 ```
 

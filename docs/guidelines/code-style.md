@@ -92,7 +92,7 @@ npm run build            # build:src (esm+cjs) + build:scripts (esm+cjs)
 class GetRouteHandler {}
 class BadRequestError {}
 class UserRepository {}
-class ConfigService {}
+class ServiceConfig {}
 
 // ❌ Avoid
 class get_route_handler {} // snake_case
@@ -133,7 +133,7 @@ function parse_request() { }  // snake_case
 ```typescript
 // ✅ Good
 interface BadRequestErrorArgs { }
-interface ConfigServer { }
+interface ServerConfig { }
 type Constructor<T> = new (...args: any[]) => T;
 type LoggerPort = { log(...): void };
 

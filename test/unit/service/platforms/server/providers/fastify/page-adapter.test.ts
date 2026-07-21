@@ -53,6 +53,31 @@ describe('FastifyPageAdapter', () => {
       expect(options.prefix).toBe('/assets/');
     });
 
+    it('should pass cache options through to fastify-static and no-cache html via setHeaders', () => {
+      adapter.registerStaticFiles({ root: '/dist/client', cache: { maxAge: '1y', immutable: true } });
+
+      const firstCall = mockServer.register.mock.calls[0];
+      const [, options] = firstCall as [
+        unknown,
+        { maxAge?: string; immutable?: boolean; setHeaders?: (res: unknown, path: string) => void },
+      ];
+      expect(options.maxAge).toBe('1y');
+      expect(options.immutable).toBe(true);
+
+      // Raw ServerResponse shape (pre-v10 @fastify/static)
+      const res = { setHeader: vi.fn() };
+      options.setHeaders?.(res, '/dist/client/index.html');
+      expect(res.setHeader).toHaveBeenCalledWith('Cache-Control', 'no-cache');
+      res.setHeader.mockClear();
+      options.setHeaders?.(res, '/dist/client/assets/app-abc123.js');
+      expect(res.setHeader).not.toHaveBeenCalled();
+
+      // Fastify Reply shape (@fastify/static v10 passes the Reply)
+      const reply = { header: vi.fn() };
+      options.setHeaders?.(reply, '/dist/client/index.html');
+      expect(reply.header).toHaveBeenCalledWith('Cache-Control', 'no-cache');
+    });
+
     it('should not include prefix when not provided', () => {
       adapter.registerStaticFiles({ root: '/dist/client' });
 
@@ -85,7 +110,7 @@ describe('FastifyPageAdapter', () => {
     });
 
     it('should serve asset files for /assets/ paths', async () => {
-      const reply = { sendFile: vi.fn(), type: vi.fn() };
+      const reply = { sendFile: vi.fn(), type: vi.fn(), header: vi.fn() };
       const request = { raw: { url: '/assets/main.js' }, method: 'GET', url: '/assets/main.js' };
 
       await notFoundHandler(request, reply);
@@ -94,7 +119,7 @@ describe('FastifyPageAdapter', () => {
     });
 
     it('should serve index.html for SPA deep link routes', async () => {
-      const reply = { sendFile: vi.fn(), type: vi.fn() };
+      const reply = { sendFile: vi.fn(), type: vi.fn(), header: vi.fn() };
       const request = { raw: { url: '/patients/123' }, method: 'GET', url: '/patients/123' };
 
       await notFoundHandler(request, reply);
@@ -104,7 +129,7 @@ describe('FastifyPageAdapter', () => {
     });
 
     it('should serve index.html for root SPA route', async () => {
-      const reply = { sendFile: vi.fn(), type: vi.fn() };
+      const reply = { sendFile: vi.fn(), type: vi.fn(), header: vi.fn() };
       const request = { raw: { url: '/' }, method: 'GET', url: '/' };
 
       await notFoundHandler(request, reply);
@@ -130,7 +155,7 @@ describe('FastifyPageAdapter', () => {
   describe('registerSpaFallback with missing URL', () => {
     it('should treat undefined url as root and fall back to index.html', async () => {
       adapter.registerSpaFallback({ api: '/api' }, '/dist/client');
-      const reply = { sendFile: vi.fn(), type: vi.fn() };
+      const reply = { sendFile: vi.fn(), type: vi.fn(), header: vi.fn() };
       const request = { raw: {}, method: 'GET' };
 
       await notFoundHandler(request, reply);

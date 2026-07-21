@@ -39,10 +39,9 @@ yarn-error.log*
 # Environment / Secrets
 # ------------------------------
 .env
-.env.development.local
-.env.local
-.env.production.local
-.env.test.local
+.env.*
+!.env.example
+.npmrc
 
 # ------------------------------
 # Dependencies
@@ -133,3 +132,6 @@ personal/
 !/scripts/publish
 !/scripts/build
 # public
+
+# Example runtime data (docker compose bind mounts)
+examples/*/data/

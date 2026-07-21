@@ -1,5 +1,7 @@
 import { readFileSync } from 'fs';
 
+import { parse as parseJsonc, printParseErrorCode, type ParseError } from 'jsonc-parser';
+
 import { BadRequestError, NotFoundError, ValidationError } from '@zacatl/error';
 import type { ZodType } from '@zacatl/third-party/zod';
 import { isNodeError, isSyntaxError, isZodError } from '@zacatl/utils';
@@ -7,12 +9,27 @@ import { isNodeError, isSyntaxError, isZodError } from '@zacatl/utils';
 export const loadJSON = <T = unknown>(filePath: string, schema?: ZodType<T>): T => {
   try {
     const content = readFileSync(filePath, 'utf-8');
-    // Strip JSONC comments for .jsonc files
-    const cleanContent = filePath.endsWith('.jsonc')
-      ? content.replace(/\/\/.*$/gm, '').replace(/\/\*[\s\S]*?\*\//g, '')
-      : content;
 
-    const data = JSON.parse(cleanContent);
+    // Parse JSONC with proper string-literal awareness using jsonc-parser
+    // For .jsonc files, strip comments; for .json, strict JSON only
+    let data: unknown;
+    const errors: ParseError[] = [];
+
+    if (filePath.endsWith('.jsonc')) {
+      data = parseJsonc(content, errors, {
+        allowTrailingComma: true,
+        allowEmptyContent: false,
+      });
+
+      const firstError = errors[0];
+      if (firstError !== undefined) {
+        throw new SyntaxError(
+          `JSONC parse error at offset ${firstError.offset}: ${printParseErrorCode(firstError.error)}`,
+        );
+      }
+    } else {
+      data = JSON.parse(content);
+    }
 
     if (schema) {
       return schema.parse(data);

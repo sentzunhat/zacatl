@@ -46,7 +46,7 @@ environment.
 ```
 
 The app container:
-- Image: `node:26-alpine` + python3/make/g++ (for native module rebuilds)
+- Image: `node:26-trixie-slim` + python3/make/g++ (matches the Docker build stages and native-module ABI)
 - Mounts repo root to `/workspace`
 - Exposes ports 8081-8084, 8181-8184 (one per example backend)
 - Sidecars: MongoDB (27017) + Postgres (5432) always-up for DB examples
@@ -86,7 +86,7 @@ npm run build
 
 ### Phase 1: Base devcontainer (no hot reload yet)
 - `devcontainer.json` pointing at `docker-compose.yml`
-- `docker-compose.yml`: `app` service (node:26-alpine + build tools) + mongodb + postgres sidecars
+- `docker-compose.yml`: `app` service (`node:26-trixie-slim` + build tools) + mongodb + postgres sidecars
 - `post-create.sh`: `npm ci && npm run build`
 - VSCode extensions: ESLint, Prettier, TypeScript, Svelte, REST Client
 
@@ -103,7 +103,7 @@ npm run build
 
 ### Phase 4: Test and document
 - Verify `npm run build`, `npm test`, all 8 examples can start in-container
-- Test rebuild of `sqlite3` native module inside alpine container
+- Test `sqlite3` native module installation inside the Debian 13 glibc container
 - Add "Quick start with devcontainer" section to root README
 - Add `docs/guidelines/dev-setup.md` (devcontainer + local-machine paths)
 
@@ -111,8 +111,8 @@ npm run build
 
 ## Open questions (discuss before Phase 1)
 
-1. Should the devcontainer use `node:26` (Debian) for broader tooling compatibility,
-   or `node:26-alpine` to match the Docker build images?
+1. Should the devcontainer pin the exact `node:26-trixie-slim` digest used by
+   the Docker build stages, or follow the mutable tag for maintenance updates?
 2. Should the DB sidecars always start, or be behind a Docker Compose profile
    so SQLite-only contributors don't pull MongoDB/Postgres images?
 3. Should `npm run build:watch` run automatically on `post-create`, or on demand?

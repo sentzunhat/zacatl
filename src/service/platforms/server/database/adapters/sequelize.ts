@@ -9,7 +9,7 @@ export class SequelizeAdapter implements DatabaseServerPort {
   private sequelizeInstance: Sequelize | null = null;
 
   async connect(_serviceName: string, config: DatabaseConfig): Promise<void> {
-    const { instance, onDatabaseConnected } = config;
+    const { instance, connection, onDatabaseConnected } = config;
     const sequelize = instance as Sequelize;
 
     if (sequelize == null || typeof sequelize.authenticate !== 'function') {
@@ -27,7 +27,7 @@ export class SequelizeAdapter implements DatabaseServerPort {
     }
 
     this.sequelizeInstance = sequelize;
-    registerOrmInstance(DatabaseVendor.SEQUELIZE, sequelize);
+    registerOrmInstance(DatabaseVendor.SEQUELIZE, connection, sequelize);
   }
 
   async disconnect(): Promise<void> {

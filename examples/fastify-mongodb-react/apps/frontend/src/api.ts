@@ -105,3 +105,12 @@ export async function deleteGreeting(id: string): Promise<{ success: boolean }> 
     method: 'DELETE',
   });
 }
+
+export async function updateGreeting(id: string, input: { message: string }): Promise<Greeting> {
+  const data = await request<ApiGreeting>(`${API_PREFIX}/greetings/${id}`, {
+    method: 'PUT',
+    body: JSON.stringify({ message: input.message.trim() }),
+  });
+
+  return toGreeting(data);
+}

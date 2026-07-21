@@ -11,7 +11,8 @@ This folder contains reusable coding standards and best practices extracted from
 5. **[documentation.md](./documentation.md)** — Comment and docstring conventions, README guidelines, changelog format
 6. **[git-workflow.md](./git-workflow.md)** — Commit message formats, branch naming, versioning strategy, release procedure
 7. **[framework-overview.md](./framework-overview.md)** — High-level framework map and module index
-8. **[../documentation-guidelines.md](../documentation-guidelines.md)** — Documentation naming and drift-prevention rules
+8. **[hardened-fastify.md](./hardened-fastify.md)** — Production security template (helmet, strict CORS, rate limit, error handler, swagger) passed to zacatl via `server.instance`
+9. **[../documentation-guidelines.md](../documentation-guidelines.md)** — Documentation naming and drift-prevention rules
 
 ## Companion Context Pack
 
@@ -45,7 +46,7 @@ For fast onboarding context (What / How / Why + API/Security/Performance), see
 | ------------ | ---------------- | ---------------------------------------- |
 | Classes      | PascalCase       | `GetRouteHandler`, `BadRequestError`     |
 | Functions    | camelCase        | `createLogger`, `resolveDependency`      |
-| Interfaces   | PascalCase       | `BadRequestErrorArgs`, `ConfigServer`    |
+| Interfaces   | PascalCase       | `BadRequestErrorArgs`, `ServerConfig`    |
 | Type Aliases | PascalCase       | `Constructor<T>`, `LoggerPort`           |
 | Files        | kebab-case       | `get-route-handler.ts`, `bad-request.ts` |
 | Folders      | kebab-case       | `dependency-injection/`, `error-guards/` |

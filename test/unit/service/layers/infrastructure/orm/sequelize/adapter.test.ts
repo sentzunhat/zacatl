@@ -68,35 +68,40 @@ describe('SequelizeAdapter', () => {
     adapter = new SequelizeAdapter(mockConfig);
   });
 
-  describe('constructor / resolveModel', () => {
-    it('resolves model eagerly in constructor', () => {
+  describe('model lazy resolution', () => {
+    it('resolves model on first access', () => {
       expect(adapter.model).toBe(MockModel);
     });
 
-    it('model property is readonly and stable', () => {
+    it('model property is stable across repeated accesses', () => {
       expect(adapter.model).toBe(adapter.model);
     });
 
-    it('throws InternalServerError when DI token is not registered', () => {
+    it('construction succeeds when DI token is not yet registered', () => {
       clearContainer();
+      expect(() => new SequelizeAdapter(mockConfig)).not.toThrow();
+    });
 
-      expect(() => new SequelizeAdapter(mockConfig)).toThrow(
+    it('throws InternalServerError on first model access when DI token is not registered', () => {
+      clearContainer();
+      const localAdapter = new SequelizeAdapter(mockConfig);
+      expect(() => localAdapter.model).toThrow(
         'Sequelize instance not registered in DI container',
       );
     });
 
-    it('throws InternalServerError when Sequelize resolves to null from DI', () => {
+    it('throws InternalServerError on first model access when Sequelize resolves to null', () => {
       clearContainer();
       container.register(SequelizeToken, { useFactory: () => null as never });
-
-      expect(() => new SequelizeAdapter(mockConfig)).toThrow(
+      const localAdapter = new SequelizeAdapter(mockConfig);
+      expect(() => localAdapter.model).toThrow(
         'Sequelize instance resolved to null from DI container',
       );
     });
   });
 
-  describe('constructor bootstrap', () => {
-    it('constructor returns immediately with the resolved model available', () => {
+  describe('model first-access timing', () => {
+    it('first model access does not block the call site', () => {
       const startTime = Date.now();
       const localAdapter = new SequelizeAdapter(mockConfig);
       const elapsed = Date.now() - startTime;
@@ -235,6 +240,44 @@ describe('SequelizeAdapter', () => {
       const result = await adapter.update('999', { name: 'Ghost' });
       expect(result).toBeNull();
       expect(MockModel.findByPk).not.toHaveBeenCalled();
+    });
+
+    describe('postgres dialect', () => {
+      const withDialect = MockModel as unknown as { sequelize?: { getDialect: () => string } };
+
+      beforeEach(() => {
+        withDialect.sequelize = { getDialect: () => 'postgres' };
+      });
+
+      afterEach(() => {
+        delete withDialect.sequelize;
+      });
+
+      it('uses RETURNING and skips the re-fetch round trip', async () => {
+        const now = new Date();
+        const updatedData = { id: '123', name: 'Updated', createdAt: now, updatedAt: now };
+        const mockInstance = new MockModel();
+        mockInstance.get = vi.fn().mockReturnValue(updatedData);
+
+        MockModel.update.mockResolvedValue([1, [mockInstance]]);
+
+        const result = await adapter.update('123', { name: 'Updated' });
+
+        expect(MockModel.update).toHaveBeenCalledWith(
+          { name: 'Updated' },
+          { where: { id: '123' }, returning: true },
+        );
+        expect(MockModel.findByPk).not.toHaveBeenCalled();
+        expect(result).toEqual(updatedData);
+      });
+
+      it('returns null when no rows affected without re-fetching', async () => {
+        MockModel.update.mockResolvedValue([0, []]);
+
+        const result = await adapter.update('999', { name: 'Ghost' });
+        expect(result).toBeNull();
+        expect(MockModel.findByPk).not.toHaveBeenCalled();
+      });
     });
   });
 

@@ -113,7 +113,7 @@ export const createApiAdapter = (server: Express, apiPrefix = ''): ApiServerPort
           target: config.upstream,
           changeOrigin: true,
           ...(config.rewritePrefix != null
-            ? { pathRewrite: { [`^${config.prefix}`]: config.rewritePrefix } }
+            ? { pathRewrite: { [`^${config.prefix.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`]: config.rewritePrefix } }
             : {}),
         }),
       );

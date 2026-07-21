@@ -7,7 +7,7 @@
  * The application layer only knows about this interface, not the specific implementation.
  */
 
-import type { Greeting, CreateGreetingInput } from '../../entities/greeting';
+import type { Greeting, CreateGreetingInput, UpdateGreetingInput } from '../../entities/greeting';
 
 export interface GreetingServicePort {
   /**
@@ -34,4 +34,9 @@ export interface GreetingServicePort {
    * Get a random greeting for a given language
    */
   getRandomGreeting(language: string): Promise<Greeting | null>;
+
+  /**
+   * Update an existing greeting
+   */
+  updateGreeting(id: string, input: UpdateGreetingInput): Promise<Greeting>;
 }

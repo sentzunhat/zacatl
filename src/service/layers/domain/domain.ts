@@ -1,11 +1,10 @@
-import { container } from '@zacatl/third-party/dependency-injection/tsyringe';
-
-import type { ConfigDomain } from './types';
+import type { DomainConfig } from './types';
+import { ensureRegisteredSingleton } from '../../../dependency-injection/container';
 
 export class Domain {
-  protected config: ConfigDomain;
+  protected config: DomainConfig;
 
-  constructor(config: ConfigDomain) {
+  constructor(config: DomainConfig) {
     this.config = config;
 
     this.register();
@@ -19,18 +18,16 @@ export class Domain {
 
   private registerProviders(): void {
     if (this.config.providers && this.config.providers.length > 0) {
-      // Providers registered - tsyringe auto-injects from @injectable metadata
       for (const provider of this.config.providers) {
-        container.registerSingleton(provider, provider);
+        ensureRegisteredSingleton(provider);
       }
     }
   }
 
   private registerServices(): void {
     if (this.config.services && this.config.services.length > 0) {
-      // Services registered - tsyringe auto-injects repositories from @injectable metadata
       for (const service of this.config.services) {
-        container.registerSingleton(service, service);
+        ensureRegisteredSingleton(service);
       }
     }
   }

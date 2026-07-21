@@ -1,19 +1,19 @@
 // @barrel-generated
-import type { ConfigApplication } from './application/types';
+import type { ApplicationConfig } from './application/types';
 import type { ProviderPort } from './domain/ports/provider';
-import type { ConfigDomain } from './domain/types';
-import type { ConfigInfrastructure } from './infrastructure/types';
+import type { DomainConfig } from './domain/types';
+import type { InfrastructureConfig } from './infrastructure/types';
 import type { Optional } from '../../utils/optionals';
 
-export interface ConfigLayers {
+export interface LayersConfig {
   /** Application layer: Entry points for different contexts */
-  application?: Optional<ConfigApplication>;
+  application?: Optional<ApplicationConfig>;
 
   /** Domain layer: Business logic providers (always required) */
-  domain?: Optional<ConfigDomain>;
+  domain?: Optional<DomainConfig>;
 
   /** Infrastructure layer: Data access repositories (always required) */
-  infrastructure?: Optional<ConfigInfrastructure>;
+  infrastructure?: Optional<InfrastructureConfig>;
 }
 
 /**

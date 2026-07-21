@@ -4,8 +4,17 @@ import type { SequelizeBaseRepositoryConfig, SequelizeRepositoryModel } from './
 
 export type BaseRepositoryConfig<D extends object = object> =
   | MongooseBaseRepositoryConfig<D>
-  | SequelizeBaseRepositoryConfig<D>
+  | SequelizeBaseRepositoryConfig
   | NodeSqliteBaseRepositoryConfig;
+
+/** Query pagination options */
+export interface QueryOptions {
+  limit?: number;
+  offset?: number;
+}
+
+/** Default maximum limit to prevent unbounded queries */
+export const DEFAULT_QUERY_LIMIT = 20;
 
 /** ORM adapter interface - implemented by Mongoose, Sequelize, and node:sqlite adapters */
 export interface ORMPort<
@@ -15,10 +24,17 @@ export interface ORMPort<
   FilterType = Record<string, unknown>,
 > {
   readonly model: ModelType;
+  ready(): Promise<void>;
   findById(id: string): Promise<OutputType | null>;
-  findMany(filter?: FilterType): Promise<OutputType[]>;
+  findMany(filter?: FilterType, options?: QueryOptions): Promise<OutputType[]>;
   create(entity: InputType): Promise<OutputType>;
-  update(id: string, update: Partial<InputType>): Promise<OutputType | null>;
+  update(
+    id: string,
+    update: Partial<InputType>,
+    options?: {
+      raw?: boolean;
+    },
+  ): Promise<OutputType | null>;
   delete(id: string): Promise<OutputType | null>;
   exists(id: string): Promise<boolean>;
   toLean(input: unknown): OutputType | null;
@@ -35,10 +51,17 @@ export interface RepositoryPort<
   FilterType = Record<string, unknown>,
 > {
   readonly model: ModelType;
+  ready(): Promise<void>;
   findById(id: string): Promise<OutputType | null>;
-  findMany(filter?: FilterType): Promise<OutputType[]>;
+  findMany(filter?: FilterType, options?: QueryOptions): Promise<OutputType[]>;
   create(entity: InputType): Promise<OutputType>;
-  update(id: string, update: Partial<InputType>): Promise<OutputType | null>;
+  update(
+    id: string,
+    update: Partial<InputType>,
+    options?: {
+      raw?: boolean;
+    },
+  ): Promise<OutputType | null>;
   delete(id: string): Promise<OutputType | null>;
   exists(id: string): Promise<boolean>;
   toLean(input: unknown): OutputType | null;

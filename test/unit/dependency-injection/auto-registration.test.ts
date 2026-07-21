@@ -73,6 +73,8 @@ describe('Auto-Registration Without Service', () => {
     class BaseTestRepository implements RepositoryPort<object> {
       public model = {} as RepositoryModel<object>;
 
+      async ready(): Promise<void> {}
+
       public toLean(input: object): object | null {
         return input ? (input as object) : null;
       }
@@ -128,6 +130,8 @@ describe('Auto-Registration Without Service', () => {
   it('should support DI injection between auto-registered layers', (): void => {
     class DataService implements RepositoryPort<object> {
       public model = {} as RepositoryModel<object>;
+
+      async ready(): Promise<void> {}
 
       public toLean(input: object): object | null {
         return input ? (input as object) : null;

@@ -5,9 +5,9 @@ import { Layers } from './layers/layers';
 import { Platforms } from './platforms/platforms';
 import { registerOrmInstance } from './platforms/server/database/orm-instance';
 import { ServiceType } from './types';
-import type { ConfigService } from './types';
+import type { ServiceConfig } from './types';
 
-export type { ConfigService };
+export type { ServiceConfig };
 
 /**
  * Main Service orchestrator.
@@ -19,17 +19,18 @@ export type { ConfigService };
  * @public
  */
 export class Service {
-  private readonly config: ConfigService;
+  private readonly config: ServiceConfig;
 
+  private readonly layers: Layers | undefined;
   private readonly platforms: Platforms | undefined;
 
   /**
    * Construct a Service instance.
    *
-   * @param config - The `ConfigService` instance that provides layers,
+   * @param config - The `ServiceConfig` instance that provides layers,
    *   platforms and runtime options required to initialize the service.
    */
-  constructor(config: ConfigService) {
+  constructor(config: ServiceConfig) {
     configureI18nNode(config.localization);
 
     this.validateConfig(config);
@@ -42,12 +43,12 @@ export class Service {
     // repositories can resolve them in their constructors via the DI container.
     if (platforms?.server?.databases != null) {
       for (const dbConfig of platforms.server.databases) {
-        registerOrmInstance(dbConfig.vendor, dbConfig.instance);
+        registerOrmInstance(dbConfig.vendor, dbConfig.connection, dbConfig.instance);
       }
     }
 
     if (layers != null) {
-      new Layers(layers);
+      this.layers = new Layers(layers);
     }
 
     if (platforms != null) {
@@ -67,7 +68,7 @@ export class Service {
     }
   }
 
-  private validateConfig(config: ConfigService): void {
+  private validateConfig(config: ServiceConfig): void {
     const { type, layers, platforms } = config;
 
     const configType = type ?? undefined;
@@ -170,11 +171,22 @@ export class Service {
 
       await this.platforms?.start(options);
     }
+
+    // Await repository/adapter readiness AFTER platforms start: database
+    // connections are opened (and their DI tokens registered) inside
+    // platform start, so awaiting earlier would crash the documented
+    // connection-only flows. Failures still surface at startup, not on
+    // the first query.
+    await this.layers?.start();
   }
 }
 
 export { ServiceType };
 export { Layers } from './layers/layers';
 export { Platforms } from './platforms/platforms';
-export type { ConfigPlatforms } from './platforms/types';
+export type { PlatformsConfig } from './platforms/types';
+export type { DatabaseConnection, ConnectionRef, DatabaseConfig } from './platforms/server/database/port';
+export { DatabaseVendor } from './platforms/server/database/port';
+export type { QueryOptions } from './layers/infrastructure/repositories/types';
+export { DEFAULT_QUERY_LIMIT } from './layers/infrastructure/repositories/types';
 export * from './types';

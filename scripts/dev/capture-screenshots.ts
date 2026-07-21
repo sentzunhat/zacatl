@@ -1,10 +1,11 @@
 /**
  * Playwright screenshot automation for all 8 Zacatl examples.
  *
- * Captures 3 states per example:
+ * Captures 4 states per example:
  *   01-initial.png      — empty list on first load
  *   02-after-create.png — one greeting created and visible
- *   03-after-delete.png — greeting deleted, list empty again
+ *   03-after-update.png — the greeting edited inline (PUT) and saved
+ *   04-after-delete.png — greeting deleted, list empty again
  *
  * Output: examples/screenshots/{example-name}/
  *
@@ -100,11 +101,21 @@ async function screenshotExample(
     await page.screenshot({ path: path.join(outDir, '02-after-create.png'), fullPage: true });
     console.log(`  📸 02-after-create.png`);
 
+    await page.locator('button:has-text("Edit")').first().click();
+    const editInput = page.locator('input[aria-label="Edit message"]');
+    await editInput.waitFor({ state: 'visible', timeout: 10_000 });
+    await editInput.fill('Hello from Zacatl! (updated)');
+    await page.locator('button:has-text("Save")').first().click();
+    await page.waitForLoadState('networkidle');
+    await page.locator('text=Hello from Zacatl! (updated)').first().waitFor({ state: 'visible', timeout: 10_000 });
+    await page.screenshot({ path: path.join(outDir, '03-after-update.png'), fullPage: true });
+    console.log(`  📸 03-after-update.png`);
+
     await page.locator('button:has-text("Delete"), button:has-text("Remove")').first().click();
     await page.waitForLoadState('networkidle');
     await page.locator('article, ul li').first().waitFor({ state: 'hidden', timeout: 10_000 }).catch(() => {});
-    await page.screenshot({ path: path.join(outDir, '03-after-delete.png'), fullPage: true });
-    console.log(`  📸 03-after-delete.png`);
+    await page.screenshot({ path: path.join(outDir, '04-after-delete.png'), fullPage: true });
+    console.log(`  📸 04-after-delete.png`);
   } finally {
     await context.close();
   }

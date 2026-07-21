@@ -2,6 +2,99 @@
 
 ---
 
+## [0.0.57] - 2026-07-17
+
+**Status**: Ready for publication
+
+### ⚠️ Breaking Changes
+
+- **Node 26 is the release contract** — `package.json` declares
+  `node >=26.0.0` and `npm >=11.0.0`. Node 24 is not a supported runtime for
+  0.0.57 consumers; use Node 26 locally, in CI, and in production images before
+  treating failures as Zacatl defects.
+- **Config types renamed to `*Config` suffix style — no aliases kept** (owner decision: no rollout window needed). Migration table:
+
+  | Removed | Use instead |
+  | ------- | ----------- |
+  | `ConfigService` | `ServiceConfig` |
+  | `ConfigServer` | `ServerConfig` |
+  | `ConfigLayers` | `LayersConfig` |
+  | `ConfigApplication` | `ApplicationConfig` |
+  | `ConfigInfrastructure` | `InfrastructureConfig` |
+  | `ConfigDomain` | `DomainConfig` |
+  | `ConfigCLI` | `CliConfig` |
+  | `ConfigDesktop` | `DesktopConfig` |
+  | `ConfigPlatforms` | `PlatformsConfig` |
+  | `ConfigLocalization` | `LocalizationConfig` |
+
+- **`generateHmac` no longer accepts SHA-1/MD5** — `HmacAlgorithm` is now `'sha256' | 'sha512'` (the separate `SafeHmacAlgorithm` type is gone; it's just `HmacAlgorithm`). Switch any SHA-1/MD5 signatures to sha256.
+
+### 🐛 Critical Fixes
+
+- **CommonJS consumers un-broken** — the published `build/cjs` tree now carries a `{"type":"commonjs"}` scope marker; previously every `require('@sentzunhat/zacatl/...')` subpath crashed because the CJS files were loaded as ESM under the `"type": "module"` package root. Verified end-to-end against the packed tarball from both `require` and `import`.
+
+### 🔒 Security
+
+- **Timing-safe HMAC verification** — New `verifyHmac()` utility uses `crypto.timingSafeEqual` with a byte-length guard (multi-byte UTF-8 signatures return `false` instead of throwing `RangeError`), preventing timing side-channel attacks on webhook signature validation.
+- **Mongoose filter sanitization** — Adapter filters now reject operator-injection patterns; updates are wrapped in `$set` to prevent accidental field overwrites.
+- **Command-runner policy fail-closed** — Unknown or unregistered commands now throw rather than silently pass; working-directory containment is enforced.
+- **Sequelize is now an optional peer** — Zacatl no longer publishes `sequelize` as a hard runtime dependency, so non-SQL consumers do not inherit Sequelize's nested `uuid@8` advisory chain. Services that use Zacatl's Sequelize adapter should install `sequelize` plus their dialect driver (`pg`, `sqlite3`, etc.) directly.
+- **Removed the scoped Sequelize UUID override** — with Sequelize moved to dev/optional-peer scope, Zacatl no longer forces Sequelize's nested `uuid` outside its declared semver range. Production consumers avoid the audit chain by not installing Sequelize unless they explicitly use SQL adapters.
+- **Consumer audit remediation path documented** — the 0.0.56 audit chain
+  `@sentzunhat/zacatl -> sequelize -> uuid@8.3.2` is fixed for non-SQL
+  consumers by isolating Sequelize as an optional peer, not by downgrading
+  Zacatl or forcing a nested UUID override. See
+  [Migration Guide: 0.0.56 → 0.0.57](migration/0.0.57.md).
+
+### ✨ Improvements
+
+- **JSDoc now ships in the published type declarations** — `removeComments` was stripping every doc comment from the `.d.ts` output, so consumers saw no API docs or deprecation hints in their IDE. Fixed; all public JSDoc now reaches consumers.
+- **@fastify/static upgraded 9 → 10** — verified against a live Fastify instance; the page adapter handles v10's `setHeaders` signature change (Fastify `Reply` instead of the raw `ServerResponse`) with backward compatibility for both shapes.
+- **Static asset caching for CDNs** — new `page.cache: { maxAge, immutable }` config: hashed bundles get long immutable `Cache-Control` while `index.html` and the SPA fallback are always `no-cache`, so deploys propagate instantly and a CDN simply respects origin headers. Implemented in both Fastify and Express page adapters.
+- **SQLite prepared-statement cache (bounded)** — `NodeSqliteAdapter` caches compiled `StatementSync` objects per SQL text in an LRU capped at 128 entries, avoiding re-parsing on every CRUD call without unbounded growth under dynamic filters.
+- **Sequelize write-path polish** — `update()` uses `RETURNING` on the Postgres dialect to skip the re-fetch round trip; write operations are documented as scoping by primary key `id` only (the shared adapter contract).
+- **Proxy path regex escaping** — Express http-proxy-middleware `pathRewrite` key now escapes the configured prefix so special regex characters in path prefixes don't silently mis-route.
+- **Fastify SPA URL decode** — Static file handler strips query strings before resolving the file path so `/assets/app.js?v=1` resolves correctly.
+- **Named database connections** — `connection: { url, name? }` API allows multiple databases of the same vendor; DI tokens are symbol-keyed per name.
+- **Awaitable adapter initialization** — `Service.start()` awaits infrastructure readiness after platform startup.
+- **`DatabaseVendor`, `QueryOptions`, `DEFAULT_QUERY_LIMIT` re-exported** from `@sentzunhat/zacatl/service` for consumer convenience.
+- **`ensureRegisteredSingleton()` DI guard** — one container helper replaces the per-layer `isRegistered` checks: Application, Domain, and Infrastructure layers skip `registerSingleton` if the class is already registered, preventing silent clobber from `@singleton()`-decorated classes.
+- **Publish staging validation** — `prepare-publish` now verifies every `exports`/`bin` target exists in the staged tree and fails the build with a missing-target list instead of shipping a silently broken subpath.
+
+### 🐛 Fixes
+
+- **Eager ORM resolution crash** — Repository adapters now resolve the ORM instance lazily on first model access, fixing startup failures under tsyringe `@singleton()` registration order.
+- **JSONC comment stripping** — Replaced buggy regex with `jsonc-parser` to correctly handle nested comments and string literals.
+- **`findMany` unbounded queries** — All three ORM adapters now enforce a default limit and cap on `findMany`; SQLite additionally pushes filters into SQL for efficiency.
+
+### 🧪 Tests & CI
+
+- **636 tests** — new coverage for `Service`, `Layers`, `Server`, `PageServer`, logger default singletons, statement-cache eviction, Postgres `RETURNING`, and cache-header behavior in both page adapters.
+- **Docker smoke workflow** — CI builds one example image per database-driver branch (sqlite3/pg/mongoose) and runs full CRUD + SPA smoke against the running containers, on relevant pushes/PRs and weekly.
+- **Consumer publish-shape proof** — release verification checks the published
+  package shape so `sequelize` remains out of Zacatl's non-dev dependency tree
+  while SQL examples install `sequelize` plus their dialect driver explicitly.
+- **Release automation** — merging `dev` → `main` auto-creates the version tag, runs the verification chain with `NPM_TOKEN` scoped to the publish step only, publishes with provenance, and creates a GitHub Release from this changelog section.
+
+### 📚 Examples
+
+- All 8 examples gained `PUT /greetings/:id` end-to-end (route handler → domain → repository), an inline Edit UI, CDN cache config, and refreshed 4-state screenshot galleries (initial → create → update → delete).
+- Example Docker Compose database defaults are factored into
+  `examples/compose/databases/{sqlite,mongodb,postgres}.yml`; each example
+  extends the relevant shared defaults while keeping only its app-specific
+  ports, build args, container names, and Mongo init script. MongoDB and
+  PostgreSQL examples default to `mongo:latest` / `postgres:latest` for local
+  copy-paste use and remain env-overridable for pinned deployment images.
+
+### 📚 Migration
+
+- Added [Migration Guide: 0.0.56 → 0.0.57](migration/0.0.57.md), covering:
+  Node 26 runtime expectations, optional ORM peer installs, Sequelize/UUID audit
+  verification, stale override removal, SQL vs non-SQL dependency choices, and
+  downstream Docker smoke expectations.
+
+---
+
 ## [0.0.56] - 2026-07-11
 
 **Status**: Ready for publication
@@ -57,7 +150,7 @@
 - **Unified API prefix** — All 8 examples now serve routes at `/api/greetings` via `server.prefixes: { api: '/api' }`. Vite dev proxies updated to `'^/api'`.
 - **Tailwind CSS 4 migration** — All 8 example frontends migrated from Tailwind 3 to Tailwind 4 (`@import "tailwindcss"`, `@theme {}` block, `@tailwindcss/vite` plugin). No `postcss.config` or `tailwind.config` files remain.
 - **Barrel removal** — Removed `src/service/layers/application/entry-points/rest/index.ts` and its orphaned test; the barrel was not in the published exports map and the Fastify-prefixed aliases it exposed were unreachable to consumers.
-- **Node.js engine requirement** — Broadened from `>=26.3.0` to `>=26.0.0`; `node:sqlite` availability correctly attributed to Node 22.5+.
+- **Node.js engine requirement** — Broadened from `>=26.3.0` to `>=26.0.0`. (Note: although `node:sqlite` first appeared experimentally in Node 22.5, the package's enforced engine floor remains `>=26.0.0` — Node 22.x is not supported.)
 
 ### 📚 Documentation
 

@@ -7,8 +7,10 @@ import type {
   SequelizeRepositoryConfig,
   SequelizeRepositoryModel,
   ORMPort,
+  QueryOptions,
 } from '../../repositories/types';
-import { SequelizeToken } from '../tokens/sequelize';
+import { DEFAULT_QUERY_LIMIT } from '../../repositories/types';
+import { createDatabaseToken } from '../tokens/factory';
 
 /**
  * Sequelize ORM adapter - handles Sequelize-specific database operations
@@ -16,27 +18,56 @@ import { SequelizeToken } from '../tokens/sequelize';
 export class SequelizeAdapter<D extends object, I extends object, O extends object>
   implements ORMPort<SequelizeRepositoryModel<D>, I, O, WhereOptions<D>>
 {
-  public readonly model: SequelizeRepositoryModel<D>;
-  private readonly config: SequelizeRepositoryConfig<D>;
+  // Resolved lazily on first use so that Service construction succeeds
+  // even when the Sequelize instance is registered later in start().
+  private _model: SequelizeRepositoryModel<D> | undefined;
+  private _readyPromise: Promise<void> | undefined;
+  private readonly config: SequelizeRepositoryConfig;
 
-  constructor(config: SequelizeRepositoryConfig<D>) {
+  constructor(config: SequelizeRepositoryConfig) {
     this.config = config;
-    this.model = this.resolveModel();
+  }
 
-    void this.initialize().catch(console.error);
+  // Satisfies ORMPort<SequelizeRepositoryModel<D>, ...>
+  get model(): SequelizeRepositoryModel<D> {
+    if (this._model === undefined) {
+      this._model = this.resolveModel();
+    }
+
+    return this._model;
+  }
+
+  async ready(): Promise<void> {
+    this.getOrCreateModel();
+
+    if (this._readyPromise === undefined) {
+      this._readyPromise = this.initialize();
+    }
+
+    await this._readyPromise;
+  }
+
+  private getOrCreateModel(): SequelizeRepositoryModel<D> {
+    if (this._model === undefined) {
+      this._model = this.resolveModel();
+    }
+
+    return this._model;
   }
 
   private resolveModel(): SequelizeRepositoryModel<D> {
-    const token = SequelizeToken as InjectionToken<Sequelize>;
+    const connectionName = this.config.connection?.name ?? 'SEQUELIZE';
+    const token = createDatabaseToken('SEQUELIZE', connectionName) as InjectionToken<Sequelize>;
 
     if (!getContainer().isRegistered(token)) {
       throw new InternalServerError({
         message: 'Sequelize instance not registered in DI container',
         reason:
-          'SequelizeToken has not been bound to a Sequelize instance. ' +
-          'Ensure registerOrmInstance is called with DatabaseVendor.SEQUELIZE before using repositories.',
+          'Database token has not been bound to a Sequelize instance. ' +
+          'Ensure registerOrmInstance is called with a valid Sequelize instance.',
         component: this.constructor.name,
         operation: 'resolveModel',
+        metadata: { connectionName },
       });
     }
 
@@ -45,11 +76,10 @@ export class SequelizeAdapter<D extends object, I extends object, O extends obje
     if (sequelize == null) {
       throw new InternalServerError({
         message: 'Sequelize instance resolved to null from DI container',
-        reason:
-          'SequelizeToken resolved to a null value. ' +
-          'Ensure registerOrmInstance is called with a valid Sequelize instance.',
+        reason: 'Database token resolved to a null value.',
         component: this.constructor.name,
         operation: 'resolveModel',
+        metadata: { connectionName },
       });
     }
 
@@ -65,9 +95,14 @@ export class SequelizeAdapter<D extends object, I extends object, O extends obje
     return this.toLean(entity);
   }
 
-  async findMany(filter: WhereOptions<D> = {}): Promise<O[]> {
+  async findMany(filter: WhereOptions<D> = {}, options?: QueryOptions): Promise<O[]> {
+    const limit = Math.max(0, Math.min(options?.limit ?? DEFAULT_QUERY_LIMIT, 1000));
+    const offset = Math.max(0, options?.offset ?? 0);
+
     const entities = await this.model.findAll({
       where: filter,
+      limit,
+      offset,
     });
 
     return entities
@@ -91,7 +126,21 @@ export class SequelizeAdapter<D extends object, I extends object, O extends obje
     return lean;
   }
 
+  // Write operations scope by primary key `id` only — the shared adapter
+  // contract across Mongoose/Sequelize/NodeSqlite. Consumers needing
+  // composite/tenant scoping must enforce it in their repository layer.
   async update(id: string, update: Partial<I>): Promise<O | null> {
+    // Postgres supports RETURNING, which saves the re-fetch round trip.
+    if (this.model.sequelize?.getDialect() === 'postgres') {
+      const [affectedCount, rows] = (await this.model.update(update as never, {
+        where: { id } as never,
+        returning: true,
+      })) as unknown as [number, unknown[]];
+
+      if (affectedCount === 0) return null;
+      return this.toLean(rows?.[0] ?? null);
+    }
+
     const [affectedCount] = await this.model.update(update as never, {
       where: { id } as never,
     });
@@ -104,6 +153,8 @@ export class SequelizeAdapter<D extends object, I extends object, O extends obje
   }
 
   async delete(id: string): Promise<O | null> {
+    // The pre-fetch is inherent to the contract: delete() returns the removed
+    // entity, and SQL DELETE cannot return the row across all dialects.
     const entity = await this.findById(id);
     if (entity == null) return null;
 

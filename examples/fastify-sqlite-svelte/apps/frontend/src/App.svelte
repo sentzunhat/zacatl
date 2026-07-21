@@ -36,6 +36,8 @@
   let newLanguage = $state('en');
   let randomLanguage = $state('en');
   let randomGreeting: Greeting | null = $state(null);
+  let editingId: string | null = $state(null);
+  let editMessage = $state('');
 
   let subtitle = $derived(
     filterLanguage ? `Showing greetings in "${filterLanguage}"` : 'Showing all greetings',
@@ -82,6 +84,22 @@
       greetings = greetings.filter((g) => g.id !== id);
     } catch (err) {
       error = err instanceof Error ? err.message : 'Failed to delete greeting';
+    }
+  }
+
+  async function handleUpdate(id: string) {
+    error = null;
+    const message = editMessage.trim();
+    if (!message) { error = 'Message is required.'; return; }
+    try {
+      const updated = await request<Greeting>(`/api/greetings/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify({ message }),
+      });
+      greetings = greetings.map((g) => (g.id === id ? updated : g));
+      editingId = null;
+    } catch (err) {
+      error = err instanceof Error ? err.message : 'Failed to update greeting';
     }
   }
 
@@ -206,18 +224,48 @@
       <ul class="flex flex-col gap-3">
         {#each greetings as greeting (greeting.id)}
           <li class="flex items-center justify-between gap-4 rounded-xl bg-slate-50 p-4">
-            <div>
-              <p class="text-sm font-semibold">{greeting.message}</p>
-              <span class="mt-2 inline-flex items-center rounded-full bg-sky-100 px-3 py-1 text-xs font-semibold text-sky-700">
-                {greeting.language}
-              </span>
-            </div>
-            <button
-              class="rounded-full bg-slate-100 px-3 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-200"
-              onclick={() => handleDelete(greeting.id)}
-            >
-              Delete
-            </button>
+            {#if editingId === greeting.id}
+              <div class="flex flex-1 items-center gap-2">
+                <input
+                  class="flex-1 rounded-xl border border-slate-200 px-3 py-2 text-sm"
+                  bind:value={editMessage}
+                  aria-label="Edit message"
+                />
+                <button
+                  class="rounded-full bg-blue-600 px-3 py-2 text-xs font-semibold text-white transition hover:bg-blue-700"
+                  onclick={() => handleUpdate(greeting.id)}
+                >
+                  Save
+                </button>
+                <button
+                  class="rounded-full bg-slate-100 px-3 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-200"
+                  onclick={() => (editingId = null)}
+                >
+                  Cancel
+                </button>
+              </div>
+            {:else}
+              <div>
+                <p class="text-sm font-semibold">{greeting.message}</p>
+                <span class="mt-2 inline-flex items-center rounded-full bg-sky-100 px-3 py-1 text-xs font-semibold text-sky-700">
+                  {greeting.language}
+                </span>
+              </div>
+              <div class="flex items-center gap-2">
+                <button
+                  class="rounded-full bg-slate-100 px-3 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-200"
+                  onclick={() => { editingId = greeting.id; editMessage = greeting.message; }}
+                >
+                  Edit
+                </button>
+                <button
+                  class="rounded-full bg-slate-100 px-3 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-200"
+                  onclick={() => handleDelete(greeting.id)}
+                >
+                  Delete
+                </button>
+              </div>
+            {/if}
           </li>
         {/each}
       </ul>

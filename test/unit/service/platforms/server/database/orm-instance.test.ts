@@ -10,7 +10,7 @@ import {
   getOrmInstance,
   registerOrmInstance,
 } from '../../../../../../src/service/platforms/server/database/orm-instance';
-import { DatabaseVendor, type DatabaseInstance } from '../../../../../../src/service/platforms/server/database/port';
+import { DatabaseVendor, type DatabaseInstance, type DatabaseConnection } from '../../../../../../src/service/platforms/server/database/port';
 
 describe('orm-instance helpers', () => {
   afterEach(() => {
@@ -25,8 +25,9 @@ describe('orm-instance helpers', () => {
 
     it('returns the instance previously registered for the token', () => {
       const mongooseInstance = { kind: 'mongoose' } as unknown as DatabaseInstance;
+      const connection: DatabaseConnection = { url: 'mongodb://localhost/test', name: DatabaseVendor.MONGOOSE };
 
-      registerOrmInstance(DatabaseVendor.MONGOOSE, mongooseInstance);
+      registerOrmInstance(DatabaseVendor.MONGOOSE, connection, mongooseInstance);
 
       expect(getOrmInstance(MongooseToken)).toBe(mongooseInstance);
     });
@@ -38,13 +39,16 @@ describe('orm-instance helpers', () => {
       [DatabaseVendor.SEQUELIZE, SequelizeToken, { kind: 'sequelize' } as unknown as DatabaseInstance],
       [DatabaseVendor.SQLITE, NodeSqliteToken, { kind: 'sqlite' } as unknown as DatabaseInstance],
     ])('binds %s instances to the DI container', (vendor, token, instance) => {
-      registerOrmInstance(vendor, instance);
+      // Use vendor string as the name to match the default token (createDatabaseToken('VENDOR', 'VENDOR'))
+      const connection: DatabaseConnection = { url: `${vendor.toLowerCase()}://test`, name: vendor };
+      registerOrmInstance(vendor, connection, instance);
 
       expect(resolveDependency(token)).toBe(instance);
     });
 
     it.each([undefined, null])('is a no-op when instance is %s', (instance) => {
-      registerOrmInstance(DatabaseVendor.MONGOOSE, instance as never);
+      const connection: DatabaseConnection = { url: 'mongodb://localhost/test', name: DatabaseVendor.MONGOOSE };
+      registerOrmInstance(DatabaseVendor.MONGOOSE, connection, instance as never);
 
       expect(() => getOrmInstance(MongooseToken)).toThrow(/ORM instance not registered/);
     });

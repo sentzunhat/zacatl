@@ -322,8 +322,8 @@ vs.
 // ❌ This import...
 import { BaseRepository, mongooseSupport } from '@sentzunhat/zacatl/service';
 
-// ...bundles ALL ORMs by default
-// Final bundle = mongoose + sequelize + better-sqlite3 + types
+// ...pulls in database adapter surfaces you may not use
+// Final bundle = mongoose + sequelize + sqlite3 + types
 ```
 
 ---

@@ -1,0 +1,117 @@
+name: Docker smoke
+
+# Builds one example image per database-driver branch of examples/Dockerfile
+# (sqlite3, pg, mongoose) and smoke-tests the running container: health,
+# full CRUD against /api/greetings, and the SPA root. This is the gate that
+# would have caught the 2026-07 breakage where the Dockerfile read driver
+# versions from a package.json section that no longer existed.
+#
+# Runs on changes to the image inputs (src/, scripts/, examples/, the
+# Dockerfile itself) and weekly to catch base-image/registry drift.
+
+on:
+  push:
+    branches: [dev, main]
+    paths:
+      - 'src/**'
+      - 'scripts/**'
+      - 'examples/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/docker-smoke.yml'
+  pull_request:
+    branches: [dev, main]
+    paths:
+      - 'src/**'
+      - 'scripts/**'
+      - 'examples/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/docker-smoke.yml'
+  schedule:
+    - cron: '17 3 * * 1' # Mondays 03:17 UTC
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    name: ${{ matrix.example }} (${{ matrix.driver }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - example: express-sqlite-react
+            driver: sqlite3
+            port: 8181
+          - example: fastify-postgres-react
+            driver: pg
+            port: 8083
+          - example: fastify-mongodb-react
+            driver: mongoose
+            port: 8082
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build and start
+        working-directory: examples/${{ matrix.example }}
+        run: |
+          # SQLite examples bind-mount ./data; on Linux runners Docker creates
+          # it root-owned while the distroless container runs as uid 65532 —
+          # pre-create it writable so the database file can be created.
+          mkdir -p data && chmod 0777 data
+          docker compose up -d --build
+
+      - name: Wait for container health
+        run: |
+          CONTAINER="$(docker compose -f examples/${{ matrix.example }}/docker-compose.yml ps -q backend)"
+          for i in $(seq 1 30); do
+            STATUS="$(docker inspect --format='{{.State.Health.Status}}' "$CONTAINER" 2>/dev/null || echo unknown)"
+            echo "health: $STATUS"
+            [ "$STATUS" = "healthy" ] && exit 0
+            [ "$STATUS" = "unhealthy" ] && break
+            sleep 5
+          done
+          echo "Container did not become healthy" >&2
+          docker logs "$CONTAINER" | tail -50
+          exit 1
+
+      - name: CRUD + SPA smoke
+        run: |
+          set -euo pipefail
+          BASE="http://localhost:${{ matrix.port }}"
+
+          echo "— SPA root —"
+          curl -sf -o /dev/null "$BASE/"
+
+          echo "— POST create —"
+          CREATED=$(curl -sf -X POST "$BASE/api/greetings" \
+            -H 'Content-Type: application/json' \
+            -d '{"message":"ci smoke","language":"en"}')
+          echo "$CREATED"
+          ID=$(echo "$CREATED" | jq -r '.id')
+          test -n "$ID" && test "$ID" != "null"
+
+          echo "— GET list —"
+          curl -sf "$BASE/api/greetings" | jq -e 'length >= 1' >/dev/null
+
+          echo "— GET by id —"
+          curl -sf "$BASE/api/greetings/$ID" | jq -e '.id != null' >/dev/null
+
+          echo "— PUT update —"
+          curl -sf -X PUT "$BASE/api/greetings/$ID" \
+            -H 'Content-Type: application/json' \
+            -d '{"message":"ci smoke updated"}' | jq -e '.message == "ci smoke updated"' >/dev/null
+
+          echo "— DELETE —"
+          curl -sf -X DELETE "$BASE/api/greetings/$ID" | jq -e '.success == true' >/dev/null
+
+          echo "All smoke checks passed."
+
+      - name: Teardown
+        if: always()
+        working-directory: examples/${{ matrix.example }}
+        run: docker compose down -v

@@ -17,7 +17,7 @@ interface SqliteModule {
  * Defensive mode is enabled by default in Node 26+, which blocks SQL
  * language features that can corrupt the database file.
  *
- * The `connectionString` is used as the SQLite file path.
+ * The `connection.url` is used as the SQLite file path.
  * Use `':memory:'` for an in-memory database.
  *
  * The `node:sqlite` module is dynamically imported only when a connection
@@ -25,14 +25,16 @@ interface SqliteModule {
  *
  * @example
  * ```typescript
- * import { DatabaseVendor, ServerVendor } from '@sentzunhat/zacatl';
+ * import { DatabaseVendor } from '@sentzunhat/zacatl';
  *
  * const service = new Service({
- *   platform: {
- *     databases: [{
- *       vendor: DatabaseVendor.SQLITE,
- *       connectionString: 'app.db',
- *     }],
+ *   platforms: {
+ *     server: {
+ *       databases: [{
+ *         vendor: DatabaseVendor.SQLITE,
+ *         connection: { url: 'app.db' },
+ *       }],
+ *     },
  *   },
  * });
  * ```
@@ -49,13 +51,13 @@ export class SqliteAdapter implements DatabaseServerPort {
   }
 
   async connect(_serviceName: string, config: DatabaseConfig): Promise<void> {
-    const { connectionString, instance, onDatabaseConnected } = config;
+    const { connection, instance, onDatabaseConnected } = config;
 
-    if (connectionString == null || connectionString.length === 0) {
+    if (connection?.url == null || connection.url.length === 0) {
       throw new CustomError({
-        message: 'SQLite connection string (file path) is required',
+        message: 'SQLite connection URL (file path) is required',
         code: 500,
-        reason: 'connectionString must be a valid file path or :memory:',
+        reason: 'connection.url must be a valid file path or :memory:',
       });
     }
 
@@ -67,17 +69,17 @@ export class SqliteAdapter implements DatabaseServerPort {
         // This defers the experimental warning until the adapter is actually used.
         const mod = await SqliteAdapter.loadModule();
         // Defensive: true is the default in Node 26 — explicitly set for clarity.
-        this.db = new mod.DatabaseSync(connectionString, { defensive: true });
+        this.db = new mod.DatabaseSync(connection.url, { defensive: true });
       }
 
-      registerOrmInstance(DatabaseVendor.SQLITE, this.db);
+      registerOrmInstance(DatabaseVendor.SQLITE, connection, this.db);
 
       if (onDatabaseConnected != null) {
         await onDatabaseConnected(this.db);
       }
     } catch (error: unknown) {
       throw new CustomError({
-        message: `Failed to open SQLite database at "${connectionString}"`,
+        message: `Failed to open SQLite database at "${connection.url}"`,
         code: 500,
         reason: 'SQLite open failed',
         error: error as Error,

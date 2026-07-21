@@ -17,6 +17,14 @@ interface TestOutput {
   updatedAt: Date;
 }
 
+const makeQueryChain = <T>(result: T) => ({
+  setOptions: vi.fn().mockReturnThis(),
+  skip: vi.fn().mockReturnThis(),
+  limit: vi.fn().mockReturnThis(),
+  lean: vi.fn().mockReturnThis(),
+  exec: vi.fn().mockResolvedValue(result),
+});
+
 const makeModel = (): {
   createCollection: ReturnType<typeof vi.fn>;
   createIndexes: ReturnType<typeof vi.fn>;
@@ -62,8 +70,8 @@ describe('MongooseAdapter', () => {
     vi.clearAllMocks();
   });
 
-  describe('constructor / resolveModel', () => {
-    it('resolves model eagerly in constructor', () => {
+  describe('model lazy resolution', () => {
+    it('resolves model on first access and returns the Mongoose model', () => {
       const adapter = new MongooseAdapter<TestInput, TestInput, TestOutput>({
         type: ORMType.Mongoose,
         name: 'TestUser',
@@ -73,7 +81,7 @@ describe('MongooseAdapter', () => {
       expect(adapter.model).toBe(mockModel);
     });
 
-    it('model property is readonly and stable across calls', () => {
+    it('model property is stable across repeated accesses', () => {
       const adapter = new MongooseAdapter<TestInput, TestInput, TestOutput>({
         type: ORMType.Mongoose,
         name: 'TestUser2',
@@ -83,7 +91,7 @@ describe('MongooseAdapter', () => {
       expect(adapter.model).toBe(adapter.model);
     });
 
-    it('throws InternalServerError when DI token is not registered', () => {
+    it('construction succeeds when DI token is not yet registered', () => {
       clearContainer();
 
       expect(
@@ -93,74 +101,220 @@ describe('MongooseAdapter', () => {
             name: 'TestUser3',
             schema: mockSchema as never,
           }),
-      ).toThrow('Mongoose instance not registered in DI container');
+      ).not.toThrow();
     });
 
-    it('throws InternalServerError when DI resolves to null', () => {
+    it('throws InternalServerError on first model access when DI token is not registered', () => {
+      clearContainer();
+
+      const adapter = new MongooseAdapter<TestInput, TestInput, TestOutput>({
+        type: ORMType.Mongoose,
+        name: 'TestUser3',
+        schema: mockSchema as never,
+      });
+
+      expect(() => adapter.model).toThrow('Mongoose instance not registered in DI container');
+    });
+
+    it('throws InternalServerError on first model access when DI resolves to null', () => {
       clearContainer();
       container.register(MongooseToken, { useFactory: () => null as never });
 
-      expect(
-        () =>
-          new MongooseAdapter<TestInput, TestInput, TestOutput>({
-            type: ORMType.Mongoose,
-            name: 'TestUser4',
-            schema: mockSchema as never,
-          }),
-      ).toThrow('Mongoose instance resolved to null from DI container');
+      const adapter = new MongooseAdapter<TestInput, TestInput, TestOutput>({
+        type: ORMType.Mongoose,
+        name: 'TestUser4',
+        schema: mockSchema as never,
+      });
+
+      expect(() => adapter.model).toThrow('Mongoose instance resolved to null from DI container');
     });
 
-    it('throws InternalServerError when schema is null', () => {
-      expect(
-        () =>
-          new MongooseAdapter<TestInput, TestInput, TestOutput>({
-            type: ORMType.Mongoose,
-            name: 'TestUser5',
-            schema: null as never,
-          }),
-      ).toThrow('Mongoose model configuration is invalid');
+    it('throws InternalServerError on first model access when schema is null', () => {
+      const adapter = new MongooseAdapter<TestInput, TestInput, TestOutput>({
+        type: ORMType.Mongoose,
+        name: 'TestUser5',
+        schema: null as never,
+      });
+
+      expect(() => adapter.model).toThrow('Mongoose model configuration is invalid');
     });
 
-    it('throws InternalServerError when name is empty string', () => {
-      expect(
-        () =>
-          new MongooseAdapter<TestInput, TestInput, TestOutput>({
-            type: ORMType.Mongoose,
-            name: '',
-            schema: mockSchema as never,
-          }),
-      ).toThrow('Mongoose model configuration is invalid');
+    it('throws InternalServerError on first model access when name is empty string', () => {
+      const adapter = new MongooseAdapter<TestInput, TestInput, TestOutput>({
+        type: ORMType.Mongoose,
+        name: '',
+        schema: mockSchema as never,
+      });
+
+      expect(() => adapter.model).toThrow('Mongoose model configuration is invalid');
     });
   });
 
-  describe('constructor bootstrap', () => {
-    it('calls createCollection, createIndexes, and init on the model', async () => {
+  describe('model readiness', () => {
+    it('calls createCollection, createIndexes, and init when ready() is awaited', async () => {
       const adapter = new MongooseAdapter<TestInput, TestInput, TestOutput>({
         type: ORMType.Mongoose,
         name: 'TestUser6',
         schema: mockSchema as never,
       });
 
-      await new Promise((resolve) => setImmediate(resolve));
-
       expect(adapter.model).toBe(mockModel);
+
+      await adapter.ready();
+
       expect(mockModel.createCollection).toHaveBeenCalled();
       expect(mockModel.createIndexes).toHaveBeenCalled();
       expect(mockModel.init).toHaveBeenCalled();
     });
 
-    it('constructor triggers initialize fire-and-forget without blocking', () => {
-      const startTime = Date.now();
-
+    it('ready() is stable across repeated calls', async () => {
       const adapter = new MongooseAdapter<TestInput, TestInput, TestOutput>({
         type: ORMType.Mongoose,
         name: 'TestUser7',
         schema: mockSchema as never,
       });
 
-      const elapsed = Date.now() - startTime;
-      expect(adapter.model).toBeDefined();
-      expect(elapsed).toBeLessThan(50);
+      await expect(adapter.ready()).resolves.toBeUndefined();
+      await expect(adapter.ready()).resolves.toBeUndefined();
+      expect(mockModel.createCollection).toHaveBeenCalledTimes(1);
+      expect(mockModel.createIndexes).toHaveBeenCalledTimes(1);
+      expect(mockModel.init).toHaveBeenCalledTimes(1);
+    });
+
+    it('propagates initialization failures through ready()', async () => {
+      mockModel.createIndexes.mockRejectedValueOnce(new Error('init-failure'));
+
+      const adapter = new MongooseAdapter<TestInput, TestInput, TestOutput>({
+        type: ORMType.Mongoose,
+        name: 'TestUser7b',
+        schema: mockSchema as never,
+      });
+
+      await expect(adapter.ready()).rejects.toThrow('init-failure');
+    });
+  });
+
+  describe('findMany', () => {
+    it('passes literal filters through sanitizeFilter and returns lean results', async () => {
+      const chain = makeQueryChain([
+        { _id: '1', name: 'Iris', createdAt: new Date(), updatedAt: new Date() },
+      ]);
+      mockModel.find.mockReturnValueOnce(chain as never);
+
+      const adapter = new MongooseAdapter<TestInput, TestInput, TestOutput>({
+        type: ORMType.Mongoose,
+        name: 'TestUser8',
+        schema: mockSchema as never,
+      });
+
+      const results = await adapter.findMany({ name: 'Iris' });
+
+      expect(mockModel.find).toHaveBeenCalledWith({ name: 'Iris' });
+      expect(chain.setOptions).toHaveBeenCalledWith({ sanitizeFilter: true });
+      expect(results).toHaveLength(1);
+      expect(results[0]?.name).toBe('Iris');
+    });
+
+    it('rejects top-level operator filters', async () => {
+      const adapter = new MongooseAdapter<TestInput, TestInput, TestOutput>({
+        type: ORMType.Mongoose,
+        name: 'TestUser9',
+        schema: mockSchema as never,
+      });
+
+      await expect(adapter.findMany({ $where: 'true' } as never)).rejects.toThrow(
+        'Invalid repository filter',
+      );
+    });
+  });
+
+  describe('update', () => {
+    it('wraps updates in $set by default', async () => {
+      const chain = makeQueryChain({
+        _id: 'abc',
+        name: 'Michelle',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
+      mockModel.findByIdAndUpdate.mockReturnValueOnce(chain as never);
+
+      const adapter = new MongooseAdapter<TestInput, TestInput, TestOutput>({
+        type: ORMType.Mongoose,
+        name: 'TestUser10',
+        schema: mockSchema as never,
+      });
+
+      const updated = await adapter.update('abc', { name: 'Michelle' });
+
+      expect(mockModel.findByIdAndUpdate).toHaveBeenCalledWith(
+        'abc',
+        { $set: { name: 'Michelle' } },
+        { returnDocument: 'after' },
+      );
+      expect(updated?.name).toBe('Michelle');
+    });
+
+    it('allows raw operator updates through the escape hatch', async () => {
+      const chain = makeQueryChain({
+        _id: 'abc',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
+      mockModel.findByIdAndUpdate.mockReturnValueOnce(chain as never);
+
+      const adapter = new MongooseAdapter<TestInput, TestInput, TestOutput>({
+        type: ORMType.Mongoose,
+        name: 'TestUser11',
+        schema: mockSchema as never,
+      });
+
+      await adapter.update('abc', { $unset: { name: 1 } } as never, { raw: true });
+
+      expect(mockModel.findByIdAndUpdate).toHaveBeenCalledWith(
+        'abc',
+        { $unset: { name: 1 } },
+        { returnDocument: 'after' },
+      );
+    });
+  });
+
+  describe('CastError handling', () => {
+    it('returns null for CastError in findById and propagates other errors', async () => {
+      const castError = Object.assign(new Error('bad id'), { name: 'CastError' });
+      const dbError = new Error('db down');
+      mockModel.findById.mockReturnValueOnce({
+        lean: vi.fn().mockReturnThis(),
+        exec: vi.fn().mockRejectedValueOnce(castError),
+      } as never);
+      mockModel.findById.mockReturnValueOnce({
+        lean: vi.fn().mockReturnThis(),
+        exec: vi.fn().mockRejectedValueOnce(dbError),
+      } as never);
+
+      const adapter = new MongooseAdapter<TestInput, TestInput, TestOutput>({
+        type: ORMType.Mongoose,
+        name: 'TestUser12',
+        schema: mockSchema as never,
+      });
+
+      await expect(adapter.findById('bad')).resolves.toBeNull();
+      await expect(adapter.findById('bad')).rejects.toThrow('db down');
+    });
+
+    it('returns false for CastError in exists and propagates other errors', async () => {
+      const castError = Object.assign(new Error('bad id'), { name: 'CastError' });
+      const dbError = new Error('db down');
+      mockModel.exists.mockRejectedValueOnce(castError);
+      mockModel.exists.mockRejectedValueOnce(dbError);
+
+      const adapter = new MongooseAdapter<TestInput, TestInput, TestOutput>({
+        type: ORMType.Mongoose,
+        name: 'TestUser13',
+        schema: mockSchema as never,
+      });
+
+      await expect(adapter.exists('bad')).resolves.toBe(false);
+      await expect(adapter.exists('bad')).rejects.toThrow('db down');
     });
   });
 });

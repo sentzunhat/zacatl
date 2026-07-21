@@ -1,17 +1,17 @@
-import type { ConfigLayers } from './layers/types';
-import type { ConfigPlatforms } from './platforms/types';
+import type { LayersConfig } from './layers/types';
+import type { PlatformsConfig } from './platforms/types';
 
 /**
  * Configuration for the CLI platform (re-export).
  * See src/platforms/cli/types for details.
  */
-export type { ConfigCLI } from './platforms/cli/types';
+export type { CliConfig } from './platforms/cli/types';
 
 /**
  * Configuration for the Desktop platform (re-export).
  * See src/platforms/desktop/types for details.
  */
-export type { ConfigDesktop } from './platforms/desktop/types';
+export type { DesktopConfig } from './platforms/desktop/types';
 
 /**
  * Service execution context.
@@ -36,7 +36,7 @@ export enum ServiceType {
  * - `objectNotation` — enable nested key access using dot notation.
  * - `overrideBuiltIn` — allow overriding built-in translations.
  */
-export interface ConfigLocalization {
+export interface LocalizationConfig {
   locales?: {
     default?: string;
     supported?: string[];
@@ -51,19 +51,19 @@ export interface ConfigLocalization {
  * Root configuration for the service module.
  *
  * - `type` — execution context, one of `ServiceType`.
- * - `layers` — layered configuration values (see `ConfigLayers`).
- * - `platforms` — platform-specific configuration (see `ConfigPlatforms`).
+ * - `layers` — layered configuration values (see `LayersConfig`).
+ * - `platforms` — platform-specific configuration (see `PlatformsConfig`).
  * - `localization` — localization settings.
  * - `run.auto` — whether the service should start automatically.
  */
-export interface ConfigService {
+export interface ServiceConfig {
   type?: ServiceType;
 
-  layers?: ConfigLayers;
+  layers?: LayersConfig;
 
-  platforms?: ConfigPlatforms;
+  platforms?: PlatformsConfig;
 
-  localization?: ConfigLocalization;
+  localization?: LocalizationConfig;
 
   run?: { auto?: boolean };
 }

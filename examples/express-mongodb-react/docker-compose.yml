@@ -1,23 +1,13 @@
 services:
   mongodb:
-    image: mongo:latest
+    extends:
+      file: ../compose/databases/mongodb.yml
+      service: mongodb
     container_name: express-mongodb-db
     ports:
-      - '27018:27017'
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: root
-      MONGO_INITDB_DATABASE: appdb
+      - '${EXPRESS_MONGODB_HOST_PORT:-27018}:27017'
     volumes:
-      - mongo-data:/data/db
       - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
-    healthcheck:
-      test: ['CMD', 'mongosh', '--eval', "db.adminCommand('ping')"]
-      interval: 10s
-      timeout: 5s
-      retries: 3
-      start_period: 10s
-    restart: unless-stopped
 
   backend:
     build:
@@ -25,6 +15,7 @@ services:
       dockerfile: examples/Dockerfile
       args:
         EXAMPLE: express-mongodb-react
+        DATABASE_DRIVER: mongoose
         BACKEND: apps/backend
         FRONTEND: apps/frontend
         PORT: 8182
@@ -36,6 +27,7 @@ services:
       - NODE_ENV=production
       - PORT=8182
       - MONGO_URI=mongodb://local:local@mongodb:27017/appdb
+      - HEALTHCHECK_PATH=/api/greetings
     depends_on:
       mongodb:
         condition: service_healthy
@@ -43,9 +35,9 @@ services:
       test:
         [
           'CMD',
-          'node',
+          '/nodejs/bin/node',
           '-e',
-          "fetch('http://localhost:8182/api/greetings').catch(() => process.exit(1))",
+          "const path=process.env.HEALTHCHECK_PATH||'/greetings'; const url=`http://127.0.0.1:$${process.env.PORT || '8182'}$${path}`; const controller=new AbortController(); const timer=setTimeout(() => controller.abort(), 4000); fetch(url, { signal: controller.signal }).then((r) => { clearTimeout(timer); if (!r.ok) process.exit(1); }).catch(() => process.exit(1));",
         ]
       interval: 10s
       timeout: 5s

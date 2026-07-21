@@ -2,7 +2,7 @@ import { describe, it, expect, vi } from 'vitest';
 
 import type { ApplicationEntryPoints } from '../../../src/service/layers/application/types';
 import { Platforms } from '../../../src/service/platforms/platforms';
-import type { ConfigPlatforms } from '../../../src/service/platforms/types';
+import type { PlatformsConfig } from '../../../src/service/platforms/types';
 
 // Mock the platform implementations to keep the test isolated and simple
 const serverStart = vi.fn(async () => {});
@@ -45,8 +45,8 @@ vi.mock('../../../src/service/platforms/desktop/desktop', () => {
 
 describe('Platforms wrapper', () => {
   it('forwards registerEntrypoints and start to server when only server configured', async () => {
-    const config: ConfigPlatforms = {
-      server: { foo: 'bar' } as unknown as ConfigPlatforms['server'],
+    const config: PlatformsConfig = {
+      server: { foo: 'bar' } as unknown as PlatformsConfig['server'],
     };
     const platforms = new Platforms(config);
 
@@ -59,10 +59,10 @@ describe('Platforms wrapper', () => {
   });
 
   it('forwards to all configured platforms', async () => {
-    const config: ConfigPlatforms = {
-      server: { foo: 1 } as unknown as ConfigPlatforms['server'],
-      cli: { bar: 2 } as unknown as ConfigPlatforms['cli'],
-      desktop: { baz: 3 } as unknown as ConfigPlatforms['desktop'],
+    const config: PlatformsConfig = {
+      server: { foo: 1 } as unknown as PlatformsConfig['server'],
+      cli: { bar: 2 } as unknown as PlatformsConfig['cli'],
+      desktop: { baz: 3 } as unknown as PlatformsConfig['desktop'],
     };
     const platforms = new Platforms(config);
 

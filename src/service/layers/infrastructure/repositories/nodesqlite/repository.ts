@@ -1,6 +1,6 @@
 import type { NodeSqliteRepositoryConfig, NodeSqliteRepositoryModel } from './types';
 import { createNodeSqliteAdapter } from '../../orm/nodesqlite/adapter-loader';
-import type { RepositoryPort, ORMPort } from '../types';
+import type { RepositoryPort, ORMPort, QueryOptions } from '../types';
 
 /**
  * Standalone Node.js SQLite Repository - delegates to NodeSqliteAdapter
@@ -36,12 +36,16 @@ export abstract class BaseRepository<I extends object, O extends object>
     return this.adapter.model;
   }
 
+  async ready(): Promise<void> {
+    await this.adapter.ready();
+  }
+
   async findById(id: string): Promise<O | null> {
     return this.adapter.findById(id);
   }
 
-  async findMany(filter: Partial<O> = {}): Promise<O[]> {
-    return this.adapter.findMany(filter);
+  async findMany(filter: Partial<O> = {}, options?: QueryOptions): Promise<O[]> {
+    return this.adapter.findMany(filter, options);
   }
 
   async create(entity: I): Promise<O> {

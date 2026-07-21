@@ -7,8 +7,9 @@ Connect to PostgreSQL, MongoDB, or any database.
 ### Setup
 
 ```bash
-# sequelize is bundled — only install the dialect driver:
-npm install pg pg-hstore  # PostgreSQL
+# Sequelize is an optional peer in Zacatl 0.0.57+.
+# Install Sequelize plus the dialect driver your service uses:
+npm install sequelize pg pg-hstore  # PostgreSQL
 ```
 
 ### Configuration
@@ -96,7 +97,8 @@ export class ProductRepository implements IRepository<Product> {
 ### Setup
 
 ```bash
-# mongoose is bundled — no install needed.
+# Mongoose is an optional peer in Zacatl 0.0.57+.
+npm install mongoose mongodb
 ```
 
 ### Configuration
@@ -113,7 +115,7 @@ const service = new Service({
         {
           vendor: DatabaseVendor.MONGOOSE,
           instance: mongoose,
-          connectionString: 'mongodb://localhost:27017/mydb',
+          connection: { url: 'mongodb://localhost:27017/mydb' },
         },
       ],
     },
@@ -178,10 +180,10 @@ Implement `IRepository<T>` for any database:
 
 ```typescript
 import { IRepository } from '@sentzunhat/zacatl/service';
-import Database from 'better-sqlite3';
+import { DatabaseSync } from 'node:sqlite';
 
 export class SQLiteRepository<T> implements IRepository<T> {
-  constructor(private db: Database.Database, private tableName: string) {}
+  constructor(private db: DatabaseSync, private tableName: string) {}
 
   findById = async (id: string): Promise<T | null> => {
     const stmt = this.db.prepare(`SELECT * FROM ${this.tableName} WHERE id = ?`);

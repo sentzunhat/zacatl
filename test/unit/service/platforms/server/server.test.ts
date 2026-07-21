@@ -1,6 +1,6 @@
 import type { FastifyInstance } from 'fastify';
 
-import type { ConfigServer } from '../../../../../src/service/platforms/server/server';
+import type { ServerConfig } from '../../../../../src/service/platforms/server/server';
 import { Server } from '../../../../../src/service/platforms/server/server';
 import { DatabaseVendor } from '../../../../../src/service/platforms/server/database/port';
 import type { DatabaseInstance } from '../../../../../src/service/platforms/server/database/port';
@@ -11,6 +11,7 @@ import {
 
 class FakeFastifyInstance {
   listen = vi.fn(() => Promise.resolve());
+  close = vi.fn(() => Promise.resolve());
   withTypeProvider = vi.fn(() => ({ route: vi.fn() }));
   addHook = vi.fn();
   register = vi.fn();
@@ -29,7 +30,7 @@ describe('Server', () => {
   const fakeFastify: FakeFastifyInstance = new FakeFastifyInstance();
   const fakeMongoose: FakeMongoose = new FakeMongoose();
 
-  let config: ConfigServer;
+  let config: ServerConfig;
 
   beforeEach(() => {
     config = {
@@ -44,7 +45,7 @@ describe('Server', () => {
         {
           vendor: DatabaseVendor.MONGOOSE,
           instance: fakeMongoose as unknown as DatabaseInstance,
-          connectionString: 'mongodb://localhost/test',
+          connection: { url: 'mongodb://localhost/test' },
           onDatabaseConnected: vi.fn(),
         },
       ],
@@ -111,6 +112,70 @@ describe('Server', () => {
       const server = new Server(config);
 
       await expect(server.start()).rejects.toThrow('failed to start service');
+    });
+  });
+
+  describe('stop()', () => {
+    it('resolves cleanly when no database server is present', async () => {
+      const serverWithNoDbs = new Server({ ...config, databases: [] });
+      await expect(serverWithNoDbs.stop()).resolves.toBeUndefined();
+    });
+
+    it('calls disconnect on the database server', async () => {
+      const server = new Server(config);
+      const dbServer = server.getDatabaseServer();
+      if (dbServer == null) throw new Error('DatabaseServer should be defined');
+      const disconnectSpy = vi.spyOn(dbServer, 'disconnect').mockResolvedValue(undefined);
+
+      await server.stop();
+
+      expect(disconnectSpy).toHaveBeenCalledOnce();
+    });
+  });
+
+  describe('registerEntrypoints()', () => {
+    it('delegates to apiServer.registerEntrypoints', async () => {
+      const server = new Server(config);
+      const apiServer = server.getApiServer();
+      if (apiServer == null) throw new Error('ApiServer should be defined');
+      const spy = vi.spyOn(apiServer, 'registerEntrypoints').mockResolvedValue(undefined);
+
+      await server.registerEntrypoints({ routes: [] });
+
+      expect(spy).toHaveBeenCalledOnce();
+    });
+  });
+
+  describe('Express vendor', () => {
+    it('creates Express adapters when vendor is EXPRESS', () => {
+      const fakeExpress = {
+        use: vi.fn(),
+        get: vi.fn(),
+        post: vi.fn(),
+        listen: vi.fn((_port, _host, cb) => { cb?.(); return { close: vi.fn() }; }),
+        set: vi.fn(),
+      };
+      const expressConfig: ServerConfig = {
+        ...config,
+        server: {
+          type: config.server.type,
+          vendor: ServerVendor.EXPRESS,
+          instance: fakeExpress as unknown as never,
+        },
+      };
+      const server = new Server(expressConfig);
+      expect(server.getApiAdapter()).toBeDefined();
+      expect(server.getPageAdapter()).toBeDefined();
+    });
+  });
+
+  describe('unsupported vendor', () => {
+    it('throws InternalServerError for unknown vendor', () => {
+      const badConfig: ServerConfig = {
+        ...config,
+        server: { ...config.server, vendor: 'UNKNOWN' as unknown as ServerVendor },
+      };
+      expect(() => new Server(badConfig)).toThrow();
     });
   });
 });

@@ -27,7 +27,7 @@ describe('CustomError', () => {
     expect(error.correlationId).not.toBe(error.id);
   });
 
-  it('toJSON() should include correlationId and structured metadata', () => {
+  it('toJSON() should expose only the concise public shape', () => {
     const metadata = { user: 'u1' };
     const error = new TestError({
       message: 'Test message',
@@ -38,28 +38,56 @@ describe('CustomError', () => {
 
     const json = error.toJSON();
 
-    expect(json.message).toBe('Test message');
-    expect(json.name).toBe('TestError');
-    expect(json.code).toBe(400);
-    expect(json.reason).toBe('Bad Input');
-    expect(json.metadata).toEqual(metadata);
-    expect(json.correlationId).toBeDefined();
-    expect(json.time).toBeDefined();
-    expect(json.custom).toBe(true);
+    expect(json).toEqual({
+      message: 'Test message',
+      code: 400,
+      correlationId: error.correlationId,
+    });
   });
 
-  it('toJSON() should include nested error info if present', () => {
+  it('toJSON() should redact internal 5xx messages and diagnostic data', () => {
+    const originalError = new Error('password=secret at /private/app/database.ts');
+    const error = new TestError({
+      message: 'Database failed at /private/app/database.ts',
+      code: 500,
+      reason: 'password=secret',
+      metadata: { password: 'secret', path: '/private/app/database.ts' },
+      error: originalError,
+      component: 'Database',
+      operation: 'connect',
+    });
+
+    const serialized = JSON.stringify(error);
+    expect(error.toJSON()).toEqual({
+      message: 'Internal Server Error',
+      code: 500,
+      correlationId: error.correlationId,
+    });
+    expect(serialized).not.toContain('secret');
+    expect(serialized).not.toContain('/private/app');
+    expect(serialized).not.toContain('stack');
+    expect(serialized).not.toContain('Database');
+  });
+
+  it('toDiagnosticJSON() should retain trusted logging context', () => {
     const originalError = new Error('Database failed');
     const error = new TestError({
       message: 'Wrap error',
+      reason: 'CONNECTION_FAILED',
+      metadata: { database: 'primary' },
       error: originalError,
+      component: 'Database',
+      operation: 'connect',
     });
 
-    const json = error.toJSON();
-    expect(json.error).toBeDefined();
-    expect(json.error?.message).toBe('Database failed');
-    expect(json.error?.name).toBe('Error');
-    expect(json.error?.stack).toBeDefined();
+    const diagnostic = error.toDiagnosticJSON();
+    expect(diagnostic.error?.message).toBe('Database failed');
+    expect(diagnostic.error?.stack).toBeDefined();
+    expect(diagnostic.metadata).toEqual({ database: 'primary' });
+    expect(diagnostic.reason).toBe('CONNECTION_FAILED');
+    expect(diagnostic.component).toBe('Database');
+    expect(diagnostic.operation).toBe('connect');
+    expect(diagnostic.stack).toBeDefined();
   });
 
   it('toString() should be formatted correctly with all details', () => {

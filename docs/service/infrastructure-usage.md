@@ -149,7 +149,7 @@ For repository-style CRUD with normalized output, use `AbstractNodeSqliteReposit
 ```typescript
 import { DatabaseVendor } from '@sentzunhat/zacatl/service';
 
-databases: [{ vendor: DatabaseVendor.SQLITE, connectionString: 'app.db' }];
+databases: [{ vendor: DatabaseVendor.SQLITE, connection: { url: 'app.db' } }];
 // ':memory:' is also valid for in-memory databases
 ```
 

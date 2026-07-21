@@ -131,7 +131,7 @@ export class UserRepository {
   public toLean(doc: MongooseDocument): UserOutput { ... }
 }
 
-export class ConfigService {
+export class ServiceConfig {
   public registerDependency(key: string, value: any): void { ... }
   public getDependency<T>(key: string): T { ... }
 }
@@ -155,8 +155,8 @@ export class BaseRepository<D, I, O> {
 }
 
 export class Service {
-  private validateConfig(config: ConfigService): void { ... }
-  private registerApplicationLayer(config: ConfigService): void { ... }
+  private validateConfig(config: ServiceConfig): void { ... }
+  private registerApplicationLayer(config: ServiceConfig): void { ... }
   private loadDatabase(): Promise<void> { ... }
 }
 
@@ -272,8 +272,8 @@ export type MongooseRepositoryConfig<D = unknown> = {
 
 export type ServiceConfig = {
   readonly type?: ServiceType;
-  readonly layers?: ConfigLayers;
-  readonly platforms?: ConfigPlatforms;
+  readonly layers?: LayersConfig;
+  readonly platforms?: PlatformsConfig;
   readonly database?: DatabaseConfig;
   readonly logger?: LoggerConfig;
 };

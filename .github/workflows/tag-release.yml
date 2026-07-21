@@ -1,0 +1,44 @@
+name: Tag Release
+
+# Release flow (owner decision, 2026-07-15): `dev` is the working trunk;
+# releases go through `main`. Merging a PR into `main` triggers this
+# workflow, which creates the `v<version>` tag from package.json (if it
+# does not already exist) and then dispatches the Release workflow on
+# that tag.
+#
+# Note: tags pushed with the default GITHUB_TOKEN do not trigger other
+# workflows (GitHub anti-recursion), so we dispatch Release explicitly.
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write # create and push the release tag
+  actions: write # dispatch the Release workflow
+
+jobs:
+  tag:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # need tags to detect already-released versions
+
+      - name: Create tag if missing and dispatch Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          PKG_VERSION="$(node -p "require('./package.json').version")"
+          TAG="v${PKG_VERSION}"
+          if git rev-parse -q --verify "refs/tags/${TAG}" >/dev/null; then
+            echo "Tag ${TAG} already exists — nothing to release."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag "${TAG}"
+          git push origin "${TAG}"
+          gh workflow run release.yml --ref "${TAG}"

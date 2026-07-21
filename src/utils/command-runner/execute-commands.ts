@@ -10,8 +10,8 @@ import type { CommandSpec, CommandResult, RunnerPolicy } from './types';
  * the input array regardless of completion order. Passing an empty array
  * short-circuits immediately and returns `[]`.
  *
- * Policy defaults are applied via `RunnerPolicySchema`, so an empty object
- * `{}` is a valid policy that uses all safe defaults.
+ * Policy defaults are applied via `RunnerPolicySchema`. A non-empty allowlist
+ * is required whenever commands are present.
  *
  * @param commands    - Ordered list of commands to run
  * @param policyInput - Partial policy; omitted fields receive safe defaults
@@ -27,7 +27,7 @@ import type { CommandSpec, CommandResult, RunnerPolicy } from './types';
  *     { cmd: 'npm', args: ['run', 'build'] },
  *     { cmd: 'npm', args: ['test'] },
  *   ],
- *   { maxConcurrency: 2, inheritEnv: true },
+ *   { allowlist: ['npm'], maxConcurrency: 2, inheritEnv: true },
  * );
  * ```
  */

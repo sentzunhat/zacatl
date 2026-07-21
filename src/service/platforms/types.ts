@@ -1,16 +1,16 @@
 // @barrel-generated
-import type { ConfigCLI } from './cli/types';
-import type { ConfigDesktop } from './desktop/types';
-import type { ConfigServer } from './server/server';
+import type { CliConfig } from './cli/types';
+import type { DesktopConfig } from './desktop/types';
+import type { ServerConfig } from './server/server';
 import type { Optional } from '../../utils/optionals';
 
-export interface ConfigPlatforms {
+export interface PlatformsConfig {
   /** Server configuration (required for SERVER type) */
-  server?: Optional<ConfigServer>;
+  server?: Optional<ServerConfig>;
 
   /** CLI configuration (required for CLI type) */
-  cli?: Optional<ConfigCLI>;
+  cli?: Optional<CliConfig>;
 
   /** Desktop configuration (required for DESKTOP type) */
-  desktop?: Optional<ConfigDesktop>;
+  desktop?: Optional<DesktopConfig>;
 }

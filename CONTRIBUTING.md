@@ -345,6 +345,25 @@ xdg-open coverage/index.html  # Linux alternative
 
 Maintainers handle releases. For reference, see [git-workflow.md](../docs/guidelines/git-workflow.md#release-procedure).
 
+**Branch and release flow:**
+
+- `dev` is the working trunk — feature/work branches merge into `dev`
+- Releases go through `main`: bump `package.json` and `docs/changelog.md` on
+  `dev`, then open and merge a PR from `dev` → `main`
+- On merge to `main`, the `Tag Release` workflow
+  (`.github/workflows/tag-release.yml`) creates the `vX.Y.Z` tag from
+  `package.json` (skipping if it already exists) and dispatches the `Release`
+  workflow
+- The `Release` workflow (`.github/workflows/release.yml`) verifies the tag
+  matches `package.json`, runs the full verification chain (guard, tests,
+  type check, lint, build), publishes to npm with `--provenance` using the
+  `NPM_TOKEN` repository secret, and creates a GitHub Release with notes
+  extracted from that version's `docs/changelog.md` section
+- Do **not** push `v*` tags manually — the tag is the release marker created
+  by CI after a successful merge to `main`
+- The `Publish (dry-run)` workflow runs the same chain (without publishing)
+  on every push and PR to `dev` and `main`
+
 **What you should know:**
 
 - Versions follow Semantic Versioning (MAJOR.MINOR.PATCH)
@@ -422,6 +441,10 @@ Keep releases simple and reproducible:
   npm install --ignore-scripts
   ```
 
+- Zacatl currently requires Node 26 or newer. That floor is intentional:
+  the service uses `node:sqlite`, so older Node releases fail at install/run
+  time instead of producing a supported runtime.
+
 - Build & verify before publishing:
 
   ```bash
@@ -432,6 +455,7 @@ Keep releases simple and reproducible:
   ```
 
 - Note: we publish `./publish` as the package root. `prepare-publish` writes a trimmed `package.json` into `publish/` and places built assets under `publish/build/`.
+- Use CI-injected publish credentials rather than committing auth to the repo.
 
 That's it — keep branches tied to issues and publish from `publish/` for a lean package.
 

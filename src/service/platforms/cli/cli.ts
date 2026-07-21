@@ -1,6 +1,6 @@
 import { InternalServerError } from '@zacatl/error';
 
-import type { ConfigCLI } from './types';
+import type { CliConfig } from './types';
 import type { CliApplicationEntryPoints } from '../../layers/application/types';
 
 /**
@@ -16,7 +16,7 @@ export class CLI {
   private readonly name: string;
   private readonly version: string;
 
-  constructor(config: ConfigCLI) {
+  constructor(config: CliConfig) {
     this.name = config.name;
     this.version = config.version;
   }

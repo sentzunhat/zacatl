@@ -14,6 +14,6 @@ export type InfrastructureRepository = Constructor<InfrastructureUnknownReposito
  */
 export type InfrastructureRepositories = Array<InfrastructureRepository>;
 
-export interface ConfigInfrastructure {
+export interface InfrastructureConfig {
   repositories?: InfrastructureRepositories;
 }

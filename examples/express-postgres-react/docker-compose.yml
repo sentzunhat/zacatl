@@ -1,22 +1,11 @@
 services:
   postgres:
-    image: postgres:16
+    extends:
+      file: ../compose/databases/postgres.yml
+      service: postgres
     container_name: express-postgres-db
     ports:
-      - '5434:5432'
-    environment:
-      - POSTGRES_USER=local
-      - POSTGRES_PASSWORD=local
-      - POSTGRES_DB=appdb
-    volumes:
-      - postgres-data:/var/lib/postgresql/data
-    healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U local -d appdb']
-      interval: 10s
-      timeout: 5s
-      retries: 3
-      start_period: 10s
-    restart: unless-stopped
+      - '${EXPRESS_POSTGRES_HOST_PORT:-5434}:5432'
 
   backend:
     build:
@@ -24,6 +13,7 @@ services:
       dockerfile: examples/Dockerfile
       args:
         EXAMPLE: express-postgres-react
+        DATABASE_DRIVER: pg
         BACKEND: apps/backend
         FRONTEND: apps/frontend
         PORT: 8183
@@ -35,6 +25,7 @@ services:
       - NODE_ENV=production
       - PORT=8183
       - DATABASE_URL=postgres://local:local@postgres:5432/appdb
+      - HEALTHCHECK_PATH=/api/greetings
     depends_on:
       postgres:
         condition: service_healthy
@@ -42,9 +33,9 @@ services:
       test:
         [
           'CMD',
-          'node',
+          '/nodejs/bin/node',
           '-e',
-          "fetch('http://localhost:8183/api/greetings').catch(() => process.exit(1))",
+          "const path=process.env.HEALTHCHECK_PATH||'/greetings'; const url=`http://127.0.0.1:$${process.env.PORT || '8183'}$${path}`; const controller=new AbortController(); const timer=setTimeout(() => controller.abort(), 4000); fetch(url, { signal: controller.signal }).then((r) => { clearTimeout(timer); if (!r.ok) process.exit(1); }).catch(() => process.exit(1));",
         ]
       interval: 10s
       timeout: 5s

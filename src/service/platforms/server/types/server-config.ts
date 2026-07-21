@@ -24,6 +24,17 @@ export interface PageServerConfig {
   spaFallback?: boolean | undefined;
   /** Named API prefixes excluded from SPA fallback. Defaults to `{ api: '/api' }`. Add more keys for additional API groups. */
   prefixes?: ApiPrefixes | undefined;
+  /**
+   * Cache-Control for static assets — the CDN-friendly pattern for
+   * content-hashed bundles (Vite/webpack emit hashed filenames, so long
+   * immutable caching is safe). index.html is always served with
+   * `no-cache` so deploys propagate immediately; a CDN in front simply
+   * respects these origin headers. `maxAge`/`immutable` are passed
+   * verbatim to express.static / @fastify/static.
+   *
+   * @example { maxAge: '1y', immutable: true }
+   */
+  cache?: { maxAge?: number | string; immutable?: boolean } | undefined;
   customRegister?: ((server: unknown) => Promise<void> | void) | undefined;
 }
 

@@ -20,3 +20,8 @@ export interface CreateGreetingInput {
   message: string;
   language: string;
 }
+
+/**
+ * Input for updating an existing greeting (all fields optional)
+ */
+export type UpdateGreetingInput = Partial<CreateGreetingInput>;

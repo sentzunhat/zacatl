@@ -34,8 +34,8 @@ describe('NodeSqliteAdapter', () => {
     mockDatabase.prepare.mockReset();
     mockDatabase.exec.mockReset();
 
-    // The constructor calls initialize() fire-and-forget, which calls ensureTableExists()
-    // synchronously. Set a default prepare stub so that call resolves without errors.
+    // The model is resolved lazily on first access. Set a default prepare stub
+    // so ensureTableExists (called on first model access) resolves without errors.
     mockDatabase.prepare.mockReturnValue({
       get: vi.fn().mockReturnValue({ name: 'test_items' }),
       run: vi.fn(),
@@ -51,7 +51,14 @@ describe('NodeSqliteAdapter', () => {
       name: 'test_items',
     };
 
+    // Construction is now safe without a registered token —
+    // resolution happens on first model access.
     adapter = new NodeSqliteAdapter(config);
+
+    // Trigger lazy init here so ensureTableExists runs during beforeEach,
+    // not during individual tests. This keeps each test's mockReturnValueOnce
+    // available for the test's own SQL statement.
+    void adapter.model;
   });
 
   afterEach(() => {
@@ -59,9 +66,39 @@ describe('NodeSqliteAdapter', () => {
     vi.clearAllMocks();
   });
 
-  describe('constructor bootstrap', () => {
-    it('should create the table when it does not exist', async () => {
-      // Override default: table does not exist on this call
+  describe('model lazy resolution', () => {
+    it('resolves the model on first access and returns the database instance', () => {
+      // Construction must not throw even though the token is registered.
+      const localAdapter = new NodeSqliteAdapter<TestInput, TestOutput>({
+        type: ORMType.NodeSqlite as const,
+        name: 'test_items',
+      });
+      // First access triggers resolution and ensureTableExists.
+      expect(localAdapter.model).toBe(mockDatabase);
+    });
+
+    it('construction succeeds before the token is registered', () => {
+      clearContainer();
+      // No token registered — construction must not throw.
+      expect(
+        () =>
+          new NodeSqliteAdapter<TestInput, TestOutput>({
+            type: ORMType.NodeSqlite as const,
+            name: 'test_items',
+          }),
+      ).not.toThrow();
+    });
+
+    it('throws only when the model is accessed with no registered token', () => {
+      clearContainer();
+      const localAdapter = new NodeSqliteAdapter<TestInput, TestOutput>({
+        type: ORMType.NodeSqlite as const,
+        name: 'test_items',
+      });
+      expect(() => localAdapter.model).toThrow('node:sqlite database instance is not valid');
+    });
+
+    it('should create the table when it does not exist on first model access', () => {
       mockDatabase.prepare.mockReturnValueOnce({
         get: vi.fn().mockReturnValue(null),
       });
@@ -72,8 +109,7 @@ describe('NodeSqliteAdapter', () => {
         name: 'test_items',
       });
 
-      await new Promise((resolve) => setImmediate(resolve));
-
+      // Access the model to trigger lazy init.
       expect(localAdapter.model).toBe(mockDatabase);
       expect(mockDatabase.prepare).toHaveBeenCalledWith(
         expect.stringContaining('SELECT name FROM sqlite_master'),
@@ -81,29 +117,31 @@ describe('NodeSqliteAdapter', () => {
       expect(mockDatabase.exec).toHaveBeenCalled();
     });
 
-    it('should not create table if it already exists', async () => {
-      // Default mock already returns table exists; clear call counts from constructor
+    it('should not create table if it already exists on first model access', () => {
       vi.clearAllMocks();
+      mockDatabase.prepare.mockReturnValue({
+        get: vi.fn().mockReturnValue({ name: 'test_items' }),
+        run: vi.fn(),
+        all: vi.fn().mockReturnValue([]),
+      });
 
-      new NodeSqliteAdapter<TestInput, TestOutput>({
+      const localAdapter = new NodeSqliteAdapter<TestInput, TestOutput>({
         type: ORMType.NodeSqlite as const,
         name: 'test_items',
       });
 
-      await new Promise((resolve) => setImmediate(resolve));
-
-      expect(mockDatabase.prepare).toHaveBeenCalled();
+      expect(localAdapter.model).toBe(mockDatabase);
       expect(mockDatabase.exec).not.toHaveBeenCalled();
     });
 
-    it('constructor resolves model eagerly', () => {
-      expect(adapter.model).toBe(mockDatabase);
-    });
-  });
-
-  describe('model', () => {
-    it('should return the database instance', () => {
-      expect(adapter.model).toBe(mockDatabase);
+    it('caches the resolved model — does not re-resolve on repeated access', () => {
+      const first = adapter.model;
+      const second = adapter.model;
+      expect(first).toBe(second);
+      // prepare is called once for ensureTableExists, not on every access
+      const prepareCalls = mockDatabase.prepare.mock.calls.length;
+      void adapter.model;
+      expect(mockDatabase.prepare.mock.calls.length).toBe(prepareCalls);
     });
   });
 
@@ -177,6 +215,50 @@ describe('NodeSqliteAdapter', () => {
     });
   });
 
+  describe('statement cache', () => {
+    type CacheInternals = {
+      prepare: (sql: string) => unknown;
+      _stmtCache: Map<string, unknown>;
+    };
+
+    it('caps the cache and evicts the least-recently-used statement', () => {
+      const internals = adapter as unknown as CacheInternals;
+      const max = 128;
+
+      for (let i = 0; i < max + 10; i++) {
+        internals.prepare(`SELECT ${i}`);
+      }
+
+      expect(internals._stmtCache.size).toBeLessThanOrEqual(max);
+      // The earliest statements were evicted; the latest survive.
+      expect(internals._stmtCache.has('SELECT 0')).toBe(false);
+      expect(internals._stmtCache.has(`SELECT ${max + 9}`)).toBe(true);
+    });
+
+    it('refreshes recency on cache hit so hot statements survive eviction', () => {
+      const internals = adapter as unknown as CacheInternals;
+      const max = 128;
+
+      internals.prepare('SELECT hot');
+      for (let i = 0; i < max - 1; i++) {
+        internals.prepare(`SELECT ${i}`);
+      }
+      // Cache is full; touch the hot statement, then overflow by one.
+      internals.prepare('SELECT hot');
+      internals.prepare('SELECT overflow');
+
+      expect(internals._stmtCache.has('SELECT hot')).toBe(true);
+      expect(internals._stmtCache.has('SELECT 0')).toBe(false);
+    });
+
+    it('returns the same statement object on repeated prepare of identical SQL', () => {
+      const internals = adapter as unknown as CacheInternals;
+      const first = internals.prepare('SELECT same');
+      const second = internals.prepare('SELECT same');
+      expect(second).toBe(first);
+    });
+  });
+
   describe('findMany', () => {
     it('should return empty array when no records exist', async () => {
       const stmt = { all: vi.fn().mockReturnValue([]) };
@@ -184,6 +266,7 @@ describe('NodeSqliteAdapter', () => {
 
       const result = await adapter.findMany();
       expect(result).toEqual([]);
+      expect(stmt.all).toHaveBeenCalledWith(20, 0);
     });
 
     it('should return array of parsed records', async () => {
@@ -225,6 +308,37 @@ describe('NodeSqliteAdapter', () => {
       expect(result[1]).toMatchObject({ id: data2.id, name: data2.name, email: data2.email });
       expect(result[0]?.createdAt).toBeInstanceOf(Date);
       expect(result[1]?.updatedAt).toBeInstanceOf(Date);
+    });
+
+    it('pushes filters into SQL before applying pagination', async () => {
+      const stmt = { all: vi.fn().mockReturnValue([]) };
+      mockDatabase.prepare.mockReturnValueOnce(stmt);
+
+      await adapter.findMany({ name: 'Jane' }, { limit: 5, offset: 20 });
+
+      expect(mockDatabase.prepare).toHaveBeenCalledWith(
+        expect.stringContaining('WHERE json_extract(data, ?) IS ? LIMIT ? OFFSET ?'),
+      );
+      expect(stmt.all).toHaveBeenCalledWith('$."name"', 'Jane', 5, 20);
+    });
+
+    it('uses the id column for id filters', async () => {
+      const stmt = { all: vi.fn().mockReturnValue([]) };
+      mockDatabase.prepare.mockReturnValueOnce(stmt);
+
+      await adapter.findMany({ id: 'user-123' });
+
+      expect(mockDatabase.prepare).toHaveBeenCalledWith(expect.stringContaining('WHERE id IS ?'));
+      expect(stmt.all).toHaveBeenCalledWith('user-123', 20, 0);
+    });
+
+    it('caps the limit and prevents negative pagination values from becoming unbounded', async () => {
+      const stmt = { all: vi.fn().mockReturnValue([]) };
+      mockDatabase.prepare.mockReturnValueOnce(stmt);
+
+      await adapter.findMany({}, { limit: -1, offset: -1 });
+
+      expect(stmt.all).toHaveBeenCalledWith(0, 0);
     });
   });
 

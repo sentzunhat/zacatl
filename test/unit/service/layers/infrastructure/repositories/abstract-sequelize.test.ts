@@ -73,9 +73,10 @@ describe('BaseRepository (Sequelize)', () => {
       expect(repository.model).toBe(MockModel);
     });
 
-    it('throws if DI is not registered when the repository is constructed', () => {
+    it('throws on first model access when DI is not registered (construction is safe)', () => {
       clearContainer();
-      expect(() => new UserRepository()).toThrow(
+      const repo = new UserRepository();
+      expect(() => repo.model).toThrow(
         'Sequelize instance not registered in DI container',
       );
     });

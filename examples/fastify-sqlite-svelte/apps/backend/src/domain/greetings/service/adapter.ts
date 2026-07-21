@@ -9,7 +9,7 @@
  */
 
 import { inject, singleton } from '@sentzunhat/zacatl/third-party/dependency-injection/tsyringe';
-import type { Greeting, CreateGreetingInput } from '../../entities/greeting';
+import type { Greeting, CreateGreetingInput, UpdateGreetingInput } from '../../entities/greeting';
 import { GreetingRepositoryAdapter } from '../../../infrastructure/greetings/repositories/greeting/adapter';
 import type { GreetingServicePort } from './port';
 
@@ -66,5 +66,19 @@ export class GreetingServiceAdapter implements GreetingServicePort {
 
     const randomIndex = Math.floor(Math.random() * greetings.length);
     return greetings[randomIndex] ?? null;
+  }
+
+  async updateGreeting(id: string, input: UpdateGreetingInput): Promise<Greeting> {
+    const normalizedInput: UpdateGreetingInput = {
+      ...input,
+      ...(input.language !== undefined ? { language: input.language.toLowerCase() } : {}),
+    };
+
+    const updated = await this.greetingRepository.update(id, normalizedInput);
+    if (!updated) {
+      throw new Error(`Greeting with id ${id} not found`);
+    }
+
+    return updated;
   }
 }

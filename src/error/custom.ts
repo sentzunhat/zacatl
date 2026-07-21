@@ -48,6 +48,25 @@ export interface CustomErrorArgs {
   operation?: Optional<string>;
 }
 
+export interface PublicErrorJSON {
+  message: string;
+  correlationId: string;
+  code?: ErrorCode;
+}
+
+export interface DiagnosticErrorJSON extends PublicErrorJSON {
+  name: string;
+  reason?: string;
+  metadata?: Record<string, unknown>;
+  component?: string;
+  operation?: string;
+  error?: { name: string; message: string; stack?: string };
+  time: string;
+  id: string;
+  stack?: string;
+  custom: boolean;
+}
+
 export class CustomError extends Error {
   public readonly custom: boolean;
   public readonly code: ErrorCode;
@@ -88,36 +107,19 @@ export class CustomError extends Error {
     }
   }
 
-  toJSON(): {
-    name: string;
-    message: string;
-    code?: ErrorCode;
-    reason?: string;
-    metadata?: Record<string, unknown>;
-    component?: string;
-    operation?: string;
-    error?: { name: string; message: string; stack?: string };
-    time: string;
-    id: string;
-    correlationId: string;
-    stack?: string | undefined;
-    custom: boolean;
-  } {
-    const out: {
-      name: string;
-      message: string;
-      code?: ErrorCode;
-      reason?: string;
-      metadata?: Record<string, unknown>;
-      component?: string;
-      operation?: string;
-      error?: { name: string; message: string; stack?: string };
-      time: string;
-      id: string;
-      correlationId: string;
-      stack?: string | undefined;
-      custom: boolean;
-    } = {
+  /** Safe default used by JSON.stringify and HTTP framework serializers. */
+  toJSON(): PublicErrorJSON {
+    const out: PublicErrorJSON = {
+      message: typeof this.code === 'number' && this.code >= 500 ? 'Internal Server Error' : this.message,
+      correlationId: this.correlationId,
+    };
+    if (this.code != null) out.code = this.code;
+    return out;
+  }
+
+  /** Full internal context for trusted logs and diagnostics only. */
+  toDiagnosticJSON(): DiagnosticErrorJSON {
+    const out: DiagnosticErrorJSON = {
       name: this.name,
       message: this.message,
       time: this.time.toISOString(),

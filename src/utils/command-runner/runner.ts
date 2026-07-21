@@ -30,7 +30,7 @@ const SIGKILL_GRACE_MS = 2_000;
  *
  * @example
  * ```typescript
- * const policy = RunnerPolicySchema.parse({ inheritEnv: true });
+ * const policy = RunnerPolicySchema.parse({ allowlist: ['node'], inheritEnv: true });
  * const result = await runCommand({ cmd: 'node', args: ['--version'] }, policy);
  * console.log(result.stdout); // v24.x.x
  * ```

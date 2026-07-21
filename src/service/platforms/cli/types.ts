@@ -1,7 +1,7 @@
 /**
  * Configuration for CLI-type services
  */
-export interface ConfigCLI {
+export interface CliConfig {
   /** CLI command name (e.g., "ujti", "zacatl") */
   name: string;
 

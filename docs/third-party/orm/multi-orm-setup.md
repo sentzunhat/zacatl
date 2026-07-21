@@ -46,7 +46,7 @@ const service = new Service({
         {
           vendor: DatabaseVendor.MONGOOSE,
           instance: mongooseInstance,
-          connectionString: 'mongodb://localhost:27017',
+          connection: { url: 'mongodb://localhost:27017' },
           onDatabaseConnected: async (db) => {
             console.log('✅ MongoDB connected');
           },
@@ -55,7 +55,7 @@ const service = new Service({
         {
           vendor: DatabaseVendor.SEQUELIZE,
           instance: sequelizeInstance,
-          connectionString: 'postgres://user:pass@localhost:5432/mydb',
+          connection: { url: 'postgres://user:pass@localhost:5432/mydb' },
           onDatabaseConnected: async (db) => {
             console.log('✅ PostgreSQL connected');
             await (db as Sequelize).sync({ alter: true });
@@ -73,15 +73,17 @@ await service.start({ port: 3000 });
 
 ### 1. Install Database Drivers
 
-`mongoose` and `sequelize` are bundled with Zacatl. Only install the SQL dialect
-package that matches your database:
+ORM packages are optional peers in Zacatl 0.0.57+. Install only the database
+ecosystem your service uses:
 
 ```bash
-npm install pg pg-hstore  # PostgreSQL
+npm install mongoose mongodb       # MongoDB
 # OR
-npm install mysql2        # MySQL
+npm install sequelize pg pg-hstore # PostgreSQL via Sequelize
 # OR
-npm install sqlite3       # SQLite via Sequelize
+npm install sequelize mysql2       # MySQL via Sequelize
+# OR
+npm install sequelize sqlite3      # SQLite via Sequelize
 ```
 
 ### 2. Create Repository with Mongoose
@@ -248,7 +250,7 @@ const service = new Service({
         {
           vendor: DatabaseVendor.MONGOOSE,
           instance: mongooseInstance,
-          connectionString: process.env.MONGODB_URI || 'mongodb://localhost:27017',
+          connection: { url: process.env.MONGODB_URI || 'mongodb://localhost:27017' },
           onDatabaseConnected: async (db) => {
             console.log('✅ MongoDB connected');
             // Optional: Run migrations, seeders, etc.
@@ -257,7 +259,7 @@ const service = new Service({
         {
           vendor: DatabaseVendor.SEQUELIZE,
           instance: sequelizeInstance,
-          connectionString: process.env.DATABASE_URL || 'postgres://localhost:5432/myapp',
+          connection: { url: process.env.DATABASE_URL || 'postgres://localhost:5432/myapp' },
           onDatabaseConnected: async (db) => {
             console.log('✅ PostgreSQL connected');
             const seq = db as Sequelize;
@@ -337,12 +339,12 @@ const service = new Service({
         {
           vendor: DatabaseVendor.SEQUELIZE,
           instance: userDb,
-          connectionString: '',
+          connection: { url: '' },
         },
         {
           vendor: DatabaseVendor.SEQUELIZE,
           instance: productDb,
-          connectionString: '',
+          connection: { url: '' },
         },
       ],
     },
@@ -366,7 +368,7 @@ const service = new Service({
         {
           vendor: DatabaseVendor.MONGOOSE,
           instance: new mongoose.Mongoose(),
-          connectionString: 'mongodb://localhost:27017',
+          connection: { url: 'mongodb://localhost:27017' },
         },
       ],
     },
@@ -390,7 +392,7 @@ const service = new Service({
         {
           vendor: DatabaseVendor.SEQUELIZE,
           instance: new Sequelize('postgres://localhost:5432/myapp'),
-          connectionString: 'postgres://localhost:5432/myapp',
+          connection: { url: 'postgres://localhost:5432/myapp' },
         },
       ],
     },
@@ -414,12 +416,12 @@ export const getDatabaseConfig = () => {
         {
           vendor: DatabaseVendor.MONGOOSE,
           instance: new mongoose.Mongoose(),
-          connectionString: process.env.MONGODB_URI!,
+          connection: { url: process.env.MONGODB_URI! },
         },
         {
           vendor: DatabaseVendor.SEQUELIZE,
           instance: new Sequelize(process.env.DATABASE_URL!),
-          connectionString: process.env.DATABASE_URL!,
+          connection: { url: process.env.DATABASE_URL! },
         },
       ],
     };
@@ -431,7 +433,7 @@ export const getDatabaseConfig = () => {
       {
         vendor: DatabaseVendor.SEQUELIZE,
         instance: new Sequelize({ dialect: 'sqlite', storage: ':memory:' }),
-        connectionString: '',
+        connection: { url: '' },
       },
     ],
   };

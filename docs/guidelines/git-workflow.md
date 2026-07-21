@@ -386,29 +386,25 @@ Add entry at the top, right after the first `---`:
 ### 4. Commit Version Bump
 
 ```bash
+# on dev
 git add package.json docs/changelog.md
 git commit -m "chore(release): bump to v0.0.40"
+git push origin dev
 ```
 
-### 5. Tag Release
+### 5. Merge to main (CI tags and publishes)
 
-```bash
-git tag v0.0.40
-git push origin main
-git push origin v0.0.40
-```
+Open a PR from `dev` → `main` and merge it. On merge:
 
-### 6. Publish to Registry (if applicable)
+1. The `Tag Release` workflow (`.github/workflows/tag-release.yml`) creates
+   the `vX.Y.Z` tag from `package.json` (skips if the tag already exists)
+   and dispatches the `Release` workflow.
+2. The `Release` workflow (`.github/workflows/release.yml`) verifies the tag
+   matches `package.json`, runs the full verification chain, publishes to
+   npm with `--provenance` (requires the `NPM_TOKEN` repository secret), and
+   creates a GitHub Release with notes from that version's changelog section.
 
-```bash
-npm publish
-```
-
-Or with scope:
-
-```bash
-npm publish --scope=@sentzunhat
-```
+Do **not** push `v*` tags or run `npm publish` manually — CI owns both.
 
 ### Changelog Entry Checklist
 

@@ -1,4 +1,5 @@
 import type { MongooseModel, Schema } from '../../../../../third-party/databases/mongoose';
+import type { ConnectionRef } from '../../../../platforms/server/database/port';
 import type { ORMType } from '../../orm/types';
 
 export type {
@@ -13,6 +14,8 @@ export interface MongooseRepositoryConfig<D = unknown> {
   readonly type?: ORMType.Mongoose;
   readonly name: string;
   readonly schema: Schema<D>;
+  /** Which database connection to use; omit for single-database default */
+  readonly connection?: ConnectionRef;
 }
 
 export type MongooseBaseRepositoryConfig<D = unknown> = MongooseRepositoryConfig<D> & {

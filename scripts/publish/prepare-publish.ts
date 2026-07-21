@@ -75,6 +75,16 @@ if (usedEsm === null) console.warn('No ESM build source found in', esmCandidates
 // eslint-disable-next-line no-console
 if (usedCjs === null) console.warn('No CJS build source found in', cjsCandidates);
 
+// The published root package.json declares "type": "module", so the CJS tree
+// needs its own scope marker or every `require()` subpath would load .js
+// files under build/cjs as ESM and crash for CommonJS consumers.
+if (usedCjs !== null) {
+  fs.writeFileSync(
+    path.join(buildCjsDest, 'package.json'),
+    `${JSON.stringify({ type: 'commonjs' }, null, 2)}\n`,
+  );
+}
+
 pruneNestedBarrelIndexes([buildEsmDest, buildCjsDest]);
 
 const binDir = path.join(buildDest, 'bin');
@@ -201,6 +211,7 @@ interface PublishPkg {
   author?: unknown;
   engines?: unknown;
   peerDependencies?: Record<string, string> | unknown;
+  peerDependenciesMeta?: Record<string, unknown> | unknown;
   dependencies?: Record<string, string> | unknown;
   main?: string | undefined;
   module?: string | undefined;
@@ -222,6 +233,7 @@ const newPkg: PublishPkg = {
   author: pkg['author'],
   engines: pkg['engines'],
   peerDependencies: pkg['peerDependencies'],
+  peerDependenciesMeta: pkg['peerDependenciesMeta'],
   dependencies: pkg['dependencies'],
   repository: (() => {
     const repo = pkg['repository'];
@@ -341,6 +353,38 @@ if ((newPkg.bin as Record<string, string>)['zacatl-fix-esm'] === undefined) {
 }
 
 if (!newPkg['files']) newPkg['files'] = ['build', 'package.json'];
+
+// Validate every exports/bin target exists in the staged tree — a stale
+// entry in the root exports map would otherwise ship as a silently broken
+// subpath (the rewrite above does not check target existence).
+const missingTargets: string[] = [];
+const checkTarget = (subpath: string, target: unknown): void => {
+  if (typeof target === 'string') {
+    const rel = target.replace(/^\.\//, '');
+    // package.json is written by this script after validation
+    if (rel === 'package.json') return;
+    if (!fs.existsSync(path.join(publishDir, rel))) {
+      missingTargets.push(`${subpath} -> ${target}`);
+    }
+  } else if (target !== null && typeof target === 'object') {
+    for (const v of Object.values(target as Record<string, unknown>)) checkTarget(subpath, v);
+  }
+};
+for (const [sub, entry] of Object.entries(
+  (newPkg['exports'] ?? {}) as Record<string, unknown>,
+)) {
+  checkTarget(sub, entry);
+}
+for (const [name, binPath] of Object.entries((newPkg['bin'] ?? {}) as Record<string, string>)) {
+  checkTarget(`bin:${name}`, `./${binPath}`);
+}
+if (missingTargets.length > 0) {
+  // eslint-disable-next-line no-console
+  console.error('prepare-publish: exports/bin targets missing from the staged tree:');
+  // eslint-disable-next-line no-console
+  for (const m of missingTargets) console.error(`  ${m}`);
+  process.exit(1);
+}
 
 fs.writeFileSync(publishPkgPath, JSON.stringify(newPkg, null, 2) + '\n');
 // eslint-disable-next-line no-console

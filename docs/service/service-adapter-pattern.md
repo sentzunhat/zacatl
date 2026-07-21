@@ -77,7 +77,7 @@ const serviceConfig = {
         {
           vendor: DatabaseVendor.SEQUELIZE, // or MONGOOSE
           instance: sequelize,
-          connectionString: databaseUrl,
+          connection: { url: databaseUrl },
           onDatabaseConnected: async (db: unknown) => {
             // Initialize models/schemas
             initModels(db);

@@ -16,53 +16,25 @@ export const registerDependency = <T>(
   tsyringeContainer.register(token, { useClass: implementation });
 };
 
-/**
- * Standalone DI container decoupled from microservice architecture.
- * Automatically used by Service layers - typically no manual registration needed.
- *
- * For advanced use cases, you can register dependencies manually:
- *
- * @example
- * ```typescript
- * import { registerDependency, resolveDependency } from '@zacatl/dependency-injection';
- *
- * // Manual registration (advanced use case)
- * class CustomService { ... }
- * registerDependency('CustomService', CustomService);
- *
- * // Resolve manually
- * const service = resolveDependency<CustomService>('CustomService');
- * ```
- *
- * Preferred approach (automatic registration through Service):
- * ```typescript
- * const service = new Service({
- *   layers: {
-/**
- * Resolve dependencies from the DI container
- *
- * Retrieve instances of already-registered classes.
- * Dependencies must be registered first (Service layers handle this automatically).
- * This function does not auto-register unregistered classes; it will throw if a
- * dependency is not registered. Ensure classes are decorated with `@injectable()`
- * (or `@singleton()`) and are registered by Service layer composition before
- * resolving.
- *
- * @param dependencies - Array of class constructors to resolve
- * @returns Array of resolved instances in the same order
- *
- * @example
- * ```typescript
- * // Resolve services that were registered by Service layers
- * const services = resolveDependencies<Service>([UserService, ProductService]);
- * ```
- */
-
 export const registerSingleton = <T>(
   token: InjectionToken<T>,
   implementation: new (...args: unknown[]) => T,
 ): void => {
   tsyringeContainer.registerSingleton(token, implementation);
+};
+
+/**
+ * Register a class as a singleton unless it is already registered.
+ *
+ * The single source of truth for the guard used by the Application, Domain,
+ * and Infrastructure layers: classes decorated with `@singleton()` register
+ * themselves on module load, and re-registering would silently clobber the
+ * existing (possibly already-resolved) registration.
+ */
+export const ensureRegisteredSingleton = <T extends object>(dependency: Constructor<T>): void => {
+  if (!tsyringeContainer.isRegistered(dependency)) {
+    tsyringeContainer.registerSingleton(dependency as InjectionToken<T>, dependency);
+  }
 };
 
 export const registerValue = <T>(token: InjectionToken<T>, value: T): void => {
@@ -82,8 +54,11 @@ export const clearContainer = (): void => {
  * Resolve dependencies from the DI container
  *
  * Retrieve instances of already-registered classes.
- * Dependencies must be registered first (Service layers handle this automatically).
- * For classes not yet registered, auto-registers them as singletons before resolving.
+ * Dependencies must be registered first (Service layers handle this
+ * automatically). This function does not auto-register unregistered classes;
+ * it throws if a dependency is not registered. Ensure classes are decorated
+ * with `@injectable()` (or `@singleton()`) and are registered by Service
+ * layer composition before resolving.
  *
  * @param dependencies - Array of class constructors to resolve
  * @returns Array of resolved instances in the same order

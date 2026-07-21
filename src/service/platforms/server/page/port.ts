@@ -3,6 +3,8 @@ import type { ApiPrefixes } from '../types/server-config';
 export interface StaticConfig {
   root: string;
   prefix?: string;
+  /** Cache-Control for served assets. index.html always gets `no-cache`. */
+  cache?: { maxAge?: number | string; immutable?: boolean };
 }
 
 export type { PageServerConfig } from '../types/server-config';

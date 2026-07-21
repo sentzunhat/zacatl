@@ -27,11 +27,11 @@ export class DatabaseServer {
     }
 
     for (const database of this.databases) {
-      if (database.connectionString == null || database.connectionString.length === 0) {
+      if (database.connection?.url == null || database.connection.url.length === 0) {
         throw new CustomError({
-          message: 'database connection string is not provided',
+          message: 'database connection URL is not provided',
           code: 500,
-          reason: 'database connection string not provided',
+          reason: 'database connection URL not provided',
         });
       }
 
@@ -39,8 +39,10 @@ export class DatabaseServer {
         const adapter = createDatabaseAdapter(database.vendor);
         await adapter.connect(this.serviceName, database);
 
-        // Store adapter for potential future use (disconnect, etc.)
-        this.adapters.set(database.vendor, adapter);
+        // Store adapter keyed by connection name (or vendor for single-database setups).
+        // This allows multiple same-vendor databases to be tracked independently.
+        const adapterKey = database.connection.name ?? database.vendor;
+        this.adapters.set(adapterKey, adapter);
       } catch (error: unknown) {
         throw new CustomError({
           message: `failed to configure database for service "${this.serviceName}"`,
@@ -50,7 +52,8 @@ export class DatabaseServer {
           metadata: {
             database: {
               vendor: database.vendor,
-              connectionString: database.connectionString,
+              connectionUrl: database.connection.url,
+              connectionName: database.connection.name,
             },
           },
         });

@@ -36,6 +36,8 @@ export default function App() {
   const [newLanguage, setNewLanguage] = useState('en');
   const [randomLanguage, setRandomLanguage] = useState('en');
   const [randomGreeting, setRandomGreeting] = useState<Greeting | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editMessage, setEditMessage] = useState('');
 
   const subtitle = useMemo(
     () => (filterLanguage ? `Showing greetings in "${filterLanguage}"` : 'Showing all greetings'),
@@ -85,6 +87,22 @@ export default function App() {
       setGreetings((prev) => prev.filter((g) => g.id !== id));
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to delete greeting');
+    }
+  }
+
+  async function handleUpdate(id: string) {
+    setError(null);
+    const message = editMessage.trim();
+    if (!message) { setError('Message is required.'); return; }
+    try {
+      const updated = await request<Greeting>(`/api/greetings/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify({ message }),
+      });
+      setGreetings((prev) => prev.map((g) => (g.id === id ? updated : g)));
+      setEditingId(null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to update greeting');
     }
   }
 
@@ -213,18 +231,51 @@ export default function App() {
           <ul className="flex flex-col gap-3">
             {greetings.map((greeting) => (
               <li key={greeting.id} className="flex items-center justify-between gap-4 rounded-xl bg-slate-50 p-4">
-                <div>
-                  <p className="text-sm font-semibold">{greeting.message}</p>
-                  <span className="mt-2 inline-flex items-center rounded-full bg-sky-100 px-3 py-1 text-xs font-semibold text-sky-700">
-                    {greeting.language}
-                  </span>
-                </div>
-                <button
-                  className="rounded-full bg-slate-100 px-3 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-200"
-                  onClick={() => handleDelete(greeting.id)}
-                >
-                  Delete
-                </button>
+                {editingId === greeting.id ? (
+                  <div className="flex flex-1 items-center gap-2">
+                    <input
+                      className="flex-1 rounded-xl border border-slate-200 px-3 py-2 text-sm"
+                      value={editMessage}
+                      onChange={(event) => setEditMessage(event.target.value)}
+                      aria-label="Edit message"
+                    />
+                    <button
+                      className="rounded-full bg-blue-600 px-3 py-2 text-xs font-semibold text-white transition hover:bg-blue-700"
+                      onClick={() => handleUpdate(greeting.id)}
+                    >
+                      Save
+                    </button>
+                    <button
+                      className="rounded-full bg-slate-100 px-3 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-200"
+                      onClick={() => setEditingId(null)}
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                ) : (
+                  <>
+                    <div>
+                      <p className="text-sm font-semibold">{greeting.message}</p>
+                      <span className="mt-2 inline-flex items-center rounded-full bg-sky-100 px-3 py-1 text-xs font-semibold text-sky-700">
+                        {greeting.language}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <button
+                        className="rounded-full bg-slate-100 px-3 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-200"
+                        onClick={() => { setEditingId(greeting.id); setEditMessage(greeting.message); }}
+                      >
+                        Edit
+                      </button>
+                      <button
+                        className="rounded-full bg-slate-100 px-3 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-200"
+                        onClick={() => handleDelete(greeting.id)}
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </>
+                )}
               </li>
             ))}
           </ul>

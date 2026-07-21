@@ -10,7 +10,7 @@
 | ---------- | ------------------ | ---------------------------------------- |
 | Classes    | `PascalCase`       | `GetRouteHandler`, `BadRequestError`     |
 | Functions  | `camelCase`        | `createLogger`, `resolveDependency`      |
-| Interfaces | `PascalCase`       | `ConfigServer`, `BadRequestErrorArgs`    |
+| Interfaces | `PascalCase`       | `ServerConfig`, `BadRequestErrorArgs`    |
 | Files      | `kebab-case`       | `get-route-handler.ts`, `user.test.ts`   |
 | Folders    | `kebab-case`       | `dependency-injection/`, `error-guards/` |
 | Constants  | `UPPER_SNAKE_CASE` | `DATABASE_VENDOR`, `TIMEOUT_MS`          |

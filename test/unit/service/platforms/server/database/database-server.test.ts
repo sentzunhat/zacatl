@@ -35,9 +35,9 @@ describe('DatabaseServer', () => {
       expect(createDatabaseAdapter).not.toHaveBeenCalled();
     });
 
-    it('throws when connection string is missing', async () => {
+    it('throws when connection URL is missing', async () => {
       const server = new DatabaseServer('svc', [
-        { vendor: DatabaseVendor.SEQUELIZE, connectionString: '' } as DatabaseConfig,
+        { vendor: DatabaseVendor.SEQUELIZE, connection: { url: '' } } as DatabaseConfig,
       ]);
 
       await expect(server.configure()).rejects.toBeInstanceOf(CustomError);
@@ -47,11 +47,11 @@ describe('DatabaseServer', () => {
       const databases: DatabaseConfig[] = [
         {
           vendor: DatabaseVendor.SEQUELIZE,
-          connectionString: 'postgres://localhost/db',
+          connection: { url: 'postgres://localhost/db' },
         },
         {
           vendor: DatabaseVendor.MONGOOSE,
-          connectionString: 'mongodb://localhost/db',
+          connection: { url: 'mongodb://localhost/db' },
         },
       ];
 
@@ -73,7 +73,7 @@ describe('DatabaseServer', () => {
       const server = new DatabaseServer('svc', [
         {
           vendor: DatabaseVendor.SEQUELIZE,
-          connectionString: 'postgres://localhost/db',
+          connection: { url: 'postgres://localhost/db' },
         },
       ]);
 
@@ -86,7 +86,7 @@ describe('DatabaseServer', () => {
       const server = new DatabaseServer('svc', [
         {
           vendor: DatabaseVendor.SQLITE,
-          connectionString: ':memory:',
+          connection: { url: ':memory:' },
         },
       ]);
 
@@ -100,7 +100,7 @@ describe('DatabaseServer', () => {
       const server = new DatabaseServer('svc', [
         {
           vendor: DatabaseVendor.SQLITE,
-          connectionString: ':memory:',
+          connection: { url: ':memory:' },
         },
       ]);
 
@@ -115,11 +115,11 @@ describe('DatabaseServer', () => {
       const server = new DatabaseServer('svc', [
         {
           vendor: DatabaseVendor.SEQUELIZE,
-          connectionString: 'postgres://localhost/db',
+          connection: { url: 'postgres://localhost/db' },
         },
         {
           vendor: DatabaseVendor.MONGOOSE,
-          connectionString: 'mongodb://localhost/db',
+          connection: { url: 'mongodb://localhost/db' },
         },
       ]);
 

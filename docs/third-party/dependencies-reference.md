@@ -56,8 +56,8 @@ import { BaseRepository, ORMType } from '@sentzunhat/zacatl/service';
 ## ORM And Platform Dependencies
 
 `express` and `fastify` are installed with Zacatl.
-ORM/database ecosystems are optional peer dependencies (`mongoose`, `sequelize`,
-`better-sqlite3`, `sqlite3`, `pg`) and should be installed based on usage.
+ORM/database ecosystems are optional peer dependencies (`mongoose`, `mongodb`,
+`sequelize`, `sqlite3`, `pg`) and should be installed based on usage.
 
 ORM and platform code is still **only loaded via subpath imports** to keep the
 main entry lean:
@@ -72,10 +72,10 @@ import { Sequelize } from '@sentzunhat/zacatl/third-party/databases/sequelize';
 Sequelize dialect packages must be installed separately:
 
 ```bash
-npm install pg pg-hstore      # PostgreSQL
-npm install mysql2            # MySQL
-npm install sqlite3           # SQLite via Sequelize ORM
-npm install tedious           # MSSQL
+npm install sequelize pg      # PostgreSQL
+npm install sequelize mysql2  # MySQL
+npm install sequelize sqlite3 # SQLite via Sequelize ORM
+npm install sequelize tedious # MSSQL
 ```
 
 ### For Native SQLite (Node 22.5+ Built-in — No Install Needed)
@@ -88,7 +88,7 @@ import { DatabaseVendor } from '@sentzunhat/zacatl/service';
 databases: [
   {
     vendor: DatabaseVendor.SQLITE,
-    connectionString: 'app.db', // or ':memory:'
+    connection: { url: 'app.db' }, // or ':memory:'
   },
 ];
 ```
@@ -265,7 +265,7 @@ const service = new Service({
 All TypeScript types are included automatically:
 
 ```typescript
-import { ConfigServer } from '@sentzunhat/zacatl/service';
+import { ServerConfig } from '@sentzunhat/zacatl/service';
 import { DependencyContainer } from '@sentzunhat/zacatl/third-party/dependency-injection/tsyringe';
 import { ZodType, ZodError } from '@sentzunhat/zacatl/third-party/zod';
 ```
@@ -325,8 +325,8 @@ import { singleton } from '@sentzunhat/zacatl/third-party/dependency-injection/t
 | ---------------- | ------- | ----------------------------- |
 | `mongoose`       | ^9.0.0  | MongoDB/Mongoose repositories |
 | `sequelize`      | ^6.0.0  | SQL database ORM              |
-| `better-sqlite3` | ^12.6.2 | SQLite ecosystem support      |
 | `sqlite3`        | ^6.0.1  | SQLite ecosystem support      |
+| `mongodb`        | ^7.2.0  | Native MongoDB driver support |
 | `pg`             | ^8.18.0 | PostgreSQL ecosystem support  |
 
 ### Development Tools

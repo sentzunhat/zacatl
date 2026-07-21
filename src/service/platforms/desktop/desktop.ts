@@ -1,6 +1,6 @@
 import { InternalServerError } from '@zacatl/error';
 
-import type { ConfigDesktop } from './types';
+import type { DesktopConfig } from './types';
 import type { IpcApplicationEntryPoints } from '../../layers/application/types';
 
 /**
@@ -13,10 +13,10 @@ import type { IpcApplicationEntryPoints } from '../../layers/application/types';
  * const desktop = new Desktop({ window: { title: "App" }, platform: "neutralino" });
  */
 export class Desktop {
-  private readonly window: ConfigDesktop['window'];
-  private readonly platform: ConfigDesktop['platform'];
+  private readonly window: DesktopConfig['window'];
+  private readonly platform: DesktopConfig['platform'];
 
-  constructor(config: ConfigDesktop) {
+  constructor(config: DesktopConfig) {
     this.window = config.window;
     this.platform = config.platform;
   }

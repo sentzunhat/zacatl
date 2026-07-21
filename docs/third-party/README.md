@@ -33,8 +33,8 @@ const UserSchema = z.object({
 ## ORM Packages (Subpath Imports Only)
 
 ORM integrations are exposed via subpath imports.
-Depending on which adapter you use, install the matching optional peer dependency
-in your consumer project.
+Depending on which adapter you use, install the matching optional peer
+dependency in your consumer project. Non-SQL consumers do not need Sequelize.
 
 See [../third-party/orm/overview.md](../third-party/orm/overview.md) for full usage and examples.
 
@@ -91,11 +91,11 @@ Zacatl uses these third-party versions:
 
 ### Optional Peer Dependencies (install based on adapter usage)
 
-- **mongoose**: ^9.0.0 (MongoDB adapter)
-- **sequelize**: ^6.0.0 (SQL adapter)
-- **better-sqlite3**: ^12.6.2 (SQLite ecosystem support)
+- **mongoose**: ^9.7.4 (MongoDB adapter)
+- **mongodb**: ^7.2.0 (MongoDB driver)
+- **sequelize**: ^6.37.8 (SQL adapter)
 - **sqlite3**: ^6.0.1 (SQLite ecosystem support)
-- **pg**: ^8.18.0 (PostgreSQL ecosystem support)
+- **pg**: ^8.22.0 (PostgreSQL ecosystem support)
 
 ### Additional Drivers (not provided by Zacatl)
 
@@ -136,7 +136,7 @@ npm install sqlite3           # SQLite
 ## Dependency policy
 
 - Core web/runtime dependencies are installed transitively with Zacatl.
-- ORM/database ecosystems are declared as optional peers (`mongoose`, `sequelize`, `better-sqlite3`, `sqlite3`, `pg`); install only what your project uses.
+- ORM/database ecosystems are declared as optional peers (`mongoose`, `sequelize`, `sqlite3`, `pg`, `mongodb`); install only what your project uses.
 - SQL dialect extras (for example `mysql2`, `pg-hstore`) are not provided by Zacatl and must be installed by consumers when needed.
 
 Use `npm run check:peers` to validate your environment before publishing or releasing.

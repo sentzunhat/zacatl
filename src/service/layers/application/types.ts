@@ -47,6 +47,6 @@ export interface ApplicationEntryPoints {
   ipc?: IpcApplicationEntryPoints;
 }
 
-export interface ConfigApplication {
+export interface ApplicationConfig {
   entryPoints: ApplicationEntryPoints;
 }

@@ -73,6 +73,20 @@ Common properties available on Zacatl errors:
 - `metadata`: optional structured context
 - `correlationId`: request/trace correlation ID
 
+## Public and Diagnostic Serialization
+
+`JSON.stringify(error)` and `error.toJSON()` return a concise public response containing only
+`message`, `correlationId`, and `code` when present. Messages for numeric 5xx errors are replaced
+with `Internal Server Error`; stacks, nested errors, metadata, reasons, internal IDs, component
+names, operations, and timestamps are never included automatically.
+
+Use `error.toDiagnosticJSON()` only with trusted internal logging systems when full debugging
+context is required. Do not send diagnostic serialization in an HTTP response.
+
+Consumers upgrading from verbose `toJSON()` should replace diagnostic logging calls with
+`toDiagnosticJSON()`. Public response code should continue using `toJSON()` or normal JSON
+serialization.
+
 ## Custom Error
 
 ```typescript

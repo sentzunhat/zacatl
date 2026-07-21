@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-import type { ConfigServer } from '../../../../../../src/service/platforms/server/server';
+import type { ServerConfig } from '../../../../../../src/service/platforms/server/server';
 import { PageServer } from '../../../../../../src/service/platforms/server/page/page-server';
 import type {
   PageServerPort,
@@ -11,7 +11,7 @@ import {
   ServerVendor,
 } from '../../../../../../src/service/platforms/server/types/server-config';
 
-const makeConfig = (page?: ConfigServer['page']): ConfigServer => ({
+const makeConfig = (page?: ServerConfig['page']): ServerConfig => ({
   name: 'TestService',
   port: 3000,
   server: { type: ServerType.SERVER, vendor: ServerVendor.FASTIFY, instance: {} },
@@ -119,6 +119,13 @@ describe('PageServer', () => {
 
       expect(adapter.registerStaticFiles).toHaveBeenCalledWith({ root: '/dist' });
     });
+
+    it('wraps adapter errors in CustomError', () => {
+      (adapter.registerStaticFiles as ReturnType<typeof vi.fn>).mockImplementation(() => { throw new Error('fs-fail'); });
+      pageServer = new PageServer(makeConfig(), adapter);
+
+      expect(() => pageServer.registerStaticFiles({ root: '/dist' })).toThrow('failed to register static files');
+    });
   });
 
   describe('registerSpaFallback()', () => {
@@ -127,6 +134,28 @@ describe('PageServer', () => {
       pageServer.registerSpaFallback({ api: '/api' }, '/dist');
 
       expect(adapter.registerSpaFallback).toHaveBeenCalledWith({ api: '/api' }, '/dist');
+    });
+
+    it('wraps adapter errors in CustomError', () => {
+      (adapter.registerSpaFallback as ReturnType<typeof vi.fn>).mockImplementation(() => { throw new Error('spa-fail'); });
+      pageServer = new PageServer(makeConfig(), adapter);
+
+      expect(() => pageServer.registerSpaFallback({ api: '/api' }, '/dist')).toThrow('failed to register SPA fallback');
+    });
+  });
+
+  describe('register()', () => {
+    it('delegates to adapter register', async () => {
+      pageServer = new PageServer(makeConfig(), adapter);
+      await expect(pageServer.register()).resolves.toBeUndefined();
+      expect(adapter.register).toHaveBeenCalledOnce();
+    });
+
+    it('wraps adapter register errors in CustomError', async () => {
+      (adapter.register as ReturnType<typeof vi.fn>).mockRejectedValue(new Error('reg-fail'));
+      pageServer = new PageServer(makeConfig(), adapter);
+
+      await expect(pageServer.register()).rejects.toThrow('failed to register page module');
     });
   });
 

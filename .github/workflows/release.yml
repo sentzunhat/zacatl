@@ -1,0 +1,71 @@
+name: Release
+
+# Runs on `v*` tags (created by the Tag Release workflow when a PR merges
+# to `main`, or dispatched by it explicitly since GITHUB_TOKEN-pushed tags
+# don't re-trigger workflows). Full verification chain, provenance-signed
+# npm publish, then a GitHub Release with notes from docs/changelog.md.
+#
+# Requires the `NPM_TOKEN` repository secret — an npm *automation* token
+# scoped to publish @sentzunhat/zacatl (Settings -> Secrets -> Actions).
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write # create the GitHub Release
+  id-token: write # npm --provenance attestation
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '26.3.0'
+          cache: 'npm'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Verify tag matches package.json version
+        run: |
+          PKG_VERSION="$(node -p "require('./package.json').version")"
+          TAG_VERSION="${GITHUB_REF_NAME#v}"
+          if [ "$PKG_VERSION" != "$TAG_VERSION" ]; then
+            echo "Ref $GITHUB_REF_NAME does not match package.json version $PKG_VERSION" >&2
+            exit 1
+          fi
+
+      - name: Install dependencies
+        run: npm ci
+
+      # NPM_TOKEN is scoped to the publish step only — the verification chain
+      # (tests, lint, build) runs arbitrary project code and must not see it.
+      - name: Verify
+        env:
+          NODE_ENV: test
+          ENV: test
+        run: npm run publish:ci:verify
+
+      - name: Publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm publish ./publish --access public --tag latest --provenance
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # Extract this version's section from docs/changelog.md as notes
+          awk "/^## \[${GITHUB_REF_NAME#v}\]/{flag=1; next} /^## \[/{flag=0} flag" docs/changelog.md > /tmp/release-notes.md
+          if [ ! -s /tmp/release-notes.md ]; then
+            echo "No changelog section found for ${GITHUB_REF_NAME} — using generated notes." >&2
+            gh release create "${GITHUB_REF_NAME}" --generate-notes
+          else
+            gh release create "${GITHUB_REF_NAME}" --notes-file /tmp/release-notes.md --title "${GITHUB_REF_NAME}"
+          fi

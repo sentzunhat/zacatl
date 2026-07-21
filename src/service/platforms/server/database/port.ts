@@ -17,15 +17,24 @@ export type OnDatabaseConnectedFunction = Optional<
   (dbInstance: DatabaseInstance) => Promise<void> | void
 >;
 
+export interface DatabaseConnection {
+  url: string;
+  name?: string;
+}
+
+export interface ConnectionRef {
+  name: string;
+}
+
 export interface DatabaseConfig {
   vendor: DatabaseVendor;
+  connection: DatabaseConnection;
   /**
    * The ORM/database instance (Mongoose or Sequelize).
-   * Not required for `NODESQLITE` — the adapter opens the file internally
-   * using `connectionString` as the file path (or `':memory:'`).
+   * Not required for `SQLITE` — the adapter opens the file internally
+   * using `connection.url` as the file path (or `':memory:'`).
    */
   instance?: DatabaseInstance;
-  connectionString: string;
   /**
    * Optional callback to be invoked after a successful DB connection.
    * Use this to perform extra initialization or plug additional modules.

@@ -1,4 +1,8 @@
-import { describe, it, expect } from 'vitest';
+import { mkdtempSync, mkdirSync, rmSync, symlinkSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join, relative } from 'node:path';
+
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
 import { commandSpecSchema, runnerPolicySchema } from '../../../src/utils/command-runner/types';
 import type { RunnerPolicy } from '../../../src/utils/command-runner/types';
@@ -11,6 +15,7 @@ const defaultPolicy = (): RunnerPolicy =>
     timeoutMs: 5_000,
     maxOutputBytes: 64_000,
     inheritEnv: true,
+    allowlist: ['echo', 'node', 'git', '__nonexistent_binary_xyz__'],
   });
 
 describe('commandSpecSchema', () => {
@@ -38,6 +43,7 @@ describe('runnerPolicySchema', () => {
     expect(policy.maxOutputBytes).toBe(1_048_576);
     expect(policy.maxConcurrency).toBe(4);
     expect(policy.inheritEnv).toBe(false);
+    expect(policy.allowUnrestrictedCommands).toBe(false);
   });
 
   it('should reject maxConcurrency below 1', () => {
@@ -47,6 +53,27 @@ describe('runnerPolicySchema', () => {
 });
 
 describe('validateCommandSpec()', () => {
+  let allowedRoot: string;
+  let allowedChild: string;
+  let siblingRoot: string;
+  let symlinkEscape: string;
+  let testRoot: string;
+
+  beforeAll(() => {
+    testRoot = mkdtempSync(join(tmpdir(), 'zacatl-command-runner-'));
+    allowedRoot = join(testRoot, 'allowed');
+    allowedChild = join(allowedRoot, 'child');
+    siblingRoot = join(testRoot, 'allowed-sibling');
+    symlinkEscape = join(allowedRoot, 'escape-link');
+    mkdirSync(allowedChild, { recursive: true });
+    mkdirSync(siblingRoot);
+    symlinkSync(siblingRoot, symlinkEscape, 'dir');
+  });
+
+  afterAll(() => {
+    rmSync(testRoot, { recursive: true, force: true });
+  });
+
   it('should pass for an allowed command', () => {
     const policy = defaultPolicy();
     policy.allowlist = ['echo', 'node'];
@@ -57,6 +84,30 @@ describe('validateCommandSpec()', () => {
     const policy = defaultPolicy();
     policy.allowlist = ['echo'];
     expect(() => validateCommandSpec({ cmd: 'rm', args: ['-rf'] }, policy)).toThrow();
+  });
+
+  it('should throw when the allowlist is missing', () => {
+    const policy = runnerPolicySchema.parse({});
+    expect(() => validateCommandSpec({ cmd: 'echo', args: [] }, policy)).toThrow(
+      'requires a non-empty allowlist',
+    );
+  });
+
+  it('should throw when the allowlist is empty', () => {
+    const policy = runnerPolicySchema.parse({ allowlist: [] });
+    expect(() => validateCommandSpec({ cmd: 'echo', args: [] }, policy)).toThrow(
+      'requires a non-empty allowlist',
+    );
+  });
+
+  it('should permit trusted callers to opt into unrestricted executables', () => {
+    const policy = runnerPolicySchema.parse({ allowUnrestrictedCommands: true });
+    expect(() => validateCommandSpec({ cmd: 'echo', args: ['safe'] }, policy)).not.toThrow();
+  });
+
+  it('should still enforce argument checks in unrestricted mode', () => {
+    const policy = runnerPolicySchema.parse({ allowUnrestrictedCommands: true });
+    expect(() => validateCommandSpec({ cmd: 'echo', args: ['unsafe;arg'] }, policy)).toThrow();
   });
 
   it('should throw when an argument matches a deny pattern', () => {
@@ -74,18 +125,67 @@ describe('validateCommandSpec()', () => {
 
   it('should throw when cwd violates cwdPrefix', () => {
     const policy = defaultPolicy();
-    policy.cwdPrefix = '/safe/prefix';
+    policy.cwdPrefix = allowedRoot;
     expect(() =>
-      validateCommandSpec({ cmd: 'echo', args: [], cwd: '/tmp/evil' }, policy),
+      validateCommandSpec({ cmd: 'echo', args: [], cwd: siblingRoot }, policy),
     ).toThrow();
   });
 
   it('should pass when cwd satisfies cwdPrefix', () => {
     const policy = defaultPolicy();
-    policy.cwdPrefix = '/safe/prefix';
+    policy.cwdPrefix = allowedRoot;
     expect(() =>
-      validateCommandSpec({ cmd: 'echo', args: [], cwd: '/safe/prefix/project' }, policy),
+      validateCommandSpec({ cmd: 'echo', args: [], cwd: allowedChild }, policy),
     ).not.toThrow();
+  });
+
+  it('should pass when cwd is the exact allowed root', () => {
+    const policy = defaultPolicy();
+    policy.cwdPrefix = allowedRoot;
+    expect(() =>
+      validateCommandSpec({ cmd: 'echo', args: [], cwd: allowedRoot }, policy),
+    ).not.toThrow();
+  });
+
+  it('should reject sibling paths sharing the allowed root prefix', () => {
+    const policy = defaultPolicy();
+    policy.cwdPrefix = allowedRoot;
+    expect(() =>
+      validateCommandSpec({ cmd: 'echo', args: [], cwd: siblingRoot }, policy),
+    ).toThrow('outside the allowed root');
+  });
+
+  it('should reject traversal outside the allowed root', () => {
+    const policy = defaultPolicy();
+    policy.cwdPrefix = allowedRoot;
+    expect(() =>
+      validateCommandSpec({ cmd: 'echo', args: [], cwd: join(allowedRoot, '..') }, policy),
+    ).toThrow('outside the allowed root');
+  });
+
+  it('should resolve relative cwd values before checking containment', () => {
+    const policy = defaultPolicy();
+    policy.cwdPrefix = allowedRoot;
+    const relativeChild = relative(process.cwd(), allowedChild);
+    expect(() =>
+      validateCommandSpec({ cmd: 'echo', args: [], cwd: relativeChild }, policy),
+    ).not.toThrow();
+  });
+
+  it('should reject symlinks that escape the allowed root', () => {
+    const policy = defaultPolicy();
+    policy.cwdPrefix = allowedRoot;
+    expect(() =>
+      validateCommandSpec({ cmd: 'echo', args: [], cwd: symlinkEscape }, policy),
+    ).toThrow('outside the allowed root');
+  });
+
+  it('should reject cwd values whose containment cannot be verified', () => {
+    const policy = defaultPolicy();
+    policy.cwdPrefix = allowedRoot;
+    expect(() =>
+      validateCommandSpec({ cmd: 'echo', args: [], cwd: join(allowedRoot, 'missing') }, policy),
+    ).toThrow('containment could not be verified');
   });
 });
 
@@ -123,7 +223,11 @@ describe('runCommand()', () => {
   });
 
   it('should enforce timeout and set timedOut to true', async () => {
-    const policy = runnerPolicySchema.parse({ timeoutMs: 200, inheritEnv: true });
+    const policy = runnerPolicySchema.parse({
+      timeoutMs: 200,
+      inheritEnv: true,
+      allowlist: ['node'],
+    });
     const result = await runCommand(
       { cmd: 'node', args: ['-e', 'setTimeout(function(){},10000)'] },
       policy,
@@ -149,7 +253,7 @@ describe('executeCommands()', () => {
       { cmd: 'echo', args: ['second'] },
       { cmd: 'echo', args: ['third'] },
     ];
-    const results = await executeCommands(cmds, { inheritEnv: true });
+    const results = await executeCommands(cmds, { allowlist: ['echo'], inheritEnv: true });
     expect(results[0]?.stdout.trim()).toBe('first');
     expect(results[1]?.stdout.trim()).toBe('second');
     expect(results[2]?.stdout.trim()).toBe('third');
@@ -160,15 +264,28 @@ describe('executeCommands()', () => {
       cmd: 'echo',
       args: [String(i)],
     }));
-    const results = await executeCommands(cmds, { maxConcurrency: 2, inheritEnv: true });
+    const results = await executeCommands(cmds, {
+      allowlist: ['echo'],
+      maxConcurrency: 2,
+      inheritEnv: true,
+    });
     expect(results).toHaveLength(6);
     for (let i = 0; i < 6; i++) {
       expect(results[i]?.exitCode).toBe(0);
     }
   });
 
-  it('should apply policy defaults when an empty policy object is given', async () => {
-    const results = await executeCommands([{ cmd: 'echo', args: ['ok'] }], {});
+  it('should reject execution when the allowlist is missing', async () => {
+    await expect(executeCommands([{ cmd: 'echo', args: ['blocked'] }], {})).rejects.toThrow(
+      'requires a non-empty allowlist',
+    );
+  });
+
+  it('should execute when unrestricted mode is explicitly enabled', async () => {
+    const results = await executeCommands(
+      [{ cmd: 'echo', args: ['ok'] }],
+      { allowUnrestrictedCommands: true },
+    );
     expect(results[0]?.exitCode).toBe(0);
   });
 });

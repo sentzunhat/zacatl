@@ -4,7 +4,7 @@ import { container } from '@zacatl/third-party/dependency-injection/tsyringe';
 import type { FastifyRequest } from '@zacatl/third-party/fastify';
 
 import { Application } from '../../../../../src/service/layers/application/application';
-import type { ConfigApplication } from '../../../../../src/service/layers/application/types';
+import type { ApplicationConfig } from '../../../../../src/service/layers/application/types';
 import type { HookHandler, HookHandlerName } from '../../../../../src/service/layers/application/entry-points/rest/hook-handlers/hook-handler';
 import type { Request } from '../../../../../src/service/layers/application/entry-points/rest/common/request';
 import { AbstractRouteHandler } from '../../../../../src/service/layers/application/entry-points/rest/fastify/handlers/abstract';
@@ -29,7 +29,7 @@ class DummyRouteHandler extends AbstractRouteHandler {
   }
 }
 
-const fakeConfig: ConfigApplication = {
+const fakeConfig: ApplicationConfig = {
   entryPoints: {
     rest: {
       hooks: [DummyHookHandler],

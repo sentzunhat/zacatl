@@ -1,7 +1,7 @@
 import { CLI } from './cli/cli';
 import { Desktop } from './desktop/desktop';
 import { Server } from './server/server';
-import type { ConfigPlatforms } from './types';
+import type { PlatformsConfig } from './types';
 import type { ApplicationEntryPoints } from '../layers/application/types';
 
 /**
@@ -14,7 +14,7 @@ export class Platforms {
   private readonly cli?: CLI;
   private readonly desktop?: Desktop;
 
-  constructor(config: ConfigPlatforms) {
+  constructor(config: PlatformsConfig) {
     const { server, cli, desktop } = config;
 
     if (server) {

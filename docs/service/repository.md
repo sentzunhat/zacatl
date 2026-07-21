@@ -4,14 +4,15 @@ Repository primitives for Mongoose, Sequelize, and Node.js SQLite.
 
 ## BaseRepository
 
-Abstract base class providing ORM-agnostic data access with immediate model availability for **Mongoose**, **Sequelize**, and **node:sqlite**.
+Base repository implementations provide ORM-agnostic data access for **Mongoose**, **Sequelize**, and **node:sqlite**. The node:sqlite model resolves lazily, after its database connection is registered.
 
 ### Features
 
-- **Sync initialization** - models ready immediately after construction
+- **Lazy SQLite initialization** - construct repositories before the node:sqlite connection is registered; access the model only after service startup
 - **Multi-ORM support** - unified interface for Mongoose, Sequelize, and node:sqlite
 - **Direct model access** - use `this.model` for ORM-specific queries
 - **Type-safe** - full TypeScript support with model type assertions
+- **Mongoose-safe by default** - repository filters are treated as data, and updates are wrapped in `$set` unless you opt into `raw: true`
 
 ## Which class should I use?
 
@@ -31,9 +32,9 @@ export abstract class BaseRepository<D, I, O> {
 
   // CRUD operations
   findById(id: string): Promise<O | null>;
-  findMany(filter?: Record<string, unknown>): Promise<O[]>;
+  findMany(filter?: Record<string, unknown>, options?: { limit?: number; offset?: number }): Promise<O[]>;
   create(entity: I): Promise<O>;
-  update(id: string, update: Partial<I>): Promise<O | null>;
+  update(id: string, update: Partial<I>, options?: { raw?: boolean }): Promise<O | null>;
   delete(id: string): Promise<O | null>;
   exists(id: string): Promise<boolean>;
 
@@ -209,6 +210,11 @@ async getAllUsers(): Promise<User[]> {
 // Find with filter
 async getActiveUsers(): Promise<User[]> {
   return this.userRepo.findMany({ isActive: true });
+}
+
+// Results are capped at 20 by default (maximum 1000). Page explicitly when needed.
+async getUsersPage(page: number): Promise<User[]> {
+  return this.userRepo.findMany({}, { limit: 50, offset: page * 50 });
 }
 
 // Find by ID

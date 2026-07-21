@@ -50,29 +50,77 @@ cd examples/express-postgres-react && docker compose up -d
 cd examples/fastify-postgres-react && docker compose up -d
 ```
 
+### Compose Database Defaults
+
+The example compose files favor copy-paste local use:
+
+- Shared database defaults live in `examples/compose/databases/`.
+- Each example's `docker-compose.yml` extends the relevant shared defaults,
+  then keeps only example-specific ports, container names, build args, and
+  initialization files.
+- MongoDB sidecars default to `mongo:latest`.
+- PostgreSQL sidecars default to `postgres:latest`.
+- SQLite examples default to an example-local `./data` folder mounted at
+  `/app/data` so the distroless non-root runtime can write the SQLite file.
+- MongoDB and PostgreSQL data use Docker-managed named volumes
+  (`mongo-data`, `postgres-data`).
+- PostgreSQL mounts `postgres-data` at `/var/lib/postgresql`, which is the
+  current official-image layout for `postgres:latest` / PostgreSQL 18+.
+
+Before deploying outside local examples, choose the Docker host/platform and pin
+database images intentionally. You can override the defaults without editing the
+compose files:
+
+```bash
+# Pin a database image for a compose run
+ZACATL_EXAMPLE_MONGO_IMAGE='mongo@sha256:<digest>' docker compose up -d
+ZACATL_EXAMPLE_POSTGRES_IMAGE='postgres@sha256:<digest>' docker compose up -d
+
+# Avoid host-port collisions while keeping app-to-database networking unchanged
+EXPRESS_MONGODB_HOST_PORT=0 docker compose up -d
+FASTIFY_MONGODB_HOST_PORT=0 docker compose up -d
+EXPRESS_POSTGRES_HOST_PORT=0 docker compose up -d
+FASTIFY_POSTGRES_HOST_PORT=0 docker compose up -d
+
+# Move SQLite data outside the example folder if needed
+ZACATL_EXAMPLE_SQLITE_DATA_DIR=/path/to/sqlite-data docker compose up -d
+```
+
+Use `docker compose down -v` when you want to delete the example database volume
+and start with empty MongoDB/PostgreSQL data again. For SQLite, delete the
+selected data folder after stopping the stack if you want an empty database.
+
 ### Using Consolidated Dockerfile (Manual Build)
 
 All 8+ examples share a **single Dockerfile** in `examples/Dockerfile` with `--build-arg` for parameterization:
+
+Build and test on the host architecture by default. On this machine that means the local `linux/arm64` images and digests are the source of truth; do not assume amd64 unless you intentionally override the platform.
+
+If you need to change the Docker host or target platform, make that decision before deploying. Changing the host after a build can invalidate the pinned digest assumptions and the runtime verification you just performed.
 
 ```bash
 # Build any example from repo root
 docker build \
   --build-arg EXAMPLE=fastify-sqlite-react \
+  --build-arg DATABASE_DRIVER=sqlite3 \
   -t zacatl-fastify-sqlite-react .
 
 docker build \
   --build-arg EXAMPLE=fastify-mongodb-react \
+  --build-arg DATABASE_DRIVER=mongoose \
   --build-arg PORT=8082 \
   -t zacatl-fastify-mongodb-react .
 
 docker build \
   --build-arg EXAMPLE=express-postgres-react \
+  --build-arg DATABASE_DRIVER=pg \
   --build-arg PORT=8183 \
   -t zacatl-express-postgres-react .
 ```
 
 **Build arguments:**
 - `EXAMPLE` (required): Example directory name (e.g., `fastify-sqlite-react`)
+- `DATABASE_DRIVER` (required for non-SQLite examples): `sqlite3`, `mongoose`, `mongodb`, or `pg`; defaults to `sqlite3`
 - `PORT` (optional, default: 8080): Container port override
 - `BACKEND` (default: `apps/backend`): Backend path within example
 - `FRONTEND` (default: `apps/frontend`): Frontend path within example
@@ -132,93 +180,117 @@ examples/
 All examples use a **single `examples/Dockerfile`** with parameterized builds:
 
 ```dockerfile
-# Stage 1: Builder (node:26-alpine)
+# Stage 1: Builder (node:26-trixie-slim)
 # - Install build tools (python3, make, g++)
 # - npm ci (installs all deps incl. optional ORM drivers)
 # - Build zacatl framework
 # - npm prune --omit=dev at root (keeps ORM drivers; they're optionalDependencies)
 
-# Stage 2: Install example deps (node:26-alpine)
+# Stage 2: Install example deps (node:26-trixie-slim)
 # Stage 3a/3b: Build backend + frontend
-# Stage 4: Lean Runtime (node:26-alpine)
+# Stage 4: Runtime (gcr.io/distroless/nodejs26-debian13:nonroot)
 # - Copy pruned root node_modules + zacatl build
 # - Copy example's pruned node_modules + dist artifacts
-# - RESULT: ~269-282 MB per image
+# - Run as distroless uid 65532 without a shell or package manager
 ```
 
 **Key Benefits:**
 - ✅ **One file to maintain** - Changes apply to all 8+ examples
 - ✅ **No duplication** - No individual Dockerfiles per example
-- ✅ **Lean alpine base** - ~270-282 MB runtime images (vs 400+ MB before ORM reclassification)
-- ✅ **Fast builds** - Alpine layers cache efficiently
+- ✅ **ABI-matched stages** - Debian 13 glibc in the builder and runtime
+- ✅ **Minimal runtime** - Distroless contains no shell or package manager
 - ✅ **Production-ready** - Industry-standard multi-stage pattern
 
 ### Image Size Optimization
 
-The consolidated Dockerfile uses **alpine** (lean) base images for both builder and runtime stages:
+The consolidated Dockerfile uses `node:26-trixie-slim` for build and install
+stages, then `gcr.io/distroless/nodejs26-debian13:nonroot` for runtime. Both
+use Debian 13 glibc, so native modules such as `sqlite3` remain ABI-compatible.
 
-All 8 examples build from the single consolidated `examples/Dockerfile`.
-Sizes below were measured from actual builds **and verified by actually
-running each container and exercising its CRUD endpoints** (2026-07-10,
-Docker 26.x, `node:26-alpine` builder + runtime, ORM drivers in
-`optionalDependencies` so root prune is safe) — not just build success:
+The following runtime comparison was measured on 2026-07-12 on the host
+architecture. Each candidate built
+`fastify-sqlite-react`; the Alpine and distroless containers both started and
+returned HTTP 200 from `/api/greetings`.
 
-| Example | Image size | Verified |
-|---------|------------|----------|
-| fastify-sqlite-react   | 282 MB | ✅ create/read/delete round trip confirmed |
-| fastify-mongodb-react  | 278 MB | ✅ starts cleanly (needs a running MongoDB to complete CRUD) |
-| fastify-sqlite-svelte  | 280 MB | ✅ create/read/delete round trip confirmed |
-| fastify-postgres-react | 269 MB | ✅ starts, requires a running PostgreSQL to connect |
-| express-sqlite-react   | 282 MB | ✅ create/read/delete round trip confirmed |
-| express-mongodb-react  | 278 MB | ✅ starts cleanly (needs a running MongoDB to complete CRUD) |
-| express-sqlite-svelte  | 280 MB | ✅ create/read/delete round trip confirmed |
-| express-postgres-react | 269 MB | ✅ starts, requires a running PostgreSQL to connect |
+| Builder and runtime | Docker Desktop expanded size | Exported gzip size | Runtime result |
+| ------------------- | ---------------------------: | -----------------: | -------------- |
+| `node:26-trixie-slim` + distroless Node 26 Debian 13 | 426 MB | **88.3 MB** | HTTP 200 |
+| `node:26-alpine` + `node:26-alpine` | **423 MB** | 93.0 MB | HTTP 200 |
+| `node:26-trixie-slim` + `node:26-trixie-slim` | 547 MB | 114.0 MB | Candidate failed its non-root runtime check |
 
-**Size chart (measured, verified-running containers):**
+Docker Desktop's expanded size is not the registry transfer size. The
+distroless image appears 3 MB larger than Alpine in the expanded view, but its
+exported compressed image is about 4.7 MB smaller. Use the exported or registry
+size when comparing distribution cost, and always pair it with a runtime smoke
+test.
+
+The older 269-282 MB Alpine figures were recorded under a different Docker
+environment and are not reproducible with the current checkout and Docker
+Desktop. They must not be used as current expectations.
+
+### Current Example Image Sizes
+
+All eight examples were rebuilt from the current database-specialized
+`examples/Dockerfile` on 2026-07-13 on the host architecture.
+The root production tree omits unused optional drivers and installs only the
+driver selected by `DATABASE_DRIVER`.
+
+| Example | Docker Desktop expanded size | Exported gzip size | Verification |
+| ------- | ---------------------------: | -----------------: | ------------ |
+| `express-mongodb-react` | 377 MB | 73.8 MB | Built with `mongoose` only |
+| `express-postgres-react` | 351 MB | 70.2 MB | Built with `pg` only |
+| `express-sqlite-react` | 389 MB | 81.6 MB | HTTP 200 from `/api/greetings` |
+| `express-sqlite-svelte` | 389 MB | 81.4 MB | HTTP 200 from `/api/greetings` |
+| `fastify-mongodb-react` | 377 MB | 73.8 MB | Built with `mongoose` only |
+| `fastify-postgres-react` | 351 MB | 70.2 MB | HTTP 200 with PostgreSQL sidecar |
+| `fastify-sqlite-react` | 389 MB | 81.6 MB | HTTP 200 from `/api/greetings` |
+| `fastify-sqlite-svelte` | 389 MB | 81.4 MB | HTTP 200 from `/api/greetings` |
+
+The expanded size is useful for comparing local Docker Desktop storage. The
+exported gzip size approximates compressed distribution cost. Neither metric
+should be silently substituted for the other.
+
+### Container Vulnerability Scanning
+
+Docker Scout is installed with Docker Desktop but requires Docker Hub
+authentication. Log in from an interactive terminal so credentials are handled
+by Docker Desktop's credential store:
+
+```bash
+docker login
+docker scout cves zacatl-specialized:fastify-sqlite-react
+docker scout cves --only-severity critical,high zacatl-specialized:fastify-sqlite-react
 ```
-                          0     100    200    300    400 MB
-                          |      |      |      |      |
-fastify-sqlite-react      ████████████████████████▌    282 MB
-fastify-mongodb-react     ███████████████████████▌     278 MB
-fastify-sqlite-svelte     ████████████████████████     280 MB
-fastify-postgres-react    ██████████████████████       269 MB
-express-sqlite-react      ████████████████████████▌    282 MB
-express-mongodb-react     ███████████████████████▌     278 MB
-express-sqlite-svelte     ████████████████████████     280 MB
-express-postgres-react    ██████████████████████       269 MB
+
+For machine or CI authentication, provide a scoped Docker Hub personal access
+token through standard input rather than putting it in shell history:
+
+```bash
+printf '%s' "$DOCKERHUB_TOKEN" | docker login --username "$DOCKERHUB_USERNAME" --password-stdin
+docker scout cves --only-severity critical,high <image>
 ```
 
-**Why Alpine?**
-- Distroless doesn't have Node.js 26 support yet
-- Alpine is the practical alternative (~150 MB vs ~250 MB for Debian)
-- Minimal attack surface, no shell by default
-- Fast downloads and container startup
-- Industry standard for production containerization
+Do not treat `npm audit` as a replacement for this scan: npm advisories cover
+JavaScript dependencies, while Scout also analyzes the image's OS packages.
+
+All eight `zacatl-specialized:*` images were scanned on 2026-07-13 with Docker
+Scout 1.20.4 on the host architecture. Scout detected **zero vulnerabilities** in every
+image. The Fastify SQLite React scan indexed 275 packages, verified build
+provenance, and reported `0C 0H 0M 0L` with an analyzed size of 82 MB.
+
+Run Scout scans serially with version 1.20.4. Concurrent scans can contend for
+the local indexing cache and fail with `cache may be in use by another process`.
 
 ### Security: Non-Root Runtime User
 
-The final runtime stage runs as the unprivileged `node` user (uid 1000,
-shipped by the `node:26-alpine` base image) rather than root — a
-container-escape or dependency-RCE scenario is strictly worse running as
-root. `COPY --chown=node:node` on every artifact plus a final `chown` on
-the per-example WORKDIR (needed for the SQLite examples' `database.sqlite`
-write) keep the non-root user able to read and write everything it needs;
-`USER node` is set right before `CMD`.
+The runtime uses distroless's unprivileged `nonroot` user (uid/gid 65532).
+Every runtime artifact is copied with `--chown=65532:65532`, and the example
+work directory is writable so SQLite examples can create their database file.
+Distroless has no shell, so verify identity with Docker inspection:
 
-Verify with `docker run --rm <image> id` — expect
-`uid=1000(node) gid=1000(node) groups=1000(node)`.
-
-**Size Breakdown (measured alpine runtime):**
-```
-Alpine Runtime (node:26-alpine):
-├─ Node.js binary + alpine libs:         ~130 MB
-├─ Root production deps (zacatl + ORMs): ~90-100 MB
-├─ Example production deps:              ~40-50 MB
-├─ App dist + frontend static:           ~5 MB
-└─ Total:                                ~269-282 MB
-
-Old images (before STAB-024, ORM drivers in devDependencies, root not pruned):
-└─ Total:                                ~404-417 MB
+```bash
+docker image inspect <image> --format '{{.Config.User}}'
+# Expected: 65532
 ```
 
 ### Critical Build Script Detail
@@ -245,12 +317,12 @@ Old images (before STAB-024, ORM drivers in devDependencies, root not pruned):
 SQLite3 requires native compilation:
 
 ```dockerfile
-# Install build tools
+# Install build tools in the Debian 13 build/install stage
 RUN apt-get update && apt-get install -y python3 make g++
-
-# Rebuild for container architecture
-RUN npm rebuild sqlite3
 ```
+
+Do not compile native modules in Alpine and copy them into the distroless
+Debian runtime. Alpine uses musl while the runtime uses glibc.
 
 ---
 
@@ -279,6 +351,9 @@ RUN npm rebuild sqlite3
 ```yaml
 services:
   backend:  # Name is "backend" but includes frontend too
+    extends:
+      file: ../compose/databases/sqlite.yml
+      service: backend
     build:
       context: ../../..  # Repository root
       dockerfile: examples/Dockerfile  # Single consolidated Dockerfile
@@ -289,16 +364,21 @@ services:
     ports:
       - "{port}:{port}"
     environment:
-      - NODE_ENV=production
-      - PORT={port}
-      - DATABASE_URL=sqlite:database.sqlite
+      NODE_ENV: production
+      PORT: {port}
+      HEALTHCHECK_PATH: /greetings
     volumes:
-      - ./data:/app/data  # Persist SQLite database
+      - ${ZACATL_EXAMPLE_SQLITE_DATA_DIR:-./data}:/app/data  # Persist SQLite database
     healthcheck:
-      test: ["CMD", "node", "-e", "fetch('http://localhost:{port}/greetings').catch(() => process.exit(1))"]
+      test:
+        [
+          "CMD",
+          "/nodejs/bin/node",
+          "-e",
+          "const path=process.env.HEALTHCHECK_PATH||'/greetings'; const url=`http://127.0.0.1:$${process.env.PORT || '{port}'}$${path}`; const controller=new AbortController(); const timer=setTimeout(() => controller.abort(), 4000); fetch(url, { signal: controller.signal }).then((r) => { clearTimeout(timer); if (!r.ok) process.exit(1); }).catch(() => process.exit(1));",
+        ]
     restart: unless-stopped
 
-# No separate frontend service!
 ```
 
 ### MongoDB (With Database Container)
@@ -306,20 +386,14 @@ services:
 ```yaml
 services:
   mongodb:
-    image: mongo:latest
+    extends:
+      file: ../compose/databases/mongodb.yml
+      service: mongodb
     container_name: {framework}-mongodb-db
     ports:
-      - "27017:27017"
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: root
-      MONGO_INITDB_DATABASE: appdb
+      - "${FASTIFY_MONGODB_HOST_PORT:-27017}:27017"
     volumes:
-      - mongo-data:/data/db
       - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
-    healthcheck:
-      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
-    restart: unless-stopped
 
   backend:
     build:
@@ -334,13 +408,20 @@ services:
       - "8082:8082"
     environment:
       - NODE_ENV=production
-      - PORT={port}
+      - PORT=8082
       - MONGO_URI=mongodb://local:local@mongodb:27017/appdb  # Note: mongodb hostname
+      - HEALTHCHECK_PATH=/greetings
     depends_on:
       mongodb:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "node", "-e", "fetch('http://localhost:{port}/greetings').catch(() => process.exit(1))"]
+      test:
+        [
+          "CMD",
+          "/nodejs/bin/node",
+          "-e",
+          "const path=process.env.HEALTHCHECK_PATH||'/greetings'; const url=`http://127.0.0.1:$${process.env.PORT || '8082'}$${path}`; const controller=new AbortController(); const timer=setTimeout(() => controller.abort(), 4000); fetch(url, { signal: controller.signal }).then((r) => { clearTimeout(timer); if (!r.ok) process.exit(1); }).catch(() => process.exit(1));",
+        ]
     restart: unless-stopped
 
 volumes:
@@ -363,19 +444,12 @@ db.createUser({
 ```yaml
 services:
   postgres:
-    image: postgres:16
+    extends:
+      file: ../compose/databases/postgres.yml
+      service: postgres
     container_name: {framework}-postgres-db
     ports:
-      - "5432:5432"
-    environment:
-      - POSTGRES_USER=local
-      - POSTGRES_PASSWORD=local
-      - POSTGRES_DB=appdb
-    volumes:
-      - postgres-data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U local -d appdb"]
-    restart: unless-stopped
+      - "${FASTIFY_POSTGRES_HOST_PORT:-5433}:5432"
 
   backend:
     build:
@@ -396,7 +470,13 @@ services:
       postgres:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "node", "-e", "fetch('http://localhost:{port}/greetings').catch(() => process.exit(1))"]
+      test:
+        [
+          "CMD",
+          "/nodejs/bin/node",
+          "-e",
+          "const path=process.env.HEALTHCHECK_PATH||'/greetings'; const url=`http://127.0.0.1:$${process.env.PORT || '{port}'}$${path}`; const controller=new AbortController(); const timer=setTimeout(() => controller.abort(), 4000); fetch(url, { signal: controller.signal }).then((r) => { clearTimeout(timer); if (!r.ok) process.exit(1); }).catch(() => process.exit(1));",
+        ]
     restart: unless-stopped
 
 volumes:
@@ -457,7 +537,7 @@ but it crashes immediately on `docker run`.
 
 **Root cause**: zacatl's compiled output (`build-src-esm/**`) resolves its
 own runtime dependencies (`reflect-metadata`, `tsyringe`) and the optional
-ORM peers (`sqlite3`, `mongoose`, `pg`, `better-sqlite3`) by walking up from
+ORM peers (`sequelize`, `sqlite3`, `mongoose`, `pg`, `mongodb`) by walking up from
 its own file location to `/app/node_modules` — the **root** node_modules
 tree, not the example's own. If the final runtime stage only copies the
 example's `node_modules` and not `/app/node_modules`, this resolution fails
@@ -472,8 +552,9 @@ COPY --from=build-backend /app/examples/${EXAMPLE}/node_modules ./node_modules
 ```
 
 The root `/app/node_modules` is pruned (`npm prune --omit=dev`) during the
-builder stage — ORM drivers (`sqlite3`, `mongoose`, `pg`, `better-sqlite3`)
-are declared as `optionalDependencies` so they survive the prune.
+builder stage. The Dockerfile installs only the ORM packages needed by the
+selected `DATABASE_DRIVER`; SQL examples install `sequelize` plus `pg` or
+`sqlite3`.
 
 **Always verify a Docker fix by running the container and hitting an
 endpoint** — `docker images` size and a successful `docker build` do not
@@ -507,10 +588,8 @@ COPY --from=build-backend /app/src/eslint               /app/src/eslint
 
 **Solution**: Rebuild in Dockerfile:
 
-```dockerfile
-RUN apk add --no-cache python3 make g++
-RUN npm rebuild sqlite3
-```
+Build and install native dependencies in `node:26-trixie-slim`, matching the
+distroless Debian 13 runtime ABI. Do not rebuild them in Alpine.
 
 ### "version is obsolete" Warning
 

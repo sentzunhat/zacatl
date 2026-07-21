@@ -10,7 +10,7 @@ import type { ServicePort } from './ports/service';
 export type DomainProviders = Array<Constructor<ProviderPort>>;
 export type DomainServices = Array<Constructor<ServicePort>>;
 
-export interface ConfigDomain {
+export interface DomainConfig {
   providers?: DomainProviders;
   services?: DomainServices;
 }

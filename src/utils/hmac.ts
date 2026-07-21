@@ -1,6 +1,6 @@
-import { createHmac } from 'crypto';
+import { createHmac, timingSafeEqual } from 'crypto';
 
-export type HmacAlgorithm = 'sha256' | 'sha512' | 'sha1' | 'md5';
+export type HmacAlgorithm = 'sha256' | 'sha512';
 export type HmacEncoding = 'hex' | 'base64' | 'base64url';
 
 export interface GenerateHmacOptions {
@@ -10,24 +10,16 @@ export interface GenerateHmacOptions {
   encoding?: HmacEncoding;
 }
 
+export interface VerifyHmacOptions {
+  message: string;
+  signature: string;
+  secretKey: string;
+  algorithm?: HmacAlgorithm;
+  encoding?: HmacEncoding;
+}
+
 /**
- * Function to generate HMAC using a secret key
- * @param options - Configuration options for HMAC generation
- * @param options.message - The message to be hashed
- * @param options.secretKey - The secret key used for HMAC
- * @param options.algorithm - Hash algorithm (default: "sha256")
- * @param options.encoding - Output encoding format (default: "hex")
- * @returns The HMAC digest in the specified encoding format
- *
- * @example
- * ```typescript
- * const hmac = generateHmac({
- *   message: "Hello World",
- *   secretKey: "my-secret-key",
- *   algorithm: "sha256",
- *   encoding: "hex"
- * });
- * ```
+ * Generate an HMAC digest using SHA-256 (default) or SHA-512.
  */
 export const generateHmac = ({
   message,
@@ -36,8 +28,41 @@ export const generateHmac = ({
   encoding = 'hex',
 }: GenerateHmacOptions): string => {
   const hmac = createHmac(algorithm, secretKey);
-
   hmac.update(message);
-
   return hmac.digest(encoding);
+};
+
+/**
+ * Timing-safe HMAC verification. Computes the expected signature and compares
+ * it to the provided signature using `crypto.timingSafeEqual` to prevent
+ * timing side-channel attacks.
+ *
+ * @returns `true` if the signature is valid, `false` otherwise.
+ *
+ * @example
+ * ```typescript
+ * const valid = verifyHmac({
+ *   message: payload,
+ *   signature: incomingSignature,
+ *   secretKey: webhookSecret,
+ *   algorithm: 'sha256',
+ *   encoding: 'hex',
+ * });
+ * ```
+ */
+export const verifyHmac = ({
+  message,
+  signature,
+  secretKey,
+  algorithm = 'sha256',
+  encoding = 'hex',
+}: VerifyHmacOptions): boolean => {
+  const expected = generateHmac({ message, secretKey, algorithm, encoding });
+  // Compare byte lengths, not string lengths: multi-byte UTF-8 characters in
+  // an attacker-supplied signature would otherwise pass the length guard and
+  // make timingSafeEqual throw RangeError on mismatched buffer sizes.
+  const expectedBuffer = Buffer.from(expected);
+  const signatureBuffer = Buffer.from(signature);
+  if (expectedBuffer.length !== signatureBuffer.length) return false;
+  return timingSafeEqual(expectedBuffer, signatureBuffer);
 };

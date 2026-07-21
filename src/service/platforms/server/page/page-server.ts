@@ -1,6 +1,6 @@
 import { CustomError } from '@zacatl/error';
 
-import type { ConfigServer } from '../server';
+import type { ServerConfig } from '../server';
 import { type ApiPrefixes, type PageServerPort, type StaticConfig } from './port';
 
 /**
@@ -10,10 +10,10 @@ import { type ApiPrefixes, type PageServerPort, type StaticConfig } from './port
  * Supports frameworks: React, Vue, Svelte, Angular, etc.
  */
 export class PageServer {
-  private readonly config: ConfigServer;
+  private readonly config: ServerConfig;
   private readonly adapter: PageServerPort;
 
-  constructor(config: ConfigServer, adapter: PageServerPort) {
+  constructor(config: ServerConfig, adapter: PageServerPort) {
     this.config = config;
     this.adapter = adapter;
   }
@@ -78,10 +78,19 @@ export class PageServer {
       return;
     }
 
-    const { staticDir, spaFallback = true, prefixes = { api: '/api' }, customRegister } = this.config.page;
+    const {
+      staticDir,
+      spaFallback = true,
+      prefixes = { api: '/api' },
+      cache,
+      customRegister,
+    } = this.config.page;
 
     if (staticDir != null) {
-      this.registerStaticFiles({ root: staticDir });
+      this.registerStaticFiles({
+        root: staticDir,
+        ...(cache != null ? { cache } : {}),
+      });
 
       if (spaFallback) {
         this.registerSpaFallback(prefixes, staticDir);

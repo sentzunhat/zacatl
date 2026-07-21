@@ -168,7 +168,7 @@ const service = new Service({
         {
           vendor: DatabaseVendor.MONGOOSE,
           instance: db,
-          connectionString: 'mongodb://localhost/example',
+          connection: { url: 'mongodb://localhost/example' },
         },
       ],
       port: 4000,
@@ -275,7 +275,7 @@ Notes:
 **Key Differences:**
 
 - ✅ `@sentzunhat/zacatl` is enough for core usage
-- ✅ Add optional peers only for the adapters you use (`mongoose`, `sequelize`, `better-sqlite3`, `sqlite3`, `pg`)
+- ✅ Add optional peers only for the adapters you use (`mongoose`, `sequelize`, `sqlite3`, `pg`, `mongodb`)
 - ✅ Reduced `package.json` complexity and reproducible builds
 
 ---

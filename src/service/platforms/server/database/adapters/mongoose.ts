@@ -9,7 +9,7 @@ export class MongooseAdapter implements DatabaseServerPort {
   private mongooseInstance: Mongoose | null = null;
 
   async connect(serviceName: string, config: DatabaseConfig): Promise<void> {
-    const { instance, connectionString, onDatabaseConnected } = config;
+    const { instance, connection, onDatabaseConnected } = config;
 
     const getMongoDbName = (uri: string): string | undefined => {
       const match = uri.match(/^mongodb(?:\+srv)?:\/\/[^/]+\/([^?]+)(\?|$)/);
@@ -26,9 +26,9 @@ export class MongooseAdapter implements DatabaseServerPort {
       });
     }
 
-    const dbName = getMongoDbName(connectionString) ?? serviceName;
+    const dbName = getMongoDbName(connection.url) ?? serviceName;
 
-    await mongoose.connect(connectionString, {
+    await mongoose.connect(connection.url, {
       dbName,
       autoIndex: true,
       autoCreate: true,
@@ -39,7 +39,7 @@ export class MongooseAdapter implements DatabaseServerPort {
     }
 
     this.mongooseInstance = mongoose;
-    registerOrmInstance(DatabaseVendor.MONGOOSE, mongoose);
+    registerOrmInstance(DatabaseVendor.MONGOOSE, connection, mongoose);
   }
 
   async disconnect(): Promise<void> {

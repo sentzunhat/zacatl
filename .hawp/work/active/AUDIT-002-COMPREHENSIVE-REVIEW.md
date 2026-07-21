@@ -68,6 +68,10 @@ Example backend `src/index.ts` files exist (correct for examples) and properly i
 
 ### 4. Docker Images & Node Version ✅
 
+> Superseded on 2026-07-12: this section predates the current Dockerfile.
+> Current verified guidance is in `examples/DOCKER.md` and
+> `.hawp/work/status/2026/07/12/docker-size-correction.md`.
+
 **Status:** ALIGNED
 
 **Current state:**
@@ -183,7 +187,7 @@ Example backend `src/index.ts` files exist (correct for examples) and properly i
 4. ✅ Publish dry-run confirmed
 
 ### For next iteration (post-0.0.56):
-1. **STAB-020:** Optimize Docker images to 200-300MB range using distroless
+1. ~~**STAB-020:** Optimize Docker images to 200-300MB range using distroless~~ Completed; the old size target is superseded by measured expanded and exported sizes.
 2. **DEVX-001:** Add `.devcontainer/` for improved developer experience
 3. **STAB-019:** Archive old closed work from BACKLOG.md
 

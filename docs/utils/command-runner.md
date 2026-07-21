@@ -38,7 +38,8 @@ const spec: CommandSpec = {
 
 ### RunnerPolicy
 
-Controls security and resource limits. All fields are optional; safe defaults apply automatically.
+Controls security and resource limits. Resource limits receive safe defaults, but command
+execution fails closed unless a non-empty `allowlist` is supplied.
 
 ```typescript
 const policy: Partial<RunnerPolicy> = {
@@ -46,8 +47,9 @@ const policy: Partial<RunnerPolicy> = {
   maxOutputBytes: 1_048_576, // combined stdout+stderr cap (default 1 MB)
   maxConcurrency: 4, // parallel command limit in a batch (default 4)
   allowlist: ['npm', 'node'], // only these binaries are permitted
+  allowUnrestrictedCommands: false, // explicit trusted-input escape hatch (default false)
   denyPatterns: ['--upload-pack'], // regex strings; any matching arg is rejected
-  cwdPrefix: '/safe/dir', // all cwd values must start here
+  cwdPrefix: '/safe/dir', // every cwd must resolve inside this existing root
   inheritEnv: true, // inherit parent process.env (default false)
 };
 ```
@@ -77,7 +79,7 @@ Executes a single command. Applies schema and policy validation, enforces timeou
 ```typescript
 import { runCommand, RunnerPolicySchema } from '@sentzunhat/zacatl/utils';
 
-const policy = RunnerPolicySchema.parse({ inheritEnv: true });
+const policy = RunnerPolicySchema.parse({ allowlist: ['node'], inheritEnv: true });
 const result = await runCommand({ cmd: 'node', args: ['--version'] }, policy);
 
 console.log(result.stdout); // v24.x.x
@@ -97,7 +99,7 @@ const results = await executeCommands(
     { cmd: 'npm', args: ['run', 'lint:silent'] },
     { cmd: 'npm', args: ['test'] },
   ],
-  { maxConcurrency: 3, inheritEnv: true, timeoutMs: 120_000 },
+  { allowlist: ['npm'], maxConcurrency: 3, inheritEnv: true, timeoutMs: 120_000 },
 );
 
 for (const result of results) {
@@ -127,11 +129,34 @@ validateCommandSpec({ cmd: 'rm', args: ['-rf', '/'] }, policy); // throws Valida
 | ------------------------ | ------------------------------------------------------------------------ |
 | Shell injection          | `shell: false` — args are never concatenated or shell-parsed             |
 | Metacharacters           | Arguments containing `;`, `&`, `\|`, `` ` ``, `$`, `<`, `>` are rejected |
-| Untrusted binaries       | Optional `allowlist` of permitted `cmd` values                           |
+| Untrusted binaries       | Required non-empty `allowlist`; missing/empty lists reject execution      |
 | Malicious arguments      | Optional `denyPatterns` (regex list) applied per argument                |
-| Unsafe working directory | Optional `cwdPrefix` restricts the `cwd` search space                    |
+| Unsafe working directory | `cwdPrefix` uses canonical real paths and descendant containment         |
 | Resource exhaustion      | `timeoutMs`, `maxOutputBytes`, `maxConcurrency`                          |
 | Runaway processes        | SIGTERM → SIGKILL fallback after a 2-second grace period                 |
+
+### Unrestricted trusted mode
+
+Trusted application code that genuinely needs arbitrary executable access can opt in explicitly:
+
+```typescript
+const policy = RunnerPolicySchema.parse({
+  allowUnrestrictedCommands: true,
+  inheritEnv: true,
+});
+```
+
+Do not enable unrestricted mode for commands originating from users, automation, CLI arguments,
+AI-generated input, or remote requests. Deny patterns, metacharacter checks, directory restrictions,
+timeouts, and output limits remain active in this mode.
+
+### Working-directory containment
+
+When `cwdPrefix` and `cwd` are supplied, both paths must exist. Relative paths are resolved from
+`process.cwd()`, matching Node's process-spawn behavior. Symlinks are resolved before containment is
+checked, and the requested directory must be either the exact canonical root or one of its descendants.
+Sibling names that merely share a string prefix and paths that traverse or link outside the root are
+rejected. Containment uses Node's platform-native path semantics on POSIX and Windows.
 
 ## Parallel Execution Script
 

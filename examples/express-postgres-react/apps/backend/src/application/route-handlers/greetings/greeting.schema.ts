@@ -36,3 +36,12 @@ export type GreetingIdParams = z.infer<typeof GreetingIdParamsSchema>;
 export type GreetingFilterQuery = z.infer<typeof GreetingFilterQuerySchema>;
 export type GreetingResponse = z.infer<typeof GreetingResponseSchema>;
 export type GreetingListResponse = z.infer<typeof GreetingListResponseSchema>;
+
+// ===== Update Schemas =====
+
+export const UpdateGreetingBodySchema = z.object({
+  message: z.string().min(1, 'Message is required').optional(),
+  language: z.string().min(2, 'Language code must be at least 2 characters').optional(),
+});
+
+export type UpdateGreetingBody = z.infer<typeof UpdateGreetingBodySchema>;

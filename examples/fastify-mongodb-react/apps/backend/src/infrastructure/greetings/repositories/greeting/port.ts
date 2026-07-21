@@ -7,7 +7,7 @@
  * The domain layer only knows about this interface, not the specific implementation.
  */
 
-import type { Greeting, CreateGreetingInput } from '../../../../domain/entities/greeting';
+import type { Greeting, CreateGreetingInput, UpdateGreetingInput } from '../../../../domain/entities/greeting';
 
 export interface GreetingRepositoryPort {
   /**
@@ -29,4 +29,9 @@ export interface GreetingRepositoryPort {
    * Delete a greeting by ID
    */
   delete(id: string): Promise<Greeting | null>;
+
+  /**
+   * Update a greeting by ID (returns null when not found)
+   */
+  update(id: string, input: UpdateGreetingInput): Promise<Greeting | null>;
 }

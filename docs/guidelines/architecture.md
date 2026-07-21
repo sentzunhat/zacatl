@@ -1060,14 +1060,17 @@ export class CustomError extends Error {
 
   toJSON() {
     return {
-      name: this.name,
-      message: this.message,
+      message: typeof this.code === 'number' && this.code >= 500
+        ? 'Internal Server Error'
+        : this.message,
       code: this.code,
       correlationId: this.correlationId,
-      metadata: this.metadata,
-      component: this.component,
-      operation: this.operation,
     };
+  }
+
+  // Explicit internal logging only; never return this from an HTTP handler.
+  toDiagnosticJSON() {
+    return { name: this.name, message: this.message, metadata: this.metadata };
   }
 }
 ```

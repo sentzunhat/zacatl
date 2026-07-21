@@ -109,8 +109,8 @@ export type DatabaseConfig = {
   vendor: DatabaseVendor;
   /** Initialized database instance */
   instance: DatabaseInstance;
-  /** Connection string (e.g. mongodb://localhost/db) */
-  connectionString: string;
+  /** Connection details (url + optional name) */
+  connection: { url: string; name?: string };
   /** Optional callback after successful connection */
   onDatabaseConnected?: (instance: DatabaseInstance) => Promise<void>;
 };

@@ -6,7 +6,10 @@ Re-exports for all third-party deps — import from here.
 
 ## Exports
 
-tsyringe, zod, uuid, i18n, js-yaml, fastify, express, http-proxy-middleware, reflect-metadata
+tsyringe, zod, uuid, i18n, js-yaml, fastify, express, http-proxy-middleware, reflect-metadata.
+
+Database integrations are subpath-only optional peers:
+`databases/mongoose`, `databases/sequelize`, `databases/sqlite3`, and `databases/nodesqlite`.
 
 ## Quick use
 

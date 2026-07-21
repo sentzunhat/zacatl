@@ -14,7 +14,7 @@ npm run dev
 
 ## Database Setup
 
-- **Storage**: SQLite file at `backend/database.sqlite`
+- **Storage**: SQLite file at `data/database.sqlite` (mounted volume)
 - **Auto-init**: Schema is created on app start
 - **Connection**: `backend/src/infrastructure/database/connection.ts`
 

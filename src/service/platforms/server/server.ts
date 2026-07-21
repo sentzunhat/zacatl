@@ -16,7 +16,7 @@ import { createPageAdapter as createFastifyPageAdapter } from './providers/fasti
 import { ServerVendor, type HttpServerConfig, type PageServerConfig } from './types/server-config';
 import type { RestApplicationEntryPoints } from '../../layers/application/types';
 
-export interface ConfigServer {
+export interface ServerConfig {
   name: string;
   server: HttpServerConfig;
   databases: Array<DatabaseConfig>;
@@ -36,14 +36,14 @@ export interface ConfigServer {
  * const server = new Server({ name: "api", server: serverConfig, databases: [], port: 3000 });
  */
 export class Server {
-  private readonly config: ConfigServer;
+  private readonly config: ServerConfig;
   private readonly apiAdapter: ApiServerPort;
   private readonly pageAdapter: PageServerPort;
   private apiServer?: ApiServer;
   private pageServer?: PageServer;
   private databaseServer?: DatabaseServer;
 
-  constructor(config: ConfigServer) {
+  constructor(config: ServerConfig) {
     this.config = config;
 
     // Create shared adapters based on vendor (Fastify or Express)

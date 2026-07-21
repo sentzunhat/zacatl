@@ -19,31 +19,31 @@ npm run screenshots:examples:capture   # requires Docker
 
 ### Fastify + SQLite + React · Fastify + SQLite + Svelte
 
-| | Initial | After Create | After Delete |
-|---|---------|-------------|--------------|
-| **React** | ![](./screenshots/fastify-sqlite-react/01-initial.png) | ![](./screenshots/fastify-sqlite-react/02-after-create.png) | ![](./screenshots/fastify-sqlite-react/03-after-delete.png) |
-| **Svelte** | ![](./screenshots/fastify-sqlite-svelte/01-initial.png) | ![](./screenshots/fastify-sqlite-svelte/02-after-create.png) | ![](./screenshots/fastify-sqlite-svelte/03-after-delete.png) |
+| | Initial | After Create | After Update | After Delete |
+|---|---------|-------------|--------------|--------------|
+| **React** | ![](./screenshots/fastify-sqlite-react/01-initial.png) | ![](./screenshots/fastify-sqlite-react/02-after-create.png) | ![](./screenshots/fastify-sqlite-react/03-after-update.png) | ![](./screenshots/fastify-sqlite-react/04-after-delete.png) |
+| **Svelte** | ![](./screenshots/fastify-sqlite-svelte/01-initial.png) | ![](./screenshots/fastify-sqlite-svelte/02-after-create.png) | ![](./screenshots/fastify-sqlite-svelte/03-after-update.png) | ![](./screenshots/fastify-sqlite-svelte/04-after-delete.png) |
 
 ### Fastify + PostgreSQL + React · Fastify + MongoDB + React
 
-| | Initial | After Create | After Delete |
-|---|---------|-------------|--------------|
-| **PostgreSQL** | ![](./screenshots/fastify-postgres-react/01-initial.png) | ![](./screenshots/fastify-postgres-react/02-after-create.png) | ![](./screenshots/fastify-postgres-react/03-after-delete.png) |
-| **MongoDB** | ![](./screenshots/fastify-mongodb-react/01-initial.png) | ![](./screenshots/fastify-mongodb-react/02-after-create.png) | ![](./screenshots/fastify-mongodb-react/03-after-delete.png) |
+| | Initial | After Create | After Update | After Delete |
+|---|---------|-------------|--------------|--------------|
+| **PostgreSQL** | ![](./screenshots/fastify-postgres-react/01-initial.png) | ![](./screenshots/fastify-postgres-react/02-after-create.png) | ![](./screenshots/fastify-postgres-react/03-after-update.png) | ![](./screenshots/fastify-postgres-react/04-after-delete.png) |
+| **MongoDB** | ![](./screenshots/fastify-mongodb-react/01-initial.png) | ![](./screenshots/fastify-mongodb-react/02-after-create.png) | ![](./screenshots/fastify-mongodb-react/03-after-update.png) | ![](./screenshots/fastify-mongodb-react/04-after-delete.png) |
 
 ### Express + SQLite + React · Express + SQLite + Svelte
 
-| | Initial | After Create | After Delete |
-|---|---------|-------------|--------------|
-| **React** | ![](./screenshots/express-sqlite-react/01-initial.png) | ![](./screenshots/express-sqlite-react/02-after-create.png) | ![](./screenshots/express-sqlite-react/03-after-delete.png) |
-| **Svelte** | ![](./screenshots/express-sqlite-svelte/01-initial.png) | ![](./screenshots/express-sqlite-svelte/02-after-create.png) | ![](./screenshots/express-sqlite-svelte/03-after-delete.png) |
+| | Initial | After Create | After Update | After Delete |
+|---|---------|-------------|--------------|--------------|
+| **React** | ![](./screenshots/express-sqlite-react/01-initial.png) | ![](./screenshots/express-sqlite-react/02-after-create.png) | ![](./screenshots/express-sqlite-react/03-after-update.png) | ![](./screenshots/express-sqlite-react/04-after-delete.png) |
+| **Svelte** | ![](./screenshots/express-sqlite-svelte/01-initial.png) | ![](./screenshots/express-sqlite-svelte/02-after-create.png) | ![](./screenshots/express-sqlite-svelte/03-after-update.png) | ![](./screenshots/express-sqlite-svelte/04-after-delete.png) |
 
 ### Express + PostgreSQL + React · Express + MongoDB + React
 
-| | Initial | After Create | After Delete |
-|---|---------|-------------|--------------|
-| **PostgreSQL** | ![](./screenshots/express-postgres-react/01-initial.png) | ![](./screenshots/express-postgres-react/02-after-create.png) | ![](./screenshots/express-postgres-react/03-after-delete.png) |
-| **MongoDB** | ![](./screenshots/express-mongodb-react/01-initial.png) | ![](./screenshots/express-mongodb-react/02-after-create.png) | ![](./screenshots/express-mongodb-react/03-after-delete.png) |
+| | Initial | After Create | After Update | After Delete |
+|---|---------|-------------|--------------|--------------|
+| **PostgreSQL** | ![](./screenshots/express-postgres-react/01-initial.png) | ![](./screenshots/express-postgres-react/02-after-create.png) | ![](./screenshots/express-postgres-react/03-after-update.png) | ![](./screenshots/express-postgres-react/04-after-delete.png) |
+| **MongoDB** | ![](./screenshots/express-mongodb-react/01-initial.png) | ![](./screenshots/express-mongodb-react/02-after-create.png) | ![](./screenshots/express-mongodb-react/03-after-update.png) | ![](./screenshots/express-mongodb-react/04-after-delete.png) |
 
 ---
 
@@ -154,7 +154,7 @@ cd express-mongodb-react && npm install && npm run dev
 ```bash
 docker run -d --name pg \
   -e POSTGRES_USER=local -e POSTGRES_PASSWORD=local \
-  -e POSTGRES_DB=appdb -p 5432:5432 postgres:16
+  -e POSTGRES_DB=appdb -p 5432:5432 postgres:latest
 cd express-postgres-react && npm install && npm run dev
 # → http://localhost:8183
 ```
@@ -342,6 +342,16 @@ cd express-sqlite-react && npm install && npm run dev
 docker run -d -p 27017:27017 --name mongo mongo:latest
 cd express-mongodb-react && npm install && npm run dev
 ```
+
+Docker Compose examples keep database state in predictable defaults: SQLite
+uses each example's `./data` folder by default, MongoDB uses the Docker-managed
+`mongo-data` volume, and PostgreSQL uses the Docker-managed `postgres-data`
+volume. Shared compose defaults live in `compose/databases/`; each example
+extends the relevant default file and keeps only its example-specific port,
+container, build, and init-script settings. MongoDB and PostgreSQL sidecars
+default to `mongo:latest` and `postgres:latest`; pin them with
+`ZACATL_EXAMPLE_MONGO_IMAGE` or `ZACATL_EXAMPLE_POSTGRES_IMAGE` before deploying
+if your environment requires digest-stable images.
 
 ---
 

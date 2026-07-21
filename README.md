@@ -6,8 +6,8 @@
 [![TypeScript](https://img.shields.io/badge/%3C%2F%3E-TypeScript-3178c6.svg)](https://www.typescriptlang.org/)
 [![Node.js 26+](https://img.shields.io/badge/Node.js-26%2B-brightgreen.svg)](https://nodejs.org/)
 [![Build](https://github.com/sentzunhat/zacatl/actions/workflows/publish-dry.yml/badge.svg)](https://github.com/sentzunhat/zacatl/actions/workflows/publish-dry.yml)
-[![Tests: 555](https://img.shields.io/badge/Tests-555-blue.svg)](#tests)
-[![Coverage: 85.96%](https://img.shields.io/badge/Coverage-85.96%25-yellow.svg)](https://img.shields.io/badge/Coverage-85.96%25-yellow.svg)
+[![Tests: 636](https://img.shields.io/badge/Tests-636-blue.svg)](#tests)
+[![Coverage: 91.19%](https://img.shields.io/badge/Coverage-91.19%25-brightgreen.svg)](https://img.shields.io/badge/Coverage-86.92%25-yellow.svg)
 
 **Universal TypeScript framework for building APIs, CLI tools, and distributed systems.**
 
@@ -60,7 +60,7 @@ Dependencies flow strictly inward. The public API surface is stable; internal mo
 npm install @sentzunhat/zacatl
 ```
 
-> Core server dependencies are installed with Zacatl. ORM/database adapters use optional peer dependencies (`mongoose`, `sequelize`, `better-sqlite3`, `sqlite3`, `pg`) that you install based on what your service uses.
+> Core server dependencies are installed with Zacatl. ORM/database adapters use optional peer dependencies (`mongoose`, `mongodb`, `sequelize`, `sqlite3`, `pg`) that you install based on what your service uses. SQL projects that use Zacatl's Sequelize adapter should install `sequelize` plus the dialect driver, for example `pg` or `sqlite3`.
 
 ```typescript
 import Fastify from 'fastify';
@@ -118,6 +118,7 @@ Full docs live in **[`docs/`](./docs/README.md)**. New contributors start with *
 | ESLint                | [docs/eslint/README.md](./docs/eslint/README.md)                                 |
 | Utils                 | [docs/utils/README.md](./docs/utils/README.md)                                   |
 | Release Notes         | [docs/changelog.md](./docs/changelog.md)                                         |
+| 0.0.57 Migration      | [docs/migration/0.0.57.md](./docs/migration/0.0.57.md)                           |
 
 ## 🧪 Testing
 

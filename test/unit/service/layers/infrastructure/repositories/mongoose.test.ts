@@ -266,7 +266,7 @@ describe('BaseRepository', () => {
 
       expect(spyUpdate).toHaveBeenCalledWith(
         created.id,
-        { name: 'Michelle' },
+        { $set: { name: 'Michelle' } },
         { returnDocument: 'after' },
       );
     });

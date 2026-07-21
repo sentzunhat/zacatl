@@ -11,9 +11,3 @@
 !scripts/build/fix-esm.ts
 !build-scripts-esm/build
 !build-scripts-esm/build/**
-!build
-!build/**
-!examples/fastify-mongodb-react/backend/dist
-!examples/fastify-mongodb-react/backend/dist/**
-!examples/fastify-mongodb-react/frontend/dist
-!examples/fastify-mongodb-react/frontend/dist/**

@@ -26,7 +26,7 @@
     "inlineSources": true,
     "sourceRoot": "./src",
     "outDir": "build-src-esm",
-    "removeComments": true,
+    "removeComments": false,
     "noEmit": false,
     "noEmitOnError": true,
     "isolatedModules": true,

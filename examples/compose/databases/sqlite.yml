@@ -1,0 +1,8 @@
+services:
+  backend:
+    environment:
+      DATABASE_URL: sqlite:/app/data/database.sqlite
+    read_only: true
+    tmpfs:
+      - /tmp
+    restart: unless-stopped

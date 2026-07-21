@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import express from 'express';
 
 import { createPageAdapter } from '../../../../../../../src/service/platforms/server/providers/express/page-adapter';
 
@@ -51,6 +52,27 @@ describe('ExpressPageAdapter', () => {
       const [prefix] = firstCall as unknown[];
       expect(prefix).toBe('/assets');
     });
+
+    it('should pass cache options to express.static and no-cache html via setHeaders', () => {
+      const staticSpy = vi.spyOn(express, 'static');
+      adapter.registerStaticFiles({ root: '/dist/client', cache: { maxAge: '1y', immutable: true } });
+
+      const opts = staticSpy.mock.calls[0]?.[1] as {
+        maxAge?: string;
+        immutable?: boolean;
+        setHeaders?: (res: unknown, path: string) => void;
+      };
+      expect(opts.maxAge).toBe('1y');
+      expect(opts.immutable).toBe(true);
+
+      const res = { setHeader: vi.fn() };
+      opts.setHeaders?.(res, '/dist/client/index.html');
+      expect(res.setHeader).toHaveBeenCalledWith('Cache-Control', 'no-cache');
+      res.setHeader.mockClear();
+      opts.setHeaders?.(res, '/dist/client/assets/app-abc123.js');
+      expect(res.setHeader).not.toHaveBeenCalled();
+      staticSpy.mockRestore();
+    });
   });
 
   describe('registerSpaFallback', () => {
@@ -77,7 +99,7 @@ describe('ExpressPageAdapter', () => {
 
     it('should serve index.html for SPA deep link routes', () => {
       const req = { path: '/patients/123', method: 'GET' };
-      const res = { sendFile: vi.fn() };
+      const res = { sendFile: vi.fn(), setHeader: vi.fn() };
       const next = vi.fn();
 
       middlewareHandler(req, res, next);
@@ -87,7 +109,7 @@ describe('ExpressPageAdapter', () => {
 
     it('should serve index.html for root route', () => {
       const req = { path: '/', method: 'GET' };
-      const res = { sendFile: vi.fn() };
+      const res = { sendFile: vi.fn(), setHeader: vi.fn() };
       const next = vi.fn();
 
       middlewareHandler(req, res, next);

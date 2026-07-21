@@ -51,7 +51,7 @@ src/
 
 ## Data and Service Flow (Server)
 
-1. `Service` receives `ConfigService` and validates required shape for the selected `ServiceType`.
+1. `Service` receives `ServiceConfig` and validates required shape for the selected `ServiceType`.
 2. Localization is configured early.
 3. DB instances (when provided for Mongoose/Sequelize) are pre-registered in DI.
 4. Layer classes are registered/resolved.

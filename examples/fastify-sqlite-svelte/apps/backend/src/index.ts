@@ -34,7 +34,7 @@ async function main() {
       // Send clean error response
       await reply.status(statusCode).send({
         error: {
-          message: error.message || 'Internal Server Error',
+          message: statusCode >= 500 ? 'Internal Server Error' : error.message,
           statusCode,
         },
       });
@@ -65,6 +65,7 @@ async function main() {
     console.log('  GET    /greetings/:id          - Get greeting by ID');
     console.log('  GET    /greetings/random/:lang - Get random greeting by language');
     console.log('  POST   /greetings              - Create new greeting');
+    console.log('  PUT    /greetings/:id              - Update a greeting');
     console.log('  DELETE /greetings/:id          - Delete greeting');
     console.log(`\n💡 Try: curl http://localhost:${config.port}/greetings`);
     console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');

@@ -32,7 +32,7 @@ async function main() {
       // Send clean error response
       await reply.status(statusCode).send({
         error: {
-          message: error.message || 'Internal Server Error',
+          message: statusCode >= 500 ? 'Internal Server Error' : error.message,
           statusCode,
         },
       });
