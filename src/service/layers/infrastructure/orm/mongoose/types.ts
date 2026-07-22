@@ -9,6 +9,14 @@ import type { LeanDocument } from '../types';
 
 export { ORMType } from '../types';
 export type { LeanDocument } from '../types';
+export { MongooseIndexManager } from './index-manager';
+export type {
+  MongooseIndexDiff,
+  MongooseIndexModelSelector,
+  MongooseIndexOperationResult,
+  MongooseIndexSyncOptions,
+} from './index-manager';
+export type { MongooseIndexBootMode, MongooseRepositoryIndexOptions } from './index-policy';
 
 export type WithMongooseMeta<T> = Default__v<Require_id<T>>;
 
@@ -29,7 +37,4 @@ export type MongooseDoc<Db> = IfAny<
 >;
 
 export type ToLeanInput<D, T extends object = Record<string, unknown>> =
-  | MongooseDoc<D>
-  | LeanDocument<T>
-  | null
-  | undefined;
+  MongooseDoc<D> | LeanDocument<T> | null | undefined;

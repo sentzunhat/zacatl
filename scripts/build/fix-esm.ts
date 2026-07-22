@@ -53,6 +53,8 @@ if (!fs.existsSync(distDir)) {
   process.exit(1);
 }
 
+const isFixableFile = (name: string): boolean => name.endsWith('.js') || name.endsWith('.d.ts');
+
 const walkDir = (dir: string): string[] => {
   const files: string[] = [];
   const items = fs.readdirSync(dir, { withFileTypes: true });
@@ -60,9 +62,39 @@ const walkDir = (dir: string): string[] => {
     if (item.name.startsWith('.')) continue;
     const fullPath = path.join(dir, item.name);
     if (item.isDirectory()) files.push(...walkDir(fullPath));
-    else if (item.isFile() && item.name.endsWith('.js')) files.push(fullPath);
+    else if (item.isFile() && isFixableFile(item.name)) files.push(fullPath);
   }
   return files;
+};
+
+const hasKnownExtension = (importPath: string): boolean => {
+  return (
+    importPath.endsWith('.js') ||
+    importPath.endsWith('.mjs') ||
+    importPath.endsWith('.cjs') ||
+    importPath.endsWith('.json')
+  );
+};
+
+const resolveSpecifier = (fileDir: string, importPath: string): string => {
+  if (hasKnownExtension(importPath)) return importPath;
+
+  const resolvedPath = path.resolve(fileDir, importPath);
+
+  // Runtime ESM and NodeNext declaration resolution both use the runtime JS
+  // specifier. For declarations, TypeScript follows `./foo.js` to `foo.d.ts`.
+  if (fs.existsSync(`${resolvedPath}.js`) || fs.existsSync(`${resolvedPath}.d.ts`)) {
+    return `${importPath}.js`;
+  }
+
+  if (
+    fs.existsSync(path.join(resolvedPath, 'index.js')) ||
+    fs.existsSync(path.join(resolvedPath, 'index.d.ts'))
+  ) {
+    return `${importPath}/index.js`;
+  }
+
+  return `${importPath}.js`;
 };
 
 const fixFile = (filePath: string): boolean => {
@@ -71,31 +103,18 @@ const fixFile = (filePath: string): boolean => {
   const fileDir = path.dirname(filePath);
 
   const patterns = [
-    /export\s+(?:\*|\{[^}]+\})\s+from\s+["'](\.[^"']*?)(?<!\.js)["']/g,
-    /import\s+(?:(?:\{[^}]+\}|[\w]+)(?:\s*,\s*(?:\{[^}]+\}|[\w]+))*\s+from\s+)?["'](\.[^"']*?)(?<!\.js)["']/g,
-    /import\(["'](\.[^"']*?)(?<!\.js)["']\)/g,
+    /(from\s+["'])(\.[^"']*?)(["'])/g,
+    /(import\s+["'])(\.[^"']*?)(["'])/g,
+    /(import\(\s*["'])(\.[^"']*?)(["']\s*\))/g,
   ];
 
   patterns.forEach((pattern) => {
-    content = content.replace(pattern, (match, importPath: string) => {
-      // Skip if already has extension or is a directory import that should resolve to index.js
-      if (importPath.endsWith('.js') || importPath.endsWith('.json')) return match;
-
-      const resolvedPath = path.resolve(fileDir, importPath);
-
-      // Check if .js file exists
-      if (fs.existsSync(`${resolvedPath}.js`)) {
-        return match.replace(importPath, `${importPath}.js`);
-      }
-
-      // Check if directory with index.js exists
-      if (fs.existsSync(path.join(resolvedPath, 'index.js'))) {
-        return match.replace(importPath, `${importPath}/index.js`);
-      }
-
-      // Default: add .js extension
-      return match.replace(importPath, `${importPath}.js`);
-    });
+    content = content.replace(
+      pattern,
+      (match, prefix: string, importPath: string, suffix: string) => {
+        return `${prefix}${resolveSpecifier(fileDir, importPath)}${suffix}`;
+      },
+    );
   });
 
   if (content !== original) {

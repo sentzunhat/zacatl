@@ -3,7 +3,7 @@
 A catalog of standalone, production-ready server applications demonstrating different patterns and use cases. Each example is fully functional, copy-paste deployable, and follows the same domain logic across different server frameworks and databases.
 
 > **🐳 For Docker:** See [docker.md](./docker.md) - Complete Docker deployment guide and architecture explanation.
-> **💾 For Databases:** Use [dev-env]() to run MongoDB + PostgreSQL containers for local development.
+> **💾 For Databases:** Use [dev-env](<>) to run MongoDB + PostgreSQL containers for local development.
 > **Note**: Examples use **Node.js 26+** with **npm**.
 > **📦 Dependencies:** All examples import from `@zacatl/*` paths — see [shared/zacatl-build-paths.json](./shared/zacatl-build-paths.json) for the standard tsconfig mapping. Run `npm run build` at the repo root before type-checking examples against compiled output.
 
@@ -19,31 +19,31 @@ npm run screenshots:examples:capture   # requires Docker
 
 ### Fastify + SQLite + React · Fastify + SQLite + Svelte
 
-| | Initial | After Create | After Update | After Delete |
-|---|---------|-------------|--------------|--------------|
-| **React** | ![](./screenshots/fastify-sqlite-react/01-initial.png) | ![](./screenshots/fastify-sqlite-react/02-after-create.png) | ![](./screenshots/fastify-sqlite-react/03-after-update.png) | ![](./screenshots/fastify-sqlite-react/04-after-delete.png) |
+|            | Initial                                                 | After Create                                                 | After Update                                                 | After Delete                                                 |
+| ---------- | ------------------------------------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| **React**  | ![](./screenshots/fastify-sqlite-react/01-initial.png)  | ![](./screenshots/fastify-sqlite-react/02-after-create.png)  | ![](./screenshots/fastify-sqlite-react/03-after-update.png)  | ![](./screenshots/fastify-sqlite-react/04-after-delete.png)  |
 | **Svelte** | ![](./screenshots/fastify-sqlite-svelte/01-initial.png) | ![](./screenshots/fastify-sqlite-svelte/02-after-create.png) | ![](./screenshots/fastify-sqlite-svelte/03-after-update.png) | ![](./screenshots/fastify-sqlite-svelte/04-after-delete.png) |
 
 ### Fastify + PostgreSQL + React · Fastify + MongoDB + React
 
-| | Initial | After Create | After Update | After Delete |
-|---|---------|-------------|--------------|--------------|
+|                | Initial                                                  | After Create                                                  | After Update                                                  | After Delete                                                  |
+| -------------- | -------------------------------------------------------- | ------------------------------------------------------------- | ------------------------------------------------------------- | ------------------------------------------------------------- |
 | **PostgreSQL** | ![](./screenshots/fastify-postgres-react/01-initial.png) | ![](./screenshots/fastify-postgres-react/02-after-create.png) | ![](./screenshots/fastify-postgres-react/03-after-update.png) | ![](./screenshots/fastify-postgres-react/04-after-delete.png) |
-| **MongoDB** | ![](./screenshots/fastify-mongodb-react/01-initial.png) | ![](./screenshots/fastify-mongodb-react/02-after-create.png) | ![](./screenshots/fastify-mongodb-react/03-after-update.png) | ![](./screenshots/fastify-mongodb-react/04-after-delete.png) |
+| **MongoDB**    | ![](./screenshots/fastify-mongodb-react/01-initial.png)  | ![](./screenshots/fastify-mongodb-react/02-after-create.png)  | ![](./screenshots/fastify-mongodb-react/03-after-update.png)  | ![](./screenshots/fastify-mongodb-react/04-after-delete.png)  |
 
 ### Express + SQLite + React · Express + SQLite + Svelte
 
-| | Initial | After Create | After Update | After Delete |
-|---|---------|-------------|--------------|--------------|
-| **React** | ![](./screenshots/express-sqlite-react/01-initial.png) | ![](./screenshots/express-sqlite-react/02-after-create.png) | ![](./screenshots/express-sqlite-react/03-after-update.png) | ![](./screenshots/express-sqlite-react/04-after-delete.png) |
+|            | Initial                                                 | After Create                                                 | After Update                                                 | After Delete                                                 |
+| ---------- | ------------------------------------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| **React**  | ![](./screenshots/express-sqlite-react/01-initial.png)  | ![](./screenshots/express-sqlite-react/02-after-create.png)  | ![](./screenshots/express-sqlite-react/03-after-update.png)  | ![](./screenshots/express-sqlite-react/04-after-delete.png)  |
 | **Svelte** | ![](./screenshots/express-sqlite-svelte/01-initial.png) | ![](./screenshots/express-sqlite-svelte/02-after-create.png) | ![](./screenshots/express-sqlite-svelte/03-after-update.png) | ![](./screenshots/express-sqlite-svelte/04-after-delete.png) |
 
 ### Express + PostgreSQL + React · Express + MongoDB + React
 
-| | Initial | After Create | After Update | After Delete |
-|---|---------|-------------|--------------|--------------|
+|                | Initial                                                  | After Create                                                  | After Update                                                  | After Delete                                                  |
+| -------------- | -------------------------------------------------------- | ------------------------------------------------------------- | ------------------------------------------------------------- | ------------------------------------------------------------- |
 | **PostgreSQL** | ![](./screenshots/express-postgres-react/01-initial.png) | ![](./screenshots/express-postgres-react/02-after-create.png) | ![](./screenshots/express-postgres-react/03-after-update.png) | ![](./screenshots/express-postgres-react/04-after-delete.png) |
-| **MongoDB** | ![](./screenshots/express-mongodb-react/01-initial.png) | ![](./screenshots/express-mongodb-react/02-after-create.png) | ![](./screenshots/express-mongodb-react/03-after-update.png) | ![](./screenshots/express-mongodb-react/04-after-delete.png) |
+| **MongoDB**    | ![](./screenshots/express-mongodb-react/01-initial.png)  | ![](./screenshots/express-mongodb-react/02-after-create.png)  | ![](./screenshots/express-mongodb-react/03-after-update.png)  | ![](./screenshots/express-mongodb-react/04-after-delete.png)  |
 
 ---
 
@@ -63,6 +63,8 @@ npm run screenshots:examples:capture   # requires Docker
   - `express-postgres-react/` - Express + PostgreSQL + React (Backend: 8183)
 - **Desktop experiment**
   - `neutralino-react-transformers-webgpu/` - Neutralinojs + React + Transformers.js + WebGPU prototype
+- **Persistence pattern**
+  - `node-sqlite-store/` - backend-only `node:sqlite` store pattern for local sessions, archive metadata, and training selections without Sequelize or external `sqlite3`
 
 **All examples include:**
 
@@ -71,6 +73,10 @@ npm run screenshots:examples:capture   # requires Docker
 - CRUD operations for Greeting entity
 - TypeScript with strict type checking
 - 🐳 Docker Compose support (single image = backend + frontend)
+
+The backend-only `node-sqlite-store/` example is intentionally smaller than the
+full-stack examples. Use it when you want the local SQLite persistence pattern
+without frontend or Docker ceremony.
 
 ### Example Security Maintenance
 
@@ -357,7 +363,7 @@ if your environment requires digest-stable images.
 
 ## 📚 Additional Resources
 
-- 
+-
 
 ---
 
@@ -393,7 +399,6 @@ To add a new example:
 ---
 
 ## 📞 Support
-
 
 ---
 

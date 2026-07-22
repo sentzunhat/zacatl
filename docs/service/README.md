@@ -107,12 +107,12 @@ type PageServerConfig = {
 
 ### `DatabaseConfig`
 
-Database connection configuration supporting Mongoose (MongoDB), Sequelize (SQL), and the Node 22.5+ built-in SQLite.
+Database connection configuration supporting Mongoose (MongoDB), Sequelize (SQL), and the Node 26 built-in SQLite runtime.
 
 ```typescript
 interface DatabaseConnection {
-  url: string; // connection URI, file path, or ':memory:'
-  name?: string; // optional connection name for multi-database setups
+  url: string; // connection URI, file path, or ':memory:'; replaces older connectionString config
+  name?: string; // stable DI token name for multi-database setups
 }
 
 type DatabaseConfig = {
@@ -127,7 +127,7 @@ type DatabaseConfig = {
 
 - `vendor` - Database vendor: `MONGOOSE`, `SEQUELIZE`, or `SQLITE`
 - `connection.url` - For SQLite: a file path (e.g. `'app.db'`) or `':memory:'`. For others: the full connection URI.
-- `connection.name` - Optional. Names the connection for multi-database setups: repositories reference it via `connection: { name: '...' }` in their config. Omit for a single database per vendor.
+- `connection.name` - Optional. Stable token name for multi-database setups: repositories reference it via `connection: { name: '...' }` in their config. Omit for a single database per vendor; Zacatl falls back to the vendor default token.
 - `instance` - The Mongoose or Sequelize instance. **Not required for `SQLITE`** — the adapter opens the file internally.
 - `onDatabaseConnected` - Optional callback invoked after successful connection (use for model initialization, syncing, etc.).
 
@@ -169,7 +169,7 @@ Database vendor/ORM.
 enum DatabaseVendor {
   MONGOOSE = 'MONGOOSE', // MongoDB via Mongoose
   SEQUELIZE = 'SEQUELIZE', // SQL databases via Sequelize
-  SQLITE = 'SQLITE', // SQLite via node:sqlite (Node 22.5+) (no external package)
+  SQLITE = 'SQLITE', // SQLite via node:sqlite on Zacatl's Node 26 runtime (no external package)
 }
 ```
 
@@ -373,7 +373,13 @@ Fastify server with `DatabaseVendor.SQLITE` (no Sequelize instance).
 
 ```typescript
 import Fastify from 'fastify';
-import { Service, ServiceType, ServerVendor, ServerType, DatabaseVendor } from '@sentzunhat/zacatl/service';
+import {
+  Service,
+  ServiceType,
+  ServerVendor,
+  ServerType,
+  DatabaseVendor,
+} from '@sentzunhat/zacatl/service';
 
 const fastify = Fastify();
 
@@ -398,21 +404,15 @@ const service = new Service({
   },
   layers: {
     infrastructure: {
-      repositories: [
-        /* ... */
-      ],
+      repositories: [/* ... */],
     },
     domain: {
-      services: [
-        /* ... */
-      ],
+      services: [/* ... */],
     },
     application: {
       entryPoints: {
         rest: {
-          routes: [
-            /* ... */
-          ],
+          routes: [/* ... */],
         },
       },
     },
@@ -452,9 +452,7 @@ const service = new Service({
     application: {
       entryPoints: {
         rest: {
-          routes: [
-            /* your routes */
-          ],
+          routes: [/* your routes */],
         },
       },
     },
@@ -508,21 +506,15 @@ const service = new Service({
   },
   layers: {
     infrastructure: {
-      repositories: [
-        /* ... */
-      ],
+      repositories: [/* ... */],
     },
     domain: {
-      services: [
-        /* ... */
-      ],
+      services: [/* ... */],
     },
     application: {
       entryPoints: {
         rest: {
-          routes: [
-            /* API routes */
-          ],
+          routes: [/* API routes */],
         },
       },
     },
@@ -616,6 +608,14 @@ const service = new Service({
           vendor: DatabaseVendor.MONGOOSE,
           instance: mongoose,
           connection: { url: 'mongodb://localhost:27017/mydb' },
+          indexes: {
+            bootMode:
+              process.env.APP_ENV === 'local' ||
+              process.env.APP_ENV === 'development' ||
+              process.env.NODE_ENV === 'test'
+                ? 'create'
+                : 'off',
+          },
           onDatabaseConnected: async () => {
             console.log('MongoDB connected');
           },
@@ -634,21 +634,15 @@ const service = new Service({
   },
   layers: {
     infrastructure: {
-      repositories: [
-        /* ... */
-      ],
+      repositories: [/* ... */],
     },
     domain: {
-      services: [
-        /* ... */
-      ],
+      services: [/* ... */],
     },
     application: {
       entryPoints: {
         rest: {
-          routes: [
-            /* ... */
-          ],
+          routes: [/* ... */],
         },
       },
     },

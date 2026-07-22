@@ -6,6 +6,7 @@
 - [orm-import-strategies.md](orm-import-strategies.md) - How to import ORM packages
 - [architecture.md](architecture.md) - How adapters work internally
 - [orm-lazy-loading.md](orm-lazy-loading.md) - Load related data on-demand
+- [mongoose-index-lifecycle.md](mongoose-index-lifecycle.md) - Safe MongoDB index diff/create/sync controls
 - [multi-orm-setup.md](multi-orm-setup.md) - Use multiple databases in one service
 - [working-with-databases.md](working-with-databases.md) - Step-by-step tutorial
 

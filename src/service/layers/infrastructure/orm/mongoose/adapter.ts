@@ -1,6 +1,7 @@
 import { type QueryFilter, type Mongoose } from '@zacatl/third-party/databases/mongoose';
 import type { InjectionToken } from '@zacatl/third-party/dependency-injection/tsyringe';
 
+import { getMongooseIndexOptions, registerMongooseIndexModel } from './index-policy';
 import { getContainer, resolveDependency } from '../../../../../dependency-injection';
 import { InternalServerError, ValidationError } from '../../../../../error';
 import type {
@@ -16,9 +17,12 @@ import { createDatabaseToken } from '../tokens/factory';
 /**
  * Mongoose ORM adapter - handles Mongoose-specific database operations
  */
-export class MongooseAdapter<D, I extends object, O extends object>
-  implements ORMPort<MongooseRepositoryModel<D>, I, O, QueryFilter<D>>
-{
+export class MongooseAdapter<D, I extends object, O extends object> implements ORMPort<
+  MongooseRepositoryModel<D>,
+  I,
+  O,
+  QueryFilter<D>
+> {
   // Resolved lazily on first use so that Service construction succeeds
   // even when the Mongoose instance is registered later in start().
   private _model: MongooseRepositoryModel<D> | undefined;
@@ -103,9 +107,27 @@ export class MongooseAdapter<D, I extends object, O extends object>
 
   private async initialize(): Promise<void> {
     const model = this.getOrCreateModel();
+    const connectionName = this.config.connection?.name ?? 'MONGOOSE';
+    const bootMode =
+      this.config.indexes?.bootMode ?? getMongooseIndexOptions(connectionName).bootMode;
+
+    registerMongooseIndexModel(
+      connectionName,
+      model as unknown as MongooseRepositoryModel<unknown>,
+    );
+
+    if (bootMode === 'off') {
+      return;
+    }
+
     await model.createCollection();
-    await model.createIndexes();
-    await model.init();
+
+    if (bootMode === 'create') {
+      await model.createIndexes();
+      return;
+    }
+
+    await model.syncIndexes();
   }
 
   async findById(id: string): Promise<O | null> {
@@ -166,7 +188,8 @@ export class MongooseAdapter<D, I extends object, O extends object>
     },
   ): Promise<O | null> {
     try {
-      const payload = options?.raw === true ? (update as unknown as Partial<D>) : ({ $set: update } as never);
+      const payload =
+        options?.raw === true ? (update as unknown as Partial<D>) : ({ $set: update } as never);
       const entity = await this.model
         .findByIdAndUpdate(id, payload, { returnDocument: 'after' })
         .lean<O>({ virtuals: true })
@@ -249,14 +272,14 @@ export class MongooseAdapter<D, I extends object, O extends object>
         base.createdAt instanceof Date
           ? base.createdAt
           : base.createdAt != null
-          ? new Date(base.createdAt)
-          : new Date(),
+            ? new Date(base.createdAt)
+            : new Date(),
       updatedAt:
         base.updatedAt instanceof Date
           ? base.updatedAt
           : base.updatedAt != null
-          ? new Date(base.updatedAt)
-          : new Date(),
+            ? new Date(base.updatedAt)
+            : new Date(),
     };
 
     return result;

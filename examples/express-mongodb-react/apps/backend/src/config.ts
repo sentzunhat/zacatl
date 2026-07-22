@@ -9,7 +9,10 @@ import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import { ServiceType } from '@sentzunhat/zacatl/service/service';
 import { DatabaseVendor } from '@sentzunhat/zacatl/service/platforms/server/database/port';
-import { ServerType, ServerVendor } from '@sentzunhat/zacatl/service/platforms/server/types/server-config';
+import {
+  ServerType,
+  ServerVendor,
+} from '@sentzunhat/zacatl/service/platforms/server/types/server-config';
 import type { ApplicationRestRoutes } from '@sentzunhat/zacatl/service/layers/application/types';
 import { repositories } from './infrastructure/greetings/repositories/repositories';
 import { GreetingServiceAdapter } from './domain/greetings/service/adapter';
@@ -35,6 +38,11 @@ export const config: AppConfig = {
 };
 
 export const API_PREFIX = '/api';
+
+const shouldCreateIndexesOnBoot =
+  process.env.APP_ENV === 'local' ||
+  process.env.APP_ENV === 'development' ||
+  process.env.NODE_ENV === 'test';
 
 export function createServiceConfig(app: Application, mongoose: Mongoose) {
   const routes = [
@@ -68,6 +76,9 @@ export function createServiceConfig(app: Application, mongoose: Mongoose) {
             vendor: DatabaseVendor.MONGOOSE,
             instance: mongoose,
             connection: { url: config.mongoUri },
+            indexes: {
+              bootMode: shouldCreateIndexesOnBoot ? 'create' : 'off',
+            },
           },
         ],
       },

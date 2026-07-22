@@ -138,11 +138,17 @@ export class UserRepository extends BaseRepository<UserDb, UserInput, UserOutput
 }
 ```
 
-#### Option B: Using Native SQLite (Node 22.5+ — No External Package)
+#### Option B: Using Native SQLite (Node 26 — No External Package)
 
-Uses the built-in `node:sqlite` module. No external package needed.
+Uses the built-in `node:sqlite` module on Zacatl's Node 26 runtime. No external
+package needed.
 
 For repository-style CRUD with normalized output, use `AbstractNodeSqliteRepository`.
+For an app-local store with explicit tables and typed row mappers, see
+[`examples/node-sqlite-store`](../../examples/node-sqlite-store/).
+If you are replacing simple Sequelize SQLite model usage, use
+[`docs/migration/sequelize-sqlite-to-nodesqlite.md`](../migration/sequelize-sqlite-to-nodesqlite.md)
+as the migration checklist.
 
 **Service config:**
 
@@ -310,7 +316,7 @@ const service = new Service({
 | ----------------- | -------------------------------- | --------- |
 | MongooseAdapter   | MongoDB                          | ✅ Ready  |
 | SequelizeAdapter  | PostgreSQL, MySQL, SQLite, MSSQL | ✅ Ready  |
-| NodeSqliteAdapter | SQLite (`node:sqlite`, Node 22.5+) | ✅ Ready  |
+| NodeSqliteAdapter | SQLite (`node:sqlite`, Node 26)  | ✅ Ready  |
 | PrismaAdapter     | Multi-database                   | 🔜 Future |
 | TypeORMAdapter    | Multi-database                   | 🔜 Future |
 

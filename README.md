@@ -6,8 +6,9 @@
 [![TypeScript](https://img.shields.io/badge/%3C%2F%3E-TypeScript-3178c6.svg)](https://www.typescriptlang.org/)
 [![Node.js 26+](https://img.shields.io/badge/Node.js-26%2B-brightgreen.svg)](https://nodejs.org/)
 [![Build](https://github.com/sentzunhat/zacatl/actions/workflows/publish-dry.yml/badge.svg)](https://github.com/sentzunhat/zacatl/actions/workflows/publish-dry.yml)
-[![Tests: 636](https://img.shields.io/badge/Tests-636-blue.svg)](#tests)
-[![Coverage: 91.19%](https://img.shields.io/badge/Coverage-91.19%25-brightgreen.svg)](https://img.shields.io/badge/Coverage-86.92%25-yellow.svg)
+[![CVE Scan](https://github.com/sentzunhat/zacatl/actions/workflows/cve-scan.yml/badge.svg)](https://github.com/sentzunhat/zacatl/actions/workflows/cve-scan.yml)
+[![Tests: 648](https://img.shields.io/badge/Tests-648-blue.svg)](#tests)
+[![Coverage: 91.19%](https://img.shields.io/badge/Coverage-91.19%25-brightgreen.svg)](https://img.shields.io/badge/Coverage-91.19%25-brightgreen.svg)
 
 **Universal TypeScript framework for building APIs, CLI tools, and distributed systems.**
 
@@ -61,6 +62,8 @@ npm install @sentzunhat/zacatl
 ```
 
 > Core server dependencies are installed with Zacatl. ORM/database adapters use optional peer dependencies (`mongoose`, `mongodb`, `sequelize`, `sqlite3`, `pg`) that you install based on what your service uses. SQL projects that use Zacatl's Sequelize adapter should install `sequelize` plus the dialect driver, for example `pg` or `sqlite3`.
+>
+> Audit note for 0.0.57+: non-SQL consumers should not install `sequelize`, and should not inherit Sequelize's nested audit surface through Zacatl core. SQL consumers that explicitly install `sequelize` own that SQL dependency tree. Apps that only need local SQLite can use Zacatl's `node:sqlite` path on Node 26 without external `sqlite3` or Sequelize.
 
 ```typescript
 import Fastify from 'fastify';
@@ -105,20 +108,21 @@ See [examples/](./examples/) for production-ready starters (Express, Fastify × 
 
 Full docs live in **[`docs/`](./docs/README.md)**. New contributors start with **[START_HERE.md](./docs/start-here.md)**.
 
-| Topic                 | Link                                                                             |
-| --------------------- | -------------------------------------------------------------------------------- |
-| Architecture Overview | [docs/guidelines/framework-overview.md](./docs/guidelines/framework-overview.md) |
-| Service Module        | [docs/service/README.md](./docs/service/README.md)                               |
-| Dependency Injection  | [docs/dependency-injection/README.md](./docs/dependency-injection/README.md)     |
-| Configuration         | [docs/configuration/README.md](./docs/configuration/README.md)                   |
-| Errors                | [docs/error/README.md](./docs/error/README.md)                                   |
-| Logs                  | [docs/logs/README.md](./docs/logs/README.md)                                     |
-| Localization          | [docs/localization/README.md](./docs/localization/README.md)                     |
-| Third-Party + ORM     | [docs/third-party/README.md](./docs/third-party/README.md)                       |
-| ESLint                | [docs/eslint/README.md](./docs/eslint/README.md)                                 |
-| Utils                 | [docs/utils/README.md](./docs/utils/README.md)                                   |
-| Release Notes         | [docs/changelog.md](./docs/changelog.md)                                         |
-| 0.0.57 Migration      | [docs/migration/0.0.57.md](./docs/migration/0.0.57.md)                           |
+| Topic                  | Link                                                                                                   |
+| ---------------------- | ------------------------------------------------------------------------------------------------------ |
+| Architecture Overview  | [docs/guidelines/framework-overview.md](./docs/guidelines/framework-overview.md)                       |
+| Service Module         | [docs/service/README.md](./docs/service/README.md)                                                     |
+| Dependency Injection   | [docs/dependency-injection/README.md](./docs/dependency-injection/README.md)                           |
+| Configuration          | [docs/configuration/README.md](./docs/configuration/README.md)                                         |
+| Errors                 | [docs/error/README.md](./docs/error/README.md)                                                         |
+| Logs                   | [docs/logs/README.md](./docs/logs/README.md)                                                           |
+| Localization           | [docs/localization/README.md](./docs/localization/README.md)                                           |
+| Third-Party + ORM      | [docs/third-party/README.md](./docs/third-party/README.md)                                             |
+| ESLint                 | [docs/eslint/README.md](./docs/eslint/README.md)                                                       |
+| Utils                  | [docs/utils/README.md](./docs/utils/README.md)                                                         |
+| Release Notes          | [docs/changelog.md](./docs/changelog.md)                                                               |
+| 0.0.57 Migration       | [docs/migration/0.0.57.md](./docs/migration/0.0.57.md)                                                 |
+| SQLite node:sqlite Cut | [docs/migration/sequelize-sqlite-to-nodesqlite.md](./docs/migration/sequelize-sqlite-to-nodesqlite.md) |
 
 ## 🧪 Testing
 
