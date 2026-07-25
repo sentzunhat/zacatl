@@ -1045,6 +1045,9 @@
       "require": "./build-src-cjs/utils/optionals.js"
     }
   },
+  "overrides": {
+    "postcss": "^8.5.19"
+  },
   "allowScripts": {
     "esbuild@0.28.1": true,
     "fsevents@2.3.3": true,
