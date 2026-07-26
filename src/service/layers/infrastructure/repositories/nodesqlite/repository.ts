@@ -1,12 +1,12 @@
 import type { NodeSqliteRepositoryConfig, NodeSqliteRepositoryModel } from './types';
 import { createNodeSqliteAdapter } from '../../orm/nodesqlite/adapter-loader';
-import type { RepositoryPort, ORMPort, QueryOptions } from '../types';
+import { BaseRepository as BaseRepositoryImpl } from '../base-repository';
 
 /**
- * Standalone Node.js SQLite Repository - delegates to NodeSqliteAdapter
+ * Node.js SQLite Repository - delegates to NodeSqliteAdapter
  *
- * Provides all repository operations for node:sqlite ORM without runtime adapter switching.
- * Internally uses the same NodeSqliteAdapter as BaseRepository for code reuse.
+ * Provides all repository operations for node:sqlite ORM.
+ * Extends the shared generic BaseRepository with node:sqlite-specific type parameters.
  *
  * @example
  * ```typescript
@@ -24,47 +24,9 @@ import type { RepositoryPort, ORMPort, QueryOptions } from '../types';
  * ```
  */
 export abstract class BaseRepository<I extends object, O extends object>
-  implements RepositoryPort<NodeSqliteRepositoryModel, I, O, Partial<O>>
+  extends BaseRepositoryImpl<NodeSqliteRepositoryModel, I, O, Partial<O>>
 {
-  private readonly adapter: ORMPort<NodeSqliteRepositoryModel, I, O, Partial<O>>;
-
   constructor(config: NodeSqliteRepositoryConfig) {
-    this.adapter = createNodeSqliteAdapter<I, O>(config);
-  }
-
-  public get model(): NodeSqliteRepositoryModel {
-    return this.adapter.model;
-  }
-
-  async ready(): Promise<void> {
-    await this.adapter.ready();
-  }
-
-  async findById(id: string): Promise<O | null> {
-    return this.adapter.findById(id);
-  }
-
-  async findMany(filter: Partial<O> = {}, options?: QueryOptions): Promise<O[]> {
-    return this.adapter.findMany(filter, options);
-  }
-
-  async create(entity: I): Promise<O> {
-    return this.adapter.create(entity);
-  }
-
-  async update(id: string, update: Partial<I>): Promise<O | null> {
-    return this.adapter.update(id, update);
-  }
-
-  async delete(id: string): Promise<O | null> {
-    return this.adapter.delete(id);
-  }
-
-  async exists(id: string): Promise<boolean> {
-    return this.adapter.exists(id);
-  }
-
-  public toLean(input: unknown): O | null {
-    return this.adapter.toLean(input);
+    super(createNodeSqliteAdapter<I, O>(config));
   }
 }

@@ -1,16 +1,8 @@
 import type { Request as ExpressRequest, Response } from 'express';
 
-import {
-  BadRequestError,
-  BadResourceError,
-  ForbiddenError,
-  InternalServerError,
-  NotFoundError,
-  UnauthorizedError,
-  ValidationError,
-} from '@zacatl/error';
 import type { z } from '@zacatl/third-party/zod';
 
+import { mapErrorToStatusCode } from '../../common/error-mapper';
 import type { HTTPMethod } from '../../common/http-methods';
 
 export type { Request } from '../../common/request';
@@ -99,46 +91,7 @@ export abstract class AbstractRouteHandler<
     statusCode: number;
     [key: string]: unknown;
   } {
-    if (error instanceof NotFoundError) {
-      return {
-        message: error.message,
-        statusCode: 404,
-      };
-    }
-    if (error instanceof BadRequestError || error instanceof BadResourceError) {
-      return {
-        message: error.message,
-        statusCode: 400,
-      };
-    }
-    if (error instanceof ValidationError) {
-      return {
-        message: error.message,
-        statusCode: 422,
-      };
-    }
-    if (error instanceof UnauthorizedError) {
-      return {
-        message: error.message,
-        statusCode: 401,
-      };
-    }
-    if (error instanceof ForbiddenError) {
-      return {
-        message: error.message,
-        statusCode: 403,
-      };
-    }
-    if (error instanceof InternalServerError) {
-      return {
-        message: error.message,
-        statusCode: 500,
-      };
-    }
-    return {
-      message: 'Something went wrong',
-      statusCode: 500,
-    };
+    return mapErrorToStatusCode(error);
   }
 
   public async execute(
