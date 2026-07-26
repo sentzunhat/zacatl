@@ -1047,8 +1047,7 @@
   },
   "overrides": {
     "postcss": "^8.5.19",
-    "brace-expansion": "^5.0.8",
-    "minimatch": "^10.0.2"
+    "minimatch": "^8.0.0"
   },
   "allowScripts": {
     "esbuild@0.28.1": true,

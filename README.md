@@ -8,7 +8,7 @@
 [![Build](https://github.com/sentzunhat/zacatl/actions/workflows/publish-dry.yml/badge.svg)](https://github.com/sentzunhat/zacatl/actions/workflows/publish-dry.yml)
 [![CVE Scan](https://github.com/sentzunhat/zacatl/actions/workflows/cve-scan.yml/badge.svg)](https://github.com/sentzunhat/zacatl/actions/workflows/cve-scan.yml)
 [![Tests: 648](https://img.shields.io/badge/Tests-648-blue.svg)](#tests)
-[![Coverage: 91.19%](https://img.shields.io/badge/Coverage-91.19%25-brightgreen.svg)](https://img.shields.io/badge/Coverage-91.19%25-brightgreen.svg)
+[![Coverage: 91.41%](https://img.shields.io/badge/Coverage-91.41%25-brightgreen.svg)](https://img.shields.io/badge/Coverage-91.19%25-brightgreen.svg)
 
 **Universal TypeScript framework for building APIs, CLI tools, and distributed systems.**
 
