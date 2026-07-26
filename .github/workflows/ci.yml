@@ -28,10 +28,11 @@ on:
   workflow_dispatch: {}
 
 # Supersede in-flight runs for the same branch/PR instead of stacking them.
-# Use the actual branch name (not the pull request number) so push and PR to the
-# same branch cancel each other.
+# For PRs: use github.head_ref (the PR's source branch)
+# For pushes: use github.ref (the branch being pushed to)
+# This ensures push and PR to the same branch use the same concurrency group.
 concurrency:
-  group: ci-${{ github.ref }}
+  group: ci-${{ github.head_ref || github.ref }}
   cancel-in-progress: true
 
 permissions:
