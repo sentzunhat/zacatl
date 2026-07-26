@@ -17,8 +17,9 @@ All component workflows are **`workflow_call`-only** with no direct triggers, el
 
 ### Pull Request → dev or main
 
-**Gates:** CVE scan, peer install check (fast, ~5–10 min)  
-**Blocks:** cve or peers failure blocks the merge
+**Default:** CVE scan, peer install check (fast, ~5–10 min)  
+**Blocks merge:** cve or peers failure  
+**Optional:** Add `docker-test` label to run docker-smoke before merge
 
 ```
   pull_request -> dev/main
@@ -27,10 +28,17 @@ All component workflows are **`workflow_call`-only** with no direct triggers, el
       ↓
   [peer-install-check]
       ↓
+  [docker-smoke] ← only if labeled 'docker-test'
+      ↓
    Merge enabled
 ```
 
-**Why not dry-run or docker on PRs?** Both are expensive (dry-run runs full test suite + builds output, docker builds three images and boots Postgres/Mongo). The same commit gets dry-run and docker coverage on the push to dev right after merge.
+**Why not docker on all PRs?** Docker builds three images and boots Postgres/Mongo containers (~15 min). Too expensive for routine PRs.
+
+**When to add the docker-test label:**
+- Before merging to main if you changed dockerfile, examples, or deployment config
+- To verify docker works before release
+- Anytime you want manual confidence — just add the label, wait ~20 min, then remove it
 
 ### Push to dev (after merge)
 
@@ -145,6 +153,23 @@ The tag is already created and public. Manual recovery:
 
 - **`NPM_TOKEN`** (GitHub secret) — Scoped npm automation token, used by `release.yml` only (not visible during tests/build).
 - **`NODE_ENV=test`**, **`ENV=test`** — Set by publish-dry and release workflows to run test suites.
+
+## Triggering Checks Manually
+
+All workflows support manual trigger via GitHub Actions:
+
+1. **GitHub UI:** Actions → [Workflow Name] → Run workflow → Choose branch
+2. **CLI:** `gh workflow run <workflow-file.yml> -r <branch>`
+
+### Manual docker-smoke
+
+Useful for testing on any branch without a PR:
+
+```bash
+gh workflow run docker-smoke.yml -r dev
+```
+
+The docker-smoke workflow will run immediately in the background (~20 min).
 
 ## Adding New Checks
 
