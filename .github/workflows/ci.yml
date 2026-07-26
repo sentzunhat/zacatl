@@ -28,8 +28,10 @@ on:
   workflow_dispatch: {}
 
 # Supersede in-flight runs for the same branch/PR instead of stacking them.
+# Use the actual branch name (not the pull request number) so push and PR to the
+# same branch cancel each other.
 concurrency:
-  group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  group: ci-${{ github.ref }}
   cancel-in-progress: true
 
 permissions:
@@ -48,20 +50,23 @@ jobs:
     name: Publish dry-run
     # Full verification (tests, type check, lint, build, consumer smokes).
     # Expensive; only run on push to main before release.
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
     uses: ./.github/workflows/publish-dry.yml
 
   docker:
     name: Docker smoke
     # Expensive: three image builds plus Postgres/Mongo services. Only run
     # on push to main before release; dev and schedule skip it.
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
     uses: ./.github/workflows/docker-smoke.yml
 
   tag:
     name: Tag release
-    # Release gate: only a real push to main, only after every check is green.
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    # Release gate: only a real push to main. Depends on cve and peers which
+    # always run; dry and docker are conditional but guaranteed to run on main.
+    # Since tag also has the main condition, all four jobs are complete before
+    # tag can run.
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
     needs: [cve, peers, dry, docker]
     runs-on: ubuntu-latest
     permissions:
