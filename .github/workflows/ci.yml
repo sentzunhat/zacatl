@@ -55,9 +55,13 @@ jobs:
 
   docker:
     name: Docker smoke
-    # Expensive: three image builds plus Postgres/Mongo services. Only run
-    # on push to main before release; dev and schedule skip it.
-    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+    # Expensive: three image builds plus Postgres/Mongo services.
+    # Runs on:
+    #   - push to main (release gate)
+    #   - PRs with 'docker-test' label (opt-in testing)
+    #   - Manual trigger from Actions tab (workflow_dispatch)
+    # Skips on: dev pushes, schedule, PRs without label
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' || (github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, 'docker-test')) }}
     uses: ./.github/workflows/docker-smoke.yml
 
   tag:
