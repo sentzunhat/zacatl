@@ -1,10 +1,14 @@
 name: Publish (dry-run)
 
+# Reusable component. Invoked by ci.yml — no push/pull_request triggers
+# of its own so it can never double-fire alongside the orchestrator.
+#
+# `publish:dry:ci` is the full verification chain: prepublish guard, tests,
+# type check, lint, build, prepare-publish, packed consumer smokes, and
+# `npm publish --dry-run`.
+
 on:
-  push:
-    branches: [dev, main]
-  pull_request:
-    branches: [dev, main]
+  workflow_call: {}
   workflow_dispatch: {}
 
 permissions:
@@ -12,6 +16,7 @@ permissions:
 
 jobs:
   publish-dry:
+    name: Dry-run publish and consumer smokes
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -33,5 +38,4 @@ jobs:
         env:
           NODE_ENV: test
           ENV: test
-        run: |
-          npm run publish:dry:ci
+        run: npm run publish:dry:ci

@@ -1,0 +1,92 @@
+name: CI
+
+# Single entry point for all branch/PR automation. Every check lives in a
+# reusable workflow that has NO push/pull_request trigger of its own, so a
+# given commit runs each check exactly once — this is what removes the
+# duplicate runs that came from combining `push: branches: ['**']` with a
+# `pull_request:` trigger on the same workflow.
+#
+# What runs where:
+#
+#   pull_request -> dev|main : cve, peers, dry            (fast gates)
+#   push         -> dev      : cve, peers, dry, docker
+#   push         -> main     : cve, peers, dry, docker -> tag -> Release
+#   schedule (weekly)        : cve, peers, dry, docker    (drift detection)
+#
+# Docker smoke is skipped on pull requests: it builds three images and boots
+# Postgres/Mongo containers, and the same commit gets docker coverage on the
+# push to dev right after merge.
+#
+# The `tag` job is what gates publishing. It only runs on a direct push to
+# main and only after every check above has passed, so a red merge can never
+# reach npm.
+
+on:
+  push:
+    branches: [dev, main]
+  pull_request:
+    branches: [dev, main]
+  schedule:
+    - cron: '17 3 * * 1' # Mondays 03:17 UTC
+  workflow_dispatch: {}
+
+# Supersede in-flight runs for the same branch/PR instead of stacking them.
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  cve:
+    name: CVE scan
+    uses: ./.github/workflows/cve-scan.yml
+
+  peers:
+    name: Peer install check
+    uses: ./.github/workflows/peer-install-check.yml
+
+  dry:
+    name: Publish dry-run
+    uses: ./.github/workflows/publish-dry.yml
+
+  docker:
+    name: Docker smoke
+    # Expensive: three image builds plus Postgres/Mongo services. Skipped on
+    # PRs, always run on pushes to dev/main and on the weekly schedule.
+    if: github.event_name != 'pull_request'
+    uses: ./.github/workflows/docker-smoke.yml
+
+  tag:
+    name: Tag release
+    # Release gate: only a real push to main, only after every check is green.
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: [cve, peers, dry, docker]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # create and push the release tag
+      actions: write # dispatch the Release workflow
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # need tags to detect already-released versions
+
+      # Tags pushed with the default GITHUB_TOKEN do not trigger other
+      # workflows (GitHub anti-recursion), so Release is dispatched explicitly.
+      - name: Create tag if missing and dispatch Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          PKG_VERSION="$(node -p "require('./package.json').version")"
+          TAG="v${PKG_VERSION}"
+          if git rev-parse -q --verify "refs/tags/${TAG}" >/dev/null; then
+            echo "Tag ${TAG} already exists — nothing to release."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag "${TAG}"
+          git push origin "${TAG}"
+          gh workflow run release.yml --ref "${TAG}"

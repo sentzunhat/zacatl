@@ -34,40 +34,21 @@ jobs:
           node-version: '26.3.0'
           cache: 'npm'
 
-      - name: Scan dependencies for vulnerabilities
+      # Must match the gate in cve-scan.yml exactly. If this scanned more than
+      # the published package's production tree (e.g. every lockfile under
+      # examples/), CI could go green and the release would then deadlock here
+      # after the tag was already pushed.
+      - name: Scan production dependencies for vulnerabilities
         shell: bash
         run: |
           set -uo pipefail
-          failed=0
-          scanned=0
-          mkdir -p scan-results
-
-          while IFS= read -r -d '' lockfile; do
-            dir=$(dirname "$lockfile")
-            safe_name=$(printf '%s' "$dir" | sed 's#^\./##; s#[^A-Za-z0-9._-]#_#g')
-            report="scan-results/${safe_name:-root}.log"
-            scanned=$((scanned + 1))
-
-            echo "Scanning: $dir"
-            if npx --yes cve-lite-cli@1.27.0 "$dir" --fail-on high 2>&1 | tee "$report"; then
-              echo "✅ $dir"
-            else
-              echo "❌ $dir"
-              failed=1
-            fi
-          done < <(find . -name 'package-lock.json' -not -path '*/node_modules/*' -print0)
-
-          [ "$scanned" -eq 0 ] && echo "No package-lock.json found." && exit 1
-          [ "$failed" -ne 0 ] && exit 1
-          echo "🎉 CVE scan passed."
-
-      - name: Upload CVE-Lite reports
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: cve-lite-reports
-          path: scan-results/
-          if-no-files-found: error
+          echo "Scanning production dependencies (--omit=dev) with npm audit..."
+          if npm audit --omit=dev --audit-level=high; then
+            echo "🎉 Production dependencies audit passed."
+          else
+            echo "❌ Production dependencies have high-severity vulnerabilities."
+            exit 1
+          fi
 
   release:
     name: Verify and publish

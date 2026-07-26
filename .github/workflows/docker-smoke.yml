@@ -6,30 +6,12 @@ name: Docker smoke
 # would have caught the 2026-07 breakage where the Dockerfile read driver
 # versions from a package.json section that no longer existed.
 #
-# Runs on changes to the image inputs (src/, scripts/, examples/, the
-# Dockerfile itself) and weekly to catch base-image/registry drift.
+# Reusable component. Invoked by ci.yml on pushes to dev/main and on the
+# weekly schedule — no push/pull_request triggers of its own so it can never
+# double-fire alongside the orchestrator.
 
 on:
-  push:
-    branches: [dev, main]
-    paths:
-      - 'src/**'
-      - 'scripts/**'
-      - 'examples/**'
-      - 'package.json'
-      - 'package-lock.json'
-      - '.github/workflows/docker-smoke.yml'
-  pull_request:
-    branches: [dev, main]
-    paths:
-      - 'src/**'
-      - 'scripts/**'
-      - 'examples/**'
-      - 'package.json'
-      - 'package-lock.json'
-      - '.github/workflows/docker-smoke.yml'
-  schedule:
-    - cron: '17 3 * * 1' # Mondays 03:17 UTC
+  workflow_call: {}
   workflow_dispatch: {}
 
 permissions:
