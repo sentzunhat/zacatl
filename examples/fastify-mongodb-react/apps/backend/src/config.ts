@@ -9,11 +9,11 @@ import { fileURLToPath } from 'url';
 import { ServiceType } from '@sentzunhat/zacatl/service/service';
 import type { HookHandler } from '@sentzunhat/zacatl/service/layers/application/entry-points/rest/hook-handlers/hook-handler';
 import { DatabaseVendor } from '@sentzunhat/zacatl/service/platforms/server/database/port';
+import type { MongooseIndexBootMode } from '@sentzunhat/zacatl/service/layers/infrastructure/orm/mongoose/types';
 import {
   ServerType,
   ServerVendor,
 } from '@sentzunhat/zacatl/service/platforms/server/types/server-config';
-import { MongooseIndexBootMode } from '@sentzunhat/zacatl/service/platforms/server/database/adapters/mongoose/types/mongoose-adapter-types';
 import type { FastifyInstance } from '@sentzunhat/zacatl/third-party/fastify';
 import type { Mongoose } from 'mongoose';
 import { repositories } from './infrastructure/greetings/repositories/repositories';
@@ -126,7 +126,7 @@ export const createServiceConfig = (fastify: FastifyInstance, mongoose: Mongoose
             instance: mongoose,
             connection: { url: config.mongoUri },
             indexes: {
-              bootMode: shouldCreateIndexesOnBoot ? MongooseIndexBootMode.CREATE : MongooseIndexBootMode.OFF,
+              bootMode: (shouldCreateIndexesOnBoot ? 'create' : 'off') as MongooseIndexBootMode,
             },
             onDatabaseConnected: async () => {},
           },
