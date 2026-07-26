@@ -13,6 +13,7 @@ import {
   ServerType,
   ServerVendor,
 } from '@sentzunhat/zacatl/service/platforms/server/types/server-config';
+import { MongooseIndexBootMode } from '@sentzunhat/zacatl/service/platforms/server/database/adapters/mongoose/types/mongoose-adapter-types';
 import type { FastifyInstance } from '@sentzunhat/zacatl/third-party/fastify';
 import type { Mongoose } from 'mongoose';
 import { repositories } from './infrastructure/greetings/repositories/repositories';
@@ -125,7 +126,7 @@ export const createServiceConfig = (fastify: FastifyInstance, mongoose: Mongoose
             instance: mongoose,
             connection: { url: config.mongoUri },
             indexes: {
-              bootMode: shouldCreateIndexesOnBoot ? 'create' : 'off',
+              bootMode: shouldCreateIndexesOnBoot ? MongooseIndexBootMode.CREATE : MongooseIndexBootMode.OFF,
             },
             onDatabaseConnected: async () => {},
           },
