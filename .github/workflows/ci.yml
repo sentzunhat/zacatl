@@ -2,24 +2,21 @@ name: CI
 
 # Single entry point for all branch/PR automation. Every check lives in a
 # reusable workflow that has NO push/pull_request trigger of its own, so a
-# given commit runs each check exactly once — this is what removes the
-# duplicate runs that came from combining `push: branches: ['**']` with a
-# `pull_request:` trigger on the same workflow.
+# given commit runs each check exactly once — this removes duplicate runs
+# that came from combining `push: branches: ['**']` with `pull_request:`.
 #
 # What runs where:
 #
-#   pull_request -> dev|main : cve, peers, dry            (fast gates)
-#   push         -> dev      : cve, peers, dry, docker
+#   pull_request -> dev|main : cve, peers                (fast gates)
+#   push         -> dev      : cve, peers                (dev feedback, lightweight)
 #   push         -> main     : cve, peers, dry, docker -> tag -> Release
-#   schedule (weekly)        : cve, peers, dry, docker    (drift detection)
+#   schedule (weekly)        : cve, peers                (drift detection only)
 #
-# Docker smoke is skipped on pull requests: it builds three images and boots
-# Postgres/Mongo containers, and the same commit gets docker coverage on the
-# push to dev right after merge.
+# Dry-run and docker are expensive and skipped on dev/schedule. They only
+# run on pushes to main (before release) to verify the full pipeline.
 #
-# The `tag` job is what gates publishing. It only runs on a direct push to
-# main and only after every check above has passed, so a red merge can never
-# reach npm.
+# The `tag` job gates publishing. It only runs on a push to main after all
+# checks pass, so a red merge can never reach npm.
 
 on:
   push:
@@ -49,13 +46,16 @@ jobs:
 
   dry:
     name: Publish dry-run
+    # Full verification (tests, type check, lint, build, consumer smokes).
+    # Expensive; only run on push to main before release.
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     uses: ./.github/workflows/publish-dry.yml
 
   docker:
     name: Docker smoke
-    # Expensive: three image builds plus Postgres/Mongo services. Skipped on
-    # PRs, always run on pushes to dev/main and on the weekly schedule.
-    if: github.event_name != 'pull_request'
+    # Expensive: three image builds plus Postgres/Mongo services. Only run
+    # on push to main before release; dev and schedule skip it.
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     uses: ./.github/workflows/docker-smoke.yml
 
   tag:
