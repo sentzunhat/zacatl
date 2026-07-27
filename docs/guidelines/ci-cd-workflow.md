@@ -99,7 +99,7 @@ The orchestrator uses GitHub's concurrency group to supersede in-flight runs:
 
 ```yaml
 concurrency:
-  group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  group: ci-${{ github.head_ref || github.ref_name }}
   cancel-in-progress: true
 ```
 

@@ -11,14 +11,14 @@ services:
         DATABASE_DRIVER: sqlite3
         BACKEND: apps/backend
         FRONTEND: apps/frontend
-        PORT: 8181
+        PORT: 8182
     image: zacatl-express-sqlite-svelte
     container_name: express-sqlite-svelte-backend
     ports:
-      - '8181:8181'
+      - '8182:8182'
     environment:
       NODE_ENV: production
-      PORT: 8181
+      PORT: 8182
       HEALTHCHECK_PATH: /api/greetings
     volumes:
       - ${ZACATL_EXAMPLE_SQLITE_DATA_DIR:-./data}:/app/data

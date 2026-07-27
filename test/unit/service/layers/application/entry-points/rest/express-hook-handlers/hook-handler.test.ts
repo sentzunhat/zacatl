@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import type { HookHandler } from '../../../../../../../../src/service/layers/application/entry-points/rest/express/hook-handlers/hook-handler';
 
 describe('Express HookHandler', () => {
-  it('accepts an onRequest hook typed against Express Request/Response without casts', async () => {
+  it('accepts an onRequest hook typed against Express Request/Response (type-safe definition)', async () => {
     const calls: string[] = [];
 
     const hook: HookHandler = {

@@ -11,14 +11,14 @@ services:
         DATABASE_DRIVER: sqlite3
         BACKEND: apps/backend
         FRONTEND: apps/frontend
-        PORT: 8081
+        PORT: 8086
     image: zacatl-fastify-sqlite-svelte
     container_name: fastify-sqlite-svelte-backend
     ports:
-      - '8085:8081'
+      - '8086:8086'
     environment:
       NODE_ENV: production
-      PORT: 8081
+      PORT: 8086
       HEALTHCHECK_PATH: /api/greetings
     volumes:
       - ${ZACATL_EXAMPLE_SQLITE_DATA_DIR:-./data}:/app/data
