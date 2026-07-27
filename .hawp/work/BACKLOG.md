@@ -31,7 +31,7 @@ Items `e1f4b2a0`, `a3d81c6e`, `b7c92f1d`, `c4e05a92` descend from AUDIT-004 (202
 
 | ID         | Type        | Title                                                                                                                                             | Status      | Plan                                                        |
 | ---------- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- | ----------------------------------------------------------- |
-| `871e98ef` | release     | P2: v0.0.59 — triage post-0.0.58 Dependabot PRs (#39–#46), close ESLint 10 as blocked, cut patch release | plan-ready  | `.hawp/work/active/871e98ef-v0.0.59-dependency-bumps.md`    |
+| `BACKLOG-COMPACT` | tooling | P2: Compact BACKLOG.md and archive closed work — Recently Closed has 30+ rows spanning 2026-07-12 to present, well past the 5–10/14–30-day cap | inbox | none yet — see `.hawp/kit/references/backlog-alignment.md` |
 | `e7a20d15` | milestone   | P1: v0.1.0 — CLI/desktop/server platforms to a minimal standard; batched breaking changes                                                         | analyzing   | `.hawp/work/active/e7a20d15-v0.1.0-milestone.md`            |
 | `f2a96e04` | improvement | P2: Dependency hygiene — remaining: HTTP-frameworks-as-peers (0.1.0). Done: exports validation 45f74849, scoped uuid override, @fastify/static 10 | in-progress | see AUDIT-005 advisories                                    |
 | `5c2c9ef3` | refactoring | P2: DI child containers, uniform guards, constructor injection, factory seam                                                                      | in-progress | `.hawp/work/active/5c2c9ef3-1a6e-469f-9c25-f644b5e3d635.md` |
@@ -43,10 +43,11 @@ Items `e1f4b2a0`, `a3d81c6e`, `b7c92f1d`, `c4e05a92` descend from AUDIT-004 (202
 
 ## Recently Closed
 
-Keep this section short (last 5–10 items or last 14–30 days).
+Keep this section short (last 5–10 items or last 14–30 days). **Over cap — see `BACKLOG-COMPACT` above.**
 
 | ID          | Type          | Title                                                                                                       | Closed     | Plan                                                                                                                                       |
 | ----------- | ------------- | ----------------------------------------------------------------------------------------------------------- | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| `871e98ef`  | `release`     | P2: v0.0.59 — 4 Dependabot PRs merged, 2 closed superseded, 2 closed blocked on ESLint 10, 9 CVE alerts fixed across examples, released to npm | 2026-07-27 | [closed/2026/07/27/871e98ef-v0.0.59-dependency-bumps.md](closed/2026/07/27/871e98ef-v0.0.59-dependency-bumps.md) |
 | `refactor-collapse-duplication` | `refactoring` | P2: Collapse BaseRepository/handler duplication, normalize Sequelize adapter errors — 75 net lines removed, 0 API breaks | 2026-07-26 | [closed/2026/07/26/refactor-duplication-collapse.md](closed/2026/07/26/refactor-duplication-collapse.md) |
 | `75df2542`  | `tooling`     | P1: CI release workflow — orchestrator redesign, no duplicate runs, all checks gate release to npm           | 2026-07-25 | [closed/2026/07/25/75df2542-ci-workflow-redesign.md](closed/2026/07/25/75df2542-ci-workflow-redesign.md)                                   |
 | `754afa86`  | `security`    | P1: npm token rotation + CI setup — owner added NPM_TOKEN secret, workflow unblocked                        | 2026-07-25 | (NPM_TOKEN configured in GitHub Actions secrets)                                                                                           |
