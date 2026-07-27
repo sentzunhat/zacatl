@@ -1,13 +1,11 @@
 # Zacatl Framework
 
-[![npm version](https://img.shields.io/npm/v/@sentzunhat/zacatl.svg?style=flat-square)](https://www.npmjs.com/package/@sentzunhat/zacatl)
-[![npm downloads](https://img.shields.io/npm/dm/@sentzunhat/zacatl.svg?style=flat-square)](https://www.npmjs.com/package/@sentzunhat/zacatl)
-[![CI](https://img.shields.io/github/actions/workflow/status/sentzunhat/zacatl/ci.yml?branch=main&style=flat-square&label=CI)](https://github.com/sentzunhat/zacatl/actions/workflows/ci.yml)
-[![Tests: 659](https://img.shields.io/badge/tests-659%20passing-brightgreen.svg?style=flat-square)](#--testing)
-[![Coverage: 91.41%](https://img.shields.io/badge/coverage-91.41%25-brightgreen.svg?style=flat-square)](#--testing)
-[![License: Apache 2.0](https://img.shields.io/badge/license-Apache%202.0-blue.svg?style=flat-square)](./LICENSE)
-[![TypeScript](https://img.shields.io/badge/%3C%2F%3E-TypeScript-3178c6.svg?style=flat-square)](https://www.typescriptlang.org/)
-[![Node.js 26+](https://img.shields.io/badge/node-%3E%3D26.0.0-brightgreen.svg?style=flat-square)](https://nodejs.org/)
+**Package** · [![npm version](https://img.shields.io/npm/v/@sentzunhat/zacatl.svg?style=flat-square)](https://www.npmjs.com/package/@sentzunhat/zacatl) [![npm downloads](https://img.shields.io/npm/dm/@sentzunhat/zacatl.svg?style=flat-square)](https://www.npmjs.com/package/@sentzunhat/zacatl) [![License: Apache 2.0](https://img.shields.io/badge/license-Apache%202.0-blue.svg?style=flat-square)](./LICENSE)
+
+**Quality** · [![CI](https://img.shields.io/github/actions/workflow/status/sentzunhat/zacatl/ci.yml?branch=main&style=flat-square&label=CI)](https://github.com/sentzunhat/zacatl/actions/workflows/ci.yml) [![Tests: 659](https://img.shields.io/badge/tests-659%20passing-brightgreen.svg?style=flat-square)](#-testing) [![Coverage: 91.41%](https://img.shields.io/badge/coverage-91.41%25-brightgreen.svg?style=flat-square)](#-testing)
+<br>One `CI` badge, deliberately — it's a single orchestrator workflow that gates CVE scanning, peer-dependency install checks, the full test suite, and an 8-example Docker smoke matrix before anything can tag a release. A separate "CVE scan" badge would just go stale (see [docs/guidelines/ci-cd-workflow.md](./docs/guidelines/ci-cd-workflow.md) for exactly what runs where and why).
+
+**Stack** · [![TypeScript](https://img.shields.io/badge/%3C%2F%3E-TypeScript-3178c6.svg?style=flat-square)](https://www.typescriptlang.org/) [![Node.js 26+](https://img.shields.io/badge/node-%3E%3D26.0.0-brightgreen.svg?style=flat-square)](https://nodejs.org/)
 
 **Universal TypeScript framework for building APIs, CLI tools, and distributed systems.**
 
@@ -17,18 +15,18 @@ Zacatl was built with the help of AI models and digital agents, and is intention
 
 ## Table of Contents
 
-- [Why Zacatl](#--why-zacatl)
-- [Quick Start](#--quick-start)
+- [Why Zacatl](#-why-zacatl)
+- [Quick Start](#-quick-start)
 - [ORM Adapters](#️-orm-adapters)
 - [Architecture](#️-architecture)
-- [Platform Support](#--platform-support)
-- [Examples & Screenshots](#--examples--screenshots)
-- [Public API Modules](#--public-api-modules)
-- [Documentation](#--documentation)
-- [Testing](#--testing)
-- [Requirements](#--requirements)
-- [Contributing](#--contributing)
-- [License](#--license)
+- [Platform Support](#-platform-support)
+- [Examples & Screenshots](#-examples--screenshots)
+- [Public API Modules](#-public-api-modules)
+- [Documentation](#-documentation)
+- [Testing](#-testing)
+- [Requirements](#-requirements)
+- [Contributing](#-contributing)
+- [License](#-license)
 
 ## ✨ Why Zacatl
 
@@ -42,7 +40,7 @@ Zacatl was built with the help of AI models and digital agents, and is intention
 | 🌐 Server Framework Choice  | Fastify or Express — same domain logic, swap the adapter           |
 | 🌍 Internationalization     | Pluggable i18n with filesystem/memory adapters                     |
 | 📝 Production Observability | Structured logging and error tracking                              |
-| 🧪 Tested                   | 659 tests, 91%+ coverage — see [Testing](#--testing)                |
+| 🧪 Tested                   | 659 tests, 91%+ coverage — see [Testing](#-testing)                |
 
 ## 🚀 Quick Start
 
@@ -163,7 +161,11 @@ Dependencies flow strictly inward — Application depends on Domain, Domain depe
 
 ## 📸 Examples & Screenshots
 
-Every example implements the same greeting CRUD flow behind a different framework/database/frontend combination, so you can compare them directly. Screenshots below are captured automatically via Playwright against the real, dockerized app — not mockups.
+Every example implements the same greeting CRUD flow behind a different framework/database/frontend combination, so you can compare them directly. Screenshots (and the walkthrough below) are captured automatically via Playwright against the real, dockerized app — not mockups.
+
+**Fastify + MongoDB + React**, full create → update → delete cycle:
+
+![Fastify + MongoDB + React walkthrough](./examples/screenshots/fastify-mongodb-react/walkthrough.gif)
 
 | Example                                                        | Server  | Database   | Frontend | Preview                                                                         |
 | ---------------------------------------------------------------- | ------- | ---------- | -------- | -------------------------------------------------------------------------------- |
@@ -215,8 +217,7 @@ Full docs live in **[`docs/`](./docs/README.md)**. New contributors start with *
 | Utils                  | [docs/utils/README.md](./docs/utils/README.md)                                                          |
 | CI/CD Pipeline         | [docs/guidelines/ci-cd-workflow.md](./docs/guidelines/ci-cd-workflow.md)                                 |
 | Release Notes          | [docs/changelog.md](./docs/changelog.md)                                                                |
-| 0.0.57 Migration       | [docs/migration/0.0.57.md](./docs/migration/0.0.57.md)                                                  |
-| SQLite `node:sqlite` Cut | [docs/migration/sequelize-sqlite-to-nodesqlite.md](./docs/migration/sequelize-sqlite-to-nodesqlite.md) |
+| Migration Guides       | [docs/migration/](./docs/migration/README.md)                                                           |
 
 ## 🧪 Testing
 
