@@ -45,6 +45,7 @@ Zacatl was built with the help of AI models and digital agents, and is intention
 - [Requirements](#-requirements)
 - [Contributing](#-contributing)
 - [License](#-license)
+- [Acknowledgments](#-acknowledgments)
 
 ## ✨ Why Zacatl
 
@@ -265,3 +266,7 @@ See [CONTRIBUTING.md](./CONTRIBUTING.md) for the full guide.
 [Apache License 2.0](./LICENSE) © 2026 Zacatl Contributors
 
 > Zacatl is permissively licensed. Please don't use it to harm people.
+
+## 🤖 Acknowledgments
+
+This framework was built with assistance from AI coding models and agents — including Claude (Anthropic), OpenAI models, GitHub Copilot, and open-source tooling like Cursor and Continue — alongside plenty of human review and decision-making. Zacatl's own design leans into that collaboration: its docs and structure are intentionally written to be navigable by both people and AI agents. Thank you to the teams building these tools.
