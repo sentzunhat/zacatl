@@ -9,7 +9,7 @@ name: CI
 #
 #   pull_request -> dev|main : cve, peers                (fast gates)
 #   push         -> dev      : (nothing — covered by the open PR's pull_request run)
-#   push         -> main     : cve, peers, dry, docker -> tag -> Release
+#   push         -> main     : should-release -> cve, peers, [dry, docker if pending] -> tag -> Release
 #   schedule (weekly)        : cve, peers                (drift detection only)
 #
 # Push to dev skips cve/peers: dev is normally the source branch of an open
@@ -17,11 +17,19 @@ name: CI
 # that runs the same checks. Running them again on push was pure duplicate
 # work — same commit, same result, twice.
 #
-# Dry-run and docker are expensive and skipped on dev/schedule. They only
-# run on pushes to main (before release) to verify the full pipeline.
+# `should-release` answers "does package.json's version still need
+# publishing?" before anything expensive runs. A push to main with no
+# version bump (e.g. a docs-only follow-up commit after a release) has
+# nothing to release, so dry/docker/tag all skip cleanly instead of dry
+# failing loudly inside prepublish-guard.ts with "already published".
 #
-# The `tag` job gates publishing. It only runs on a push to main after all
-# checks pass, so a red merge can never reach npm.
+# Dry-run and docker are expensive and skipped on dev/schedule, and on main
+# once the current version is already released. They run on pushes to main
+# with a pending release to verify the full pipeline before tagging.
+#
+# The `tag` job gates publishing. It only runs on a push to main with a
+# pending release, after all checks pass, so a red merge can never reach
+# npm.
 
 on:
   push:
@@ -44,6 +52,36 @@ permissions:
   contents: read
 
 jobs:
+  should-release:
+    name: Check pending release
+    # Cheap, always runs (never skipped) so downstream `needs` never hits
+    # skip-vs-success ambiguity. Answers one question early: does the version
+    # on package.json still need to be published? A push to main that doesn't
+    # bump the version (e.g. a docs-only follow-up) has nothing to release —
+    # without this gate, `dry` used to find that out the expensive way, deep
+    # inside prepublish-guard.ts, after cve/peers/dry had already spent CI
+    # minutes on a run that was always going to fail.
+    runs-on: ubuntu-latest
+    outputs:
+      pending: ${{ steps.check.outputs.pending }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0 # need tags to check if this version was already released
+
+      - name: Check whether this package.json version is already tagged
+        id: check
+        run: |
+          PKG_VERSION="$(node -p "require('./package.json').version")"
+          TAG="v${PKG_VERSION}"
+          if git rev-parse -q --verify "refs/tags/${TAG}" >/dev/null; then
+            echo "Tag ${TAG} already exists — no release pending."
+            echo "pending=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "pending=true" >> "$GITHUB_OUTPUT"
+          fi
+
   cve:
     name: CVE scan
     # Skip on push to dev — an open PR from dev already runs this via
@@ -60,29 +98,35 @@ jobs:
   dry:
     name: Publish dry-run
     # Full verification (tests, type check, lint, build, consumer smokes).
-    # Expensive; only run on push to main before release.
-    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+    # Expensive; only run on push to main, and only when the version isn't
+    # already published — otherwise prepublish-guard.ts fails on purpose,
+    # which is correct for a manual dispatch but just noise on an ordinary
+    # push to main with no version bump.
+    needs: [should-release]
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.should-release.outputs.pending == 'true' }}
     uses: ./.github/workflows/publish-dry.yml
 
   docker:
     name: Docker smoke
     # Expensive: three image builds plus Postgres/Mongo services.
     # Runs on:
-    #   - push to main (release gate)
+    #   - push to main with a pending release (release gate)
     #   - PRs with 'docker-test' label (opt-in testing)
     #   - Manual trigger from Actions tab (workflow_dispatch)
-    # Skips on: dev pushes, schedule, PRs without label
-    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' || (github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, 'docker-test')) }}
+    # Skips on: dev pushes, schedule, PRs without label, main pushes with
+    # no version bump (nothing to release, see `should-release`)
+    needs: [should-release]
+    if: ${{ (github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.should-release.outputs.pending == 'true') || (github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, 'docker-test')) }}
     uses: ./.github/workflows/docker-smoke.yml
 
   tag:
     name: Tag release
-    # Release gate: only a real push to main. Depends on cve and peers which
-    # always run; dry and docker are conditional but guaranteed to run on main.
-    # Since tag also has the main condition, all four jobs are complete before
-    # tag can run.
-    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
-    needs: [cve, peers, dry, docker]
+    # Release gate: only a real push to main with a pending version bump.
+    # `always()` plus explicit result checks because dry/docker may be
+    # legitimately skipped (no pending release) rather than successful —
+    # skipped is fine, failed is not.
+    if: ${{ always() && github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.should-release.outputs.pending == 'true' && needs.cve.result == 'success' && needs.peers.result == 'success' && (needs.dry.result == 'success' || needs.dry.result == 'skipped') && (needs.docker.result == 'success' || needs.docker.result == 'skipped') }}
+    needs: [should-release, cve, peers, dry, docker]
     runs-on: ubuntu-latest
     permissions:
       contents: write # create and push the release tag
