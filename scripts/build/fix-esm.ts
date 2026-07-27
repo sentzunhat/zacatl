@@ -98,8 +98,7 @@ const resolveSpecifier = (fileDir: string, importPath: string): string => {
 };
 
 const fixFile = (filePath: string): boolean => {
-  let content = fs.readFileSync(filePath, 'utf-8');
-  const original = content;
+  const content = fs.readFileSync(filePath, 'utf-8');
   const fileDir = path.dirname(filePath);
 
   const patterns = [
@@ -108,17 +107,27 @@ const fixFile = (filePath: string): boolean => {
     /(import\(\s*["'])(\.[^"']*?)(["']\s*\))/g,
   ];
 
-  patterns.forEach((pattern) => {
-    content = content.replace(
-      pattern,
-      (match, prefix: string, importPath: string, suffix: string) => {
-        return `${prefix}${resolveSpecifier(fileDir, importPath)}${suffix}`;
-      },
-    );
+  const processedLines = content.split('\n').map((line) => {
+    const trimmed = line.trimStart();
+    // Skip single-line comment lines and block-comment content lines (starting with *)
+    if (trimmed.startsWith('//') || trimmed.startsWith('*')) return line;
+
+    let result = line;
+    for (const pattern of patterns) {
+      pattern.lastIndex = 0;
+      result = result.replace(
+        pattern,
+        (_, prefix: string, importPath: string, suffix: string) =>
+          `${prefix}${resolveSpecifier(fileDir, importPath)}${suffix}`,
+      );
+    }
+    return result;
   });
 
-  if (content !== original) {
-    fs.writeFileSync(filePath, content, 'utf-8');
+  const processed = processedLines.join('\n');
+
+  if (processed !== content) {
+    fs.writeFileSync(filePath, processed, 'utf-8');
     return true;
   }
 

@@ -32,7 +32,7 @@ on:
 # For pushes: github.ref_name = branch name (e.g., "dev", "refs/heads/..." stripped)
 # This ensures both use the clean branch name and cancel each other.
 concurrency:
-  group: ci-${{ github.head_ref || github.ref_name }}
+  group: ci-${{ github.event.pull_request.number || github.head_ref || github.ref_name }}
   cancel-in-progress: true
 
 permissions:

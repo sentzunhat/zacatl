@@ -45,14 +45,14 @@ export const registerMongooseIndexOptions = (
   connectionName: string | undefined,
   options: MongooseRepositoryIndexOptions | undefined,
 ): void => {
+  if (options == null) return;
+
   const normalizedConnectionName = normalizeConnectionName(connectionName);
-
-  if (options == null || options.bootMode == null) {
-    indexOptionsByConnection.delete(normalizedConnectionName);
-    return;
-  }
-
   indexOptionsByConnection.set(normalizedConnectionName, options);
+};
+
+export const unregisterMongooseIndexOptions = (connectionName: string | undefined): void => {
+  indexOptionsByConnection.delete(normalizeConnectionName(connectionName));
 };
 
 export const getMongooseIndexOptions = (
