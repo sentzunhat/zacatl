@@ -58,9 +58,9 @@ npm run screenshots:examples:capture   # requires Docker
   - `fastify-postgres-react/` - Fastify + PostgreSQL + React (Backend: 8083, < 2s startup)
 - **Express** - Traditional Node.js patterns
   - `express-sqlite-react/` - Express + SQLite + React (Backend: 8181)
-  - `express-sqlite-svelte/` - Express + SQLite + Svelte (Backend: 8181)
-  - `express-mongodb-react/` - Express + MongoDB + React (Backend: 8182)
+  - `express-sqlite-svelte/` - Express + SQLite + Svelte (Backend: 8182)
   - `express-postgres-react/` - Express + PostgreSQL + React (Backend: 8183)
+  - `express-mongodb-react/` - Express + MongoDB + React (Backend: 8184)
 - **Desktop experiment**
   - `neutralino-react-transformers-webgpu/` - Neutralinojs + React + Transformers.js + WebGPU prototype
 - **Persistence pattern**
@@ -142,7 +142,7 @@ cd express-sqlite-react && npm install && npm run dev
 ```bash
 docker run -d -p 27017:27017 --name mongo mongo:latest
 cd express-mongodb-react && npm install && npm run dev
-# → http://localhost:8182
+# → http://localhost:8184
 ```
 
 **What it shows:**

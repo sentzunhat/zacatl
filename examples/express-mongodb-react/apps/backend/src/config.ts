@@ -34,7 +34,7 @@ export interface AppConfig {
 }
 
 export const config: AppConfig = {
-  port: Number(process.env.PORT ?? 8182),
+  port: Number(process.env.PORT ?? 8184),
   mongoUri: process.env.MONGO_URI ?? 'mongodb://local:local@localhost:27017/appdb',
 };
 
