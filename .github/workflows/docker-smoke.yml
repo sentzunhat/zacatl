@@ -40,7 +40,7 @@ jobs:
           # Fastify examples (all drivers and frontends)
           - example: fastify-sqlite-react
             driver: sqlite3
-            port: 8085
+            port: 8081
           - example: fastify-sqlite-svelte
             driver: sqlite3
             port: 8086

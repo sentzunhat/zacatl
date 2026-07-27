@@ -9,6 +9,7 @@ import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import { ServiceType } from '@sentzunhat/zacatl/service/service';
 import { DatabaseVendor } from '@sentzunhat/zacatl/service/platforms/server/database/port';
+import type { MongooseIndexBootMode } from '@sentzunhat/zacatl/service/layers/infrastructure/orm/mongoose/types';
 import {
   ServerType,
   ServerVendor,
@@ -77,7 +78,7 @@ export function createServiceConfig(app: Application, mongoose: Mongoose) {
             instance: mongoose,
             connection: { url: config.mongoUri },
             indexes: {
-              bootMode: shouldCreateIndexesOnBoot ? 'create' : 'off',
+              bootMode: (shouldCreateIndexesOnBoot ? 'create' : 'off') as MongooseIndexBootMode,
             },
           },
         ],
