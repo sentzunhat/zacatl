@@ -1046,8 +1046,7 @@
     }
   },
   "overrides": {
-    "postcss": "^8.5.19",
-    "minimatch": "^8.0.0"
+    "postcss": "^8.5.19"
   },
   "allowScripts": {
     "esbuild@0.28.1": true,
@@ -1055,5 +1054,10 @@
     "mongodb-memory-server@11.2.0": true,
     "sqlite3@6.0.1": true,
     "unrs-resolver@1.12.2": true
+  },
+  "auditConfig": {
+    "audit_overrides": {
+      "brace-expansion_GHSA-mh99-v99m-4gvg": "{\"from\":\"\",\"to\":\"\",\"reason\":\"Transitive via minimatch; requires minimatch major-version bump. Mitigated: package is devDependencies-only (build-time), does not ship to npm.\"}"
+    }
   }
 }
