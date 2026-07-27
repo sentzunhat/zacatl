@@ -5,8 +5,7 @@
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0)
 [![TypeScript](https://img.shields.io/badge/%3C%2F%3E-TypeScript-3178c6.svg)](https://www.typescriptlang.org/)
 [![Node.js 26+](https://img.shields.io/badge/Node.js-26%2B-brightgreen.svg)](https://nodejs.org/)
-[![Build](https://github.com/sentzunhat/zacatl/actions/workflows/publish-dry.yml/badge.svg)](https://github.com/sentzunhat/zacatl/actions/workflows/publish-dry.yml)
-[![CVE Scan](https://github.com/sentzunhat/zacatl/actions/workflows/cve-scan.yml/badge.svg)](https://github.com/sentzunhat/zacatl/actions/workflows/cve-scan.yml)
+[![CI](https://github.com/sentzunhat/zacatl/actions/workflows/ci.yml/badge.svg)](https://github.com/sentzunhat/zacatl/actions/workflows/ci.yml)
 [![Tests: 648](https://img.shields.io/badge/Tests-648-blue.svg)](#tests)
 [![Coverage: 91.41%](https://img.shields.io/badge/Coverage-91.41%25-brightgreen.svg)](https://img.shields.io/badge/Coverage-91.19%25-brightgreen.svg)
 
