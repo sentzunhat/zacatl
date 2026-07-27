@@ -2,6 +2,10 @@ import type { Mongoose } from 'mongoose';
 
 import { CustomError } from '@zacatl/error';
 
+import {
+  getMongooseIndexOptions,
+  registerMongooseIndexOptions,
+} from '../../../../layers/infrastructure/orm/mongoose/index-policy';
 import { registerOrmInstance } from '../orm-instance';
 import { DatabaseVendor, type DatabaseServerPort, type DatabaseConfig } from '../port';
 
@@ -27,11 +31,15 @@ export class MongooseAdapter implements DatabaseServerPort {
     }
 
     const dbName = getMongoDbName(connection.url) ?? serviceName;
+    registerMongooseIndexOptions(connection.name, config.indexes);
+
+    const { bootMode } = getMongooseIndexOptions(connection.name);
+    const shouldAutoManageIndexes = bootMode === 'create' || bootMode === 'sync';
 
     await mongoose.connect(connection.url, {
       dbName,
-      autoIndex: true,
-      autoCreate: true,
+      autoIndex: shouldAutoManageIndexes,
+      autoCreate: shouldAutoManageIndexes,
     });
 
     if (onDatabaseConnected != null) {

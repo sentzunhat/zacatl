@@ -417,6 +417,18 @@ export class UpdateUserHandler extends PutRouteHandler<
 
 ## Hook/Middleware Patterns
 
+> **Fastify vs Express:** the examples below import the Fastify `HookHandler`
+> type, which supports `onRequest`, `preHandler`, `preValidation`, and
+> `preSerialization` — Fastify's native request lifecycle events
+> (`server.addHook(...)`). Express has no equivalent lifecycle, only a single
+> middleware chain, so Express consumers should import `HookHandler` from
+> `@sentzunhat/zacatl/service/layers/application/entry-points/rest/express/hook-handlers/hook-handler`
+> instead, which supports only `onRequest` and `preHandler` (both are mapped
+> to `app.use(...)` middleware at runtime — see `ExpressApiAdapter.registerHook`).
+> Register hooks the same way in either case, casting the array to
+> `ApplicationRestHooks` if needed (the same pattern used for Express route
+> handlers).
+
 ### Authentication Hook
 
 Verify JWT and attach user to request:

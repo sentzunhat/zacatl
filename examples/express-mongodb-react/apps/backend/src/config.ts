@@ -9,7 +9,11 @@ import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import { ServiceType } from '@sentzunhat/zacatl/service/service';
 import { DatabaseVendor } from '@sentzunhat/zacatl/service/platforms/server/database/port';
-import { ServerType, ServerVendor } from '@sentzunhat/zacatl/service/platforms/server/types/server-config';
+import type { MongooseIndexBootMode } from '@sentzunhat/zacatl/service/layers/infrastructure/orm/mongoose/types';
+import {
+  ServerType,
+  ServerVendor,
+} from '@sentzunhat/zacatl/service/platforms/server/types/server-config';
 import type { ApplicationRestRoutes } from '@sentzunhat/zacatl/service/layers/application/types';
 import { repositories } from './infrastructure/greetings/repositories/repositories';
 import { GreetingServiceAdapter } from './domain/greetings/service/adapter';
@@ -30,11 +34,16 @@ export interface AppConfig {
 }
 
 export const config: AppConfig = {
-  port: Number(process.env.PORT ?? 8182),
+  port: Number(process.env.PORT ?? 8184),
   mongoUri: process.env.MONGO_URI ?? 'mongodb://local:local@localhost:27017/appdb',
 };
 
 export const API_PREFIX = '/api';
+
+const shouldCreateIndexesOnBoot =
+  process.env.APP_ENV === 'local' ||
+  process.env.APP_ENV === 'development' ||
+  process.env.NODE_ENV === 'test';
 
 export function createServiceConfig(app: Application, mongoose: Mongoose) {
   const routes = [
@@ -68,6 +77,9 @@ export function createServiceConfig(app: Application, mongoose: Mongoose) {
             vendor: DatabaseVendor.MONGOOSE,
             instance: mongoose,
             connection: { url: config.mongoUri },
+            indexes: {
+              bootMode: (shouldCreateIndexesOnBoot ? 'create' : 'off') as MongooseIndexBootMode,
+            },
           },
         ],
       },

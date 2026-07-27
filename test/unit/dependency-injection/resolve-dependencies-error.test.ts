@@ -26,6 +26,15 @@ class RegisteredService {
   }
 }
 
+// A class that IS registered but throws during construction, forcing
+// tsyringeContainer.resolve() itself to throw (distinct from the
+// not-registered branch above).
+class ThrowsOnConstruct {
+  constructor() {
+    throw new Error('boom during construction');
+  }
+}
+
 describe('resolveDependencies — descriptive error on missing registration', () => {
   beforeEach(() => {
     clearContainer();
@@ -96,5 +105,22 @@ describe('resolveDependencies — descriptive error on missing registration', ()
     expect(() => resolveDependencies([RegisteredService, UnregisteredService])).toThrow(
       /UnregisteredService/,
     );
+  });
+
+  it('wraps a resolve()-time failure (registered but construction throws)', () => {
+    registerSingleton(ThrowsOnConstruct, ThrowsOnConstruct);
+
+    let thrown: Error | null = null;
+    try {
+      resolveDependencies([ThrowsOnConstruct]);
+    } catch (e) {
+      thrown = e as Error;
+    }
+
+    expect(thrown).not.toBeNull();
+    expect(thrown!.message).toMatch(/ThrowsOnConstruct/);
+
+    const errorWithReason = thrown as { reason?: string };
+    expect(errorWithReason.reason).toMatch(/boom during construction/);
   });
 });

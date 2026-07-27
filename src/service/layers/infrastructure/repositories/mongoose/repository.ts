@@ -2,62 +2,18 @@ import type { QueryFilter } from '@zacatl/third-party/databases/mongoose';
 
 import type { MongooseRepositoryConfig, MongooseRepositoryModel } from './types';
 import { createMongooseAdapter } from '../../orm/mongoose/adapter-loader';
-import type { RepositoryPort, ORMPort, QueryOptions } from '../types';
+import { BaseRepository as BaseRepositoryImpl } from '../base-repository';
 
 /**
- * Standalone Mongoose Repository - delegates to MongooseAdapter
+ * Mongoose Repository - delegates to MongooseAdapter
  *
- * Provides all repository operations for Mongoose ORM without runtime adapter switching.
- * Internally uses the same MongooseAdapter as BaseRepository for code reuse.
+ * Provides all repository operations for Mongoose ORM.
+ * Extends the shared generic BaseRepository with Mongoose-specific type parameters.
  */
 export abstract class BaseRepository<D, I extends object, O extends object>
-  implements RepositoryPort<MongooseRepositoryModel<D>, I, O, QueryFilter<D>>
+  extends BaseRepositoryImpl<MongooseRepositoryModel<D>, I, O, QueryFilter<D>>
 {
-  private readonly adapter: ORMPort<MongooseRepositoryModel<D>, I, O, QueryFilter<D>>;
-
   constructor(config: MongooseRepositoryConfig<D>) {
-    this.adapter = createMongooseAdapter<D, I, O>(config);
-  }
-
-  public get model(): MongooseRepositoryModel<D> {
-    return this.adapter.model;
-  }
-
-  async ready(): Promise<void> {
-    await this.adapter.ready();
-  }
-
-  async findById(id: string): Promise<O | null> {
-    return this.adapter.findById(id);
-  }
-
-  async findMany(filter: QueryFilter<D> = {}, options?: QueryOptions): Promise<O[]> {
-    return this.adapter.findMany(filter, options);
-  }
-
-  async create(entity: I): Promise<O> {
-    return this.adapter.create(entity);
-  }
-
-  async update(
-    id: string,
-    update: Partial<I>,
-    options?: {
-      raw?: boolean;
-    },
-  ): Promise<O | null> {
-    return this.adapter.update(id, update, options);
-  }
-
-  async delete(id: string): Promise<O | null> {
-    return this.adapter.delete(id);
-  }
-
-  async exists(id: string): Promise<boolean> {
-    return this.adapter.exists(id);
-  }
-
-  public toLean(input: unknown): O | null {
-    return this.adapter.toLean(input);
+    super(createMongooseAdapter<D, I, O>(config));
   }
 }

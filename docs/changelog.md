@@ -2,6 +2,63 @@
 
 ---
 
+## [0.0.58] - 2026-07-21
+
+**Status**: Ready for publication
+
+### ✨ Improvements
+
+- **Safe Mongoose index lifecycle controls** — Mongoose database configs now
+  support `indexes.bootMode: 'off' | 'create' | 'sync'`. App boot defaults to
+  create-only behavior for local/development/test and no index mutation for
+  staging/production. Repository readiness no longer calls `model.init()` for
+  hidden index creation.
+- **Mongoose index manager API** — added `MongooseIndexManager` for read-only
+  `diff()`, explicit create-only `createMissing()`, and force-guarded
+  `syncIndexes({ force: true })` operations with model/collection allowlists and
+  structured results.
+- **Consumer smoke fixtures now run in the publish gate** — packed-package
+  fixtures verify non-SQL, node:sqlite, Mongoose, Sequelize SQLite, and
+  Sequelize Postgres consumer installs before publish/dry-run flows.
+- **NodeNext-compatible declarations** — generated ESM `.d.ts` files now use
+  runtime `.js` specifiers for relative imports/exports, so packed consumers can
+  compile with TypeScript `NodeNext` resolution.
+- **Small-app node:sqlite migration path** — added a practical migration
+  reference and example links for apps moving simple local SQLite persistence
+  from Sequelize to Node 26's built-in `node:sqlite`.
+- **node:sqlite store example** — added a standalone example for session,
+  archive, and training-selection style stores with explicit migrations, typed
+  row mapping, prepared statements, and create/display/delete smoke behavior.
+
+### 📚 Docs
+
+- Added
+  [Mongoose Index Lifecycle Controls](third-party/orm/mongoose-index-lifecycle.md)
+  with boot-mode guidance, operator-safe diff/create/sync examples, and rolling
+  index strategy notes for large MongoDB collections.
+- Clarified optional peer audit ownership: non-SQL consumers should not install
+  Sequelize, SQL consumers own Sequelize's audit surface, and simple local
+  SQLite apps can avoid external `sqlite3` and Sequelize with `node:sqlite`.
+- Expanded the 0.0.57 migration guide with `connectionString` →
+  `connection.url` / `connection.name` examples and SQL vs non-SQL audit
+  examples.
+- Added
+  [Migrating Small SQLite Apps From Sequelize To node:sqlite](migration/sequelize-sqlite-to-nodesqlite.md)
+  for consumers that want to remove Sequelize and external `sqlite3` from simple
+  local SQLite persistence.
+
+### 🧪 Release Verification
+
+- **648 tests** — added Mongoose index boot-policy and index-manager coverage
+  for safe boot, diff, create-only, allowlists, and force-guarded sync.
+- `publish:dry` and `publish:dry:ci` are expected to run the packed consumer
+  smoke matrix before `npm publish --dry-run`.
+- Non-SQL and node:sqlite smoke fixtures fail if `sequelize` or `sqlite3` enter
+  their production lockfiles; Sequelize fixtures build and run while reporting
+  Sequelize-owned audit findings.
+
+---
+
 ## [0.0.57] - 2026-07-17
 
 **Status**: Ready for publication
@@ -14,18 +71,18 @@
   treating failures as Zacatl defects.
 - **Config types renamed to `*Config` suffix style — no aliases kept** (owner decision: no rollout window needed). Migration table:
 
-  | Removed | Use instead |
-  | ------- | ----------- |
-  | `ConfigService` | `ServiceConfig` |
-  | `ConfigServer` | `ServerConfig` |
-  | `ConfigLayers` | `LayersConfig` |
-  | `ConfigApplication` | `ApplicationConfig` |
+  | Removed                | Use instead            |
+  | ---------------------- | ---------------------- |
+  | `ConfigService`        | `ServiceConfig`        |
+  | `ConfigServer`         | `ServerConfig`         |
+  | `ConfigLayers`         | `LayersConfig`         |
+  | `ConfigApplication`    | `ApplicationConfig`    |
   | `ConfigInfrastructure` | `InfrastructureConfig` |
-  | `ConfigDomain` | `DomainConfig` |
-  | `ConfigCLI` | `CliConfig` |
-  | `ConfigDesktop` | `DesktopConfig` |
-  | `ConfigPlatforms` | `PlatformsConfig` |
-  | `ConfigLocalization` | `LocalizationConfig` |
+  | `ConfigDomain`         | `DomainConfig`         |
+  | `ConfigCLI`            | `CliConfig`            |
+  | `ConfigDesktop`        | `DesktopConfig`        |
+  | `ConfigPlatforms`      | `PlatformsConfig`      |
+  | `ConfigLocalization`   | `LocalizationConfig`   |
 
 - **`generateHmac` no longer accepts SHA-1/MD5** — `HmacAlgorithm` is now `'sha256' | 'sha512'` (the separate `SafeHmacAlgorithm` type is gone; it's just `HmacAlgorithm`). Switch any SHA-1/MD5 signatures to sha256.
 
@@ -45,6 +102,10 @@
   consumers by isolating Sequelize as an optional peer, not by downgrading
   Zacatl or forcing a nested UUID override. See
   [Migration Guide: 0.0.56 → 0.0.57](migration/0.0.57.md).
+- **Optional peer audit ownership clarified** — non-SQL consumers should not
+  install Sequelize; SQL consumers that explicitly install Sequelize own
+  Sequelize's transitive audit surface; local SQLite consumers can avoid
+  external `sqlite3` and Sequelize by using the Node 26 `node:sqlite` path.
 
 ### ✨ Improvements
 
@@ -55,11 +116,36 @@
 - **Sequelize write-path polish** — `update()` uses `RETURNING` on the Postgres dialect to skip the re-fetch round trip; write operations are documented as scoping by primary key `id` only (the shared adapter contract).
 - **Proxy path regex escaping** — Express http-proxy-middleware `pathRewrite` key now escapes the configured prefix so special regex characters in path prefixes don't silently mis-route.
 - **Fastify SPA URL decode** — Static file handler strips query strings before resolving the file path so `/assets/app.js?v=1` resolves correctly.
-- **Named database connections** — `connection: { url, name? }` API allows multiple databases of the same vendor; DI tokens are symbol-keyed per name.
+- **Named database connections** — `connection: { url, name? }` replaces the
+  older `connectionString` shape and allows multiple databases of the same
+  vendor; DI tokens are symbol-keyed per `connection.name`.
+
+  ```typescript
+  // Before
+  { vendor: DatabaseVendor.SQLITE, connectionString: 'data/app.db' }
+
+  // 0.0.57+
+  { vendor: DatabaseVendor.SQLITE, connection: { url: 'data/app.db', name: 'default' } }
+  ```
+
 - **Awaitable adapter initialization** — `Service.start()` awaits infrastructure readiness after platform startup.
 - **`DatabaseVendor`, `QueryOptions`, `DEFAULT_QUERY_LIMIT` re-exported** from `@sentzunhat/zacatl/service` for consumer convenience.
 - **`ensureRegisteredSingleton()` DI guard** — one container helper replaces the per-layer `isRegistered` checks: Application, Domain, and Infrastructure layers skip `registerSingleton` if the class is already registered, preventing silent clobber from `@singleton()`-decorated classes.
 - **Publish staging validation** — `prepare-publish` now verifies every `exports`/`bin` target exists in the staged tree and fails the build with a missing-target list instead of shipping a silently broken subpath.
+- **Consumer smoke fixtures** — release publish paths now run a packed-package
+  consumer matrix for non-SQL, node:sqlite, Mongoose, Sequelize SQLite, and
+  Sequelize Postgres installs. Non-SQL and node:sqlite fixtures fail if
+  `sequelize` or `sqlite3` enter their lockfile; SQL fixtures build and run
+  while recording Sequelize-owned audit findings.
+- **NodeNext-compatible declarations** — the ESM fix step now rewrites generated
+  `.d.ts` relative imports/exports to runtime `.js` specifiers, matching the
+  generated ESM JavaScript without changing source imports or consumer package
+  imports. Packed consumer smokes now compile with TypeScript `NodeNext`.
+- **Small-app SQLite migration reference** — added a Sequelize SQLite →
+  `node:sqlite` guide for apps that only need local sessions, archive metadata,
+  selections, queues, or similar small stores. The guide covers before/after
+  code, dependency removal, audit expectations, Docker notes, and a consumer
+  checklist.
 
 ### 🐛 Fixes
 
@@ -92,6 +178,10 @@
   Node 26 runtime expectations, optional ORM peer installs, Sequelize/UUID audit
   verification, stale override removal, SQL vs non-SQL dependency choices, and
   downstream Docker smoke expectations.
+- Added
+  [Migrating Small SQLite Apps From Sequelize To node:sqlite](migration/sequelize-sqlite-to-nodesqlite.md)
+  for consumers that want to remove Sequelize and external `sqlite3` from simple
+  local SQLite persistence.
 
 ---
 

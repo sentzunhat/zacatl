@@ -116,6 +116,14 @@ const service = new Service({
           vendor: DatabaseVendor.MONGOOSE,
           instance: mongoose,
           connection: { url: 'mongodb://localhost:27017/mydb' },
+          indexes: {
+            bootMode:
+              process.env.APP_ENV === 'local' ||
+              process.env.APP_ENV === 'development' ||
+              process.env.NODE_ENV === 'test'
+                ? 'create'
+                : 'off',
+          },
         },
       ],
     },
@@ -124,6 +132,10 @@ const service = new Service({
 
 await service.start();
 ```
+
+For large staging/production collections, keep app boot index-safe with
+`bootMode: 'off'` and run explicit diff/create scripts. See
+[Mongoose Index Lifecycle Controls](./mongoose-index-lifecycle.md).
 
 ### Repository Example
 
@@ -183,7 +195,10 @@ import { IRepository } from '@sentzunhat/zacatl/service';
 import { DatabaseSync } from 'node:sqlite';
 
 export class SQLiteRepository<T> implements IRepository<T> {
-  constructor(private db: DatabaseSync, private tableName: string) {}
+  constructor(
+    private db: DatabaseSync,
+    private tableName: string,
+  ) {}
 
   findById = async (id: string): Promise<T | null> => {
     const stmt = this.db.prepare(`SELECT * FROM ${this.tableName} WHERE id = ?`);

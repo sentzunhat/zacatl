@@ -6,31 +6,12 @@ name: Docker smoke
 # would have caught the 2026-07 breakage where the Dockerfile read driver
 # versions from a package.json section that no longer existed.
 #
-# Runs on changes to the image inputs (src/, scripts/, examples/, the
-# Dockerfile itself) and weekly to catch base-image/registry drift.
+# Reusable component, invoked by ci.yml. Also supports manual trigger and
+# label-based triggering (see ci.yml for docker-test label condition).
 
 on:
-  push:
-    branches: [dev, main]
-    paths:
-      - 'src/**'
-      - 'scripts/**'
-      - 'examples/**'
-      - 'package.json'
-      - 'package-lock.json'
-      - '.github/workflows/docker-smoke.yml'
-  pull_request:
-    branches: [dev, main]
-    paths:
-      - 'src/**'
-      - 'scripts/**'
-      - 'examples/**'
-      - 'package.json'
-      - 'package-lock.json'
-      - '.github/workflows/docker-smoke.yml'
-  schedule:
-    - cron: '17 3 * * 1' # Mondays 03:17 UTC
-  workflow_dispatch: {}
+  workflow_call: {}
+  workflow_dispatch: {}  # Manual trigger from Actions tab anytime
 
 permissions:
   contents: read
@@ -43,9 +24,26 @@ jobs:
       fail-fast: false
       matrix:
         include:
+          # Express examples (all drivers and frontends)
           - example: express-sqlite-react
             driver: sqlite3
             port: 8181
+          - example: express-sqlite-svelte
+            driver: sqlite3
+            port: 8182
+          - example: express-postgres-react
+            driver: pg
+            port: 8183
+          - example: express-mongodb-react
+            driver: mongoose
+            port: 8184
+          # Fastify examples (all drivers and frontends)
+          - example: fastify-sqlite-react
+            driver: sqlite3
+            port: 8081
+          - example: fastify-sqlite-svelte
+            driver: sqlite3
+            port: 8086
           - example: fastify-postgres-react
             driver: pg
             port: 8083

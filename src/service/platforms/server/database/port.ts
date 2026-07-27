@@ -4,6 +4,7 @@ import type { Mongoose } from 'mongoose';
 import type { Sequelize } from 'sequelize';
 
 import type { Optional } from '../../../../utils/optionals';
+import type { MongooseRepositoryIndexOptions } from '../../../layers/infrastructure/orm/mongoose/index-policy';
 
 export enum DatabaseVendor {
   MONGOOSE = 'MONGOOSE',
@@ -18,7 +19,15 @@ export type OnDatabaseConnectedFunction = Optional<
 >;
 
 export interface DatabaseConnection {
+  /**
+   * Connection URI, SQLite file path, or `':memory:'`.
+   * Replaces the pre-0.0.57 `connectionString` configuration shape.
+   */
   url: string;
+  /**
+   * Stable DI token name for multi-database setups.
+   * Omit to use the vendor default token.
+   */
   name?: string;
 }
 
@@ -35,6 +44,14 @@ export interface DatabaseConfig {
    * using `connection.url` as the file path (or `':memory:'`).
    */
   instance?: DatabaseInstance;
+  /**
+   * Mongoose index lifecycle policy for this database connection.
+   *
+   * Defaults are environment-aware: local/development/test create missing
+   * declared indexes, while staging/production do not mutate indexes during
+   * normal boot.
+   */
+  indexes?: MongooseRepositoryIndexOptions;
   /**
    * Optional callback to be invoked after a successful DB connection.
    * Use this to perform extra initialization or plug additional modules.

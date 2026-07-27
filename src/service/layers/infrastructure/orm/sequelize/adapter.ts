@@ -91,85 +91,153 @@ export class SequelizeAdapter<D extends object, I extends object, O extends obje
   }
 
   async findById(id: string): Promise<O | null> {
-    const entity = await this.model.findByPk(id);
-    return this.toLean(entity);
+    try {
+      const entity = await this.model.findByPk(id);
+      return this.toLean(entity);
+    } catch (err: unknown) {
+      const error = err instanceof Error ? err : new Error(String(err));
+      throw new InternalServerError({
+        message: `Failed to find record by id: ${error.message}`,
+        reason: 'Sequelize query failed',
+        component: this.constructor.name,
+        operation: 'findById',
+        metadata: { id },
+      });
+    }
   }
 
   async findMany(filter: WhereOptions<D> = {}, options?: QueryOptions): Promise<O[]> {
-    const limit = Math.max(0, Math.min(options?.limit ?? DEFAULT_QUERY_LIMIT, 1000));
-    const offset = Math.max(0, options?.offset ?? 0);
+    try {
+      const limit = Math.max(0, Math.min(options?.limit ?? DEFAULT_QUERY_LIMIT, 1000));
+      const offset = Math.max(0, options?.offset ?? 0);
 
-    const entities = await this.model.findAll({
-      where: filter,
-      limit,
-      offset,
-    });
+      const entities = await this.model.findAll({
+        where: filter,
+        limit,
+        offset,
+      });
 
-    return entities
-      .map((entity) => this.toLean(entity))
-      .filter((entity): entity is O => entity != null);
+      return entities
+        .map((entity) => this.toLean(entity))
+        .filter((entity): entity is O => entity != null);
+    } catch (err: unknown) {
+      const error = err instanceof Error ? err : new Error(String(err));
+      throw new InternalServerError({
+        message: `Failed to find records: ${error.message}`,
+        reason: 'Sequelize query failed',
+        component: this.constructor.name,
+        operation: 'findMany',
+      });
+    }
   }
 
   async create(entity: I): Promise<O> {
-    const document = await this.model.create(entity as never);
-    const lean = this.toLean(document);
+    try {
+      const document = await this.model.create(entity as never);
+      const lean = this.toLean(document);
 
-    if (lean == null) {
+      if (lean == null) {
+        throw new InternalServerError({
+          message: 'Failed to create record',
+          reason: 'Document was created but toLean returned null',
+          component: this.constructor.name,
+          operation: 'create',
+        });
+      }
+
+      return lean;
+    } catch (err: unknown) {
+      if (err instanceof InternalServerError) {
+        throw err;
+      }
+
+      const error = err instanceof Error ? err : new Error(String(err));
       throw new InternalServerError({
-        message: 'Failed to create record',
-        reason: 'Document was created but toLean returned null',
+        message: `Failed to create record: ${error.message}`,
+        reason: 'Sequelize insert failed',
         component: this.constructor.name,
         operation: 'create',
       });
     }
-
-    return lean;
   }
 
   // Write operations scope by primary key `id` only — the shared adapter
   // contract across Mongoose/Sequelize/NodeSqlite. Consumers needing
   // composite/tenant scoping must enforce it in their repository layer.
   async update(id: string, update: Partial<I>): Promise<O | null> {
-    // Postgres supports RETURNING, which saves the re-fetch round trip.
-    if (this.model.sequelize?.getDialect() === 'postgres') {
-      const [affectedCount, rows] = (await this.model.update(update as never, {
+    try {
+      // Postgres supports RETURNING, which saves the re-fetch round trip.
+      if (this.model.sequelize?.getDialect() === 'postgres') {
+        const [affectedCount, rows] = (await this.model.update(update as never, {
+          where: { id } as never,
+          returning: true,
+        })) as unknown as [number, unknown[]];
+
+        if (affectedCount === 0) return null;
+        return this.toLean(rows?.[0] ?? null);
+      }
+
+      const [affectedCount] = await this.model.update(update as never, {
         where: { id } as never,
-        returning: true,
-      })) as unknown as [number, unknown[]];
+      });
 
-      if (affectedCount === 0) return null;
-      return this.toLean(rows?.[0] ?? null);
+      if (affectedCount === 0) {
+        return null;
+      }
+
+      return await this.findById(id);
+    } catch (err: unknown) {
+      const error = err instanceof Error ? err : new Error(String(err));
+      throw new InternalServerError({
+        message: `Failed to update record: ${error.message}`,
+        reason: 'Sequelize update failed',
+        component: this.constructor.name,
+        operation: 'update',
+        metadata: { id },
+      });
     }
-
-    const [affectedCount] = await this.model.update(update as never, {
-      where: { id } as never,
-    });
-
-    if (affectedCount === 0) {
-      return null;
-    }
-
-    return this.findById(id);
   }
 
   async delete(id: string): Promise<O | null> {
-    // The pre-fetch is inherent to the contract: delete() returns the removed
-    // entity, and SQL DELETE cannot return the row across all dialects.
-    const entity = await this.findById(id);
-    if (entity == null) return null;
+    try {
+      // The pre-fetch is inherent to the contract: delete() returns the removed
+      // entity, and SQL DELETE cannot return the row across all dialects.
+      const entity = await this.findById(id);
+      if (entity == null) return null;
 
-    await this.model.destroy({
-      where: { id } as never,
-    });
+      await this.model.destroy({
+        where: { id } as never,
+      });
 
-    return entity;
+      return entity;
+    } catch (err: unknown) {
+      const error = err instanceof Error ? err : new Error(String(err));
+      throw new InternalServerError({
+        message: `Failed to delete record: ${error.message}`,
+        reason: 'Sequelize delete failed',
+        component: this.constructor.name,
+        operation: 'delete',
+        metadata: { id },
+      });
+    }
   }
 
   async exists(id: string): Promise<boolean> {
-    const count = await this.model.count({
-      where: { id } as never,
-    });
-    return (Array.isArray(count) ? count.length : count) > 0;
+    try {
+      const count = await this.model.count({
+        where: { id } as never,
+      });
+      return (Array.isArray(count) ? count.length : count) > 0;
+    } catch (err: unknown) {
+      const error = err instanceof Error ? err : new Error(String(err));
+      throw new InternalServerError({
+        message: `Failed to check if record exists: ${error.message}`,
+        reason: 'Sequelize query failed',
+        component: this.constructor.name,
+        operation: 'exists',
+        metadata: { id },
+      });
+    }
   }
 
   public toLean(input: unknown): O | null {

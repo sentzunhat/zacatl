@@ -1,9 +1,11 @@
 import { InternalServerError } from '@zacatl/error';
 import { configureI18nNode } from '@zacatl/localization';
 
+import { registerMongooseIndexOptions } from './layers/infrastructure/orm/mongoose/index-policy';
 import { Layers } from './layers/layers';
 import { Platforms } from './platforms/platforms';
 import { registerOrmInstance } from './platforms/server/database/orm-instance';
+import { DatabaseVendor } from './platforms/server/database/port';
 import { ServiceType } from './types';
 import type { ServiceConfig } from './types';
 
@@ -44,6 +46,9 @@ export class Service {
     if (platforms?.server?.databases != null) {
       for (const dbConfig of platforms.server.databases) {
         registerOrmInstance(dbConfig.vendor, dbConfig.connection, dbConfig.instance);
+        if (dbConfig.vendor === DatabaseVendor.MONGOOSE) {
+          registerMongooseIndexOptions(dbConfig.connection.name, dbConfig.indexes);
+        }
       }
     }
 
@@ -185,8 +190,24 @@ export { ServiceType };
 export { Layers } from './layers/layers';
 export { Platforms } from './platforms/platforms';
 export type { PlatformsConfig } from './platforms/types';
-export type { DatabaseConnection, ConnectionRef, DatabaseConfig } from './platforms/server/database/port';
+export type {
+  DatabaseConnection,
+  ConnectionRef,
+  DatabaseConfig,
+} from './platforms/server/database/port';
 export { DatabaseVendor } from './platforms/server/database/port';
+export {
+  MongooseIndexManager,
+  type MongooseIndexDiff,
+  type MongooseIndexModelSelector,
+  type MongooseIndexOperationResult,
+  type MongooseIndexSyncOptions,
+} from './layers/infrastructure/orm/mongoose/index-manager';
+export {
+  getDefaultMongooseIndexBootMode,
+  type MongooseIndexBootMode,
+  type MongooseRepositoryIndexOptions,
+} from './layers/infrastructure/orm/mongoose/index-policy';
 export type { QueryOptions } from './layers/infrastructure/repositories/types';
 export { DEFAULT_QUERY_LIMIT } from './layers/infrastructure/repositories/types';
 export * from './types';

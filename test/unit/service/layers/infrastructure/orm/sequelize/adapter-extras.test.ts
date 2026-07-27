@@ -3,6 +3,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { container } from '@zacatl/third-party/dependency-injection/tsyringe';
 
 import { clearContainer } from '../../../../../../../src/dependency-injection';
+import { InternalServerError } from '../../../../../../../src/error';
 import { SequelizeAdapter } from '../../../../../../../src/service/layers/infrastructure/orm/sequelize/adapter';
 import { SequelizeToken } from '../../../../../../../src/service/layers/infrastructure/orm/tokens/sequelize';
 import { ORMType } from '../../../../../../../src/service/layers/infrastructure/repositories/types';
@@ -61,6 +62,184 @@ describe('SequelizeAdapter Extras', () => {
     const result = adapter.toLean({ _id: 'abc', name: 'z' } as Plain) as Plain | null;
     expect(result).not.toBeNull();
     expect(result!.id).toBe('abc');
+  });
+
+  describe('error normalization', () => {
+    it('findById normalizes database errors to InternalServerError', async () => {
+      const dbError = new Error('connection refused');
+      const mockModel: { findByPk: ReturnType<typeof vi.fn>; sequelize?: unknown } = {
+        findByPk: vi.fn().mockRejectedValue(dbError),
+      };
+
+      container.register(SequelizeToken, {
+        useValue: { model: (_name: string) => mockModel },
+      });
+
+      const adapter = new SequelizeAdapter({ type: ORMType.Sequelize, name: 'MockModel' });
+
+      try {
+        await adapter.findById('test-id');
+        expect.fail('should have thrown');
+      } catch (err: unknown) {
+        expect(err).toBeInstanceOf(InternalServerError);
+        expect(String(err)).toContain('connection refused');
+      }
+    });
+
+    it('findMany normalizes database errors to InternalServerError', async () => {
+      const dbError = new Error('timeout');
+      const mockModel: { findAll: ReturnType<typeof vi.fn>; sequelize?: unknown } = {
+        findAll: vi.fn().mockRejectedValue(dbError),
+      };
+
+      container.register(SequelizeToken, {
+        useValue: { model: (_name: string) => mockModel },
+      });
+
+      const adapter = new SequelizeAdapter({ type: ORMType.Sequelize, name: 'MockModel' });
+
+      try {
+        await adapter.findMany();
+        expect.fail('should have thrown');
+      } catch (err: unknown) {
+        expect(err).toBeInstanceOf(InternalServerError);
+        expect(String(err)).toContain('timeout');
+      }
+    });
+
+    it('create normalizes database errors to InternalServerError', async () => {
+      const dbError = new Error('constraint violation');
+      const mockModel: { create: ReturnType<typeof vi.fn>; sequelize?: unknown } = {
+        create: vi.fn().mockRejectedValue(dbError),
+      };
+
+      container.register(SequelizeToken, {
+        useValue: { model: (_name: string) => mockModel },
+      });
+
+      const adapter = new SequelizeAdapter({ type: ORMType.Sequelize, name: 'MockModel' });
+
+      try {
+        await adapter.create({ name: 'test' });
+        expect.fail('should have thrown');
+      } catch (err: unknown) {
+        expect(err).toBeInstanceOf(InternalServerError);
+        expect(String(err)).toContain('constraint violation');
+      }
+    });
+
+    it('update normalizes database errors to InternalServerError', async () => {
+      const dbError = new Error('row lock');
+      const mockModel: {
+        update: ReturnType<typeof vi.fn>;
+        sequelize?: { getDialect: () => string };
+      } = {
+        update: vi.fn().mockRejectedValue(dbError),
+        sequelize: { getDialect: () => 'mysql' },
+      };
+
+      container.register(SequelizeToken, {
+        useValue: { model: (_name: string) => mockModel },
+      });
+
+      const adapter = new SequelizeAdapter({ type: ORMType.Sequelize, name: 'MockModel' });
+
+      try {
+        await adapter.update('test-id', { name: 'updated' });
+        expect.fail('should have thrown');
+      } catch (err: unknown) {
+        expect(err).toBeInstanceOf(InternalServerError);
+        expect(String(err)).toContain('row lock');
+      }
+    });
+
+    it('delete normalizes database errors to InternalServerError', async () => {
+      const dbError = new Error('foreign key constraint');
+      const mockModel: {
+        destroy: ReturnType<typeof vi.fn>;
+        findByPk: ReturnType<typeof vi.fn>;
+        sequelize?: unknown;
+      } = {
+        findByPk: vi.fn().mockResolvedValue({ id: 'test-id', name: 'test' }),
+        destroy: vi.fn().mockRejectedValue(dbError),
+      };
+
+      container.register(SequelizeToken, {
+        useValue: { model: (_name: string) => mockModel },
+      });
+
+      const adapter = new SequelizeAdapter({ type: ORMType.Sequelize, name: 'MockModel' });
+
+      try {
+        await adapter.delete('test-id');
+        expect.fail('should have thrown');
+      } catch (err: unknown) {
+        expect(err).toBeInstanceOf(InternalServerError);
+        expect(String(err)).toContain('foreign key constraint');
+      }
+    });
+
+    it('exists normalizes database errors to InternalServerError', async () => {
+      const dbError = new Error('query syntax error');
+      const mockModel: { count: ReturnType<typeof vi.fn>; sequelize?: unknown } = {
+        count: vi.fn().mockRejectedValue(dbError),
+      };
+
+      container.register(SequelizeToken, {
+        useValue: { model: (_name: string) => mockModel },
+      });
+
+      const adapter = new SequelizeAdapter({ type: ORMType.Sequelize, name: 'MockModel' });
+
+      try {
+        await adapter.exists('test-id');
+        expect.fail('should have thrown');
+      } catch (err: unknown) {
+        expect(err).toBeInstanceOf(InternalServerError);
+        expect(String(err)).toContain('query syntax error');
+      }
+    });
+
+    it('create re-throws InternalServerError from toLean validation', async () => {
+      const mockModel: { create: ReturnType<typeof vi.fn>; sequelize?: unknown } = {
+        create: vi.fn().mockResolvedValue(null),
+      };
+
+      container.register(SequelizeToken, {
+        useValue: { model: (_name: string) => mockModel },
+      });
+
+      const adapter = new SequelizeAdapter({ type: ORMType.Sequelize, name: 'MockModel' });
+
+      try {
+        await adapter.create({ name: 'test' });
+        expect.fail('should have thrown');
+      } catch (err: unknown) {
+        expect(err).toBeInstanceOf(InternalServerError);
+        // The error reason should contain the toLean validation message
+        expect((err as Record<string, unknown>)['reason']).toContain('toLean returned null');
+      }
+    });
+
+    it('normalizes non-Error exceptions to InternalServerError', async () => {
+      const mockModel: { findByPk: ReturnType<typeof vi.fn>; sequelize?: unknown } = {
+        findByPk: vi.fn().mockRejectedValue('string error'),
+      };
+
+      container.register(SequelizeToken, {
+        useValue: { model: (_name: string) => mockModel },
+      });
+
+      const adapter = new SequelizeAdapter({ type: ORMType.Sequelize, name: 'MockModel' });
+
+      try {
+        await adapter.findById('test-id');
+        expect.fail('should have thrown');
+      } catch (err: unknown) {
+        expect(err).toBeInstanceOf(InternalServerError);
+        expect(String(err)).toContain('string error');
+      }
+    });
   });
 });
 

@@ -37,6 +37,7 @@ If you are new to this repository, start with [START_HERE.md](./start-here.md).
 ## Reference
 
 - [Dependencies reference](third-party/dependencies-reference.md)
+- [SQLite Sequelize → node:sqlite migration](migration/sequelize-sqlite-to-nodesqlite.md)
 - [Dev vs Publish Export Patterns](service/dependency-exports.md#development-vs-publish-export-patterns)
 - [Changelog](changelog.md)
 - [Roadmap](roadmap/index.md)

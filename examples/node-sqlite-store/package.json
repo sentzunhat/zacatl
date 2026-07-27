@@ -1,0 +1,21 @@
+{
+  "name": "zacatl-node-sqlite-store-example",
+  "version": "1.0.0",
+  "description": "Minimal Zacatl node:sqlite store pattern without Sequelize or external sqlite3",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "rm -rf dist && tsc -p tsconfig.json",
+    "start": "node dist/index.js",
+    "smoke": "npm run build && npm run start",
+    "deps:check": "node scripts/verify-dependencies.mjs",
+    "clean": "rm -rf dist data node_modules"
+  },
+  "dependencies": {
+    "@sentzunhat/zacatl": "file:../.."
+  },
+  "devDependencies": {
+    "@types/node": "^26.1.1",
+    "typescript": "^6.0.3"
+  }
+}

@@ -1,10 +1,10 @@
 name: Peer install check
 
+# Reusable component. Invoked by ci.yml — no push/pull_request triggers
+# of its own so it can never double-fire alongside the orchestrator.
+
 on:
-  push:
-    branches: [main]
-  pull_request:
-    branches: [main]
+  workflow_call: {}
   workflow_dispatch: {}
 
 permissions:

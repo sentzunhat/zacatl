@@ -19,8 +19,41 @@ permissions:
   id-token: write # npm --provenance attestation
 
 jobs:
-  release:
+  cve-scan:
+    name: CVE scan
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '26.3.0'
+          cache: 'npm'
+
+      # Must match the gate in cve-scan.yml exactly. If this scanned more than
+      # the published package's production tree (e.g. every lockfile under
+      # examples/), CI could go green and the release would then deadlock here
+      # after the tag was already pushed.
+      - name: Scan production dependencies for vulnerabilities
+        shell: bash
+        run: |
+          set -uo pipefail
+          echo "Scanning production dependencies (--omit=dev) with npm audit..."
+          if npm audit --omit=dev --audit-level=high; then
+            echo "🎉 Production dependencies audit passed."
+          else
+            echo "❌ Production dependencies have high-severity vulnerabilities."
+            exit 1
+          fi
+
+  release:
+    name: Verify and publish
+    runs-on: ubuntu-latest
+    needs: [cve-scan]
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -61,7 +94,6 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          # Extract this version's section from docs/changelog.md as notes
           awk "/^## \[${GITHUB_REF_NAME#v}\]/{flag=1; next} /^## \[/{flag=0} flag" docs/changelog.md > /tmp/release-notes.md
           if [ ! -s /tmp/release-notes.md ]; then
             echo "No changelog section found for ${GITHUB_REF_NAME} — using generated notes." >&2

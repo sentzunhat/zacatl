@@ -2,6 +2,11 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 import { clearContainer } from '../../../../../../../src/dependency-injection';
 import { MongooseAdapter } from '../../../../../../../src/service/layers/infrastructure/orm/mongoose/adapter';
+import {
+  clearMongooseIndexRegistry,
+  registerMongooseIndexOptions,
+} from '../../../../../../../src/service/layers/infrastructure/orm/mongoose/index-policy';
+import { createDatabaseToken } from '../../../../../../../src/service/layers/infrastructure/orm/tokens/factory';
 import { MongooseToken } from '../../../../../../../src/service/layers/infrastructure/orm/tokens/mongoose';
 import { ORMType } from '../../../../../../../src/service/layers/infrastructure/repositories/types';
 import { container } from '../../../../../../../src/third-party';
@@ -17,7 +22,15 @@ interface TestOutput {
   updatedAt: Date;
 }
 
-const makeQueryChain = <T>(result: T) => ({
+const makeQueryChain = <T>(
+  result: T,
+): {
+  setOptions: ReturnType<typeof vi.fn>;
+  skip: ReturnType<typeof vi.fn>;
+  limit: ReturnType<typeof vi.fn>;
+  lean: ReturnType<typeof vi.fn>;
+  exec: ReturnType<typeof vi.fn>;
+} => ({
   setOptions: vi.fn().mockReturnThis(),
   skip: vi.fn().mockReturnThis(),
   limit: vi.fn().mockReturnThis(),
@@ -26,8 +39,12 @@ const makeQueryChain = <T>(result: T) => ({
 });
 
 const makeModel = (): {
+  modelName: string;
+  collection: { collectionName: string };
   createCollection: ReturnType<typeof vi.fn>;
   createIndexes: ReturnType<typeof vi.fn>;
+  syncIndexes: ReturnType<typeof vi.fn>;
+  diffIndexes: ReturnType<typeof vi.fn>;
   init: ReturnType<typeof vi.fn>;
   findById: ReturnType<typeof vi.fn>;
   find: ReturnType<typeof vi.fn>;
@@ -36,8 +53,15 @@ const makeModel = (): {
   findByIdAndDelete: ReturnType<typeof vi.fn>;
   exists: ReturnType<typeof vi.fn>;
 } => ({
+  modelName: 'TestUser',
+  collection: { collectionName: 'testusers' },
   createCollection: vi.fn().mockResolvedValue(undefined),
   createIndexes: vi.fn().mockResolvedValue(undefined),
+  syncIndexes: vi.fn().mockResolvedValue(['legacy_index']),
+  diffIndexes: vi.fn().mockResolvedValue({
+    toCreate: [{ key: { email: 1 }, name: 'email_1' }],
+    toDrop: ['legacy_index'],
+  }),
   init: vi.fn().mockResolvedValue(undefined),
   findById: vi.fn(),
   find: vi.fn(),
@@ -60,6 +84,7 @@ describe('MongooseAdapter', () => {
 
   beforeEach(() => {
     clearContainer();
+    clearMongooseIndexRegistry();
     vi.clearAllMocks();
     mockModel = makeModel();
     container.register(MongooseToken, { useValue: makeMockMongoose(mockModel) });
@@ -67,6 +92,7 @@ describe('MongooseAdapter', () => {
 
   afterEach(() => {
     clearContainer();
+    clearMongooseIndexRegistry();
     vi.clearAllMocks();
   });
 
@@ -151,7 +177,7 @@ describe('MongooseAdapter', () => {
   });
 
   describe('model readiness', () => {
-    it('calls createCollection, createIndexes, and init when ready() is awaited', async () => {
+    it('defaults to create mode and does not call model.init()', async () => {
       const adapter = new MongooseAdapter<TestInput, TestInput, TestOutput>({
         type: ORMType.Mongoose,
         name: 'TestUser6',
@@ -164,7 +190,76 @@ describe('MongooseAdapter', () => {
 
       expect(mockModel.createCollection).toHaveBeenCalled();
       expect(mockModel.createIndexes).toHaveBeenCalled();
-      expect(mockModel.init).toHaveBeenCalled();
+      expect(mockModel.syncIndexes).not.toHaveBeenCalled();
+      expect(mockModel.init).not.toHaveBeenCalled();
+    });
+
+    it('bootMode off resolves and registers the model without mutating indexes', async () => {
+      const adapter = new MongooseAdapter<TestInput, TestInput, TestOutput>({
+        type: ORMType.Mongoose,
+        name: 'TestUser6Off',
+        schema: mockSchema as never,
+        indexes: { bootMode: 'off' },
+      });
+
+      await adapter.ready();
+
+      expect(mockModel.createCollection).not.toHaveBeenCalled();
+      expect(mockModel.createIndexes).not.toHaveBeenCalled();
+      expect(mockModel.syncIndexes).not.toHaveBeenCalled();
+      expect(mockModel.init).not.toHaveBeenCalled();
+    });
+
+    it('bootMode create creates declared indexes without syncing or init()', async () => {
+      const adapter = new MongooseAdapter<TestInput, TestInput, TestOutput>({
+        type: ORMType.Mongoose,
+        name: 'TestUser6Create',
+        schema: mockSchema as never,
+        indexes: { bootMode: 'create' },
+      });
+
+      await adapter.ready();
+
+      expect(mockModel.createCollection).toHaveBeenCalled();
+      expect(mockModel.createIndexes).toHaveBeenCalled();
+      expect(mockModel.syncIndexes).not.toHaveBeenCalled();
+      expect(mockModel.init).not.toHaveBeenCalled();
+    });
+
+    it('bootMode sync runs syncIndexes only when explicitly configured', async () => {
+      const adapter = new MongooseAdapter<TestInput, TestInput, TestOutput>({
+        type: ORMType.Mongoose,
+        name: 'TestUser6Sync',
+        schema: mockSchema as never,
+        indexes: { bootMode: 'sync' },
+      });
+
+      await adapter.ready();
+
+      expect(mockModel.createCollection).toHaveBeenCalled();
+      expect(mockModel.createIndexes).not.toHaveBeenCalled();
+      expect(mockModel.syncIndexes).toHaveBeenCalled();
+      expect(mockModel.init).not.toHaveBeenCalled();
+    });
+
+    it('uses the connection-level boot policy when repository config omits indexes', async () => {
+      registerMongooseIndexOptions('reporting', { bootMode: 'off' });
+      container.register(createDatabaseToken('MONGOOSE', 'reporting'), {
+        useValue: makeMockMongoose(mockModel),
+      });
+
+      const adapter = new MongooseAdapter<TestInput, TestInput, TestOutput>({
+        type: ORMType.Mongoose,
+        name: 'TestUser6ConnectionPolicy',
+        schema: mockSchema as never,
+        connection: { name: 'reporting' },
+      });
+
+      await adapter.ready();
+
+      expect(mockModel.createCollection).not.toHaveBeenCalled();
+      expect(mockModel.createIndexes).not.toHaveBeenCalled();
+      expect(mockModel.syncIndexes).not.toHaveBeenCalled();
     });
 
     it('ready() is stable across repeated calls', async () => {
@@ -178,7 +273,8 @@ describe('MongooseAdapter', () => {
       await expect(adapter.ready()).resolves.toBeUndefined();
       expect(mockModel.createCollection).toHaveBeenCalledTimes(1);
       expect(mockModel.createIndexes).toHaveBeenCalledTimes(1);
-      expect(mockModel.init).toHaveBeenCalledTimes(1);
+      expect(mockModel.syncIndexes).not.toHaveBeenCalled();
+      expect(mockModel.init).not.toHaveBeenCalled();
     });
 
     it('propagates initialization failures through ready()', async () => {

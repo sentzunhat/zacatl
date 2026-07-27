@@ -77,7 +77,13 @@ class UserRepository implements IRepository<User> {
 ### Register
 
 ```typescript
-import { Service, ServiceType, ServerType, ServerVendor, DatabaseVendor } from '@sentzunhat/zacatl/service';
+import {
+  Service,
+  ServiceType,
+  ServerType,
+  ServerVendor,
+  DatabaseVendor,
+} from '@sentzunhat/zacatl/service';
 
 const service = new Service({
   type: ServiceType.SERVER,
@@ -182,12 +188,25 @@ const service = new Service({
         {
           vendor: DatabaseVendor.MONGOOSE,
           instance: mongoose,
+          connection: { url: 'mongodb://localhost:27017/mydb' },
+          indexes: {
+            bootMode:
+              process.env.APP_ENV === 'local' ||
+              process.env.APP_ENV === 'development' ||
+              process.env.NODE_ENV === 'test'
+                ? 'create'
+                : 'off',
+          },
         },
       ],
     },
   },
 });
 ```
+
+For staging/production collections, prefer `indexes.bootMode: 'off'` and run
+index operations separately. See
+[Mongoose Index Lifecycle Controls](./mongoose-index-lifecycle.md).
 
 ---
 

@@ -17,7 +17,11 @@ Some ORM/database integrations are optional peers and should be installed by usa
 ### Core Dependencies
 
 ```typescript
-import { singleton, inject, container } from '@sentzunhat/zacatl/third-party/dependency-injection/tsyringe';
+import {
+  singleton,
+  inject,
+  container,
+} from '@sentzunhat/zacatl/third-party/dependency-injection/tsyringe';
 import { z } from '@sentzunhat/zacatl/third-party/zod';
 import { Service } from '@sentzunhat/zacatl/service';
 import { resolveDependency } from '@sentzunhat/zacatl/dependency-injection';
@@ -78,9 +82,10 @@ npm install sequelize sqlite3 # SQLite via Sequelize ORM
 npm install sequelize tedious # MSSQL
 ```
 
-### For Native SQLite (Node 22.5+ Built-in — No Install Needed)
+### For Native SQLite (Node 26 Built-in — No Install Needed)
 
-Use `DatabaseVendor.SQLITE` — no external package required. Powered by the built-in `node:sqlite` module:
+Use `DatabaseVendor.SQLITE` — no external package required. Powered by the
+built-in `node:sqlite` module on Zacatl's Node 26 runtime:
 
 ```typescript
 import { DatabaseVendor } from '@sentzunhat/zacatl/service';
@@ -246,17 +251,17 @@ const service = new Service({
 
 ## Quick Reference Table
 
-| Feature               | Import From                                | Install Required?           |
-| --------------------- | ------------------------------------------ | --------------------------- |
-| `singleton` decorator | `@sentzunhat/zacatl/third-party/dependency-injection/tsyringe`  | ❌ No (included)            |
-| `Service`             | `@sentzunhat/zacatl`                       | ❌ No (included)            |
-| `BaseRepository`      | `@sentzunhat/zacatl`                       | ❌ No (included)            |
-| `logger`              | `@sentzunhat/zacatl`                       | ❌ No (included)            |
-| `z` (Zod)             | `@sentzunhat/zacatl/third-party/zod`       | ❌ No (included)            |
-| `mongoose`            | `@sentzunhat/zacatl/third-party/databases/mongoose`  | ✅ Yes (optional peer)      |
-| `Schema`              | `@sentzunhat/zacatl/third-party/databases/mongoose`  | ✅ Yes (optional peer)      |
-| `Sequelize`           | `@sentzunhat/zacatl/third-party/databases/sequelize` | ✅ Yes (optional peer)      |
-| Database drivers      | `pg`, `mysql2`, etc                        | ✅ Yes (if using Sequelize) |
+| Feature               | Import From                                                    | Install Required?           |
+| --------------------- | -------------------------------------------------------------- | --------------------------- |
+| `singleton` decorator | `@sentzunhat/zacatl/third-party/dependency-injection/tsyringe` | ❌ No (included)            |
+| `Service`             | `@sentzunhat/zacatl`                                           | ❌ No (included)            |
+| `BaseRepository`      | `@sentzunhat/zacatl`                                           | ❌ No (included)            |
+| `logger`              | `@sentzunhat/zacatl`                                           | ❌ No (included)            |
+| `z` (Zod)             | `@sentzunhat/zacatl/third-party/zod`                           | ❌ No (included)            |
+| `mongoose`            | `@sentzunhat/zacatl/third-party/databases/mongoose`            | ✅ Yes (optional peer)      |
+| `Schema`              | `@sentzunhat/zacatl/third-party/databases/mongoose`            | ✅ Yes (optional peer)      |
+| `Sequelize`           | `@sentzunhat/zacatl/third-party/databases/sequelize`           | ✅ Yes (optional peer)      |
+| Database drivers      | `pg`, `mysql2`, etc                                            | ✅ Yes (if using Sequelize) |
 
 ---
 
@@ -321,21 +326,21 @@ import { singleton } from '@sentzunhat/zacatl/third-party/dependency-injection/t
 
 ### Optional Peer Dependencies
 
-| Package          | Version | When to Use                   |
-| ---------------- | ------- | ----------------------------- |
-| `mongoose`       | ^9.0.0  | MongoDB/Mongoose repositories |
-| `sequelize`      | ^6.0.0  | SQL database ORM              |
-| `sqlite3`        | ^6.0.1  | SQLite ecosystem support      |
-| `mongodb`        | ^7.2.0  | Native MongoDB driver support |
-| `pg`             | ^8.18.0 | PostgreSQL ecosystem support  |
+| Package     | Version | When to Use                   |
+| ----------- | ------- | ----------------------------- |
+| `mongoose`  | ^9.0.0  | MongoDB/Mongoose repositories |
+| `sequelize` | ^6.0.0  | SQL database ORM              |
+| `sqlite3`   | ^6.0.1  | SQLite ecosystem support      |
+| `mongodb`   | ^7.2.0  | Native MongoDB driver support |
+| `pg`        | ^8.18.0 | PostgreSQL ecosystem support  |
 
 ### Development Tools
 
-| Tool         | Version      |
-| ------------ | ------------ |
-| `typescript` | ^5.9.3       |
+| Tool         | Version |
+| ------------ | ------- |
+| `typescript` | ^5.9.3  |
 | `node`       | 26.0.0+ |
-| `npm`        | 11.0.0+      |
+| `npm`        | 11.0.0+ |
 
 ---
 
