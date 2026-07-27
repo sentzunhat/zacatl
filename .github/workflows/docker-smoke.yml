@@ -52,7 +52,7 @@ jobs:
             port: 8082
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Build and start
         working-directory: examples/${{ matrix.example }}

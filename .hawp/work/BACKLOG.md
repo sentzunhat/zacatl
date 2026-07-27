@@ -31,6 +31,7 @@ Items `e1f4b2a0`, `a3d81c6e`, `b7c92f1d`, `c4e05a92` descend from AUDIT-004 (202
 
 | ID         | Type        | Title                                                                                                                                             | Status      | Plan                                                        |
 | ---------- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- | ----------------------------------------------------------- |
+| `871e98ef` | release     | P2: v0.0.59 — triage post-0.0.58 Dependabot PRs (#39–#46), close ESLint 10 as blocked, cut patch release | plan-ready  | `.hawp/work/active/871e98ef-v0.0.59-dependency-bumps.md`    |
 | `e7a20d15` | milestone   | P1: v0.1.0 — CLI/desktop/server platforms to a minimal standard; batched breaking changes                                                         | analyzing   | `.hawp/work/active/e7a20d15-v0.1.0-milestone.md`            |
 | `f2a96e04` | improvement | P2: Dependency hygiene — remaining: HTTP-frameworks-as-peers (0.1.0). Done: exports validation 45f74849, scoped uuid override, @fastify/static 10 | in-progress | see AUDIT-005 advisories                                    |
 | `5c2c9ef3` | refactoring | P2: DI child containers, uniform guards, constructor injection, factory seam                                                                      | in-progress | `.hawp/work/active/5c2c9ef3-1a6e-469f-9c25-f644b5e3d635.md` |
