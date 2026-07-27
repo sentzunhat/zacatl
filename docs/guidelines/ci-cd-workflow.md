@@ -102,11 +102,13 @@ The orchestrator uses GitHub's concurrency group to supersede in-flight runs:
 
 ```yaml
 concurrency:
-  group: ci-${{ github.head_ref || github.ref_name }}
+  group: ci-${{ github.event.pull_request.number || github.head_ref || github.ref_name }}
   cancel-in-progress: true
 ```
 
-This prevents stacking of checks when you push again before the previous check finishes.
+Keying by PR number (falling back to branch) avoids cross-PR/fork collisions when two PRs
+happen to share a source branch name, while still superseding in-flight runs when you push
+again before the previous check finishes.
 
 ## Release Gate
 
