@@ -3,7 +3,7 @@
 A catalog of standalone, production-ready server applications demonstrating different patterns and use cases. Each example is fully functional, copy-paste deployable, and follows the same domain logic across different server frameworks and databases.
 
 > **🐳 For Docker:** See [DOCKER.md](./DOCKER.md) — Complete Docker deployment guide and architecture explanation.
-> **💾 For Databases:** See [dev-env.md](./dev-env.md) for MongoDB + PostgreSQL container setup.
+> **💾 For Databases:** See [DOCKER.md](./DOCKER.md) for MongoDB + PostgreSQL container setup.
 > **Note**: Examples use **Node.js 26+** with **npm**.
 > **📦 Dependencies:** All examples import from `@zacatl/*` paths — see [shared/zacatl-build-paths.json](./shared/zacatl-build-paths.json) for the standard tsconfig mapping. Run `npm run build` at the repo root before type-checking examples against compiled output.
 
