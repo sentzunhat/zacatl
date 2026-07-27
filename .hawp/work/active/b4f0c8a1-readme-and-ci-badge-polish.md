@@ -52,3 +52,28 @@ to this one's log below.
   real Playwright-captured PNGs per example and `examples/DOCKER.md` already
   has a Docker architecture writeup — reused both rather than fabricating new
   diagrams/images.
+- 2026-07-27 (same day, follow-up): Shipped via PR #51 (merged, squash). Along
+  the way:
+  - Verified TOC anchors against GitHub's actual rendered permalink hrefs via
+    `gh api -H "Accept: application/vnd.github.html"` rather than guessing —
+    caught and fixed a self-inflicted regression where a first "fix" pass used
+    the wrong attribute (`id` instead of the visible `href`) and broke every
+    anchor; reverted before merge.
+  - Added `docs/migration/README.md` as an index; root README's Documentation
+    table now links there once instead of listing each guide.
+  - Added an animated walkthrough GIF for `fastify-mongodb-react` — stitched
+    locally with `ffmpeg` from the existing Playwright screenshots (no new
+    capture, no external hosting, 52KB).
+  - Grouped badges into Package/Quality/Stack rows; documented inline why
+    there's one `CI` badge instead of a separate CVE badge (no reliable way to
+    badge a single job within a `workflow_call`-only sub-workflow without
+    reintroducing the frozen-badge bug fixed earlier this session).
+  - Hit a real merge conflict on PR #51 (`dev` vs `main` diverged after
+    several squash-merges this session touched the same README lines) —
+    resolved in favor of `dev`'s content, which strictly superseded `main`'s
+    stale badges/backlog row. Worth watching: this squash-merge-heavy workflow
+    will keep producing `dev`/`main` divergence; consider rebasing `dev` onto
+    `main` after each merge if conflicts become frequent.
+  - Deferred, needs user input: "benefits from other projects like tekit,
+    mictlan, howfily" — none of these are recognizable library names; asked
+    the user to clarify rather than guess.
