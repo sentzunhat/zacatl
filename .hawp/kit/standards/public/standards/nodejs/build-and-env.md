@@ -102,7 +102,7 @@ DATABASE_URL="mongodb://localhost:27017/myapp"
 - **Purpose:** Database connection string
 - **Examples:**
   - Local: `mongodb://localhost:27017/myapp`
-  - Cloud: `mongodb+srv://user:pass@cluster.mongodb.net/myapp`
+  - Cloud: `mongodb+srv://<username>:<password>@<cluster-host>/myapp`
 - **Standard level:** Required
 
 ---
@@ -211,7 +211,7 @@ VITE_API_URL="http://localhost:3000/api"
 ```bash
 # .env.production (do not commit secrets)
 BACKEND_PORT=3000
-DATABASE_URL="mongodb+srv://prod-user:prod-pass@cluster.mongodb.net/myapp"
+DATABASE_URL="mongodb+srv://<username>:<password>@<cluster-host>/myapp"
 AUTH_SERVICE_URL="https://auth.example.com"
 AUTH_ISSUER="https://auth.example.com"
 AUTH_STRICT_JWKS="true"
