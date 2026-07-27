@@ -4,14 +4,16 @@ Zacatl uses a centralized CI orchestrator to gate development, testing, and rele
 
 ## Workflow Architecture
 
-**Single orchestrator** — `.github/workflows/ci.yml` is the only workflow responding to branch/PR/schedule events. It invokes reusable component workflows:
+**Single orchestrator** — `.github/workflows/ci.yml` is the only workflow responding to branch/PR events. It invokes reusable component workflows:
 
 - `cve-scan.yml` — Production dependency CVE audit (`npm audit --omit=dev --audit-level=high`)
 - `peer-install-check.yml` — Verify peerDependencies can be installed and imported
 - `publish-dry.yml` — Full verification chain: tests, type check, lint, build, consumer smoke tests, and `npm publish --dry-run`
 - `docker-smoke.yml` — Build and smoke-test three example Docker images (sqlite, postgres, mongodb)
 
-All component workflows are **`workflow_call`-only** with no direct triggers, eliminating duplicate runs.
+All component workflows are **`workflow_call`-only** with no direct `push`/`pull_request` triggers, eliminating duplicate runs on those events.
+
+**Deliberate exception**: `cve-scan.yml` also carries its own weekly `schedule` trigger (same cron as `ci.yml`'s). `workflow_call` invocations never register as a top-level run of the *called* file, so without this, `cve-scan.yml`'s own badge/run-history would freeze on stale history regardless of how often the check itself runs inside `ci.yml`. This means the Monday 03:17 UTC scan genuinely runs twice — once as `ci.yml`'s scheduled `cve` job, once as `cve-scan.yml`'s own direct trigger. Accepted tradeoff: one extra ~15s job per week for a CVE Scan badge that's actually live (see the root README's badge section).
 
 ## What Runs Where
 
@@ -97,12 +99,15 @@ dispatched.
 
 ### Weekly schedule
 
-**Drift detection** — Same as push to dev (cve, peers), no dry-run or docker.
+**Drift detection** — Same as push to dev (cve, peers), no dry-run or docker. Two separate schedule
+triggers fire at the same cron: `ci.yml`'s own (running `cve` + `peers` as jobs) and
+`cve-scan.yml`'s standalone one (badge freshness — see the exception noted above). `peers` only
+runs once, via `ci.yml`.
 
 ```
   schedule (Monday 03:17 UTC)
-      ↓
-    [cve-scan]
+      ↓                              ↓
+    [cve-scan] (via ci.yml)     [cve-scan.yml] (standalone, badge only)
       ↓
   [peer-install-check]
       ↓
