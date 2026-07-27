@@ -12,23 +12,31 @@ drop indexes that are not declared in the current schema.
 Configure Mongoose index behavior on the database config:
 
 ```typescript
-import { DatabaseVendor } from '@sentzunhat/zacatl/service';
+import { DatabaseVendor, Service, ServiceType } from '@sentzunhat/zacatl/service';
 
 const isLocalIndexBoot =
   process.env.APP_ENV === 'local' ||
   process.env.APP_ENV === 'development' ||
   process.env.NODE_ENV === 'test';
 
-databases: [
-  {
-    vendor: DatabaseVendor.MONGOOSE,
-    instance: mongoose,
-    connection: { url: process.env.MONGO_URI! },
-    indexes: {
-      bootMode: isLocalIndexBoot ? 'create' : 'off',
+const service = new Service({
+  type: ServiceType.SERVER,
+  platforms: {
+    server: {
+      // ... other config
+      databases: [
+        {
+          vendor: DatabaseVendor.MONGOOSE,
+          instance: mongoose,
+          connection: { url: process.env.MONGO_URI! },
+          indexes: {
+            bootMode: isLocalIndexBoot ? 'create' : 'off',
+          },
+        },
+      ],
     },
   },
-];
+});
 ```
 
 Boot modes:
