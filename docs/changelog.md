@@ -2,6 +2,30 @@
 
 ---
 
+## [0.0.59] - 2026-07-27
+
+**Status**: Ready for publication
+
+### 🔒 Security
+
+- **Closed 9 additional Dependabot alerts across example apps** — bumped
+  `postcss` (`GHSA-r28c-9q8g-f849`, path traversal via source-map
+  auto-loading) and `tar` (`GHSA-r292-9mhp-454m`, uncontrolled recursion
+  DoS) in the `express-mongodb-react`, `express-postgres-react`,
+  `express-sqlite-react`, `express-sqlite-svelte`, `fastify-postgres-react`,
+  and `fastify-sqlite-react` example lockfiles, matching the fixes already
+  applied to `fastify-sqlite-svelte` via Dependabot.
+
+### 🧹 Maintenance
+
+- Bumped `actions/setup-node` (4 → 7) and `actions/checkout` (4 → 7) across
+  all workflows.
+- Bumped `tar` (7.5.19 → 7.5.22) and `postcss` (8.5.16 → 8.5.23) in
+  `examples/fastify-sqlite-svelte`.
+- Closed two Dependabot PRs (`eslint` and `@eslint/js` → 10.x) as blocked:
+  `eslint-plugin-import` does not yet declare ESLint 10 peer support. See
+  `.hawp/work/parked/ESLINT-010.md` for the unpark plan.
+
 ## [0.0.58] - 2026-07-21
 
 **Status**: Ready for publication
