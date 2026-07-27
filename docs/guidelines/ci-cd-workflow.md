@@ -60,27 +60,40 @@ until the weekly schedule catches drift). Open a PR to get immediate feedback.
 
 ### Push to main (release candidate)
 
-**Full verification.** All checks pass before the release tag is created and npm publish is dispatched.
+**`should-release` runs first** — a cheap, unconditional job that checks whether `package.json`'s
+version is already tagged (`git rev-parse -q --verify refs/tags/v<version>`). This answers "is there
+actually a release pending?" before anything expensive runs, so a push to `main` that doesn't bump
+the version (e.g. a docs-only follow-up commit right after a release) doesn't waste CI time — or fail
+loudly inside `prepublish-guard.ts` with "already published" — on a run that could never publish
+anyway.
+
+**If a release is pending:** full verification, then the release tag is created and npm publish is
+dispatched.
 
 ```
   push -> main
+      ↓
+  [should-release] ← is package.json's version already tagged?
       ↓
     [cve-scan]
       ↓
   [peer-install-check]
       ↓
   [publish-dry.yml] ← full verification: tests, type check, lint, build, smokes, dry-run
-      ↓
+      ↓                 (skipped if should-release says nothing is pending)
   [docker-smoke.yml] ← three images built and smoke-tested
-      ↓
+      ↓                 (skipped if should-release says nothing is pending)
     [tag job]
-      ↓
+      ↓                 (skipped if should-release says nothing is pending)
     Create v<version> tag
       ↓
   Dispatch release.yml
       ↓
   release.yml: CVE check → npm publish → GitHub Release
 ```
+
+**If no release is pending:** `cve` and `peers` still run (cheap, always useful drift checks);
+`dry`, `docker`, and `tag` all skip cleanly.
 
 ### Weekly schedule
 
@@ -112,17 +125,36 @@ again before the previous check finishes.
 
 ## Release Gate
 
-The `tag` job inside `ci.yml` is the release gate:
+The `should-release` job inside `ci.yml` runs first and decides whether there's anything to release:
+
+```yaml
+should-release:
+  runs-on: ubuntu-latest
+  outputs:
+    pending: ${{ steps.check.outputs.pending }}
+  # Checks git tags for v<package.json version>; sets pending=false if it already exists
+```
+
+`dry` and `docker` only run when `needs.should-release.outputs.pending == 'true'` (in addition to
+being a push to main). The `tag` job is the release gate:
 
 ```yaml
 tag:
-  if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-  needs: [cve, peers, dry, docker]
+  if: >
+    always() && github.event_name == 'push' && github.ref == 'refs/heads/main' &&
+    needs.should-release.outputs.pending == 'true' &&
+    needs.cve.result == 'success' && needs.peers.result == 'success' &&
+    (needs.dry.result == 'success' || needs.dry.result == 'skipped') &&
+    (needs.docker.result == 'success' || needs.docker.result == 'skipped')
+  needs: [should-release, cve, peers, dry, docker]
   runs-on: ubuntu-latest
   # Creates v<version> tag and dispatches release.yml
 ```
 
-**Key:** `tag` only runs on a push to main (not PRs), and it waits for all four checks. A red merge cannot publish.
+**Key:** `tag` only runs on a push to main with a pending release (not PRs, not a repeat push at the
+same version), and it waits for cve/peers to succeed and dry/docker to either succeed or be
+legitimately skipped. A red merge cannot publish, and a push with nothing new to release cannot
+either — it just skips cleanly instead of failing.
 
 The `release.yml` workflow then:
 1. Runs the same `npm audit --omit=dev --audit-level=high` check (must match the gate)
@@ -146,6 +178,13 @@ Same as PR failures. Cve and peers are the only gates on dev.
 Check which job failed:
 - **cve, peers, dry, docker** — See debugging steps above. The push is accepted but release is blocked.
 - **tag job failure** — The tag creation or dispatch failed. Check git permissions and GitHub API access (NPM_TOKEN must be present).
+
+**`dry` failing with "Version X is already published to npm"** — this shouldn't happen anymore on a
+normal push to main; `should-release` is supposed to skip `dry` entirely once the current version is
+tagged. If you see it, either `should-release` mis-detected the tag (check `git fetch --tags` locally
+and confirm `v<version>` exists), or you triggered `publish-dry.yml` directly via manual dispatch
+(bypassing `should-release` — expected there, since a manual dry-run check on an already-published
+version is a legitimate thing to want to confirm).
 
 ### Release workflow fails after tag is pushed
 
