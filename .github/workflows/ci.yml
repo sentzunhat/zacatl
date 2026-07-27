@@ -8,9 +8,14 @@ name: CI
 # What runs where:
 #
 #   pull_request -> dev|main : cve, peers                (fast gates)
-#   push         -> dev      : cve, peers                (dev feedback, lightweight)
+#   push         -> dev      : (nothing — covered by the open PR's pull_request run)
 #   push         -> main     : cve, peers, dry, docker -> tag -> Release
 #   schedule (weekly)        : cve, peers                (drift detection only)
+#
+# Push to dev skips cve/peers: dev is normally the source branch of an open
+# PR, so every push to dev already fires a pull_request:synchronize event
+# that runs the same checks. Running them again on push was pure duplicate
+# work — same commit, same result, twice.
 #
 # Dry-run and docker are expensive and skipped on dev/schedule. They only
 # run on pushes to main (before release) to verify the full pipeline.
@@ -41,10 +46,15 @@ permissions:
 jobs:
   cve:
     name: CVE scan
+    # Skip on push to dev — an open PR from dev already runs this via
+    # pull_request:synchronize. Still runs on push to main (release gate),
+    # pull_request, and schedule.
+    if: ${{ !(github.event_name == 'push' && github.ref == 'refs/heads/dev') }}
     uses: ./.github/workflows/cve-scan.yml
 
   peers:
     name: Peer install check
+    if: ${{ !(github.event_name == 'push' && github.ref == 'refs/heads/dev') }}
     uses: ./.github/workflows/peer-install-check.yml
 
   dry:

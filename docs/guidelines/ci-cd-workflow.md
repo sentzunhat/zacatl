@@ -42,18 +42,21 @@ All component workflows are **`workflow_call`-only** with no direct triggers, el
 
 ### Push to dev (after merge)
 
-**Gates:** CVE scan, peer install check (fast feedback for developers)  
-**Does NOT gate:** Dry-run, docker (those run on push to main only)
+**Gates:** nothing directly — covered by the open PR's `pull_request:synchronize` run.
+
+Pushing to `dev` while a PR from `dev` is open fires two events for the same
+commit: `push` and `pull_request:synchronize`. Running cve/peers on both was
+pure duplicate work, so `push -> dev` is a no-op; the PR's `pull_request` run
+is the one that actually gates the commit.
 
 ```
   push -> dev
       ↓
-    [cve-scan]
-      ↓
-  [peer-install-check]
-      ↓
-   Commit accepted
+  (no jobs — see the PR's pull_request run for cve/peers)
 ```
+
+If you push to `dev` with **no open PR**, no CI runs until you open one (or
+until the weekly schedule catches drift). Open a PR to get immediate feedback.
 
 ### Push to main (release candidate)
 
