@@ -1,11 +1,29 @@
 # Zacatl Framework
 
-**Package** · [![npm version](https://img.shields.io/npm/v/@sentzunhat/zacatl.svg?style=flat-square)](https://www.npmjs.com/package/@sentzunhat/zacatl) [![npm downloads](https://img.shields.io/npm/dm/@sentzunhat/zacatl.svg?style=flat-square)](https://www.npmjs.com/package/@sentzunhat/zacatl) [![License: Apache 2.0](https://img.shields.io/badge/license-Apache%202.0-blue.svg?style=flat-square)](./LICENSE)
+<div align="center">
 
-**Quality** · [![CI](https://img.shields.io/github/actions/workflow/status/sentzunhat/zacatl/ci.yml?branch=main&style=flat-square&label=CI)](https://github.com/sentzunhat/zacatl/actions/workflows/ci.yml) [![CVE scan](https://img.shields.io/github/actions/workflow/status/sentzunhat/zacatl/cve-scan.yml?style=flat-square&label=CVE%20scan)](https://github.com/sentzunhat/zacatl/actions/workflows/cve-scan.yml) [![Release](https://img.shields.io/github/actions/workflow/status/sentzunhat/zacatl/release.yml?style=flat-square&label=release)](https://github.com/sentzunhat/zacatl/actions/workflows/release.yml) [![Tests: 659](https://img.shields.io/badge/tests-659%20passing-brightgreen.svg?style=flat-square)](#-testing) [![Coverage: 91.41%](https://img.shields.io/badge/coverage-91.41%25-brightgreen.svg?style=flat-square)](#-testing)
-<br>`CI` is the orchestrator — CVE scanning, peer-dependency install checks, the full test suite, and an 8-example Docker smoke matrix, gating every merge to `main`. `CVE scan` runs that same audit again on its own weekly schedule so its badge stays live independent of `CI`. `Release` reflects the actual tag → npm publish → GitHub Release pipeline, only fired by real releases. There's no separate "Publish dry-run" badge: that check only runs as part of `CI` (gated on a pending version bump), and giving it its own trigger would mean it either fails on ordinary non-release pushes or needs to duplicate that gate — not worth it for one more badge. See [docs/guidelines/ci-cd-workflow.md](./docs/guidelines/ci-cd-workflow.md) for exactly what runs where and why.
+**Package**
 
-**Stack** · [![TypeScript](https://img.shields.io/badge/%3C%2F%3E-TypeScript-3178c6.svg?style=flat-square)](https://www.typescriptlang.org/) [![Node.js 26+](https://img.shields.io/badge/node-%3E%3D26.0.0-brightgreen.svg?style=flat-square)](https://nodejs.org/)
+[![npm version](https://img.shields.io/npm/v/@sentzunhat/zacatl.svg?style=flat-square)](https://www.npmjs.com/package/@sentzunhat/zacatl)
+[![npm downloads](https://img.shields.io/npm/dm/@sentzunhat/zacatl.svg?style=flat-square)](https://www.npmjs.com/package/@sentzunhat/zacatl)
+[![License: Apache 2.0](https://img.shields.io/badge/license-Apache%202.0-blue.svg?style=flat-square)](./LICENSE)
+
+**Quality**
+
+[![CI](https://img.shields.io/github/actions/workflow/status/sentzunhat/zacatl/ci.yml?branch=main&style=flat-square&label=CI)](https://github.com/sentzunhat/zacatl/actions/workflows/ci.yml)
+[![CVE scan](https://img.shields.io/github/actions/workflow/status/sentzunhat/zacatl/cve-scan.yml?style=flat-square&label=CVE%20scan)](https://github.com/sentzunhat/zacatl/actions/workflows/cve-scan.yml)
+[![Release](https://img.shields.io/github/actions/workflow/status/sentzunhat/zacatl/release.yml?style=flat-square&label=release)](https://github.com/sentzunhat/zacatl/actions/workflows/release.yml)
+[![Tests: 659](https://img.shields.io/badge/tests-659%20passing-brightgreen.svg?style=flat-square)](#-testing)
+[![Coverage: 91.41%](https://img.shields.io/badge/coverage-91.41%25-brightgreen.svg?style=flat-square)](#-testing)
+
+**Stack**
+
+[![TypeScript](https://img.shields.io/badge/%3C%2F%3E-TypeScript-3178c6.svg?style=flat-square)](https://www.typescriptlang.org/)
+[![Node.js 26+](https://img.shields.io/badge/node-%3E%3D26.0.0-brightgreen.svg?style=flat-square)](https://nodejs.org/)
+
+</div>
+
+> `CI` is the orchestrator — CVE scanning, peer-dependency install checks, the full test suite, and an 8-example Docker smoke matrix, gating every merge to `main`. `CVE scan` runs that same audit again on its own weekly schedule so its badge stays live independent of `CI`. `Release` reflects the actual tag → npm publish → GitHub Release pipeline, only fired by real releases. There's no separate "Publish dry-run" badge: that check only runs as part of `CI` (gated on a pending version bump), and giving it its own trigger would mean it either fails on ordinary non-release pushes or needs to duplicate that gate — not worth it for one more badge. See [docs/guidelines/ci-cd-workflow.md](./docs/guidelines/ci-cd-workflow.md) for exactly what runs where and why.
 
 **Universal TypeScript framework for building APIs, CLI tools, and distributed systems.**
 
