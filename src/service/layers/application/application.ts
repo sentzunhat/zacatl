@@ -1,14 +1,17 @@
 import { resolveDependencies } from '@zacatl/dependency-injection';
 import { InternalServerError } from '@zacatl/error';
+import type { DependencyContainer } from '@zacatl/third-party/dependency-injection/tsyringe';
 
 import type { ApplicationConfig } from './types';
 import { ensureRegisteredSingleton } from '../../../dependency-injection/container';
 
 export class Application {
   protected config: ApplicationConfig;
+  private readonly container: DependencyContainer | undefined;
 
-  constructor(config: ApplicationConfig) {
+  constructor(config: ApplicationConfig, container?: DependencyContainer) {
     this.config = config;
+    this.container = container;
 
     this.register();
   }
@@ -33,19 +36,19 @@ export class Application {
     // handlers already registered on module load are left untouched.
     if (restHooks != null && restHooks.length > 0) {
       for (const hook of restHooks) {
-        ensureRegisteredSingleton(hook);
+        ensureRegisteredSingleton(hook, this.container);
       }
     }
 
     if (restRoutes != null && restRoutes.length > 0) {
       for (const route of restRoutes) {
-        ensureRegisteredSingleton(route);
+        ensureRegisteredSingleton(route, this.container);
       }
     }
 
     // Verify all handlers can be resolved
-    const hooks = restHooks != null ? resolveDependencies(restHooks) : [];
-    const routes = restRoutes != null ? resolveDependencies(restRoutes) : [];
+    const hooks = restHooks != null ? resolveDependencies(restHooks, this.container) : [];
+    const routes = restRoutes != null ? resolveDependencies(restRoutes, this.container) : [];
 
     if (
       hooks.length !== (restHooks != null ? restHooks.length : 0) ||

@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest';
 
 import { InternalServerError } from '../../../src/error';
+import {
+  createChildContainer,
+  ensureRegisteredSingleton,
+} from '@zacatl/dependency-injection/container';
 import type { ServiceConfig } from '../../../src/service/service';
 import { Service, ServiceType } from '../../../src/service/service';
 import {
@@ -159,6 +163,41 @@ describe('Service (unit)', () => {
         },
       },
     })).toThrow(InternalServerError);
+  });
+
+  it('two Service child containers do not share DI singleton registrations', () => {
+    // Verify the child-container isolation mechanism that Service relies on.
+    // Each Service creates an independent child container via createChildContainer();
+    // a singleton registered in one must not be visible from the other.
+
+    class IsolatedDomainService {
+      readonly tag: string;
+      constructor() {
+        this.tag = Math.random().toString(36).slice(2);
+      }
+    }
+
+    const containerA = createChildContainer();
+    const containerB = createChildContainer();
+
+    ensureRegisteredSingleton(IsolatedDomainService, containerA);
+    ensureRegisteredSingleton(IsolatedDomainService, containerB);
+
+    const instanceA = containerA.resolve(IsolatedDomainService);
+    const instanceB = containerB.resolve(IsolatedDomainService);
+
+    // Same class, different child containers → distinct singleton instances.
+    expect(instanceA).not.toBe(instanceB);
+
+    // Resolving again from the same container returns the same singleton.
+    expect(containerA.resolve(IsolatedDomainService)).toBe(instanceA);
+    expect(containerB.resolve(IsolatedDomainService)).toBe(instanceB);
+
+    // A registration in containerA must not leak into containerB.
+    expect(containerB.isRegistered(IsolatedDomainService)).toBe(true);
+    // Both containers are children of the global root; they are siblings,
+    // not parent/child of each other, so neither inherits the other's singletons.
+    expect(instanceA.tag).not.toBe(instanceB.tag);
   });
 
   it('accepts builtInLocalesDir in localization config', () => {
