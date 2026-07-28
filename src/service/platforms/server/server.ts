@@ -118,43 +118,6 @@ export class Server {
   }
 
   /**
-   * Get API adapter for advanced configuration
-   * Useful for accessing framework-specific features (Fastify/Express)
-   */
-  public getApiAdapter(): ApiServerPort {
-    return this.apiAdapter;
-  }
-
-  /**
-   * Get Page adapter for advanced configuration
-   * Useful for custom page rendering or SPA setup
-   */
-  public getPageAdapter(): PageServerPort {
-    return this.pageAdapter;
-  }
-
-  /**
-   * Get ApiServer instance for direct access
-   */
-  public getApiServer(): ApiServer | undefined {
-    return this.apiServer;
-  }
-
-  /**
-   * Get PageServer instance for direct access
-   */
-  public getPageServer(): PageServer | undefined {
-    return this.pageServer;
-  }
-
-  /**
-   * Get DatabaseServer instance for direct access
-   */
-  public getDatabaseServer(): DatabaseServer | undefined {
-    return this.databaseServer;
-  }
-
-  /**
    * Stop the server: close HTTP connections and disconnect all databases.
    */
   public async stop(): Promise<void> {
