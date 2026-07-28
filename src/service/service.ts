@@ -1,6 +1,7 @@
 import { InternalServerError } from '@zacatl/error';
 import { configureI18nNode } from '@zacatl/localization';
 
+import { createChildContainer } from '../dependency-injection/container';
 import { registerMongooseIndexOptions } from './layers/infrastructure/orm/mongoose/index-policy';
 import { Layers } from './layers/layers';
 import { Platforms } from './platforms/platforms';
@@ -53,7 +54,8 @@ export class Service {
     }
 
     if (layers != null) {
-      this.layers = new Layers(layers);
+      const serviceContainer = createChildContainer();
+      this.layers = new Layers(layers, serviceContainer);
     }
 
     if (platforms != null) {
