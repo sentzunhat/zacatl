@@ -77,3 +77,9 @@ to this one's log below.
   - Deferred, needs user input: "benefits from other projects like tekit,
     mictlan, howfily" — none of these are recognizable library names; asked
     the user to clarify rather than guess.
+- 2026-08-13: Follow-up positioning pass requested from external review. The
+  next README iteration should lead with the developer problem and audience,
+  show the complete CRUD path near the top, and keep AI collaboration as
+  secondary acknowledgment. A related v0.1.0 work item was added to audit
+  server/frontend provider boundaries as replaceable peers, analogous to the
+  database adapter boundary.

@@ -90,10 +90,10 @@ All repo-relative paths will use forward slashes and be measured from repository
 
 ```
 pwd
-/Users/beltrd/Desktop/projects/sentzunhat/zacatl
+<repo-root-abs>
 
 git rev-parse --show-toplevel
-/Users/beltrd/Desktop/projects/sentzunhat/zacatl
+<repo-root-abs>
 
 git rev-parse --show-prefix
 (empty — working at root)
