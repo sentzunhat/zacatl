@@ -17,6 +17,7 @@ concurrency:
 permissions:
   contents: write
   actions: write
+  pull-requests: read
 
 jobs:
   tag:
@@ -24,6 +25,18 @@ jobs:
     if: ${{ github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push' && github.event.workflow_run.head_branch == 'main' }}
     runs-on: ubuntu-latest
     steps:
+      - name: Require merged PR into main
+        env:
+          GH_TOKEN: ${{ github.token }}
+          HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
+        run: |
+          ASSOCIATED_PRS="$(gh api -H 'Accept: application/vnd.github+json' "/repos/${GITHUB_REPOSITORY}/commits/${HEAD_SHA}/pulls")"
+          MERGED_PR_COUNT="$(printf '%s' "${ASSOCIATED_PRS}" | jq '[.[] | select(.merged_at != null and .base.ref == "main")] | length')"
+          if [ "${MERGED_PR_COUNT}" -eq 0 ]; then
+            echo "Refusing to tag ${HEAD_SHA}: no merged PR into main is associated with this commit."
+            exit 1
+          fi
+
       - name: Checkout merged main commit
         uses: actions/checkout@v7
         with:
