@@ -2,6 +2,26 @@
 
 ---
 
+## [0.0.61] - 2026-08-16
+
+**Status**: Release candidate for the automated `main` release path
+
+### 📚 Documentation and package metadata
+
+- Updated the npm downloads badge to use the weekly metric, avoiding the
+  rate-prone monthly downloads endpoint in rendered package documentation.
+- Pinned the CVE scan badge to the `main` branch so it reflects the current
+  release line rather than an unrelated workflow ref.
+- Prepared the package metadata and lockfile for the `0.0.61` release so the
+  corrected README is included in the next npm publication.
+
+### 🧪 Verification
+
+- The README badge endpoints resolve successfully for weekly downloads, CI,
+  and the `main` CVE scan.
+- The release candidate must pass the full CVE, peer-install, publish dry-run,
+  and eight-example Docker smoke matrix before merge.
+
 ## [0.0.60] - 2026-08-15
 
 **Status**: Release candidate prepared on `dev`; do not merge or publish without owner approval.
