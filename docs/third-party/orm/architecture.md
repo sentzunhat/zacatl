@@ -339,7 +339,7 @@ export type BaseRepositoryConfig<D> =
 ### Step 3: Update BaseRepository
 
 ```typescript
-// src/service/layers/infrastructure/repositories/abstract.ts
+// src/service/layers/infrastructure/repositories/base-repository.ts
 import { YourAdapter } from '../orm/adapters/your-adapter';
 
 export abstract class BaseRepository<D, I, O> implements Repository<D, I, O> {

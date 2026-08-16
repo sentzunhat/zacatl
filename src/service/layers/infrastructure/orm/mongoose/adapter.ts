@@ -99,6 +99,14 @@ export class MongooseAdapter<D, I extends object, O extends object> implements O
       });
     }
 
+    // Reuse a model already registered on this Mongoose instance. Repositories
+    // can be resolved more than once while layered containers are bootstrapped,
+    // and Mongoose throws when the same model name is compiled again.
+    const existingModel = resolved.models[name] as MongooseRepositoryModel<D> | undefined;
+    if (existingModel !== undefined) {
+      return existingModel;
+    }
+
     // mongoose.model() is synchronous — registers the model with Mongoose's registry.
     // Async bootstrapping (createCollection, createIndexes, init) is handled
     // internally during construction.

@@ -1,21 +1,40 @@
 # Zacatl Framework
 
-**Package** · [![npm version](https://img.shields.io/npm/v/@sentzunhat/zacatl.svg?style=flat-square)](https://www.npmjs.com/package/@sentzunhat/zacatl) [![npm downloads](https://img.shields.io/npm/dm/@sentzunhat/zacatl.svg?style=flat-square)](https://www.npmjs.com/package/@sentzunhat/zacatl) [![License: Apache 2.0](https://img.shields.io/badge/license-Apache%202.0-blue.svg?style=flat-square)](./LICENSE)
+<div align="center">
 
-**Quality** · [![CI](https://img.shields.io/github/actions/workflow/status/sentzunhat/zacatl/ci.yml?branch=main&style=flat-square&label=CI)](https://github.com/sentzunhat/zacatl/actions/workflows/ci.yml) [![CVE scan](https://img.shields.io/github/actions/workflow/status/sentzunhat/zacatl/cve-scan.yml?style=flat-square&label=CVE%20scan)](https://github.com/sentzunhat/zacatl/actions/workflows/cve-scan.yml) [![Release](https://img.shields.io/github/actions/workflow/status/sentzunhat/zacatl/release.yml?style=flat-square&label=release)](https://github.com/sentzunhat/zacatl/actions/workflows/release.yml) [![Tests: 659](https://img.shields.io/badge/tests-659%20passing-brightgreen.svg?style=flat-square)](#-testing) [![Coverage: 91.41%](https://img.shields.io/badge/coverage-91.41%25-brightgreen.svg?style=flat-square)](#-testing)
-<br>`CI` is the orchestrator — CVE scanning, peer-dependency install checks, the full test suite, and an 8-example Docker smoke matrix, gating every merge to `main`. `CVE scan` runs that same audit again on its own weekly schedule so its badge stays live independent of `CI`. `Release` reflects the actual tag → npm publish → GitHub Release pipeline, only fired by real releases. There's no separate "Publish dry-run" badge: that check only runs as part of `CI` (gated on a pending version bump), and giving it its own trigger would mean it either fails on ordinary non-release pushes or needs to duplicate that gate — not worth it for one more badge. See [docs/guidelines/ci-cd-workflow.md](./docs/guidelines/ci-cd-workflow.md) for exactly what runs where and why.
+**Package**
 
-**Stack** · [![TypeScript](https://img.shields.io/badge/%3C%2F%3E-TypeScript-3178c6.svg?style=flat-square)](https://www.typescriptlang.org/) [![Node.js 26+](https://img.shields.io/badge/node-%3E%3D26.0.0-brightgreen.svg?style=flat-square)](https://nodejs.org/)
+[![npm version](https://img.shields.io/npm/v/@sentzunhat/zacatl.svg?style=flat-square)](https://www.npmjs.com/package/@sentzunhat/zacatl)
+[![npm downloads](https://img.shields.io/npm/dm/@sentzunhat/zacatl.svg?style=flat-square)](https://www.npmjs.com/package/@sentzunhat/zacatl)
+[![License: Apache 2.0](https://img.shields.io/badge/license-Apache%202.0-blue.svg?style=flat-square)](./LICENSE)
 
-**Universal TypeScript framework for building APIs, CLI tools, and distributed systems.**
+**Quality**
 
-Zacatl enforces layered (hexagonal) architecture with built-in dependency injection, type-safe validation, and structured error handling — designed for both human developers and AI agents to collaborate effectively. It doesn't replace [Fastify](https://fastify.dev), [Express](https://expressjs.com), [Mongoose](https://mongoosejs.com), or [Sequelize](https://sequelize.org) — it wires them together behind a consistent, testable architecture, so swapping HTTP framework or database vendor is a config change, not a rewrite.
+[![CI](https://img.shields.io/github/actions/workflow/status/sentzunhat/zacatl/ci.yml?branch=main&style=flat-square&label=CI)](https://github.com/sentzunhat/zacatl/actions/workflows/ci.yml)
+[![CVE scan](https://img.shields.io/github/actions/workflow/status/sentzunhat/zacatl/cve-scan.yml?style=flat-square&label=CVE%20scan)](https://github.com/sentzunhat/zacatl/actions/workflows/cve-scan.yml)
+[![Release](https://img.shields.io/github/actions/workflow/status/sentzunhat/zacatl/release.yml?style=flat-square&label=release)](https://github.com/sentzunhat/zacatl/actions/workflows/release.yml)
+[![Tests: 659](https://img.shields.io/badge/tests-659%20passing-brightgreen.svg?style=flat-square)](#-testing)
+[![Coverage: 91.41%](https://img.shields.io/badge/coverage-91.41%25-brightgreen.svg?style=flat-square)](#-testing)
 
-Zacatl was built with the help of AI models and digital agents, and is intentionally designed to be navigable by both humans and automated tooling alike.
+**Stack**
+
+[![TypeScript](https://img.shields.io/badge/%3C%2F%3E-TypeScript-3178c6.svg?style=flat-square)](https://www.typescriptlang.org/)
+[![Node.js 26+](https://img.shields.io/badge/node-%3E%3D26.0.0-brightgreen.svg?style=flat-square)](https://nodejs.org/)
+
+</div>
+
+> `CI` is the orchestrator — CVE scanning, peer-dependency install checks, the full test suite, and an 8-example Docker smoke matrix, gating every merge to `main`. `CVE scan` runs that same audit again on its own weekly schedule so its badge stays live independent of `CI`. `Release` reflects the actual tag → npm publish → GitHub Release pipeline, only fired by real releases. There's no separate "Publish dry-run" badge: that check only runs as part of `CI` (gated on a pending version bump), and giving it its own trigger would mean it either fails on ordinary non-release pushes or needs to duplicate that gate — not worth it for one more badge. See [docs/guidelines/ci-cd-workflow.md](./docs/guidelines/ci-cd-workflow.md) for exactly what runs where and why.
+
+**Build consistent TypeScript services without giving up the frameworks you already use.**
+
+Zacatl gives TypeScript teams a repeatable application → domain → infrastructure → platform structure, built-in dependency injection, type-safe validation, and structured errors. You keep using [Fastify](https://fastify.dev), [Express](https://expressjs.com), [Mongoose](https://mongoosejs.com), or [Sequelize](https://sequelize.org); Zacatl supplies the boundaries that keep those choices from leaking through the whole application.
+
+It is aimed first at teams building modular APIs and backend services that want consistent project structure, replaceable adapters, and earlier feedback from tests and CI/CD.
 
 ## Table of Contents
 
 - [Why Zacatl](#-why-zacatl)
+- [See It in a Real Service](#-see-it-in-a-real-service)
 - [Quick Start](#-quick-start)
 - [ORM Adapters](#️-orm-adapters)
 - [Architecture](#️-architecture)
@@ -27,8 +46,15 @@ Zacatl was built with the help of AI models and digital agents, and is intention
 - [Requirements](#-requirements)
 - [Contributing](#-contributing)
 - [License](#-license)
+- [Acknowledgments](#-acknowledgments)
 
 ## ✨ Why Zacatl
+
+Zacatl is useful when a service needs to stay understandable as it grows, or when several services need to follow the same architectural rules without sharing one large application.
+
+- **Keep business logic portable:** domain services depend on repository ports, while database and platform adapters remain replaceable.
+- **Make boundaries visible:** routes, validation, services, repositories, and startup wiring have clear homes and test seams.
+- **Catch drift earlier:** typed contracts, focused tests, dependency checks, and CI-friendly verification make consistency part of the workflow.
 
 | Capability                  | Detail                                                             |
 | ---------------------------- | ------------------------------------------------------------------ |
@@ -41,6 +67,29 @@ Zacatl was built with the help of AI models and digital agents, and is intention
 | 🌍 Internationalization     | Pluggable i18n with filesystem/memory adapters                     |
 | 📝 Production Observability | Structured logging and error tracking                              |
 | 🧪 Tested                   | 659 tests, 91%+ coverage — see [Testing](#-testing)                |
+
+## 🧭 See It in a Real Service
+
+The [`fastify-sqlite-react`](./examples/fastify-sqlite-react) example is a complete greeting CRUD service, not just a bootstrap snippet:
+
+```text
+HTTP request
+  → validated route handler
+  → GreetingService
+  → GreetingRepository port
+  → SQLite adapter
+  → typed response
+```
+
+It includes create, list, update, and delete flows with validation, domain logic, repository wiring, persistence, and a React frontend. Run it locally with:
+
+```bash
+cd examples/fastify-sqlite-react
+docker compose up -d
+curl http://localhost:8081/api/greetings
+```
+
+The same greeting flow is implemented across Fastify/Express, SQLite/PostgreSQL/MongoDB, and React/Svelte in the [examples matrix](./examples/README.md), making the adapter boundaries visible instead of theoretical.
 
 ## 🚀 Quick Start
 
@@ -247,3 +296,7 @@ See [CONTRIBUTING.md](./CONTRIBUTING.md) for the full guide.
 [Apache License 2.0](./LICENSE) © 2026 Zacatl Contributors
 
 > Zacatl is permissively licensed. Please don't use it to harm people.
+
+## 🤖 Acknowledgments
+
+This framework was built with assistance from AI coding models and agents — including Claude (Anthropic), OpenAI models, GitHub Copilot, and open-source tooling like Cursor and Continue — alongside plenty of human review and decision-making. Zacatl's own design leans into that collaboration: its docs and structure are intentionally written to be navigable by both people and AI agents. Thank you to the teams building these tools.

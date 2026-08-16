@@ -1,12 +1,26 @@
 import '@zacatl/third-party/dependency-injection/reflect-metadata';
 import { InternalServerError } from '@zacatl/error';
 import { container as tsyringeContainer } from '@zacatl/third-party/dependency-injection/tsyringe';
-import type { InjectionToken } from '@zacatl/third-party/dependency-injection/tsyringe';
+import type { DependencyContainer, InjectionToken } from '@zacatl/third-party/dependency-injection/tsyringe';
 
 import type { Constructor } from '../service/layers/types';
 
 export const getContainer = (): typeof tsyringeContainer => {
   return tsyringeContainer;
+};
+
+/**
+ * Create a child container that inherits registrations from a parent.
+ *
+ * Resolutions in the child container fall back to the parent when the token
+ * is not registered locally, allowing scoped overrides without polluting the
+ * global container.
+ *
+ * @param parent - Parent container; defaults to the global tsyringe container
+ * @returns A new child DependencyContainer
+ */
+export const createChildContainer = (parent?: DependencyContainer): DependencyContainer => {
+  return (parent ?? tsyringeContainer).createChildContainer();
 };
 
 export const registerDependency = <T>(
@@ -30,24 +44,46 @@ export const registerSingleton = <T>(
  * and Infrastructure layers: classes decorated with `@singleton()` register
  * themselves on module load, and re-registering would silently clobber the
  * existing (possibly already-resolved) registration.
+ *
+ * @param dependency - Class constructor to register
+ * @param container - Container to register into; defaults to the global container
  */
-export const ensureRegisteredSingleton = <T extends object>(dependency: Constructor<T>): void => {
-  if (!tsyringeContainer.isRegistered(dependency)) {
-    tsyringeContainer.registerSingleton(dependency as InjectionToken<T>, dependency);
+export const ensureRegisteredSingleton = <T extends object>(
+  dependency: Constructor<T>,
+  container: DependencyContainer = tsyringeContainer,
+): void => {
+  if (!container.isRegistered(dependency)) {
+    container.registerSingleton(dependency as InjectionToken<T>, dependency);
   }
 };
 
-export const registerValue = <T>(token: InjectionToken<T>, value: T): void => {
-  tsyringeContainer.register(token, { useValue: value });
+/**
+ * Register a value token in the DI container.
+ *
+ * @param token - Injection token to register
+ * @param value - Value to bind to the token
+ * @param container - Container to register into; defaults to the global container
+ */
+export const registerValue = <T>(
+  token: InjectionToken<T>,
+  value: T,
+  container: DependencyContainer = tsyringeContainer,
+): void => {
+  container.register(token, { useValue: value });
 };
 
 export const resolveDependency = <T>(token: InjectionToken<T>): T => {
   return tsyringeContainer.resolve(token);
 };
 
-export const clearContainer = (): void => {
-  tsyringeContainer.clearInstances();
-  tsyringeContainer.reset();
+/**
+ * Clear all instances (and optionally reset) a container.
+ *
+ * @param container - Container to clear; defaults to the global container
+ */
+export const clearContainer = (container: DependencyContainer = tsyringeContainer): void => {
+  container.clearInstances();
+  container.reset();
 };
 
 /**
@@ -61,6 +97,7 @@ export const clearContainer = (): void => {
  * layer composition before resolving.
  *
  * @param dependencies - Array of class constructors to resolve
+ * @param container - Container to resolve from; defaults to the global container
  * @returns Array of resolved instances in the same order
  *
  * @example
@@ -69,10 +106,13 @@ export const clearContainer = (): void => {
  * const services = resolveDependencies<Service>([UserService, ProductService]);
  * ```
  */
-export const resolveDependencies = <T extends object>(dependencies: Array<Constructor<T>>): T[] => {
+export const resolveDependencies = <T extends object>(
+  dependencies: Array<Constructor<T>>,
+  container: DependencyContainer = tsyringeContainer,
+): T[] => {
   return dependencies.map((dependency) => {
     // Check registration before attempting to resolve
-    if (!tsyringeContainer.isRegistered(dependency)) {
+    if (!container.isRegistered(dependency)) {
       const name = (dependency as { name?: string }).name ?? String(dependency);
       throw new InternalServerError({
         message: `Failed to resolve '${name}' from the DI container`,
@@ -88,7 +128,7 @@ export const resolveDependencies = <T extends object>(dependencies: Array<Constr
     }
 
     try {
-      return tsyringeContainer.resolve<T>(dependency);
+      return container.resolve<T>(dependency);
     } catch (err) {
       const name = (dependency as { name?: string }).name ?? String(dependency);
       throw new InternalServerError({
@@ -110,6 +150,7 @@ export const resolveDependencies = <T extends object>(dependencies: Array<Constr
  * Typically used by Service layers for layer composition.
  *
  * @param dependencies - Array of class constructors to register
+ * @param container - Container to register into; defaults to the global container
  *
  * @example
  * ```typescript
@@ -118,9 +159,10 @@ export const resolveDependencies = <T extends object>(dependencies: Array<Constr
  */
 export const registerDependencies = <T extends object>(
   dependencies: Array<Constructor<T>>,
+  container: DependencyContainer = tsyringeContainer,
 ): void => {
   for (const dependency of dependencies) {
-    tsyringeContainer.register(dependency, {
+    container.register(dependency, {
       useClass: dependency,
     });
   }

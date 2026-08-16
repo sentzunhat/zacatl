@@ -1,5 +1,6 @@
 import { resolveDependencies } from '@zacatl/dependency-injection';
 import { InternalServerError } from '@zacatl/error';
+import type { DependencyContainer } from '@zacatl/third-party/dependency-injection/tsyringe';
 
 import type { InfrastructureConfig, InfrastructureUnknownRepository } from './types';
 import { ensureRegisteredSingleton } from '../../../dependency-injection/container';
@@ -15,9 +16,11 @@ export type { InfrastructureConfig };
 export class Infrastructure {
   protected config: InfrastructureConfig;
   private readonly repositories: InfrastructureUnknownRepository[] = [];
+  private readonly container: DependencyContainer | undefined;
 
-  constructor(config: InfrastructureConfig) {
+  constructor(config: InfrastructureConfig, container?: DependencyContainer) {
     this.config = config;
+    this.container = container;
 
     this.register();
   }
@@ -34,11 +37,12 @@ export class Infrastructure {
     }
 
     for (const repository of this.config.repositories) {
-      ensureRegisteredSingleton(repository);
+      ensureRegisteredSingleton(repository, this.container);
     }
 
     const resolvedRepositories = resolveDependencies<InfrastructureUnknownRepository>(
       this.config.repositories,
+      this.container,
     );
 
     if (resolvedRepositories.length !== this.config.repositories.length) {

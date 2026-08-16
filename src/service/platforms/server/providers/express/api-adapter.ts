@@ -56,10 +56,14 @@ export const createApiAdapter = (server: Express, apiPrefix = ''): ApiServerPort
 
           const replyAdapter = {
             sent: false as boolean,
-            code: (statusCode: number) => {
+            setStatus: (statusCode: number) => {
               res.status(statusCode);
               return replyAdapter;
             },
+            // Support both Express route handlers and shared Fastify-shaped
+            // integrations when they run through this adapter.
+            status: (statusCode: number) => replyAdapter.setStatus(statusCode),
+            code: (statusCode: number) => replyAdapter.setStatus(statusCode),
             send: (payload: unknown) => {
               if (res.headersSent !== true) {
                 replyAdapter.sent = true;
