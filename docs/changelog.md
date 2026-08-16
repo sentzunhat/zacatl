@@ -89,7 +89,9 @@
   `@fastify/static` `10.1.2` → `10.1.3`, and `js-yaml` `5.2.2` → `5.3.0` in
   the runtime dependency set; refreshed compatible Playwright, Vite,
   Svelte, React type, Node type, Mongoose, PostgreSQL, `tsx`, and related
-  development dependencies in the lockfile.
+  development dependencies in the lockfile. The four SQLite example
+  lockfiles also now resolve `undici` `6.27.0` → `6.28.0`, removing the
+  reported production-tree advisory from their Docker dependency chain.
 - **Deferred unsafe or compatibility-sensitive major lines** — ESLint 10 and
   TypeScript 7 remain unmerged pending the existing compatibility review. The
   lockfile does resolve the existing TypeScript ESLint peer range from 8.65.0
