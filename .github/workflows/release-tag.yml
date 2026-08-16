@@ -30,6 +30,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
         run: |
+          set -euo pipefail
           ASSOCIATED_PRS="$(gh api -H 'Accept: application/vnd.github+json' "/repos/${GITHUB_REPOSITORY}/commits/${HEAD_SHA}/pulls")"
           MERGED_PR_COUNT="$(printf '%s' "${ASSOCIATED_PRS}" | jq '[.[] | select(.merged_at != null and .base.ref == "main")] | length')"
           if [ "${MERGED_PR_COUNT}" -eq 0 ]; then
