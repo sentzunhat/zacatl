@@ -81,9 +81,10 @@
   the runtime dependency set; refreshed compatible Playwright, Vite,
   Svelte, React type, Node type, Mongoose, PostgreSQL, `tsx`, and related
   development dependencies in the lockfile.
-- **Deferred unsafe or compatibility-sensitive major lines** — ESLint 10,
-  TypeScript 7, and the TypeScript ESLint 8.65 → 8.67 peer set remain
-  unmerged pending the existing peer-compatibility review.
+- **Deferred unsafe or compatibility-sensitive major lines** — ESLint 10 and
+  TypeScript 7 remain unmerged pending the existing compatibility review. The
+  lockfile does resolve the existing TypeScript ESLint peer range from 8.65.0
+  to 8.67.0.
 - No npm publish, GitHub merge, release tag, or external token change is part
   of this preparation step.
 
