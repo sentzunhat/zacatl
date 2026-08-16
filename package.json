@@ -624,11 +624,6 @@
       "import": "./build-src-esm/service/layers/infrastructure/orm/types.js",
       "require": "./build-src-cjs/service/layers/infrastructure/orm/types.js"
     },
-    "./service/layers/infrastructure/repositories/abstract": {
-      "types": "./build-src-esm/service/layers/infrastructure/repositories/abstract.d.ts",
-      "import": "./build-src-esm/service/layers/infrastructure/repositories/abstract.js",
-      "require": "./build-src-cjs/service/layers/infrastructure/repositories/abstract.js"
-    },
     "./service/layers/infrastructure/repositories/base-repository": {
       "types": "./build-src-esm/service/layers/infrastructure/repositories/base-repository.d.ts",
       "import": "./build-src-esm/service/layers/infrastructure/repositories/base-repository.js",
@@ -714,50 +709,15 @@
       "import": "./build-src-esm/service/platforms/platforms.js",
       "require": "./build-src-cjs/service/platforms/platforms.js"
     },
-    "./service/platforms/server/api/adapters": {
-      "types": "./build-src-esm/service/platforms/server/api/adapters.d.ts",
-      "import": "./build-src-esm/service/platforms/server/api/adapters.js",
-      "require": "./build-src-cjs/service/platforms/server/api/adapters.js"
-    },
-    "./service/platforms/server/api/adapters/express": {
-      "types": "./build-src-esm/service/platforms/server/api/adapters/express.d.ts",
-      "import": "./build-src-esm/service/platforms/server/api/adapters/express.js",
-      "require": "./build-src-cjs/service/platforms/server/api/adapters/express.js"
-    },
-    "./service/platforms/server/api/adapters/fastify": {
-      "types": "./build-src-esm/service/platforms/server/api/adapters/fastify.d.ts",
-      "import": "./build-src-esm/service/platforms/server/api/adapters/fastify.js",
-      "require": "./build-src-cjs/service/platforms/server/api/adapters/fastify.js"
-    },
     "./service/platforms/server/api/api-server": {
       "types": "./build-src-esm/service/platforms/server/api/api-server.d.ts",
       "import": "./build-src-esm/service/platforms/server/api/api-server.js",
       "require": "./build-src-cjs/service/platforms/server/api/api-server.js"
     },
-    "./service/platforms/server/api/express-adapter": {
-      "types": "./build-src-esm/service/platforms/server/api/express-adapter.d.ts",
-      "import": "./build-src-esm/service/platforms/server/api/express-adapter.js",
-      "require": "./build-src-cjs/service/platforms/server/api/express-adapter.js"
-    },
-    "./service/platforms/server/api/fastify-adapter": {
-      "types": "./build-src-esm/service/platforms/server/api/fastify-adapter.d.ts",
-      "import": "./build-src-esm/service/platforms/server/api/fastify-adapter.js",
-      "require": "./build-src-cjs/service/platforms/server/api/fastify-adapter.js"
-    },
     "./service/platforms/server/api/port": {
       "types": "./build-src-esm/service/platforms/server/api/port.d.ts",
       "import": "./build-src-esm/service/platforms/server/api/port.js",
       "require": "./build-src-cjs/service/platforms/server/api/port.js"
-    },
-    "./service/platforms/server/api/schema-helper": {
-      "types": "./build-src-esm/service/platforms/server/api/schema-helper.d.ts",
-      "import": "./build-src-esm/service/platforms/server/api/schema-helper.js",
-      "require": "./build-src-cjs/service/platforms/server/api/schema-helper.js"
-    },
-    "./service/platforms/server/database/adapters": {
-      "types": "./build-src-esm/service/platforms/server/database/adapters.d.ts",
-      "import": "./build-src-esm/service/platforms/server/database/adapters.js",
-      "require": "./build-src-cjs/service/platforms/server/database/adapters.js"
     },
     "./service/platforms/server/database/adapters/factory": {
       "types": "./build-src-esm/service/platforms/server/database/adapters/factory.d.ts",
@@ -784,11 +744,6 @@
       "import": "./build-src-esm/service/platforms/server/database/database-server.js",
       "require": "./build-src-cjs/service/platforms/server/database/database-server.js"
     },
-    "./service/platforms/server/database/mongoose-adapter": {
-      "types": "./build-src-esm/service/platforms/server/database/mongoose-adapter.d.ts",
-      "import": "./build-src-esm/service/platforms/server/database/mongoose-adapter.js",
-      "require": "./build-src-cjs/service/platforms/server/database/mongoose-adapter.js"
-    },
     "./service/platforms/server/database/orm-instance": {
       "types": "./build-src-esm/service/platforms/server/database/orm-instance.d.ts",
       "import": "./build-src-esm/service/platforms/server/database/orm-instance.js",
@@ -798,41 +753,6 @@
       "types": "./build-src-esm/service/platforms/server/database/port.d.ts",
       "import": "./build-src-esm/service/platforms/server/database/port.js",
       "require": "./build-src-cjs/service/platforms/server/database/port.js"
-    },
-    "./service/platforms/server/database/sequelize-adapter": {
-      "types": "./build-src-esm/service/platforms/server/database/sequelize-adapter.d.ts",
-      "import": "./build-src-esm/service/platforms/server/database/sequelize-adapter.js",
-      "require": "./build-src-cjs/service/platforms/server/database/sequelize-adapter.js"
-    },
-    "./service/platforms/server/database/sqlite-adapter": {
-      "types": "./build-src-esm/service/platforms/server/database/sqlite-adapter.d.ts",
-      "import": "./build-src-esm/service/platforms/server/database/sqlite-adapter.js",
-      "require": "./build-src-cjs/service/platforms/server/database/sqlite-adapter.js"
-    },
-    "./service/platforms/server/page/adapters": {
-      "types": "./build-src-esm/service/platforms/server/page/adapters.d.ts",
-      "import": "./build-src-esm/service/platforms/server/page/adapters.js",
-      "require": "./build-src-cjs/service/platforms/server/page/adapters.js"
-    },
-    "./service/platforms/server/page/adapters/express": {
-      "types": "./build-src-esm/service/platforms/server/page/adapters/express.d.ts",
-      "import": "./build-src-esm/service/platforms/server/page/adapters/express.js",
-      "require": "./build-src-cjs/service/platforms/server/page/adapters/express.js"
-    },
-    "./service/platforms/server/page/adapters/fastify": {
-      "types": "./build-src-esm/service/platforms/server/page/adapters/fastify.d.ts",
-      "import": "./build-src-esm/service/platforms/server/page/adapters/fastify.js",
-      "require": "./build-src-cjs/service/platforms/server/page/adapters/fastify.js"
-    },
-    "./service/platforms/server/page/express-page-adapter": {
-      "types": "./build-src-esm/service/platforms/server/page/express-page-adapter.d.ts",
-      "import": "./build-src-esm/service/platforms/server/page/express-page-adapter.js",
-      "require": "./build-src-cjs/service/platforms/server/page/express-page-adapter.js"
-    },
-    "./service/platforms/server/page/fastify-page-adapter": {
-      "types": "./build-src-esm/service/platforms/server/page/fastify-page-adapter.d.ts",
-      "import": "./build-src-esm/service/platforms/server/page/fastify-page-adapter.js",
-      "require": "./build-src-cjs/service/platforms/server/page/fastify-page-adapter.js"
     },
     "./service/platforms/server/page/page-server": {
       "types": "./build-src-esm/service/platforms/server/page/page-server.d.ts",
@@ -969,35 +889,10 @@
       "import": "./build-src-esm/third-party/js-yaml.js",
       "require": "./build-src-cjs/third-party/js-yaml.js"
     },
-    "./third-party/mongoose": {
-      "types": "./build-src-esm/third-party/mongoose.d.ts",
-      "import": "./build-src-esm/third-party/mongoose.js",
-      "require": "./build-src-cjs/third-party/mongoose.js"
-    },
     "./third-party/pino": {
       "types": "./build-src-esm/third-party/pino.d.ts",
       "import": "./build-src-esm/third-party/pino.js",
       "require": "./build-src-cjs/third-party/pino.js"
-    },
-    "./third-party/reflect-metadata": {
-      "types": "./build-src-esm/third-party/reflect-metadata.d.ts",
-      "import": "./build-src-esm/third-party/reflect-metadata.js",
-      "require": "./build-src-cjs/third-party/reflect-metadata.js"
-    },
-    "./third-party/sequelize": {
-      "types": "./build-src-esm/third-party/sequelize.d.ts",
-      "import": "./build-src-esm/third-party/sequelize.js",
-      "require": "./build-src-cjs/third-party/sequelize.js"
-    },
-    "./third-party/sqlite3": {
-      "types": "./build-src-esm/third-party/sqlite3.d.ts",
-      "import": "./build-src-esm/third-party/sqlite3.js",
-      "require": "./build-src-cjs/third-party/sqlite3.js"
-    },
-    "./third-party/tsyringe": {
-      "types": "./build-src-esm/third-party/tsyringe.d.ts",
-      "import": "./build-src-esm/third-party/tsyringe.js",
-      "require": "./build-src-cjs/third-party/tsyringe.js"
     },
     "./third-party/uuid": {
       "types": "./build-src-esm/third-party/uuid.d.ts",
