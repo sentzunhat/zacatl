@@ -108,7 +108,7 @@ jobs:
 
   docker:
     name: Docker smoke
-    # Expensive: three image builds plus Postgres/Mongo services.
+    # Expensive: eight example builds plus Postgres/Mongo services.
     # Runs on:
     #   - push to main with a pending release (release gate)
     #   - PRs with 'docker-smoke' label (opt-in testing)

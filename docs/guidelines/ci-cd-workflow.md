@@ -297,7 +297,7 @@ tag:
   - Tests, type check, lint: ~8 min
   - Build: ~3 min
   - Consumer smoke tests: ~5 min
-  - Docker smoke tests (3 images): ~15 min
+  - Docker smoke tests (8 example jobs): ~15 min
 - **Weekly schedule:** Same as main (full drift detection)
 
 Docker smoke is the slowest step. If you need faster feedback on main, docker can be moved to a nightly schedule and dry-run kept on main. Contact the maintainers to discuss.
