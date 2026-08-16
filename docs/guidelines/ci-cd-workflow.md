@@ -186,8 +186,13 @@ a duplicate tag.
 
 The `release.yml` workflow then:
 1. Runs the same `npm audit --omit=dev --audit-level=high` check (must match the gate)
-2. Runs `npm publish ./publish --access public --tag latest --provenance`
-3. Creates a GitHub Release with notes from `docs/changelog.md`
+2. Verifies, then publishes `npm publish ./publish --access public --tag latest --provenance`
+   unless the immutable version is already present on npm
+3. Creates the GitHub Release in a separate rerunnable job with notes from `docs/changelog.md`
+
+The split makes partial success recoverable: if npm publication succeeds but GitHub Release
+creation fails, rerunning the workflow verifies the tag and package, skips the already-published
+version, and retries only the missing GitHub Release.
 
 ## Debugging Failures
 

@@ -31,6 +31,10 @@
   merged PR, confirms the tested commit is still the current `main` tip, and
   safely retries the publish-workflow dispatch if tag creation succeeded before
   dispatch was interrupted.
+- **Made publication recovery-safe** — npm publication and GitHub Release
+  creation now run as separate retryable stages. A rerun skips only an already
+  published immutable version and can recover a missing GitHub Release without
+  attempting to publish the same version twice.
 - **Preserved single-run workflow ownership** — reusable checks remain
   `workflow_call` components so branch and pull-request events do not create
   duplicate runs; the standalone weekly CVE schedule remains intentional for
