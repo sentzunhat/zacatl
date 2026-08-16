@@ -16,7 +16,16 @@
 [![Tests: 659](https://img.shields.io/badge/tests-659%20passing-brightgreen.svg?style=flat-square)](#-testing)
 [![Coverage: 91.41%](https://img.shields.io/badge/coverage-91.41%25-brightgreen.svg?style=flat-square)](#-testing)
 
-**Stack**
+| Capability                  | Detail                                                            |
+| --------------------------- | ----------------------------------------------------------------- |
+| 🏗️ Layered Architecture     | Strict Application → Domain → Infrastructure → Platform layers    |
+| 💉 Dependency Injection     | Built-in DI container via `tsyringe`                              |
+| ✅ Type-Safe Validation     | Zod schema support                                              |
+| 🛡️ Structured Errors        | 8 custom error types with correlation IDs                         |
+| 🗄️ Pluggable ORM Adapters   | Sequelize, Mongoose, built-in SQLite via `node:sqlite`, or custom |
+| 🌐 Internationalization     | Pluggable i18n with filesystem/memory adapters                    |
+| 📝 Production Observability | Structured logging and error tracking                             |
+| 🧪 Tested                   | Vitest — test count and coverage shown in badges above            |
 
 [![TypeScript](https://img.shields.io/badge/%3C%2F%3E-TypeScript-3178c6.svg?style=flat-square)](https://www.typescriptlang.org/)
 [![Node.js 26+](https://img.shields.io/badge/node-%3E%3D26.0.0-brightgreen.svg?style=flat-square)](https://nodejs.org/)
@@ -61,7 +70,7 @@ Zacatl is useful when a service needs to stay understandable as it grows, or whe
 | 🏗️ Layered Architecture     | Strict Application → Domain → Infrastructure → Platform layers     |
 | 💉 Dependency Injection     | Built-in DI container via `tsyringe`                                |
 | ✅ Type-Safe Validation     | Zod schema support; Yup and optional validation planned            |
-| 🛡️ Structured Errors        | 7 custom error types with correlation IDs                          |
+| 🛡️ Structured Errors        | 8 custom error types with correlation IDs                          |
 | 🗄️ Pluggable ORM Adapters   | Sequelize, Mongoose, built-in SQLite via `node:sqlite`, or custom   |
 | 🌐 Server Framework Choice  | Fastify or Express — same domain logic, swap the adapter           |
 | 🌍 Internationalization     | Pluggable i18n with filesystem/memory adapters                     |
