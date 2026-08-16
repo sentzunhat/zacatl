@@ -75,8 +75,10 @@ const mockSchema = { type: 'MockSchema' };
 
 const makeMockMongoose = (
   model: ReturnType<typeof makeModel>,
-): { model: ReturnType<typeof vi.fn> } => ({
+  models: Record<string, ReturnType<typeof makeModel>> = {},
+): { model: ReturnType<typeof vi.fn>; models: Record<string, ReturnType<typeof makeModel>> } => ({
   model: vi.fn().mockReturnValue(model),
+  models,
 });
 
 describe('MongooseAdapter', () => {
@@ -115,6 +117,20 @@ describe('MongooseAdapter', () => {
       });
 
       expect(adapter.model).toBe(adapter.model);
+    });
+
+    it('reuses a model already registered on the Mongoose instance', () => {
+      const registeredModel = makeModel();
+      const mongoose = makeMockMongoose(mockModel, { TestUserExisting: registeredModel });
+      container.register(MongooseToken, { useValue: mongoose });
+      const adapter = new MongooseAdapter<TestInput, TestInput, TestOutput>({
+        type: ORMType.Mongoose,
+        name: 'TestUserExisting',
+        schema: mockSchema as never,
+      });
+
+      expect(adapter.model).toBe(registeredModel);
+      expect(mongoose.model).not.toHaveBeenCalled();
     });
 
     it('construction succeeds when DI token is not yet registered', () => {
