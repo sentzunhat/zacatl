@@ -1,0 +1,90 @@
+name: Release tag
+
+# This workflow is deliberately separate from PR CI. It is invoked only after
+# the CI workflow has completed successfully for a push to main (the merge
+# path), so pull requests never display a skipped release job.
+
+on:
+  workflow_run:
+    workflows: ['CI']
+    types: [completed]
+    branches: [main]
+
+concurrency:
+  group: release-tag-main
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  actions: write
+  pull-requests: read
+
+jobs:
+  tag:
+    name: Tag release
+    if: ${{ github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push' && github.event.workflow_run.head_branch == 'main' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require merged PR into main
+        env:
+          GH_TOKEN: ${{ github.token }}
+          HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
+        run: |
+          set -euo pipefail
+          ASSOCIATED_PRS="$(gh api -H 'Accept: application/vnd.github+json' "/repos/${GITHUB_REPOSITORY}/commits/${HEAD_SHA}/pulls")"
+          MERGED_PR_COUNT="$(printf '%s' "${ASSOCIATED_PRS}" | jq '[.[] | select(.merged_at != null and .base.ref == "main")] | length')"
+          if [ "${MERGED_PR_COUNT}" -eq 0 ]; then
+            echo "Refusing to tag ${HEAD_SHA}: no merged PR into main is associated with this commit."
+            exit 1
+          fi
+
+      - name: Checkout merged main commit
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+          fetch-depth: 0
+
+      - name: Create tag if missing and dispatch Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
+        run: |
+          set -euo pipefail
+          CURRENT_MAIN_SHA="$(gh api \
+            -H 'Accept: application/vnd.github+json' \
+            "/repos/${GITHUB_REPOSITORY}/git/ref/heads/main" \
+            --jq '.object.sha')"
+          if [ "${CURRENT_MAIN_SHA}" != "${HEAD_SHA}" ]; then
+            echo "Refusing to tag stale CI commit ${HEAD_SHA}; current main is ${CURRENT_MAIN_SHA}." >&2
+            echo "The newer main commit must complete CI before it can be released." >&2
+            exit 1
+          fi
+          PKG_VERSION="$(node -p "require('./package.json').version")"
+          TAG="v${PKG_VERSION}"
+          if git rev-parse -q --verify "refs/tags/${TAG}" >/dev/null; then
+            TAG_SHA="$(git rev-list -n 1 "refs/tags/${TAG}")"
+            if [ "${TAG_SHA}" != "${HEAD_SHA}" ]; then
+              echo "Refusing to reuse ${TAG}: it points to ${TAG_SHA}, not ${HEAD_SHA}." >&2
+              exit 1
+            fi
+            echo "Tag ${TAG} already exists at the verified commit; checking publish dispatch state."
+          else
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git tag "${TAG}"
+            git push origin "${TAG}"
+          fi
+
+          RELEASE_RUNS="$(gh run list --workflow release.yml --limit 100 --json status,conclusion,headBranch,headSha)"
+          if printf '%s' "${RELEASE_RUNS}" | jq -e --arg tag "${TAG}" --arg sha "${HEAD_SHA}" '
+            any(.[]; .headBranch == $tag and .headSha == $sha and
+              (.status == "queued" or .status == "in_progress" or .conclusion == "success"))
+          ' >/dev/null; then
+            echo "Release workflow for ${TAG} is already queued, running, or completed successfully."
+            exit 0
+          fi
+
+          # Tags pushed with GITHUB_TOKEN do not start another workflow, so
+          # dispatch the publish workflow explicitly. This remains safe to
+          # retry when tag creation succeeded but dispatch failed.
+          gh workflow run release.yml --ref "${TAG}"

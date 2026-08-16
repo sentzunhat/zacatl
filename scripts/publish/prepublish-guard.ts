@@ -8,6 +8,8 @@ const packagePath = resolve(root, 'package.json');
 const changelogPath = resolve(root, 'docs/changelog.md');
 const skipGuard = process.env['SKIP_PREPUBLISH_GUARD'] === '1';
 const skipGuardReason = (process.env['SKIP_PREPUBLISH_GUARD_REASON'] ?? '').trim();
+const allowPublishedVersionRecovery =
+  process.env['ALLOW_PUBLISHED_VERSION_RECOVERY'] === '1';
 
 const fail = (message: string): void => {
   // eslint-disable-next-line no-console
@@ -107,7 +109,14 @@ try {
 }
 
 if (publishedVersions.includes(packageVersion)) {
-  fail(`Version ${packageVersion} is already published to npm for ${packageName}`);
+  if (allowPublishedVersionRecovery) {
+    warn(
+      `Version ${packageVersion} is already published to npm for ${packageName}; ` +
+        'continuing for an explicit release-recovery verification run.',
+    );
+  } else {
+    fail(`Version ${packageVersion} is already published to npm for ${packageName}`);
+  }
+} else {
+  pass(`Published-version check passed: ${packageVersion} is not on npm yet`);
 }
-
-pass(`Published-version check passed: ${packageVersion} is not on npm yet`);

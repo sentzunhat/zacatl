@@ -2,6 +2,103 @@
 
 ---
 
+## [0.0.60] - 2026-08-15
+
+**Status**: Release candidate prepared on `dev`; do not merge or publish without owner approval.
+
+### 🔒 Security and release hardening
+
+- **Kept provenance-signed publishing in the release path** — the existing
+  release workflow requests GitHub's OIDC identity token and publishes with
+  npm provenance enabled.
+- **Tracked the next release-security priority** — migrate the publish job
+  from the long-lived `NPM_TOKEN` secret to npm Trusted Publishing through
+  GitHub Actions OIDC, restrict the trusted publisher to the exact repository,
+  workflow, and release environment, then revoke the legacy publish token.
+  This is tracked as `NPM-OIDC-001` and is not claimed as complete in this
+  release.
+
+### 🧱 CI and release workflow
+
+- **Layered the CI orchestrator** — branch and pull-request events enter
+  through `ci.yml`, which coordinates CVE scanning, peer installation checks,
+  publish verification, Docker smoke tests, and the release tag gate.
+- **Added pending-release gating** — publish-dry, Docker smoke, and tag
+  creation skip cleanly when the package version is already released, avoiding
+  false failures on ordinary post-release commits.
+- **Separated merge-only release tagging** — pull-request CI no longer shows a
+  skipped tag job. After successful CI on `main`, `release-tag.yml` requires a
+  merged PR, confirms the tested commit is still the current `main` tip, and
+  safely retries the publish-workflow dispatch if tag creation succeeded before
+  dispatch was interrupted.
+- **Made publication recovery-safe** — npm publication and GitHub Release
+  creation now run as separate retryable stages. A rerun skips only an already
+  published immutable version and can recover a missing GitHub Release without
+  attempting to publish the same version twice.
+- **Preserved single-run workflow ownership** — reusable checks remain
+  `workflow_call` components so branch and pull-request events do not create
+  duplicate runs; the standalone weekly CVE schedule remains intentional for
+  badge freshness.
+
+### 🐳 Example and database verification
+
+- **Hardened the MongoDB Docker smoke window** — widened the health-check
+  startup allowance and retries for slower CI environments while retaining
+  the full health, CRUD, and SPA checks.
+- **Maintained the database smoke matrix** across SQLite, PostgreSQL, and
+  MongoDB-backed examples, including the eight example application variants
+  covered by the Docker workflow.
+- **Kept consumer publish smokes in the release gate** — packed-package
+  checks cover non-SQL, node:sqlite, Mongoose, Sequelize SQLite, and
+  Sequelize Postgres consumers.
+
+### 🧩 Architecture and dependency injection
+
+- **Completed layered DI containers** — infrastructure, domain, and
+  application layers now receive child containers that preserve the existing
+  consumer decorator and injection API.
+- **Removed internal `Server` passthrough getters** and kept platform
+  composition behind the service/container boundaries.
+- **Retained the server and database adapter direction** — Fastify, Express,
+  Mongoose, Sequelize, and node:sqlite remain explicit adapter choices while
+  the v0.1.0 plan now includes an audit of server/frontend providers as
+  replaceable peers (`PLATFORM-001`).
+- **Regenerated the package export map during release preparation** so the
+  staged package reflects the current built public modules rather than a
+  stale local export list.
+
+### 📚 Documentation and project workflow
+
+- **Reworked the README positioning** around consistent TypeScript services,
+  visible architecture boundaries, the intended initial audience, and a
+  real greeting CRUD path from HTTP request through validation, service,
+  repository port, SQLite adapter, and typed response.
+- **Grouped package, quality, and stack badges** and documented the CI, CVE,
+  and release badge behavior.
+- **Added and maintained the v0.1.0 milestone plan** for CLI and Desktop
+  platform support, server hygiene, provider boundaries, testing, and the
+  eventual 0.0.x-to-0.1.0 migration path.
+
+### 🧪 Verification record
+
+- The repository's established verification path includes type checking,
+  linting, unit tests, build output, packed consumer smoke fixtures, and the
+  Docker matrix. Run the full release verification on the release candidate
+  before merging.
+- **Refreshed compatible dependencies** — updated Fastify `5.10` → `5.12`,
+  `@fastify/static` `10.1.2` → `10.1.3`, and `js-yaml` `5.2.2` → `5.3.0` in
+  the runtime dependency set; refreshed compatible Playwright, Vite,
+  Svelte, React type, Node type, Mongoose, PostgreSQL, `tsx`, and related
+  development dependencies in the lockfile. The four SQLite example
+  lockfiles also now resolve `undici` `6.27.0` → `6.28.0`, removing the
+  reported production-tree advisory from their Docker dependency chain.
+- **Deferred unsafe or compatibility-sensitive major lines** — ESLint 10 and
+  TypeScript 7 remain unmerged pending the existing compatibility review. The
+  lockfile does resolve the existing TypeScript ESLint peer range from 8.65.0
+  to 8.67.0.
+- No npm publish, GitHub merge, release tag, or external token change is part
+  of this preparation step.
+
 ## [0.0.59] - 2026-07-27
 
 **Status**: Ready for publication

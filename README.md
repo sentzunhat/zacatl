@@ -25,15 +25,16 @@
 
 > `CI` is the orchestrator — CVE scanning, peer-dependency install checks, the full test suite, and an 8-example Docker smoke matrix, gating every merge to `main`. `CVE scan` runs that same audit again on its own weekly schedule so its badge stays live independent of `CI`. `Release` reflects the actual tag → npm publish → GitHub Release pipeline, only fired by real releases. There's no separate "Publish dry-run" badge: that check only runs as part of `CI` (gated on a pending version bump), and giving it its own trigger would mean it either fails on ordinary non-release pushes or needs to duplicate that gate — not worth it for one more badge. See [docs/guidelines/ci-cd-workflow.md](./docs/guidelines/ci-cd-workflow.md) for exactly what runs where and why.
 
-**Universal TypeScript framework for building APIs, CLI tools, and distributed systems.**
+**Build consistent TypeScript services without giving up the frameworks you already use.**
 
-Zacatl enforces layered (hexagonal) architecture with built-in dependency injection, type-safe validation, and structured error handling — designed for both human developers and AI agents to collaborate effectively. It doesn't replace [Fastify](https://fastify.dev), [Express](https://expressjs.com), [Mongoose](https://mongoosejs.com), or [Sequelize](https://sequelize.org) — it wires them together behind a consistent, testable architecture, so swapping HTTP framework or database vendor is a config change, not a rewrite.
+Zacatl gives TypeScript teams a repeatable application → domain → infrastructure → platform structure, built-in dependency injection, type-safe validation, and structured errors. You keep using [Fastify](https://fastify.dev), [Express](https://expressjs.com), [Mongoose](https://mongoosejs.com), or [Sequelize](https://sequelize.org); Zacatl supplies the boundaries that keep those choices from leaking through the whole application.
 
-Zacatl was built with the help of AI models and digital agents, and is intentionally designed to be navigable by both humans and automated tooling alike.
+It is aimed first at teams building modular APIs and backend services that want consistent project structure, replaceable adapters, and earlier feedback from tests and CI/CD.
 
 ## Table of Contents
 
 - [Why Zacatl](#-why-zacatl)
+- [See It in a Real Service](#-see-it-in-a-real-service)
 - [Quick Start](#-quick-start)
 - [ORM Adapters](#️-orm-adapters)
 - [Architecture](#️-architecture)
@@ -49,6 +50,12 @@ Zacatl was built with the help of AI models and digital agents, and is intention
 
 ## ✨ Why Zacatl
 
+Zacatl is useful when a service needs to stay understandable as it grows, or when several services need to follow the same architectural rules without sharing one large application.
+
+- **Keep business logic portable:** domain services depend on repository ports, while database and platform adapters remain replaceable.
+- **Make boundaries visible:** routes, validation, services, repositories, and startup wiring have clear homes and test seams.
+- **Catch drift earlier:** typed contracts, focused tests, dependency checks, and CI-friendly verification make consistency part of the workflow.
+
 | Capability                  | Detail                                                             |
 | ---------------------------- | ------------------------------------------------------------------ |
 | 🏗️ Layered Architecture     | Strict Application → Domain → Infrastructure → Platform layers     |
@@ -60,6 +67,29 @@ Zacatl was built with the help of AI models and digital agents, and is intention
 | 🌍 Internationalization     | Pluggable i18n with filesystem/memory adapters                     |
 | 📝 Production Observability | Structured logging and error tracking                              |
 | 🧪 Tested                   | 659 tests, 91%+ coverage — see [Testing](#-testing)                |
+
+## 🧭 See It in a Real Service
+
+The [`fastify-sqlite-react`](./examples/fastify-sqlite-react) example is a complete greeting CRUD service, not just a bootstrap snippet:
+
+```text
+HTTP request
+  → validated route handler
+  → GreetingService
+  → GreetingRepository port
+  → SQLite adapter
+  → typed response
+```
+
+It includes create, list, update, and delete flows with validation, domain logic, repository wiring, persistence, and a React frontend. Run it locally with:
+
+```bash
+cd examples/fastify-sqlite-react
+docker compose up -d
+curl http://localhost:8081/api/greetings
+```
+
+The same greeting flow is implemented across Fastify/Express, SQLite/PostgreSQL/MongoDB, and React/Svelte in the [examples matrix](./examples/README.md), making the adapter boundaries visible instead of theoretical.
 
 ## 🚀 Quick Start
 

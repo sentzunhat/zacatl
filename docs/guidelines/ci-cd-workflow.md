@@ -8,8 +8,8 @@ Zacatl uses a centralized CI orchestrator to gate development, testing, and rele
 
 - `cve-scan.yml` — Production dependency CVE audit (`npm audit --omit=dev --audit-level=high`)
 - `peer-install-check.yml` — Verify peerDependencies can be installed and imported
-- `publish-dry.yml` — Full verification chain: tests, type check, lint, build, consumer smoke tests, and `npm publish --dry-run`
-- `docker-smoke.yml` — Build and smoke-test three example Docker images (sqlite, postgres, mongodb)
+- `publish-dry.yml` — Full verification chain: tests, type check, lint, build, consumer smoke tests, and `npm publish --dry-run`; opt in on a PR with the `publish-dry-run` label
+- `docker-smoke.yml` — Build and smoke-test eight example jobs covering SQLite, PostgreSQL, and MongoDB
 
 All component workflows are **`workflow_call`-only** with no direct `push`/`pull_request` triggers, eliminating duplicate runs on those events.
 
@@ -21,7 +21,8 @@ All component workflows are **`workflow_call`-only** with no direct `push`/`pull
 
 **Default:** CVE scan, peer install check (fast, ~5–10 min)  
 **Blocks merge:** cve or peers failure  
-**Optional:** Add `docker-test` label to run docker-smoke before merge
+**Optional:** Add `docker-smoke` to run Docker smoke before merge, or
+`publish-dry-run` to run the full package verification and npm dry-run.
 
 ```
   pull_request -> dev/main
@@ -30,17 +31,29 @@ All component workflows are **`workflow_call`-only** with no direct `push`/`pull
       ↓
   [peer-install-check]
       ↓
-  [docker-smoke] ← only if labeled 'docker-test'
+  [docker-smoke] ← only if labeled 'docker-smoke'
+      ↓
+  [publish-dry-run] ← only if labeled 'publish-dry-run'
       ↓
    Merge enabled
 ```
 
-**Why not docker on all PRs?** Docker builds three images and boots Postgres/Mongo containers (~15 min). Too expensive for routine PRs.
+**Why not docker on all PRs?** Docker builds eight example jobs and boots Postgres/Mongo containers (~15 min). Too expensive for routine PRs.
 
-**When to add the docker-test label:**
+**When to add the docker-smoke label:**
 - Before merging to main if you changed dockerfile, examples, or deployment config
 - To verify docker works before release
 - Anytime you want manual confidence — just add the label, wait ~20 min, then remove it
+
+**When to add the publish-dry-run label:**
+
+- Before merging a release candidate
+- After changing package metadata, exports, dependencies, or publish scripts
+- To verify the packed consumer fixtures and `npm publish --dry-run`
+
+Adding either label emits a new `pull_request:labeled` event and starts a new
+orchestrator run. Removing a label does not cancel an already-running job; it
+only prevents that label from selecting the next run.
 
 ### Push to dev (after merge)
 
@@ -69,8 +82,9 @@ the version (e.g. a docs-only follow-up commit right after a release) doesn't wa
 loudly inside `prepublish-guard.ts` with "already published" — on a run that could never publish
 anyway.
 
-**If a release is pending:** full verification, then the release tag is created and npm publish is
-dispatched.
+**If a release is pending:** full verification completes first. A separate merge-only
+`release-tag.yml` workflow then verifies the commit came from a merged PR and is still the current
+tip of `main` before creating the release tag and dispatching npm publish.
 
 ```
   push -> main
@@ -83,10 +97,12 @@ dispatched.
       ↓
   [publish-dry.yml] ← full verification: tests, type check, lint, build, smokes, dry-run
       ↓                 (skipped if should-release says nothing is pending)
-  [docker-smoke.yml] ← three images built and smoke-tested
+  [docker-smoke.yml] ← eight example jobs across three database families
       ↓                 (skipped if should-release says nothing is pending)
-    [tag job]
-      ↓                 (skipped if should-release says nothing is pending)
+    CI completes successfully
+      ↓
+  [release-tag.yml] ← merged PR + current main tip guard
+      ↓
     Create v<version> tag
       ↓
   Dispatch release.yml
@@ -95,7 +111,8 @@ dispatched.
 ```
 
 **If no release is pending:** `cve` and `peers` still run (cheap, always useful drift checks);
-`dry`, `docker`, and `tag` all skip cleanly.
+`dry` and `docker` skip cleanly. `release-tag.yml` never creates a duplicate tag, and it can retry
+the publish-workflow dispatch if tag creation succeeded but the first dispatch attempt failed.
 
 ### Weekly schedule
 
@@ -141,30 +158,41 @@ should-release:
 ```
 
 `dry` and `docker` only run when `needs.should-release.outputs.pending == 'true'` (in addition to
-being a push to main). The `tag` job is the release gate:
+being a push to main). After the CI workflow completes successfully, `release-tag.yml` is the
+merge-only release gate:
 
 ```yaml
-tag:
-  if: >
-    always() && github.event_name == 'push' && github.ref == 'refs/heads/main' &&
-    needs.should-release.outputs.pending == 'true' &&
-    needs.cve.result == 'success' && needs.peers.result == 'success' &&
-    (needs.dry.result == 'success' || needs.dry.result == 'skipped') &&
-    (needs.docker.result == 'success' || needs.docker.result == 'skipped')
-  needs: [should-release, cve, peers, dry, docker]
-  runs-on: ubuntu-latest
-  # Creates v<version> tag and dispatches release.yml
+on:
+  workflow_run:
+    workflows: ['CI']
+    types: [completed]
+    branches: [main]
+
+jobs:
+  tag:
+    if: >
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'push' &&
+      github.event.workflow_run.head_branch == 'main'
+    # The job also checks that head_sha belongs to a merged PR into main and is
+    # still the current main tip immediately before tagging.
+    # Creates v<version> and dispatches release.yml.
 ```
 
-**Key:** `tag` only runs on a push to main with a pending release (not PRs, not a repeat push at the
-same version), and it waits for cve/peers to succeed and dry/docker to either succeed or be
-legitimately skipped. A red merge cannot publish, and a push with nothing new to release cannot
-either — it just skips cleanly instead of failing.
+**Key:** `release-tag.yml` is not part of PR CI. It only considers successful CI runs for `main`,
+requires the CI commit to belong to a merged PR targeting `main`, and fails closed if `main` has
+advanced since that CI run. A red merge cannot publish, and a repeat version exits without creating
+a duplicate tag.
 
 The `release.yml` workflow then:
 1. Runs the same `npm audit --omit=dev --audit-level=high` check (must match the gate)
-2. Runs `npm publish ./publish --access public --tag latest --provenance`
-3. Creates a GitHub Release with notes from `docs/changelog.md`
+2. Verifies, then publishes `npm publish ./publish --access public --tag latest --provenance`
+   unless the immutable version is already present on npm
+3. Creates the GitHub Release in a separate rerunnable job with notes from `docs/changelog.md`
+
+The split makes partial success recoverable: if npm publication succeeds but GitHub Release
+creation fails, rerunning the workflow verifies the tag and package, skips the already-published
+version, and retries only the missing GitHub Release.
 
 ## Debugging Failures
 
@@ -181,8 +209,11 @@ Same as PR failures. Cve and peers are the only gates on dev.
 ### Push to main fails before release
 
 Check which job failed:
-- **cve, peers, dry, docker** — See debugging steps above. The push is accepted but release is blocked.
-- **tag job failure** — The tag creation or dispatch failed. Check git permissions and GitHub API access (NPM_TOKEN must be present).
+- **cve, peers, dry, docker** — See debugging steps above. The merge is accepted but release is blocked.
+- **release-tag workflow failure** — Check the merged-PR and current-main guards first. A stale CI run
+  is intentionally rejected so a newer `main` commit can complete its own release gate. For tag
+  creation or dispatch failures, check GitHub API permissions; `NPM_TOKEN` is only used later by
+  `release.yml` during npm publication.
 
 **`dry` failing with "Version X is already published to npm"** — this shouldn't happen anymore on a
 normal push to main; `should-release` is supposed to skip `dry` entirely once the current version is
@@ -266,7 +297,7 @@ tag:
   - Tests, type check, lint: ~8 min
   - Build: ~3 min
   - Consumer smoke tests: ~5 min
-  - Docker smoke tests (3 images): ~15 min
+  - Docker smoke tests (8 example jobs): ~15 min
 - **Weekly schedule:** Same as main (full drift detection)
 
 Docker smoke is the slowest step. If you need faster feedback on main, docker can be moved to a nightly schedule and dry-run kept on main. Contact the maintainers to discuss.

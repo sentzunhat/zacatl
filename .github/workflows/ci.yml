@@ -9,7 +9,8 @@ name: CI
 #
 #   pull_request -> dev|main : cve, peers                (fast gates)
 #   push         -> dev      : (nothing — covered by the open PR's pull_request run)
-#   push         -> main     : should-release -> cve, peers, [dry, docker if pending] -> tag -> Release
+#   push         -> main     : should-release -> cve, peers, [dry, docker if pending]
+#   completed CI on main     : release-tag -> Release (merge-only release path)
 #   schedule (weekly)        : cve, peers                (drift detection only)
 #
 # Push to dev skips cve/peers: dev is normally the source branch of an open
@@ -27,15 +28,16 @@ name: CI
 # once the current version is already released. They run on pushes to main
 # with a pending release to verify the full pipeline before tagging.
 #
-# The `tag` job gates publishing. It only runs on a push to main with a
-# pending release, after all checks pass, so a red merge can never reach
-# npm.
+# Release tagging is intentionally handled by release-tag.yml after this
+# workflow completes successfully on main. Keeping it in a separate workflow
+# means PRs never show a skipped release job.
 
 on:
   push:
     branches: [dev, main]
   pull_request:
     branches: [dev, main]
+    types: [opened, synchronize, reopened, labeled]
   schedule:
     - cron: '17 3 * * 1' # Mondays 03:17 UTC
   workflow_dispatch: {}
@@ -98,59 +100,21 @@ jobs:
   dry:
     name: Publish dry-run
     # Full verification (tests, type check, lint, build, consumer smokes).
-    # Expensive; only run on push to main, and only when the version isn't
-    # already published — otherwise prepublish-guard.ts fails on purpose,
-    # which is correct for a manual dispatch but just noise on an ordinary
-    # push to main with no version bump.
+    # Runs on a pending release push to main, or when a PR opts in with the
+    # publish-dry-run label. Adding that label starts a fresh labeled event.
     needs: [should-release]
-    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.should-release.outputs.pending == 'true' }}
+    if: ${{ (github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.should-release.outputs.pending == 'true') || (github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, 'publish-dry-run')) }}
     uses: ./.github/workflows/publish-dry.yml
 
   docker:
     name: Docker smoke
-    # Expensive: three image builds plus Postgres/Mongo services.
+    # Expensive: eight example builds plus Postgres/Mongo services.
     # Runs on:
     #   - push to main with a pending release (release gate)
-    #   - PRs with 'docker-test' label (opt-in testing)
+    #   - PRs with 'docker-smoke' label (opt-in testing)
     #   - Manual trigger from Actions tab (workflow_dispatch)
     # Skips on: dev pushes, schedule, PRs without label, main pushes with
     # no version bump (nothing to release, see `should-release`)
     needs: [should-release]
-    if: ${{ (github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.should-release.outputs.pending == 'true') || (github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, 'docker-test')) }}
+    if: ${{ (github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.should-release.outputs.pending == 'true') || (github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, 'docker-smoke')) }}
     uses: ./.github/workflows/docker-smoke.yml
-
-  tag:
-    name: Tag release
-    # Release gate: only a real push to main with a pending version bump.
-    # `always()` plus explicit result checks because dry/docker may be
-    # legitimately skipped (no pending release) rather than successful —
-    # skipped is fine, failed is not.
-    if: ${{ always() && github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.should-release.outputs.pending == 'true' && needs.cve.result == 'success' && needs.peers.result == 'success' && (needs.dry.result == 'success' || needs.dry.result == 'skipped') && (needs.docker.result == 'success' || needs.docker.result == 'skipped') }}
-    needs: [should-release, cve, peers, dry, docker]
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write # create and push the release tag
-      actions: write # dispatch the Release workflow
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v7
-        with:
-          fetch-depth: 0 # need tags to detect already-released versions
-
-      # Tags pushed with the default GITHUB_TOKEN do not trigger other
-      # workflows (GitHub anti-recursion), so Release is dispatched explicitly.
-      - name: Create tag if missing and dispatch Release
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          PKG_VERSION="$(node -p "require('./package.json').version")"
-          TAG="v${PKG_VERSION}"
-          if git rev-parse -q --verify "refs/tags/${TAG}" >/dev/null; then
-            echo "Tag ${TAG} already exists — nothing to release."
-            exit 0
-          fi
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git tag "${TAG}"
-          git push origin "${TAG}"
-          gh workflow run release.yml --ref "${TAG}"

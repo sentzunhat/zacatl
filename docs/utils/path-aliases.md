@@ -66,7 +66,7 @@ See the [main README](../../README.md) for complete import examples.
 
 ```typescript
 import { Service } from '../../../service/service';
-import { BaseRepository } from '../../service/layers/infrastructure/repositories/abstract';
+import { BaseRepository } from '../../service/layers/infrastructure/repositories/base-repository';
 import { BadRequestError } from '../../../error/bad-request';
 import { logger } from '../../../logs';
 ```

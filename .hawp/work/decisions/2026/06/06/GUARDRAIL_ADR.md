@@ -2,7 +2,7 @@
 
 Date: 2026-04-26
 Status: Proposed
-Owner: Diego Beltran
+Owner: repository maintainer
 Project: Human AI Workflow Protocol
 
 ## Context
