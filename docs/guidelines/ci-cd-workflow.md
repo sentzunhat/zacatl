@@ -82,8 +82,9 @@ the version (e.g. a docs-only follow-up commit right after a release) doesn't wa
 loudly inside `prepublish-guard.ts` with "already published" — on a run that could never publish
 anyway.
 
-**If a release is pending:** full verification, then the release tag is created and npm publish is
-dispatched.
+**If a release is pending:** full verification completes first. A separate merge-only
+`release-tag.yml` workflow then verifies the commit came from a merged PR and is still the current
+tip of `main` before creating the release tag and dispatching npm publish.
 
 ```
   push -> main
@@ -98,8 +99,10 @@ dispatched.
       ↓                 (skipped if should-release says nothing is pending)
   [docker-smoke.yml] ← three images built and smoke-tested
       ↓                 (skipped if should-release says nothing is pending)
-    [tag job]
-      ↓                 (skipped if should-release says nothing is pending)
+    CI completes successfully
+      ↓
+  [release-tag.yml] ← merged PR + current main tip guard
+      ↓
     Create v<version> tag
       ↓
   Dispatch release.yml
@@ -108,7 +111,7 @@ dispatched.
 ```
 
 **If no release is pending:** `cve` and `peers` still run (cheap, always useful drift checks);
-`dry`, `docker`, and `tag` all skip cleanly.
+`dry` and `docker` skip cleanly, and `release-tag.yml` exits without creating a duplicate tag.
 
 ### Weekly schedule
 
@@ -154,25 +157,31 @@ should-release:
 ```
 
 `dry` and `docker` only run when `needs.should-release.outputs.pending == 'true'` (in addition to
-being a push to main). The `tag` job is the release gate:
+being a push to main). After the CI workflow completes successfully, `release-tag.yml` is the
+merge-only release gate:
 
 ```yaml
-tag:
-  if: >
-    always() && github.event_name == 'push' && github.ref == 'refs/heads/main' &&
-    needs.should-release.outputs.pending == 'true' &&
-    needs.cve.result == 'success' && needs.peers.result == 'success' &&
-    (needs.dry.result == 'success' || needs.dry.result == 'skipped') &&
-    (needs.docker.result == 'success' || needs.docker.result == 'skipped')
-  needs: [should-release, cve, peers, dry, docker]
-  runs-on: ubuntu-latest
-  # Creates v<version> tag and dispatches release.yml
+on:
+  workflow_run:
+    workflows: ['CI']
+    types: [completed]
+    branches: [main]
+
+jobs:
+  tag:
+    if: >
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'push' &&
+      github.event.workflow_run.head_branch == 'main'
+    # The job also checks that head_sha belongs to a merged PR into main and is
+    # still the current main tip immediately before tagging.
+    # Creates v<version> and dispatches release.yml.
 ```
 
-**Key:** `tag` only runs on a push to main with a pending release (not PRs, not a repeat push at the
-same version), and it waits for cve/peers to succeed and dry/docker to either succeed or be
-legitimately skipped. A red merge cannot publish, and a push with nothing new to release cannot
-either — it just skips cleanly instead of failing.
+**Key:** `release-tag.yml` is not part of PR CI. It only considers successful CI runs for `main`,
+requires the CI commit to belong to a merged PR targeting `main`, and fails closed if `main` has
+advanced since that CI run. A red merge cannot publish, and a repeat version exits without creating
+a duplicate tag.
 
 The `release.yml` workflow then:
 1. Runs the same `npm audit --omit=dev --audit-level=high` check (must match the gate)
@@ -194,8 +203,11 @@ Same as PR failures. Cve and peers are the only gates on dev.
 ### Push to main fails before release
 
 Check which job failed:
-- **cve, peers, dry, docker** — See debugging steps above. The push is accepted but release is blocked.
-- **tag job failure** — The tag creation or dispatch failed. Check git permissions and GitHub API access (NPM_TOKEN must be present).
+- **cve, peers, dry, docker** — See debugging steps above. The merge is accepted but release is blocked.
+- **release-tag workflow failure** — Check the merged-PR and current-main guards first. A stale CI run
+  is intentionally rejected so a newer `main` commit can complete its own release gate. For tag
+  creation or dispatch failures, check GitHub API permissions; `NPM_TOKEN` is only used later by
+  `release.yml` during npm publication.
 
 **`dry` failing with "Version X is already published to npm"** — this shouldn't happen anymore on a
 normal push to main; `should-release` is supposed to skip `dry` entirely once the current version is

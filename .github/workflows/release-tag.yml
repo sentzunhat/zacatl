@@ -47,7 +47,18 @@ jobs:
       - name: Create tag if missing and dispatch Release
         env:
           GH_TOKEN: ${{ github.token }}
+          HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
         run: |
+          set -euo pipefail
+          CURRENT_MAIN_SHA="$(gh api \
+            -H 'Accept: application/vnd.github+json' \
+            "/repos/${GITHUB_REPOSITORY}/git/ref/heads/main" \
+            --jq '.object.sha')"
+          if [ "${CURRENT_MAIN_SHA}" != "${HEAD_SHA}" ]; then
+            echo "Refusing to tag stale CI commit ${HEAD_SHA}; current main is ${CURRENT_MAIN_SHA}." >&2
+            echo "The newer main commit must complete CI before it can be released." >&2
+            exit 1
+          fi
           PKG_VERSION="$(node -p "require('./package.json').version")"
           TAG="v${PKG_VERSION}"
           if git rev-parse -q --verify "refs/tags/${TAG}" >/dev/null; then
