@@ -1,0 +1,49 @@
+name: Release tag
+
+# This workflow is deliberately separate from PR CI. It is invoked only after
+# the CI workflow has completed successfully for a push to main (the merge
+# path), so pull requests never display a skipped release job.
+
+on:
+  workflow_run:
+    workflows: ['CI']
+    types: [completed]
+    branches: [main]
+
+concurrency:
+  group: release-tag-main
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  actions: write
+
+jobs:
+  tag:
+    name: Tag release
+    if: ${{ github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push' && github.event.workflow_run.head_branch == 'main' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout merged main commit
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+          fetch-depth: 0
+
+      - name: Create tag if missing and dispatch Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          PKG_VERSION="$(node -p "require('./package.json').version")"
+          TAG="v${PKG_VERSION}"
+          if git rev-parse -q --verify "refs/tags/${TAG}" >/dev/null; then
+            echo "Tag ${TAG} already exists — nothing to release."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag "${TAG}"
+          git push origin "${TAG}"
+          # Tags pushed with GITHUB_TOKEN do not start another workflow, so
+          # dispatch the publish workflow explicitly at the new tag.
+          gh workflow run release.yml --ref "${TAG}"
