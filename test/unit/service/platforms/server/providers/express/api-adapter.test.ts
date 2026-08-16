@@ -263,6 +263,28 @@ describe('ExpressApiAdapter', () => {
       expect(res.status).toHaveBeenCalledWith(201);
       expect(res.json).toHaveBeenCalledWith({ ok: true });
     });
+
+    it('reply adapter maps status/send onto the Express response', async () => {
+      const handler: RouteHandler = {
+        method: 'GET',
+        url: '/status',
+        execute: vi.fn(async (_req: unknown, reply: { status: (n: number) => { send: (p: unknown) => void } }) => {
+          reply.status(503).send({ ok: false });
+        }),
+      } as unknown as RouteHandler;
+      adapter.registerRoute(handler);
+
+      const routeFn = mockServer.get.mock.calls[0]?.[1] as (
+        req: unknown,
+        res: unknown,
+        next: (err?: unknown) => void,
+      ) => Promise<void>;
+      const res = { headersSent: false, status: vi.fn().mockReturnThis(), end: vi.fn(), json: vi.fn(), setHeader: vi.fn() };
+      await routeFn({}, res, vi.fn());
+
+      expect(res.status).toHaveBeenCalledWith(503);
+      expect(res.json).toHaveBeenCalledWith({ ok: false });
+    });
   });
 
   describe('listen/close/getRawServer', () => {

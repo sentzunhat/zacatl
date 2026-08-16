@@ -30,7 +30,7 @@ async function main() {
       console.error(`[${request.method}] ${request.url}:`, error.message);
 
       // Send clean error response
-      await reply.status(statusCode).send({
+      await reply.code(statusCode).send({
         error: {
           message: statusCode >= 500 ? 'Internal Server Error' : error.message,
           statusCode,
