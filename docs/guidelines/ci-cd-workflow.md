@@ -8,7 +8,7 @@ Zacatl uses a centralized CI orchestrator to gate development, testing, and rele
 
 - `cve-scan.yml` — Production dependency CVE audit (`npm audit --omit=dev --audit-level=high`)
 - `peer-install-check.yml` — Verify peerDependencies can be installed and imported
-- `publish-dry.yml` — Full verification chain: tests, type check, lint, build, consumer smoke tests, and `npm publish --dry-run`
+- `publish-dry.yml` — Full verification chain: tests, type check, lint, build, consumer smoke tests, and `npm publish --dry-run`; opt in on a PR with the `publish-dry-run` label
 - `docker-smoke.yml` — Build and smoke-test three example Docker images (sqlite, postgres, mongodb)
 
 All component workflows are **`workflow_call`-only** with no direct `push`/`pull_request` triggers, eliminating duplicate runs on those events.
@@ -21,7 +21,8 @@ All component workflows are **`workflow_call`-only** with no direct `push`/`pull
 
 **Default:** CVE scan, peer install check (fast, ~5–10 min)  
 **Blocks merge:** cve or peers failure  
-**Optional:** Add `docker-test` label to run docker-smoke before merge
+**Optional:** Add `docker-smoke` to run Docker smoke before merge, or
+`publish-dry-run` to run the full package verification and npm dry-run.
 
 ```
   pull_request -> dev/main
@@ -30,17 +31,29 @@ All component workflows are **`workflow_call`-only** with no direct `push`/`pull
       ↓
   [peer-install-check]
       ↓
-  [docker-smoke] ← only if labeled 'docker-test'
+  [docker-smoke] ← only if labeled 'docker-smoke'
+      ↓
+  [publish-dry-run] ← only if labeled 'publish-dry-run'
       ↓
    Merge enabled
 ```
 
 **Why not docker on all PRs?** Docker builds three images and boots Postgres/Mongo containers (~15 min). Too expensive for routine PRs.
 
-**When to add the docker-test label:**
+**When to add the docker-smoke label:**
 - Before merging to main if you changed dockerfile, examples, or deployment config
 - To verify docker works before release
 - Anytime you want manual confidence — just add the label, wait ~20 min, then remove it
+
+**When to add the publish-dry-run label:**
+
+- Before merging a release candidate
+- After changing package metadata, exports, dependencies, or publish scripts
+- To verify the packed consumer fixtures and `npm publish --dry-run`
+
+Adding either label emits a new `pull_request:labeled` event and starts a new
+orchestrator run. Removing a label does not cancel an already-running job; it
+only prevents that label from selecting the next run.
 
 ### Push to dev (after merge)
 

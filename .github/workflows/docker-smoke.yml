@@ -7,7 +7,7 @@ name: Docker smoke
 # versions from a package.json section that no longer existed.
 #
 # Reusable component, invoked by ci.yml. Also supports manual trigger and
-# label-based triggering (see ci.yml for docker-test label condition).
+# label-based triggering (see ci.yml for docker-smoke label condition).
 
 on:
   workflow_call: {}
