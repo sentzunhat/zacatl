@@ -288,7 +288,7 @@ interface DatabaseServerPort {
 REST API adapter for Fastify.
 
 ```typescript
-import { FastifyApiAdapter } from '@sentzunhat/zacatl/service/platforms/server/api/adapters';
+import { createApiAdapter as createFastifyApiAdapter } from '@sentzunhat/zacatl/service/platforms/server/providers/fastify/api-adapter';
 ```
 
 #### `FastifyPageAdapter`
@@ -296,7 +296,7 @@ import { FastifyApiAdapter } from '@sentzunhat/zacatl/service/platforms/server/a
 Page server adapter for Fastify.
 
 ```typescript
-import { FastifyPageAdapter } from '@sentzunhat/zacatl/service/platforms/server/page/adapters';
+import { createPageAdapter as createFastifyPageAdapter } from '@sentzunhat/zacatl/service/platforms/server/providers/fastify/page-adapter';
 ```
 
 ---
@@ -308,7 +308,7 @@ import { FastifyPageAdapter } from '@sentzunhat/zacatl/service/platforms/server/
 REST API adapter for Express.
 
 ```typescript
-import { ExpressApiAdapter } from '@sentzunhat/zacatl/service/platforms/server/api/adapters';
+import { createApiAdapter as createExpressApiAdapter } from '@sentzunhat/zacatl/service/platforms/server/providers/express/api-adapter';
 ```
 
 #### `ExpressPageAdapter`
@@ -316,7 +316,7 @@ import { ExpressApiAdapter } from '@sentzunhat/zacatl/service/platforms/server/a
 Page server adapter for Express.
 
 ```typescript
-import { ExpressPageAdapter } from '@sentzunhat/zacatl/service/platforms/server/page/adapters';
+import { createPageAdapter as createExpressPageAdapter } from '@sentzunhat/zacatl/service/platforms/server/providers/express/page-adapter';
 ```
 
 ---

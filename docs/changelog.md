@@ -26,6 +26,11 @@
 - **Added pending-release gating** — publish-dry, Docker smoke, and tag
   creation skip cleanly when the package version is already released, avoiding
   false failures on ordinary post-release commits.
+- **Separated merge-only release tagging** — pull-request CI no longer shows a
+  skipped tag job. After successful CI on `main`, `release-tag.yml` requires a
+  merged PR, confirms the tested commit is still the current `main` tip, and
+  safely retries the publish-workflow dispatch if tag creation succeeded before
+  dispatch was interrupted.
 - **Preserved single-run workflow ownership** — reusable checks remain
   `workflow_call` components so branch and pull-request events do not create
   duplicate runs; the standalone weekly CVE schedule remains intentional for

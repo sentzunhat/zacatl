@@ -9,7 +9,7 @@ Zacatl uses a centralized CI orchestrator to gate development, testing, and rele
 - `cve-scan.yml` — Production dependency CVE audit (`npm audit --omit=dev --audit-level=high`)
 - `peer-install-check.yml` — Verify peerDependencies can be installed and imported
 - `publish-dry.yml` — Full verification chain: tests, type check, lint, build, consumer smoke tests, and `npm publish --dry-run`; opt in on a PR with the `publish-dry-run` label
-- `docker-smoke.yml` — Build and smoke-test three example Docker images (sqlite, postgres, mongodb)
+- `docker-smoke.yml` — Build and smoke-test eight example jobs covering SQLite, PostgreSQL, and MongoDB
 
 All component workflows are **`workflow_call`-only** with no direct `push`/`pull_request` triggers, eliminating duplicate runs on those events.
 
@@ -38,7 +38,7 @@ All component workflows are **`workflow_call`-only** with no direct `push`/`pull
    Merge enabled
 ```
 
-**Why not docker on all PRs?** Docker builds three images and boots Postgres/Mongo containers (~15 min). Too expensive for routine PRs.
+**Why not docker on all PRs?** Docker builds eight example jobs and boots Postgres/Mongo containers (~15 min). Too expensive for routine PRs.
 
 **When to add the docker-smoke label:**
 - Before merging to main if you changed dockerfile, examples, or deployment config
@@ -97,7 +97,7 @@ tip of `main` before creating the release tag and dispatching npm publish.
       ↓
   [publish-dry.yml] ← full verification: tests, type check, lint, build, smokes, dry-run
       ↓                 (skipped if should-release says nothing is pending)
-  [docker-smoke.yml] ← three images built and smoke-tested
+  [docker-smoke.yml] ← eight example jobs across three database families
       ↓                 (skipped if should-release says nothing is pending)
     CI completes successfully
       ↓
@@ -111,7 +111,8 @@ tip of `main` before creating the release tag and dispatching npm publish.
 ```
 
 **If no release is pending:** `cve` and `peers` still run (cheap, always useful drift checks);
-`dry` and `docker` skip cleanly, and `release-tag.yml` exits without creating a duplicate tag.
+`dry` and `docker` skip cleanly. `release-tag.yml` never creates a duplicate tag, and it can retry
+the publish-workflow dispatch if tag creation succeeded but the first dispatch attempt failed.
 
 ### Weekly schedule
 

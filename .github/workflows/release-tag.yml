@@ -62,13 +62,29 @@ jobs:
           PKG_VERSION="$(node -p "require('./package.json').version")"
           TAG="v${PKG_VERSION}"
           if git rev-parse -q --verify "refs/tags/${TAG}" >/dev/null; then
-            echo "Tag ${TAG} already exists — nothing to release."
+            TAG_SHA="$(git rev-list -n 1 "refs/tags/${TAG}")"
+            if [ "${TAG_SHA}" != "${HEAD_SHA}" ]; then
+              echo "Refusing to reuse ${TAG}: it points to ${TAG_SHA}, not ${HEAD_SHA}." >&2
+              exit 1
+            fi
+            echo "Tag ${TAG} already exists at the verified commit; checking publish dispatch state."
+          else
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git tag "${TAG}"
+            git push origin "${TAG}"
+          fi
+
+          RELEASE_RUNS="$(gh run list --workflow release.yml --limit 100 --json status,conclusion,headBranch,headSha)"
+          if printf '%s' "${RELEASE_RUNS}" | jq -e --arg tag "${TAG}" --arg sha "${HEAD_SHA}" '
+            any(.[]; .headBranch == $tag and .headSha == $sha and
+              (.status == "queued" or .status == "in_progress" or .conclusion == "success"))
+          ' >/dev/null; then
+            echo "Release workflow for ${TAG} is already queued, running, or completed successfully."
             exit 0
           fi
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git tag "${TAG}"
-          git push origin "${TAG}"
+
           # Tags pushed with GITHUB_TOKEN do not start another workflow, so
-          # dispatch the publish workflow explicitly at the new tag.
+          # dispatch the publish workflow explicitly. This remains safe to
+          # retry when tag creation succeeded but dispatch failed.
           gh workflow run release.yml --ref "${TAG}"
