@@ -2,6 +2,58 @@
 
 ---
 
+## [Unreleased]
+
+**Status**: Fixes on `dev`; version bump and release left to the maintainer.
+
+### 🐛 Fixes
+
+- **node:sqlite no longer requires `sqlite3`** — the node:sqlite ORM adapter
+  imported `uuidv4` from the `third-party` barrel, which re-exported the
+  optional `sqlite3` peer. Importing
+  `service/layers/infrastructure/repositories/nodesqlite/repository` threw
+  `ERR_MODULE_NOT_FOUND: Cannot find package 'sqlite3'` in apps without it.
+  The adapter now imports `third-party/uuid` directly.
+- **`@sentzunhat/zacatl/third-party` no longer re-exports `sqlite3`** — the
+  barrel pulled the optional peer in for every consumer, so even
+  `import { z } from '@sentzunhat/zacatl/third-party'` failed without
+  `sqlite3` installed. This aligns the barrel with the documented rule that
+  database integrations are subpath-only. An audit importing every built
+  module with `sqlite3`, `sequelize`, `mongoose`, `mongodb` and `pg` blocked
+  now fails only for the explicit `third-party/databases/*` subpaths.
+- **Fastify routes no longer send twice** — `AbstractRouteHandler.execute()`
+  sends its own result and returns it, and the Fastify adapter passed that
+  return value back to Fastify, which sent it again and logged
+  `FST_ERR_REP_ALREADY_SENT` at warn level on every request. The adapter now
+  returns `reply` when the response was already sent, and still hands back the
+  result for handlers that leave sending to Fastify.
+- **Handler errors are logged once** — when a handler had already sent its
+  error response, the re-thrown error made Fastify log
+  "Promise errored, but reply.sent = true was set". The adapter now logs it
+  once through `reply.log` (5xx at `error`, other statuses at `info`).
+
+### ⚠️ Migration
+
+- Import `sqlite3` from `@sentzunhat/zacatl/third-party/databases/sqlite3`
+  instead of `@sentzunhat/zacatl/third-party`. All in-repo examples and smoke
+  fixtures already use the subpath.
+- No change for route handlers: `AbstractRouteHandler.execute()` and
+  `RouteHandler` keep their signatures and behavior, including `execute()`
+  overrides that set a status code and return `super.execute()`.
+
+### 🧪 Verification
+
+- New real-Fastify test covers GET, POST, 4xx, 5xx, an `execute()` override
+  returning 201, and a plain `RouteHandler` that returns its payload; it
+  asserts no double-send or "reply.sent" log.
+- New test loads the node:sqlite `BaseRepository` and the `third-party`
+  barrel with `sqlite3`, `sequelize` and `mongoose` mocked to throw on import,
+  and checks that `src/` has no value imports from the barrel.
+- The `node-sqlite` consumer smoke fixture (packed install, no `sqlite3`) now
+  imports the barrel and round-trips a record through `BaseRepository`.
+- `examples/node-sqlite-store` `deps:check` also round-trips a record through
+  `BaseRepository` with the optional peers blocked at resolution time.
+
 ## [0.0.61] - 2026-08-16
 
 **Status**: Release candidate for the automated `main` release path

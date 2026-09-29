@@ -1,5 +1,5 @@
 import proxy from '@fastify/http-proxy';
-import type { FastifyInstance } from 'fastify';
+import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 
 import type { ZodTypeProvider } from '@zacatl/third-party/fastify';
 
@@ -11,10 +11,7 @@ import { normalizePrefix } from '../../shared/prefixes/normalize-prefix';
 /**
  * Fastify implementation of ApiServerPort.
  */
-export const createApiAdapter = (
-  server: FastifyInstance,
-  apiPrefix = '',
-): ApiServerPort => {
+export const createApiAdapter = (server: FastifyInstance, apiPrefix = ''): ApiServerPort => {
   const getRouteUrl = (url: string): string => {
     const prefix = normalizePrefix(apiPrefix);
 
@@ -33,7 +30,32 @@ export const createApiAdapter = (
         url: getRouteUrl(handler.url),
         method: handler.method,
         schema: handler.schema,
-        handler: handler.execute.bind(handler),
+        handler: async (request: FastifyRequest, reply: FastifyReply) => {
+          try {
+            const result = await handler.execute(request, reply);
+
+            // AbstractRouteHandler sends its own result. Handing that result back
+            // to Fastify would send it twice (FST_ERR_REP_ALREADY_SENT), so return
+            // the reply to mark the request handled. Handlers that leave sending
+            // to Fastify still have their result sent as before.
+            // eslint-disable-next-line @typescript-eslint/return-await
+            return reply.sent ? reply : result;
+          } catch (error) {
+            if (!reply.sent) {
+              throw error;
+            }
+
+            // The error response is already out; log once here instead of letting
+            // Fastify log "Promise errored, but reply.sent = true was set".
+            if (reply.statusCode >= 500) {
+              reply.log.error({ err: error }, 'Route handler failed');
+            } else {
+              reply.log.info({ err: error }, 'Route handler rejected request');
+            }
+
+            return reply;
+          }
+        },
       });
     },
 

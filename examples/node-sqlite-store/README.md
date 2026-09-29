@@ -30,7 +30,13 @@ Expected dependency check:
 
 ```text
 No sequelize or sqlite3 dependencies declared by this example.
+node:sqlite BaseRepository works without sqlite3/sequelize/mongoose installed.
 ```
+
+The second line comes from `scripts/verify-repository-without-peers.mjs`, which
+blocks resolution of the optional database peers and round-trips a record
+through Zacatl's node:sqlite `BaseRepository`. It needs the root package built
+(`npm run build` at the repo root).
 
 This repo-local example uses `@sentzunhat/zacatl` through `file:../..`, so a raw
 `npm ls sequelize sqlite3` can see Zacatl's development dependencies from the

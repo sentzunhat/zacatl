@@ -7,4 +7,3 @@ export * from './third-party/fastify';
 export * from './third-party/express';
 export * from './third-party/http-proxy-middleware';
 export * from './third-party/dependency-injection/reflect-metadata';
-export * from './third-party/databases/sqlite3';

@@ -8,7 +8,7 @@
     "build": "rm -rf dist && tsc -p tsconfig.json",
     "start": "node dist/index.js",
     "smoke": "npm run build && npm run start",
-    "deps:check": "node scripts/verify-dependencies.mjs",
+    "deps:check": "node scripts/verify-dependencies.mjs && node scripts/verify-repository-without-peers.mjs",
     "clean": "rm -rf dist data node_modules"
   },
   "dependencies": {
