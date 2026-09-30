@@ -11,7 +11,10 @@ import { normalizePrefix } from '../../shared/prefixes/normalize-prefix';
 /**
  * Fastify implementation of ApiServerPort.
  */
-export const createApiAdapter = (server: FastifyInstance, apiPrefix = ''): ApiServerPort => {
+export const createApiAdapter = (
+  server: FastifyInstance,
+  apiPrefix = '',
+): ApiServerPort => {
   const getRouteUrl = (url: string): string => {
     const prefix = normalizePrefix(apiPrefix);
 

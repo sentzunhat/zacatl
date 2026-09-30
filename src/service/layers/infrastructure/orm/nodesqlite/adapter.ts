@@ -23,12 +23,9 @@ import { createDatabaseToken } from '../tokens/factory';
  * Uses prepared statements for type safety and performance.
  * Defensive mode is enabled by default to prevent database corruption.
  */
-export class NodeSqliteAdapter<I extends object, O extends object> implements ORMPort<
-  NodeSqliteRepositoryModel,
-  I,
-  O,
-  Partial<O>
-> {
+export class NodeSqliteAdapter<I extends object, O extends object>
+  implements ORMPort<NodeSqliteRepositoryModel, I, O, Partial<O>>
+{
   // Resolved lazily on first use so that Service construction succeeds
   // even when the node:sqlite DatabaseSync is registered later in start().
   private _model: NodeSqliteRepositoryModel | undefined;
@@ -65,10 +62,7 @@ export class NodeSqliteAdapter<I extends object, O extends object> implements OR
 
   private resolveModel(): NodeSqliteRepositoryModel {
     const connectionName = this.config.connection?.name ?? 'SQLITE';
-    const token = createDatabaseToken(
-      'SQLITE',
-      connectionName,
-    ) as InjectionToken<NodeSqliteRepositoryModel>;
+    const token = createDatabaseToken('SQLITE', connectionName) as InjectionToken<NodeSqliteRepositoryModel>;
 
     const resolved = getContainer().isRegistered(token)
       ? resolveDependency<NodeSqliteRepositoryModel>(token)
@@ -366,8 +360,8 @@ export class NodeSqliteAdapter<I extends object, O extends object> implements OR
             typeof data === 'string'
               ? (JSON.parse(data) as Record<string, unknown>)
               : typeof data === 'object' && data != null
-                ? (data as Record<string, unknown>)
-                : {};
+              ? (data as Record<string, unknown>)
+              : {};
 
           plain = {
             ...parsed,
@@ -393,14 +387,14 @@ export class NodeSqliteAdapter<I extends object, O extends object> implements OR
           createdAtValue instanceof Date
             ? createdAtValue
             : createdAtValue != null
-              ? new Date(createdAtValue as string | number | Date)
-              : new Date(),
+            ? new Date(createdAtValue as string | number | Date)
+            : new Date(),
         updatedAt:
           updatedAtValue instanceof Date
             ? updatedAtValue
             : updatedAtValue != null
-              ? new Date(updatedAtValue as string | number | Date)
-              : new Date(),
+            ? new Date(updatedAtValue as string | number | Date)
+            : new Date(),
       } as O;
     } catch {
       return null;

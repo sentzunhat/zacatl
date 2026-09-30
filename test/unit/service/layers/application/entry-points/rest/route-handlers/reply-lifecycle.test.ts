@@ -81,6 +81,17 @@ const plainHandler: RouteHandler = {
   execute: async () => ({ plain: true }),
 };
 
+// A RouteHandler that throws before sending anything; the adapter must hand the
+// error to Fastify's error handler instead of swallowing it.
+const throwingPlainHandler: RouteHandler = {
+  url: '/plain-throws',
+  method: 'GET',
+  schema: {},
+  execute: async () => {
+    throw new Error('plain handler failed');
+  },
+};
+
 const isDoubleSendLog = (line: LogLine): boolean =>
   line.code === 'FST_ERR_REP_ALREADY_SENT' ||
   line.err?.code === 'FST_ERR_REP_ALREADY_SENT' ||
@@ -112,6 +123,7 @@ describe('Fastify route reply lifecycle (real Fastify)', () => {
     adapter.registerRoute(new BrokenItemHandler());
     adapter.registerRoute(new CreatedItemHandler());
     adapter.registerRoute(plainHandler);
+    adapter.registerRoute(throwingPlainHandler);
     await app.ready();
   });
 
@@ -148,6 +160,9 @@ describe('Fastify route reply lifecycle (real Fastify)', () => {
     expect(response.json()).toEqual({ message: 'Item not found' });
     expect(logs.filter(isDoubleSendLog)).toEqual([]);
     expect(logs.filter((line) => line.level >= 40)).toEqual([]);
+    expect(
+      logs.filter((line) => line.level === 30 && line.msg === 'Route handler rejected request'),
+    ).toHaveLength(1);
   });
 
   it('keeps status codes set by execute() overrides', async () => {
@@ -169,6 +184,16 @@ describe('Fastify route reply lifecycle (real Fastify)', () => {
     expect(response.statusCode).toBe(200);
     expect(response.json()).toEqual({ plain: true });
     expect(logs.filter((line) => line.level >= 40)).toEqual([]);
+  });
+
+  it('passes errors from handlers that did not send to Fastify', async () => {
+    const response = await app.inject({ method: 'GET', url: '/plain-throws' });
+
+    expect(response.statusCode).toBe(500);
+    expect(response.json()).toMatchObject({ message: 'plain handler failed' });
+    const errorLogs = logs.filter((line) => line.level >= 50);
+    expect(errorLogs).toHaveLength(1);
+    expect(errorLogs[0]?.msg).not.toBe('Route handler failed');
   });
 
   it('logs 5xx handler errors once at error level', async () => {
