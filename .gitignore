@@ -135,3 +135,6 @@ personal/
 
 # Example runtime data (docker compose bind mounts)
 examples/*/data/
+
+# HAWP CLI: platform-specific binary installed by the HAWP update script
+.hawp/bin/

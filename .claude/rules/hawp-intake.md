@@ -3,7 +3,7 @@ paths:
   - ".hawp/**"
 ---
 
-<!-- Generated from core/providers/shared/behaviors — edit shared source and run npm --prefix librarian run providers:sync -->
+<!-- Generated from core/providers/shared/behaviors - edit shared source and run `hawp providers sync` -->
 
 # HAWP Modular Intake
 

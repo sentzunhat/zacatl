@@ -69,7 +69,7 @@ When writing a status report, capture:
 - help wanted
 - suggested next step
 
-Save reports over time in [../../work/status](../../work/status) using the dated layout `../../work/status/YYYY/MM/DD/`.
+Save reports over time in [../../work/status](../../work/status) at the canonical path `../../work/status/YYYY/MM/DD/<uuid>/status.md`.
 
 ## Intake Workflow
 

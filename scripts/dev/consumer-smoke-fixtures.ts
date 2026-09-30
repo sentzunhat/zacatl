@@ -52,16 +52,38 @@ const fixtures: Fixture[] = [
     source: `
       import { DatabaseSync } from 'node:sqlite';
 
+      import { registerValue } from '@sentzunhat/zacatl/dependency-injection';
       import { DatabaseVendor } from '@sentzunhat/zacatl/service';
+      import { NodeSqliteToken } from '@sentzunhat/zacatl/service/layers/infrastructure/orm/tokens/nodesqlite';
+      import { BaseRepository } from '@sentzunhat/zacatl/service/layers/infrastructure/repositories/nodesqlite/repository';
+      import { ORMType } from '@sentzunhat/zacatl/service/layers/infrastructure/repositories/types';
+      import { z } from '@sentzunhat/zacatl/third-party';
       import type { DatabaseSync as ZacatlDatabaseSync } from '@sentzunhat/zacatl/third-party/databases/nodesqlite';
 
       const db: ZacatlDatabaseSync = new DatabaseSync(':memory:');
       db.exec('CREATE TABLE items (id TEXT PRIMARY KEY, value TEXT NOT NULL)');
       db.prepare('INSERT INTO items (id, value) VALUES (?, ?)').run('one', 'ok');
       const row = db.prepare('SELECT value FROM items WHERE id = ?').get('one') as { value: string };
+
+      // The repository and the third-party barrel must load without the sqlite3 peer.
+      class NoteRepository extends BaseRepository<
+        { title: string },
+        { id: string; title: string; createdAt: Date; updatedAt: Date }
+      > {
+        constructor() {
+          super({ type: ORMType.NodeSqlite, name: 'notes' });
+        }
+      }
+
+      registerValue(NodeSqliteToken, db);
+      const notes = new NoteRepository();
+      const created = await notes.create({ title: z.string().parse('hello') });
+      const found = await notes.findById(created.id);
       db.close();
 
-      console.log(JSON.stringify({ vendor: DatabaseVendor.SQLITE, value: row.value }));
+      console.log(
+        JSON.stringify({ vendor: DatabaseVendor.SQLITE, value: row.value, repository: found?.title }),
+      );
     `,
   },
   {

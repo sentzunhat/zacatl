@@ -1,6 +1,6 @@
 # Workflow Loop — Iteration Handoff
 
-Save to: `.hawp/work/status/YYYY/MM/DD/<ID>-iter-<NNN>.md`
+Save to: `.hawp/work/status/YYYY/MM/DD/<ID>/status.md` (append one entry per iteration)
 
 Compact continuity artifact for the next session. Not a transcript dump — link to plan and evidence.
 
@@ -12,7 +12,7 @@ Compact continuity artifact for the next session. Not a transcript dump — link
 **Iteration:** NNN / **Budget:** 3 | 5 | 8
 **Loop mode:** autonomous | gated
 **Date:** YYYY-MM-DD
-**Plan:** `.hawp/work/active/<ID>.md`
+**Plan:** `.hawp/work/active/<ID>/plan.md`
 **Executor:** human | agent
 **Reviewer:** human | agent
 **Risk level:** low | medium | high
@@ -96,7 +96,7 @@ _In **autonomous** mode with `retry` and budget remaining: next executor continu
 
 ## Links
 
-- Plan: `.hawp/work/active/<ID>.md`
+- Plan: `.hawp/work/active/<ID>/plan.md`
 - Prior iteration: _(path or none)_
 - Evidence: _(paths or none)_
 

@@ -24,6 +24,20 @@ These folders are the source of truth for downstream projects:
 
 Kit quick-links at `.hawp/kit/patterns/*.md` redirect here — edit canonical files only.
 
+## HAWP implementation harnesses
+
+These workflow-specific checklists support changes to HAWP itself. Use them
+with the general standards above; they do not add required HAWP schema fields.
+
+- [slice-harness.md](slice-harness.md) — scope, ownership, focused verification,
+  and evidence for an implementation slice
+- [provider-harness.md](provider-harness.md) — contracts and checks for
+  embedding and LLM adapters
+- [tool-harness.md](tool-harness.md) — validation and behavior checks for CLI
+  commands and MCP tools
+- [parallel-work-guardrails.md](patterns/parallel-work-guardrails.md) — safe
+  ownership when multiple agents or people work in parallel
+
 ## public/ mirror (non-normative archive)
 
 `public/` keeps a read-only snapshot used when absorbing or auditing standards promotions.

@@ -47,7 +47,7 @@ What area is affected, and what is known right now?
 ## Backlog + Plan Link
 
 **Status now:** inbox | analyzing | plan-ready
-**Plan file:** work/active/<ID>.md
+**Plan file:** work/active/<ID>/plan.md
 
 ## Next Step
 

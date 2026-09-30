@@ -2,6 +2,95 @@
 
 ---
 
+## [0.0.62] - 2026-09-30
+
+**Status**: Release candidate for the automated `main` release path
+
+### 🐛 Fixes
+
+- **node:sqlite no longer requires `sqlite3`** — the node:sqlite ORM adapter
+  imported `uuidv4` from the `third-party` barrel, which re-exported the
+  optional `sqlite3` peer. Importing
+  `service/layers/infrastructure/repositories/nodesqlite/repository` threw
+  `ERR_MODULE_NOT_FOUND: Cannot find package 'sqlite3'` in apps without it.
+  The adapter now imports `third-party/uuid` directly.
+- **`@sentzunhat/zacatl/third-party` no longer re-exports `sqlite3`** — the
+  barrel pulled the optional peer in for every consumer, so even
+  `import { z } from '@sentzunhat/zacatl/third-party'` failed without
+  `sqlite3` installed. This aligns the barrel with the documented rule that
+  database integrations are subpath-only. An audit importing every built
+  module with `sqlite3`, `sequelize`, `mongoose`, `mongodb` and `pg` blocked
+  now fails only for the explicit `third-party/databases/*` subpaths.
+- **`third-party` barrel and `third-party/dependency-injection/tsyringe` load
+  on their own** — both threw "tsyringe requires a reflect polyfill" when
+  imported first (for example `import { z } from '@sentzunhat/zacatl/third-party'`
+  in a fresh app, as the third-party README shows), because `tsyringe` was
+  evaluated before `reflect-metadata`. The tsyringe re-export now loads the
+  polyfill first. Present in 0.0.61 and earlier.
+- **Fastify routes no longer send twice** — `AbstractRouteHandler.execute()`
+  sends its own result and returns it, and the Fastify adapter passed that
+  return value back to Fastify, which sent it again and logged
+  `FST_ERR_REP_ALREADY_SENT` at warn level on every request. The adapter now
+  returns `reply` when the response was already sent, and still hands back the
+  result for handlers that leave sending to Fastify.
+- **Handler errors are logged once** — when a handler had already sent its
+  error response, the re-thrown error made Fastify log
+  "Promise errored, but reply.sent = true was set". The adapter now logs it
+  once through `reply.log` (5xx at `error`, other statuses at `info`).
+
+### 🔒 Security
+
+- Cleared the production `npm audit` findings that failed the CVE scan gate
+  (2 high, 3 moderate): raised the `fastify` floor to `^5.12.5`, `js-yaml` to
+  `^5.4.2` and `@fastify/http-proxy` to `^11.6.2`, and refreshed the lockfile
+  for transitive `fast-uri` (3.1.8 / 4.2.1), `undici` (7.30.0) and `qs`
+  (6.16.0).
+- Patched `brace-expansion` to 5.0.12 (high, GHSA-q2hr-2g5m-vwhr and related
+  DoS advisories), reached in production through `@fastify/static` → `glob` →
+  `minimatch`; the same in-range fix updated dev-only copies and `moment`.
+- `npm audit --omit=dev` reports 0 vulnerabilities. Three moderate dev-only
+  advisories in `@vitest/mocker` remain for the vitest update.
+
+### 🧰 Tooling
+
+- `npm run update:readme-coverage` (run by `test:coverage`) matches the
+  current flat-square README badges again: it updates only the numbers, keeps
+  each badge's label, style and link, and also refreshes the "N tests" counts
+  in the README text. It had been exiting with "No Coverage badge found",
+  which failed `test:coverage` and the local `prepublish:only` chain.
+- CI no longer runs on pushes to `dev` (the open PR's run already covers the
+  commit), which removes the extra, mostly skipped "(push)" check set from
+  `dev → main` PRs. Labels other than `publish-dry-run` / `docker-smoke` no
+  longer start a run that could cancel the PR's in-flight pipeline.
+
+### ⚠️ Migration
+
+- Import `sqlite3` from `@sentzunhat/zacatl/third-party/databases/sqlite3`
+  instead of `@sentzunhat/zacatl/third-party`. All in-repo examples and smoke
+  fixtures already use the subpath.
+- No change for route handlers: `AbstractRouteHandler.execute()` and
+  `RouteHandler` keep their signatures and behavior, including `execute()`
+  overrides that set a status code and return `super.execute()`.
+
+### 🧪 Verification
+
+- New real-Fastify test covers GET, POST, 4xx, 5xx, an `execute()` override
+  returning 201, a plain `RouteHandler` that returns its payload, and one that
+  throws before sending (Fastify's error handler still gets the error); it
+  asserts no double-send or "reply.sent" log and one log line per handled
+  error.
+- New test loads the node:sqlite `BaseRepository` and the `third-party`
+  barrel with `sqlite3`, `sequelize` and `mongoose` mocked to throw on import,
+  and checks that `src/` has no value imports from the barrel.
+- The `node-sqlite` consumer smoke fixture (packed install, no `sqlite3`) now
+  imports the barrel and round-trips a record through `BaseRepository`.
+- New `npm run check:optional-peers` loads every `package.json` export of the
+  prepared package (ESM and CJS, each in a fresh process) with all optional
+  peers blocked; only `third-party/databases/<peer>` may fail, and only for its
+  own peer. It runs after `prepare-publish` in every publish chain, so release
+  and publish dry-run gate on it.
+- 671 tests across 80 files pass; line coverage 91.82%.
+
 ## [0.0.61] - 2026-08-16
 
 **Status**: Release candidate for the automated `main` release path

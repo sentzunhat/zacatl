@@ -8,15 +8,20 @@ name: CI
 # What runs where:
 #
 #   pull_request -> dev|main : cve, peers                (fast gates)
-#   push         -> dev      : (nothing — covered by the open PR's pull_request run)
+#   push         -> dev      : not triggered (the open PR's pull_request run covers it)
 #   push         -> main     : should-release -> cve, peers, [dry, docker if pending]
 #   completed CI on main     : release-tag -> Release (merge-only release path)
 #   schedule (weekly)        : cve, peers                (drift detection only)
 #
-# Push to dev skips cve/peers: dev is normally the source branch of an open
-# PR, so every push to dev already fires a pull_request:synchronize event
-# that runs the same checks. Running them again on push was pure duplicate
-# work — same commit, same result, twice.
+# Push to dev does not trigger this workflow at all: dev is normally the
+# source branch of an open PR, so every push to dev already fires a
+# pull_request:synchronize event that runs the same checks. A push run used
+# to start anyway just to skip cve/peers, which added a second, mostly
+# skipped "(push)" check set to every dev -> main PR.
+#
+# `labeled` only matters for the opt-in labels (publish-dry-run,
+# docker-smoke). Any other label gets its own concurrency group so it can't
+# cancel an in-flight run, and every job skips.
 #
 # `should-release` answers "does package.json's version still need
 # publishing?" before anything expensive runs. A push to main with no
@@ -34,7 +39,7 @@ name: CI
 
 on:
   push:
-    branches: [dev, main]
+    branches: [main]
   pull_request:
     branches: [dev, main]
     types: [opened, synchronize, reopened, labeled]
@@ -43,11 +48,11 @@ on:
   workflow_dispatch: {}
 
 # Supersede in-flight runs for the same branch/PR instead of stacking them.
-# For PRs: github.head_ref = PR source branch (e.g., "dev")
-# For pushes: github.ref_name = branch name (e.g., "dev", "refs/heads/..." stripped)
-# This ensures both use the clean branch name and cancel each other.
+# For PRs: the PR number; for pushes/schedule: the branch name.
+# A `labeled` event for a label other than the opt-in ones gets a unique
+# group (its run id), so it never cancels the PR's real run.
 concurrency:
-  group: ci-${{ github.event.pull_request.number || github.head_ref || github.ref_name }}
+  group: ci-${{ github.event.pull_request.number || github.head_ref || github.ref_name }}${{ github.event.action == 'labeled' && github.event.label.name != 'publish-dry-run' && github.event.label.name != 'docker-smoke' && format('-ignored-label-{0}', github.run_id) || '' }}
   cancel-in-progress: true
 
 permissions:
@@ -56,13 +61,15 @@ permissions:
 jobs:
   should-release:
     name: Check pending release
-    # Cheap, always runs (never skipped) so downstream `needs` never hits
+    # Cheap, always runs (never skipped, except on an ignored `labeled` event
+    # where the whole run is a no-op) so downstream `needs` never hits
     # skip-vs-success ambiguity. Answers one question early: does the version
     # on package.json still need to be published? A push to main that doesn't
     # bump the version (e.g. a docs-only follow-up) has nothing to release —
     # without this gate, `dry` used to find that out the expensive way, deep
     # inside prepublish-guard.ts, after cve/peers/dry had already spent CI
     # minutes on a run that was always going to fail.
+    if: ${{ (github.event.action != 'labeled' || github.event.label.name == 'publish-dry-run' || github.event.label.name == 'docker-smoke') }}
     runs-on: ubuntu-latest
     outputs:
       pending: ${{ steps.check.outputs.pending }}
@@ -86,15 +93,14 @@ jobs:
 
   cve:
     name: CVE scan
-    # Skip on push to dev — an open PR from dev already runs this via
-    # pull_request:synchronize. Still runs on push to main (release gate),
-    # pull_request, and schedule.
-    if: ${{ !(github.event_name == 'push' && github.ref == 'refs/heads/dev') }}
+    # Runs on push to main (release gate), pull_request and schedule; skipped
+    # only for labels other than the opt-in ones.
+    if: ${{ (github.event.action != 'labeled' || github.event.label.name == 'publish-dry-run' || github.event.label.name == 'docker-smoke') }}
     uses: ./.github/workflows/cve-scan.yml
 
   peers:
     name: Peer install check
-    if: ${{ !(github.event_name == 'push' && github.ref == 'refs/heads/dev') }}
+    if: ${{ (github.event.action != 'labeled' || github.event.label.name == 'publish-dry-run' || github.event.label.name == 'docker-smoke') }}
     uses: ./.github/workflows/peer-install-check.yml
 
   dry:
@@ -103,7 +109,7 @@ jobs:
     # Runs on a pending release push to main, or when a PR opts in with the
     # publish-dry-run label. Adding that label starts a fresh labeled event.
     needs: [should-release]
-    if: ${{ (github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.should-release.outputs.pending == 'true') || (github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, 'publish-dry-run')) }}
+    if: ${{ (github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.should-release.outputs.pending == 'true') || (github.event_name == 'pull_request' && (github.event.action != 'labeled' || github.event.label.name == 'publish-dry-run' || github.event.label.name == 'docker-smoke') && contains(github.event.pull_request.labels.*.name, 'publish-dry-run')) }}
     uses: ./.github/workflows/publish-dry.yml
 
   docker:
@@ -116,5 +122,5 @@ jobs:
     # Skips on: dev pushes, schedule, PRs without label, main pushes with
     # no version bump (nothing to release, see `should-release`)
     needs: [should-release]
-    if: ${{ (github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.should-release.outputs.pending == 'true') || (github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, 'docker-smoke')) }}
+    if: ${{ (github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.should-release.outputs.pending == 'true') || (github.event_name == 'pull_request' && (github.event.action != 'labeled' || github.event.label.name == 'publish-dry-run' || github.event.label.name == 'docker-smoke') && contains(github.event.pull_request.labels.*.name, 'docker-smoke')) }}
     uses: ./.github/workflows/docker-smoke.yml
