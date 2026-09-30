@@ -32,6 +32,15 @@
   "Promise errored, but reply.sent = true was set". The adapter now logs it
   once through `reply.log` (5xx at `error`, other statuses at `info`).
 
+### 🔒 Security
+
+- Cleared the production `npm audit` findings that failed the CVE scan gate
+  (2 high, 3 moderate): raised the `fastify` floor to `^5.12.5`, `js-yaml` to
+  `^5.4.2` and `@fastify/http-proxy` to `^11.6.2`, and refreshed the lockfile
+  for transitive `fast-uri` (3.1.8 / 4.2.1), `undici` (7.30.0) and `qs`
+  (6.16.0). `npm audit --omit=dev` reports 0 vulnerabilities. Three moderate
+  dev-only advisories in `@vitest/mocker` remain for the vitest update.
+
 ### ⚠️ Migration
 
 - Import `sqlite3` from `@sentzunhat/zacatl/third-party/databases/sqlite3`
