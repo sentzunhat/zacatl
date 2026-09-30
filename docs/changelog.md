@@ -21,6 +21,12 @@
   database integrations are subpath-only. An audit importing every built
   module with `sqlite3`, `sequelize`, `mongoose`, `mongodb` and `pg` blocked
   now fails only for the explicit `third-party/databases/*` subpaths.
+- **`third-party` barrel and `third-party/dependency-injection/tsyringe` load
+  on their own** — both threw "tsyringe requires a reflect polyfill" when
+  imported first (for example `import { z } from '@sentzunhat/zacatl/third-party'`
+  in a fresh app, as the third-party README shows), because `tsyringe` was
+  evaluated before `reflect-metadata`. The tsyringe re-export now loads the
+  polyfill first. Present in 0.0.61 and earlier.
 - **Fastify routes no longer send twice** — `AbstractRouteHandler.execute()`
   sends its own result and returns it, and the Fastify adapter passed that
   return value back to Fastify, which sent it again and logged
@@ -60,8 +66,11 @@
   and checks that `src/` has no value imports from the barrel.
 - The `node-sqlite` consumer smoke fixture (packed install, no `sqlite3`) now
   imports the barrel and round-trips a record through `BaseRepository`.
-- `examples/node-sqlite-store` `deps:check` also round-trips a record through
-  `BaseRepository` with the optional peers blocked at resolution time.
+- New `npm run check:optional-peers` loads every `package.json` export of the
+  prepared package (ESM and CJS, each in a fresh process) with all optional
+  peers blocked; only `third-party/databases/<peer>` may fail, and only for its
+  own peer. It runs after `prepare-publish` in every publish chain, so release
+  and publish dry-run gate on it.
 
 ## [0.0.61] - 2026-08-16
 
