@@ -4,7 +4,7 @@ import type { InjectionToken } from '@zacatl/third-party/dependency-injection/ts
 
 import { getContainer, resolveDependency } from '../../../../../dependency-injection';
 import { InternalServerError } from '../../../../../error';
-import { uuidv4 } from '../../../../../third-party';
+import { uuidv4 } from '../../../../../third-party/uuid';
 import type {
   NodeSqliteRepositoryConfig,
   NodeSqliteRepositoryModel,

@@ -42,91 +42,91 @@ const main = async (): Promise<void> => {
       const color =
         percent >= 90 ? 'brightgreen' : percent >= 75 ? 'yellow' : percent >= 50 ? 'orange' : 'red';
 
-      const coverageLinkedRegex =
-        /\[!\[[^\]]*Coverage[^\]]*\]\(\s*https?:\/\/img\.shields\.io\/badge\/Coverage-([\d.]+)(?:%25|%)?-([a-zA-Z0-9_-]+)\.svg\s*\)\]\([^)]*\)/i;
-      const coverageImageRegex =
-        /!\[[^\]]*Coverage[^\]]*\]\(\s*https?:\/\/img\.shields\.io\/badge\/Coverage-([\d.]+)(?:%25|%)?-([a-zA-Z0-9_-]+)\.svg\s*\)/i;
-
-      const newBadgeUrl = `https://img.shields.io/badge/Coverage-${encodeURIComponent(
-        percentStr + '%',
-      )}-${color}.svg`;
-      let newReadme = readme;
-
-      if (coverageLinkedRegex.test(readme)) {
-        newReadme = readme.replace(coverageLinkedRegex, (m) => {
-          const linkTargetMatch = /\]\(([^)]*)\)\]/.exec(m);
-          const linkTarget = linkTargetMatch ? linkTargetMatch[1] : '#testing';
-          return `[![Coverage: ${percentStr}%](${newBadgeUrl})](${linkTarget})`;
-        });
-      } else if (coverageImageRegex.test(readme)) {
-        newReadme = readme.replace(
-          coverageImageRegex,
-          `![Coverage: ${percentStr}%](${newBadgeUrl})`,
+      // Rewrites only the number (and optionally the color) of a shields.io
+      // badge such as `![Coverage: 91.4%](…/badge/coverage-91.4%25-brightgreen.svg?style=flat-square)`,
+      // keeping its label, message text, style query and surrounding link.
+      const updateBadge = (
+        text: string,
+        name: 'Coverage' | 'Tests',
+        value: string,
+        badgeColor?: string,
+      ): string | null => {
+        const badgeRegex = new RegExp(
+          `!\\[${name}:[^\\]]*\\]\\((https?:\\/\\/img\\.shields\\.io\\/badge\\/)([^-/)]+)-([^)]*?)-([A-Za-z0-9_]+)\\.svg(\\?[^)]*)?\\)`,
+          'i',
         );
-      } else {
+        const match = badgeRegex.exec(text);
+        if (match == null) return null;
+
+        const [whole, base, label, message = '', oldColor, query = ''] = match;
+        const alt = name === 'Coverage' ? `${name}: ${value}%` : `${name}: ${value}`;
+        const updated = `![${alt}](${base}${label}-${message.replace(/[\d.]+/, value)}-${
+          badgeColor ?? oldColor
+        }.svg${query})`;
+        return text.replace(whole, updated);
+      };
+
+      const withCoverage = updateBadge(readme, 'Coverage', percentStr, color);
+      if (withCoverage == null) {
         // eslint-disable-next-line no-console
         console.error('No Coverage badge found in README.md to update.');
         process.exit(1);
       }
+      let newReadme = withCoverage;
 
       const testCountEnv = process.env['TEST_COUNT'];
       let testCount = testCountEnv !== undefined ? Number(testCountEnv) || 0 : 0;
+      let testFileCount = 0;
 
-      if (testCount === 0) {
-        const resultsPath = path.join(repoRoot, 'test-results.json');
-        try {
-          const raw = await fs.readFile(resultsPath, 'utf8');
-          const parsed = JSON.parse(raw);
+      const resultsPath = path.join(repoRoot, 'test-results.json');
+      try {
+        const raw = await fs.readFile(resultsPath, 'utf8');
+        const parsed = JSON.parse(raw);
 
-          const deriveCount = (obj: unknown): number => {
-            if (obj === null || typeof obj !== 'object') return 0;
-            const anyObj = obj as Record<string, unknown>;
-            if (typeof anyObj['numTotalTests'] === 'number')
-              return anyObj['numTotalTests'] as number;
-            if (typeof anyObj['total'] === 'number') return anyObj['total'] as number;
-            const statsValue = anyObj['stats'];
-            if (statsValue !== null && typeof statsValue === 'object') {
-              const stats = statsValue as Record<string, unknown>;
-              if (typeof stats['tests'] === 'number') return stats['tests'] as number;
-              if (typeof stats['numTotalTests'] === 'number')
-                return stats['numTotalTests'] as number;
-            }
-            if (Array.isArray(anyObj['testResults'])) {
-              return (anyObj['testResults'] as Array<Record<string, unknown>>).reduce((acc, r) => {
-                if (typeof r['numPassingTests'] === 'number')
-                  return acc + (r['numPassingTests'] as number);
-                if (Array.isArray(r['assertionResults']))
-                  return acc + (r['assertionResults'] as Array<unknown>).length;
-                return acc;
-              }, 0);
-            }
-            for (const k of Object.keys(anyObj)) {
-              const v = deriveCount(anyObj[k]);
-              if (v > 0) return v;
-            }
-            return 0;
-          };
-
-          testCount = deriveCount(parsed) || 0;
-        } catch {
-          // ignore and fall back to 0
+        if (Array.isArray(parsed?.testResults)) {
+          testFileCount = parsed.testResults.length;
         }
-      }
-      const testsLinkedRegex =
-        /\[!\[Tests:\s*(\d+)\]\(https?:\/\/img\.shields\.io\/badge\/Tests-(\d+)-([a-zA-Z0-9_%-]+)\.svg\)\]\([^)]*\)/i;
-      const testsImageRegex =
-        /!\[Tests:\s*(\d+)\]\(https?:\/\/img\.shields\.io\/badge\/Tests-(\d+)-([a-zA-Z0-9_%-]+)\.svg\)/i;
 
-      if (testsLinkedRegex.test(newReadme)) {
-        newReadme = newReadme.replace(
-          testsLinkedRegex,
-          `[![Tests: ${testCount}](https://img.shields.io/badge/Tests-${testCount}-blue.svg)](#tests)`,
-        );
-      } else if (testsImageRegex.test(newReadme)) {
-        newReadme = newReadme.replace(
-          testsImageRegex,
-          `![Tests: ${testCount}](https://img.shields.io/badge/Tests-${testCount}-blue.svg)`,
-        );
+        const deriveCount = (obj: unknown): number => {
+          if (obj === null || typeof obj !== 'object') return 0;
+          const anyObj = obj as Record<string, unknown>;
+          if (typeof anyObj['numTotalTests'] === 'number') return anyObj['numTotalTests'] as number;
+          if (typeof anyObj['total'] === 'number') return anyObj['total'] as number;
+          const statsValue = anyObj['stats'];
+          if (statsValue !== null && typeof statsValue === 'object') {
+            const stats = statsValue as Record<string, unknown>;
+            if (typeof stats['tests'] === 'number') return stats['tests'] as number;
+            if (typeof stats['numTotalTests'] === 'number') return stats['numTotalTests'] as number;
+          }
+          if (Array.isArray(anyObj['testResults'])) {
+            return (anyObj['testResults'] as Array<Record<string, unknown>>).reduce((acc, r) => {
+              if (typeof r['numPassingTests'] === 'number')
+                return acc + (r['numPassingTests'] as number);
+              if (Array.isArray(r['assertionResults']))
+                return acc + (r['assertionResults'] as Array<unknown>).length;
+              return acc;
+            }, 0);
+          }
+          for (const k of Object.keys(anyObj)) {
+            const v = deriveCount(anyObj[k]);
+            if (v > 0) return v;
+          }
+          return 0;
+        };
+
+        if (testCount === 0) testCount = deriveCount(parsed) || 0;
+      } catch {
+        // ignore and fall back to TEST_COUNT or 0
+      }
+
+      if (testCount > 0) {
+        newReadme = updateBadge(newReadme, 'Tests', String(testCount)) ?? newReadme;
+        // Prose mentions, e.g. "| 🧪 Tested | 671 tests, …" and "671 tests across 80 files".
+        newReadme = newReadme.replace(/(\|\s*🧪 Tested\s*\|\s*)\d+( tests)/, `$1${testCount}$2`);
+        newReadme = newReadme.replace(/^(\d+) tests across (\d+) files/m, (_m, _tests, files) => {
+          const fileCount = testFileCount > 0 ? testFileCount : Number(files);
+          return `${testCount} tests across ${fileCount} files`;
+        });
       }
 
       await fs.writeFile(readmePath, newReadme, 'utf8');

@@ -3,6 +3,13 @@
 Rows compacted out of `BACKLOG.md` → Recently Closed. Newest first.
 Plan files (when they exist) live under `.hawp/work/closed/YYYY/MM/DD/`.
 
+## Archived 2026-09-29
+
+| ID | Type | Title | Closed | Plan |
+| --- | --- | --- | --- | --- |
+| `c8e1f0d2`                      | `refactoring` | P2: small-app Sequelize-to-node:sqlite migration reference                                                                                     | 2026-07-21 | [closed/2026/07/21/c8e1f0d2-small-app-nodesqlite-migration.md](2026/07/21/c8e1f0d2-small-app-nodesqlite-migration.md)       |
+| `4b7e2c91`                      | `bugfix`      | P2: NodeNext declaration-barrel compatibility for packed consumers                                                                             | 2026-07-21 | [closed/2026/07/21/4b7e2c91-nodenext-declaration-barrels.md](2026/07/21/4b7e2c91-nodenext-declaration-barrels.md)           |
+
 ## Archived 2026-07-27
 
 | ID          | Type          | Title                                                                                                       | Closed     | Plan                                                                                                                                       |
