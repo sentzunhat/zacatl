@@ -8,7 +8,7 @@ Zacatl uses a centralized CI orchestrator to gate development, testing, and rele
 
 - `cve-scan.yml` — Production dependency CVE audit (`npm audit --omit=dev --audit-level=high`)
 - `peer-install-check.yml` — Verify peerDependencies can be installed and imported
-- `publish-dry.yml` — Full verification chain: tests, type check, lint, build, consumer smoke tests, and `npm publish --dry-run`; opt in on a PR with the `publish-dry-run` label
+- `publish-dry.yml` — Full verification chain: tests, type check, lint, build, the optional-peer entry point check (`npm run check:optional-peers`), consumer smoke tests, and `npm publish --dry-run`; opt in on a PR with the `publish-dry-run` label
 - `docker-smoke.yml` — Build and smoke-test eight example jobs covering SQLite, PostgreSQL, and MongoDB
 
 All component workflows are **`workflow_call`-only** with no direct `push`/`pull_request` triggers, eliminating duplicate runs on those events.

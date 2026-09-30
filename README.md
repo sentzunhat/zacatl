@@ -13,19 +13,10 @@
 [![CI](https://img.shields.io/github/actions/workflow/status/sentzunhat/zacatl/ci.yml?branch=main&style=flat-square&label=CI)](https://github.com/sentzunhat/zacatl/actions/workflows/ci.yml)
 [![CVE scan](https://img.shields.io/github/actions/workflow/status/sentzunhat/zacatl/cve-scan.yml?branch=main&style=flat-square&label=CVE%20scan)](https://github.com/sentzunhat/zacatl/actions/workflows/cve-scan.yml)
 [![Release](https://img.shields.io/github/actions/workflow/status/sentzunhat/zacatl/release.yml?style=flat-square&label=release)](https://github.com/sentzunhat/zacatl/actions/workflows/release.yml)
-[![Tests: 659](https://img.shields.io/badge/tests-659%20passing-brightgreen.svg?style=flat-square)](#-testing)
-[![Coverage: 91.41%](https://img.shields.io/badge/coverage-91.41%25-brightgreen.svg?style=flat-square)](#-testing)
+[![Tests: 671](https://img.shields.io/badge/tests-671%20passing-brightgreen.svg?style=flat-square)](#-testing)
+[![Coverage: 91.82%](https://img.shields.io/badge/coverage-91.82%25-brightgreen.svg?style=flat-square)](#-testing)
 
-| Capability                  | Detail                                                            |
-| --------------------------- | ----------------------------------------------------------------- |
-| 🏗️ Layered Architecture     | Strict Application → Domain → Infrastructure → Platform layers    |
-| 💉 Dependency Injection     | Built-in DI container via `tsyringe`                              |
-| ✅ Type-Safe Validation     | Zod schema support                                              |
-| 🛡️ Structured Errors        | 8 custom error types with correlation IDs                         |
-| 🗄️ Pluggable ORM Adapters   | Sequelize, Mongoose, built-in SQLite via `node:sqlite`, or custom |
-| 🌐 Internationalization     | Pluggable i18n with filesystem/memory adapters                    |
-| 📝 Production Observability | Structured logging and error tracking                             |
-| 🧪 Tested                   | Vitest — test count and coverage shown in badges above            |
+**Stack**
 
 [![TypeScript](https://img.shields.io/badge/%3C%2F%3E-TypeScript-3178c6.svg?style=flat-square)](https://www.typescriptlang.org/)
 [![Node.js 26+](https://img.shields.io/badge/node-%3E%3D26.0.0-brightgreen.svg?style=flat-square)](https://nodejs.org/)
@@ -75,7 +66,7 @@ Zacatl is useful when a service needs to stay understandable as it grows, or whe
 | 🌐 Server Framework Choice  | Fastify or Express — same domain logic, swap the adapter           |
 | 🌍 Internationalization     | Pluggable i18n with filesystem/memory adapters                     |
 | 📝 Production Observability | Structured logging and error tracking                              |
-| 🧪 Tested                   | 659 tests, 91%+ coverage — see [Testing](#-testing)                |
+| 🧪 Tested                   | 671 tests, 91%+ coverage — see [Testing](#-testing)                |
 
 ## 🧭 See It in a Real Service
 
@@ -284,7 +275,7 @@ npm test                 # Run all tests
 npm run test:coverage    # Coverage report
 ```
 
-659 tests across 78 files, 91%+ line coverage. CI runs the full suite plus type-check, lint, and an 8-example Docker smoke matrix before any release — see [docs/guidelines/ci-cd-workflow.md](./docs/guidelines/ci-cd-workflow.md) for exactly what gates what.
+671 tests across 80 files, 91%+ line coverage. CI runs the full suite plus type-check, lint, and an 8-example Docker smoke matrix before any release — see [docs/guidelines/ci-cd-workflow.md](./docs/guidelines/ci-cd-workflow.md) for exactly what gates what.
 
 ## 📋 Requirements
 

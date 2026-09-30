@@ -2,9 +2,9 @@
 
 ---
 
-## [Unreleased]
+## [0.0.62] - 2026-09-30
 
-**Status**: Fixes on `dev`; version bump and release left to the maintainer.
+**Status**: Release candidate for the automated `main` release path
 
 ### 🐛 Fixes
 
@@ -44,8 +44,20 @@
   (2 high, 3 moderate): raised the `fastify` floor to `^5.12.5`, `js-yaml` to
   `^5.4.2` and `@fastify/http-proxy` to `^11.6.2`, and refreshed the lockfile
   for transitive `fast-uri` (3.1.8 / 4.2.1), `undici` (7.30.0) and `qs`
-  (6.16.0). `npm audit --omit=dev` reports 0 vulnerabilities. Three moderate
-  dev-only advisories in `@vitest/mocker` remain for the vitest update.
+  (6.16.0).
+- Patched `brace-expansion` to 5.0.12 (high, GHSA-q2hr-2g5m-vwhr and related
+  DoS advisories), reached in production through `@fastify/static` → `glob` →
+  `minimatch`; the same in-range fix updated dev-only copies and `moment`.
+- `npm audit --omit=dev` reports 0 vulnerabilities. Three moderate dev-only
+  advisories in `@vitest/mocker` remain for the vitest update.
+
+### 🧰 Tooling
+
+- `npm run update:readme-coverage` (run by `test:coverage`) matches the
+  current flat-square README badges again: it updates only the numbers, keeps
+  each badge's label, style and link, and also refreshes the "N tests" counts
+  in the README text. It had been exiting with "No Coverage badge found",
+  which failed `test:coverage` and the local `prepublish:only` chain.
 
 ### ⚠️ Migration
 
@@ -59,8 +71,10 @@
 ### 🧪 Verification
 
 - New real-Fastify test covers GET, POST, 4xx, 5xx, an `execute()` override
-  returning 201, and a plain `RouteHandler` that returns its payload; it
-  asserts no double-send or "reply.sent" log.
+  returning 201, a plain `RouteHandler` that returns its payload, and one that
+  throws before sending (Fastify's error handler still gets the error); it
+  asserts no double-send or "reply.sent" log and one log line per handled
+  error.
 - New test loads the node:sqlite `BaseRepository` and the `third-party`
   barrel with `sqlite3`, `sequelize` and `mongoose` mocked to throw on import,
   and checks that `src/` has no value imports from the barrel.
@@ -71,6 +85,7 @@
   peers blocked; only `third-party/databases/<peer>` may fail, and only for its
   own peer. It runs after `prepare-publish` in every publish chain, so release
   and publish dry-run gate on it.
+- 671 tests across 80 files pass; line coverage 91.82%.
 
 ## [0.0.61] - 2026-08-16
 
