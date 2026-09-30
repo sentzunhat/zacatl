@@ -52,3 +52,7 @@ The hardener config path and key syntax depend on the infrascode project — che
   better than retroactively asking people to adjust notification settings.
 - Consider adding a note in CONTRIBUTING.md advising watchers to set
   "Releases only" watch level to avoid PR/push noise.
+
+## Closure (2026-09-29)
+
+Closed: Discussions disabled (`has_discussions: false` via GitHub API) and the repo-hardener policy sets it by default (commit `610e5d5`). Evidence: [backlog-sync-release-evidence.md](../../../../evidence/2026/09/29/backlog-sync-release-evidence.md).
