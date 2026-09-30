@@ -42,7 +42,9 @@ Plan snippet: [../templates/workflow-loop-plan-section.md](../templates/workflow
 
 **Hard stops** (both modes): success transition, park, escalate, blocked, or budget exhausted → no further auto-advance.
 
-**Final human gate:** After all N iterations **or** early success, produce one summary handoff (`.hawp/work/status/YYYY/MM/DD/<ID>-loop-final.md` or last iter handoff marked `success`) for human review before intake close.
+**Final human gate:** After all N iterations **or** early success, update the
+UUID-scoped status handoff at `.hawp/work/status/YYYY/MM/DD/<ID>/status.md`
+(mark the final entry `success`) for human review before intake close.
 
 ---
 
@@ -125,10 +127,10 @@ Do **not** create new runtime folders (`loop-runs/`, per-field shape folders, et
 | Artifact | Location | Purpose |
 | -------- | -------- | ------- |
 | Coordination index | `.hawp/work/BACKLOG.md` | Status: `in-progress`, `plan-ready`, `parked`, etc. |
-| Source of truth | `.hawp/work/active/<ID>.md` | Plan + **Iteration Log** section (append each pass) |
-| Iteration handoff | `.hawp/work/status/YYYY/MM/DD/<ID>-iter-<NNN>.md` | Compact continuity for the next session |
+| Source of truth | `.hawp/work/active/<ID>/plan.md` | Plan + **Iteration Log** section (append each pass) |
+| Iteration handoff | `.hawp/work/status/YYYY/MM/DD/<ID>/status.md` | Append one compact iteration entry per pass |
 | Reflection on retry | Same status file or plan Iteration Log | What failed, what to try next |
-| Evidence | `.hawp/work/evidence/YYYY/MM/DD/<ID>-*.md` | Large verification output |
+| Evidence | `.hawp/work/evidence/YYYY/MM/DD/<ID>/evidence.md` | Large verification output |
 | Pause marker | HAWP shape `checkpoint` field (optional string) | Short anchor in prompts only — not a log |
 
 Template: [../templates/workflow-loop-handoff.md](../templates/workflow-loop-handoff.md)
@@ -139,7 +141,7 @@ Template: [../templates/workflow-loop-handoff.md](../templates/workflow-loop-han
 
 Prerequisites (from intake workflow):
 
-1. Backlog row exists with plan file in `work/active/<ID>.md`
+1. Backlog row exists with plan file in `work/active/<ID>/plan.md`
 2. Investigation and plan are complete; risk level set
 3. Plan approved (or low-risk auto-approved)
 
@@ -158,17 +160,17 @@ Add to the plan file (full snippet: [../templates/workflow-loop-plan-section.md]
 **Auto-approve:** false
 ```
 
-**Plan file path:** Prefer `.hawp/work/active/<Legacy ID>.md` (e.g. `TASK-079.md`) so `hawp backlog validate` and loop Continue steps resolve the plan by ID. If the plan uses a descriptive filename, keep the BACKLOG **Plan File** link accurate and expect the validator to flag a missing plan until renamed or aliased.
+**Plan file path:** Prefer `.hawp/work/active/<ID>/plan.md` so `hawp backlog validate` and loop Continue steps resolve the plan by ID without filename drift.
 
 Set BACKLOG status to `in-progress`.
 
 ### Quick Start (first iteration)
 
-1. Confirm plan at `.hawp/work/active/<Legacy ID>.md` and BACKLOG row `in-progress`
+1. Confirm plan at `.hawp/work/active/<ID>/plan.md` and BACKLOG row `in-progress`
 2. Add **Workflow Loop** block + empty **Iteration Log** table to the plan (see above)
 3. Set **Current iteration** to `0`; open a new executor session
 4. **Continue:** increment to `1`, read BACKLOG → plan → latest handoff
-5. **Execute** one scoped slice → save handoff to `work/status/YYYY/MM/DD/<ID>-iter-001.md`
+5. **Execute** one scoped slice → append the handoff to `work/status/YYYY/MM/DD/<ID>/status.md`
 6. **Review** (separate hat/session) → **Transition** (`approve` | `retry` | `park`) before iteration 2
 
 ---
@@ -180,8 +182,8 @@ Set BACKLOG status to `in-progress`.
 **Executor or new session** reads in order:
 
 1. `.hawp/work/BACKLOG.md` — confirm item is active
-2. `.hawp/work/active/<ID>.md` — mission, constraints, **Loop Contract** fields, Iteration Log
-3. Latest `.hawp/work/status/.../<ID>-iter-*.md` if any
+2. `.hawp/work/active/<ID>/plan.md` — mission, constraints, **Loop Contract** fields, Iteration Log
+3. `.hawp/work/status/YYYY/MM/DD/<ID>/status.md` if any
 4. Linked evidence files
 
 Increment **Current iteration** in the plan before executing (0 → 1 on the first pass; handoff filenames use this number).
@@ -198,8 +200,8 @@ input: |
   Execute only this pass scope: <one-line objective>
 
 context: |
-  Plan: .hawp/work/active/<ID>.md
-  Prior handoff: .hawp/work/status/YYYY/MM/DD/<ID>-iter-<NNN>.md (latest, if exists)
+  Plan: .hawp/work/active/<ID>/plan.md
+  Prior handoff: .hawp/work/status/YYYY/MM/DD/<ID>/status.md (latest entry, if exists)
   Loop mode: (from plan — autonomous | gated)
   Iteration budget: (from plan — 3 | 5 | 8)
 
@@ -214,7 +216,7 @@ checkpoint: |
 constraints: |
   - Smallest correct diff; no scope creep
   - Path discipline per intake-workflow.md
-  - Same output path every iteration: .hawp/work/status/YYYY/MM/DD/<ID>-iter-<NNN>.md
+  - Same output path every iteration: .hawp/work/status/YYYY/MM/DD/<ID>/status.md
   - Do not close the backlog item until final human gate after success or budget end
 
 output: |
@@ -224,9 +226,9 @@ output: |
 
 #### Mandatory output (same every iteration)
 
-Every execution pass **must** produce a handoff at:
+Every execution pass **must** append a handoff to:
 
-`.hawp/work/status/YYYY/MM/DD/<ID>-iter-<NNN>.md`
+`.hawp/work/status/YYYY/MM/DD/<ID>/status.md`
 
 Use [../templates/workflow-loop-handoff.md](../templates/workflow-loop-handoff.md). Append a row to the plan **Iteration Log**. Do not substitute ad-hoc paths or skip the handoff between autonomous iterations.
 
@@ -307,8 +309,8 @@ Add this section to the active plan when starting a loop:
 
 | Iter | Date | Outcome | Handoff |
 | ---- | ---- | ------- | ------- |
-| 1 | YYYY-MM-DD | retry | [status](../status/YYYY/MM/DD/<ID>-iter-001.md) |
-| 2 | YYYY-MM-DD | success | [status](../status/YYYY/MM/DD/<ID>-iter-002.md) |
+| 1 | YYYY-MM-DD | retry | [status](../status/YYYY/MM/DD/<ID>/status.md) |
+| 2 | YYYY-MM-DD | success | [status](../status/YYYY/MM/DD/<ID>/status.md) |
 ```
 
 Keep rows compact. Detail lives in status files.
@@ -319,11 +321,11 @@ Keep rows compact. Detail lives in status files.
 
 **Start autonomous loop (executor — runs N iterations without mid-loop prompts):**
 
-> Run Workflow Loop for `<ID>` in **autonomous** mode. Iteration budget: `<3|5|8>`. Read plan Loop Contract. For each iteration 1→N: use the standardized Continue prompt, execute scoped slice, review, save handoff to `work/status/YYYY/MM/DD/<ID>-iter-<NNN>.md`, update Iteration Log. Auto-advance per plan rules. Stop at success, park, blocked, or budget exhausted. Produce final summary handoff for human review.
+> Run Workflow Loop for `<ID>` in **autonomous** mode. Iteration budget: `<3|5|8>`. Read plan Loop Contract. For each iteration 1→N: use the standardized Continue prompt, execute scoped slice, review, append the handoff to `work/status/YYYY/MM/DD/<ID>/status.md`, update Iteration Log. Auto-advance per plan rules. Stop at success, park, blocked, or budget exhausted. Produce final summary handoff for human review.
 
 **Start next iteration (executor — gated mode):**
 
-> Continue Workflow Loop for `<ID>` iteration `<N>`. Read the active plan, latest handoff, and reflection. Execute only the **Next try** scope. Save handoff to `work/status/YYYY/MM/DD/<ID>-iter-<NNN>.md`. Stop before transition — I will approve or reject.
+> Continue Workflow Loop for `<ID>` iteration `<N>`. Read the active plan, latest status entry, and reflection. Execute only the **Next try** scope. Append the handoff to `work/status/YYYY/MM/DD/<ID>/status.md`. Stop before transition — I will approve or reject.
 
 **Review-only (agent reviewer):**
 
@@ -361,7 +363,7 @@ See [../standards/patterns/parallel-work-guardrails.md](../standards/patterns/pa
 | Must user say "loop again"? | **No** in `autonomous` mode; **yes** in `gated` mode between iterations |
 | How to set 3/5/8 runs? | Plan field **Iteration budget:** `3` \| `5` \| `8` |
 | Same input each pass? | Standardized Continue prompt block (plan + last handoff + log) |
-| Same output each pass? | Handoff at `.hawp/work/status/YYYY/MM/DD/<ID>-iter-<NNN>.md` |
+| Same output each pass? | Append the handoff at `.hawp/work/status/YYYY/MM/DD/<ID>/status.md` |
 | How to pause? | Park per intake; optional `checkpoint` string in prompts |
 | Who approves? | Per-iteration in gated mode; final human gate after autonomous run |
 | Failed iteration? | Reflect → append Iteration Log → retry or auto-advance |

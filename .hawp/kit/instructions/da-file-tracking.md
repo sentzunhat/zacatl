@@ -30,7 +30,8 @@ This instruction defines the file-tracking convention for digital agents coordin
 
 **File tracking lives inside each work item**, not in the backlog.
 
-Location: `.hawp/work/active/<TASK-ID>-files.md`
+Location: `.hawp/work/active/<uuid>/files.md` for new work items. Legacy `TASK-*`
+records remain readable until they are closed or migrated.
 
 This document is the authoritative source for:
 
@@ -48,7 +49,7 @@ This document is the authoritative source for:
 
 ✅ **Good:**
 
-- `.hawp/work/active/TASK-030.md`
+- `.hawp/work/active/<uuid>/plan.md`
 - `.hawp/kit/templates/work-item-files.md`
 - `README.md`
 - `librarian/scripts/backlog-upgrade/cli.ts`
@@ -99,7 +100,7 @@ Plain-text exact repo-relative paths remain the source of truth.
 
 For lock/index artifacts that must be filename-safe across OSes, you may add an optional task-local encoded path-key directory:
 
-- `.hawp/work/files/<TASK-ID>/`
+- `.hawp/work/files/<uuid>/`
 - One file per tracked path using deterministic path-key naming
 
 Deterministic path-key algorithm:
@@ -116,7 +117,7 @@ Prefix meaning:
 
 If the resulting filename would exceed filesystem limits, use:
 
-- `.hawp/work/files/<TASK-ID>/pk/<chunk1>/<chunk2>/.../entry.txt`
+- `.hawp/work/files/<uuid>/pk/<chunk1>/<chunk2>/.../entry.txt`
 - Split the same base64url token into deterministic chunks (for example 120 chars per folder segment).
 - Store full path and full base64url token in file content.
 
@@ -138,11 +139,11 @@ These artifacts are coordination helpers only. They never replace plain-text pat
 
 When starting or coordinating a work item:
 
-1. **Check the work item plan** (`.hawp/work/active/TASK-XXX.md`).
+1. **Check the work item plan** (`.hawp/work/active/TASK-XXX/plan.md`).
    - Read the "Constraints" and "Scope" sections.
    - Check for file-tracking document references.
 
-2. **Read the file tracking document** (`.hawp/work/active/TASK-XXX-files.md`).
+2. **Read the file tracking document** (`.hawp/work/active/TASK-XXX/files.md`).
    - Before editing any file, verify it is in "Owned Files" section.
    - Before reading a file, verify it is in "Owned Files" or "Read-Only Context Files".
    - Before touching any file, check it is NOT in "Do-Not-Touch Files".
@@ -196,12 +197,6 @@ For v0.2 file-tracking enforcement lanes, execute this sequence:
 
 Use one of the commands below to deterministically generate a path-key from an exact repo-relative path.
 
-Node.js (macOS/Linux/Windows):
-
-```bash
-node -e 'const p=process.argv[1];const b=Buffer.from(p,"utf8").toString("base64").replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"" );console.log(`pk-${b}.txt`);' ".hawp/kit/templates/work-item-files.md"
-```
-
 Python 3 (macOS/Linux/Windows):
 
 ```bash
@@ -235,7 +230,7 @@ Template structure:
 
 ### 6. When to Create a File Tracking Document
 
-Create a separate file-tracking document (`.hawp/work/active/TASK-XXX-files.md`) when:
+Create a separate file-tracking document (`.hawp/work/active/TASK-XXX/files.md`) when:
 
 - The task touches multiple files or folders
 - The task risks overlapping with parallel work
@@ -294,8 +289,7 @@ git diff --name-status
 git diff --check
 
 # Run repo validation
-npm run typecheck
-npm run validate:workflow
+.hawp/bin/hawp work validate
 ```
 
 Confirm that:
@@ -337,7 +331,7 @@ These are deferred and not part of v0.1:
 
 ### Read-Only Context Files
 
-- `librarian/package.json`
+- `librarian/src/go.mod`
 - `README.md`
 
 ### Do-Not-Touch Files

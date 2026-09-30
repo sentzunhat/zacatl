@@ -55,7 +55,8 @@ When working in the **HAWP protocol source repository** (not a downstream instal
 
 - `distribution/sources/**`
 - `distribution/generated/**`
-- `librarian/scripts/librarian/distribution/**`
+- `librarian/src/internal/domain/distribution/**`
+- `librarian/src/internal/domain/providersync/**`
 
 Downstream projects use generated guides at install time (for example from the project's install/update documentation links). They do not maintain those paths locally.
 

@@ -18,7 +18,9 @@ This guide is a repo-local companion to HAWP task shaping, not an expansion of t
 - Task is trivial (typo fix, one-line config change, isolated utility fix)
 - Everything was directly verified and is documented in the plan file
 
-**Location:** Save reports to `work/status/YYYY/MM/DD/<ID>-status.md`
+**Location:** Save reports to `work/status/YYYY/MM/DD/<ID>/status.md`, using
+the owning work item's UUID or short ID. Prefer `hawp work status --title
+"<label>"` to generate the canonical path.
 
 ---
 
@@ -118,7 +120,7 @@ In every report:
 
 ## Usage Notes
 
-- Save report files over time in your `.hawp/work/status/` folder (using `YYYY/MM/DD/` date-based subfolders).
+- Save report files under `.hawp/work/status/YYYY/MM/DD/<ID>/status.md`.
 - Keep one report focused on one intent thread when possible.
 - In Help Wanted, ask for specific support such as challenging an assumption, reviewing a risk, or proposing the next 2-3 steps.
 - Link to plan files, evidence, and artifacts instead of copying large raw outputs.

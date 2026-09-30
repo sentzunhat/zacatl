@@ -2,15 +2,15 @@
 
 Use this template to track files for a work item.
 
-**Save as:** `.hawp/work/active/<TASK-ID>-files.md`
+**Save as:** `.hawp/work/active/<uuid>/files.md`
 
 ---
 
-## TASK-XXX: [Task Title] — File Tracking
+## <uuid>: [Task Title] — File Tracking
 
 **Purpose:** Track files related to this work item using exact repo-relative paths. Source of truth for file ownership, read-only context, and lock status.
 
-**Work Item:** `.hawp/work/active/TASK-XXX.md`
+**Work Item:** `.hawp/work/active/<uuid>/plan.md`
 
 **Last Updated:** YYYY-MM-DD
 
@@ -20,7 +20,7 @@ Use this template to track files for a work item.
 
 Files this task is allowed to create or edit.
 
-- `.hawp/work/active/TASK-XXX.md` — this work item plan
+- `.hawp/work/active/<uuid>/plan.md` — this work item plan
 - `path/to/file.md` — file 1
 - `path/to/another-file.ts` — file 2
 
@@ -32,7 +32,7 @@ Files this task may read for context but must not edit.
 
 - `.hawp/kit/references/backlog-alignment.md`
 - `README.md`
-- `package.json`
+- `librarian/src/go.mod`
 
 ---
 
@@ -49,7 +49,7 @@ Files explicitly out of scope. Agents must not edit these even if they appear re
 
 Files currently reserved for this task. Other agents must not touch these while the task is active.
 
-- `.hawp/work/BACKLOG.md` — TASK-030 will add a single row for this item
+- `.hawp/work/BACKLOG.md` — this work item will add a single row for this item
 
 ---
 
@@ -62,8 +62,8 @@ Files actually changed during this task. Populate as work progresses.
 - `.hawp/kit/templates/work-item-files.md` (new)
 - `.hawp/kit/instructions/da-file-tracking.md` (new)
 - `.hawp/kit/references/work-item-file-tracking.md` (new)
-- `.hawp/work/active/TASK-030.md` (this work item)
-- `.hawp/work/BACKLOG.md` (updated with TASK-030 row)
+- `.hawp/work/active/<uuid>/plan.md` (this work item)
+- `.hawp/work/BACKLOG.md` (updated with this work item row)
 
 ---
 
@@ -73,13 +73,13 @@ Use this section only when filename-safe lock/index artifacts are needed.
 
 Artifact directory:
 
-- `.hawp/work/files/TASK-XXX/`
+- `.hawp/work/files/<uuid>/`
 
 Deterministic filename rule:
 
 - `pk-<base64url-no-pad>.txt`
 - Input must be the exact repo-relative path with `/` separators.
-- If key length is too long for the filesystem, use `.hawp/work/files/TASK-XXX/pk/<chunk1>/<chunk2>/.../entry.txt` with deterministic token chunks and store full token in file content.
+- If key length is too long for the filesystem, use `.hawp/work/files/<uuid>/pk/<chunk1>/<chunk2>/.../entry.txt` with deterministic token chunks and store full token in file content.
 
 Prefix meaning:
 
@@ -87,7 +87,7 @@ Prefix meaning:
 
 Example artifact files:
 
-- `.hawp/work/files/TASK-XXX/pk-Y29yZS8uaGF3cC9raXQvdGVtcGxhdGVzL3dvcms....txt`
+- `.hawp/work/files/<uuid>/pk-Y29yZS8uaGF3cC9raXQvdGVtcGxhdGVzL3dvcms....txt`
 
 Required artifact content:
 
@@ -111,11 +111,8 @@ git diff --name-status
 # Check no trailing whitespace
 git diff --check
 
-# Verify TypeScript (if applicable)
-npm run typecheck
-
 # Verify HAWP workflow structure
-npm run validate:workflow
+.hawp/bin/hawp work validate
 
 # Final commit validation
 git log -1 --oneline

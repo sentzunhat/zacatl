@@ -37,7 +37,7 @@ output: |
 - **constraints** — state what must not happen as clearly as what must.
 - **output** — describe the artifact form, not just "an answer."
 - **checkpoint** — omit unless you need a handoff or pause anchor.
-- For this repository, use Node 26 when running librarian or workflow-maintenance commands; follow the repo's declared runtime contract before treating a failure as a protocol issue.
+- For this repository, run maintainer and workflow commands through `librarian/src` (`go run ./cmd/hawp ...` or `make build`); follow the repo's declared Go toolchain before treating a failure as a protocol issue.
 - For path-sensitive work, reference files using exact repo-relative paths from repository root.
 - Basename-only file mentions are unsafe for path-sensitive work unless the file is truly at repository root and explicitly marked as such.
 - Capture repo-root proof (`pwd`, `git rev-parse --show-toplevel`, `git rev-parse --show-prefix`, `git status --short`) before path-sensitive edits.
@@ -72,6 +72,27 @@ HAWP is a **shaping protocol**, not a runtime. Better results come from stronger
 
 ## Next Resources
 
+### HAWP Tools And Record Updates
+
+Provider setup and reusable worker instructions:
+[Codex, Claude Code, and GitHub Copilot](usage/mcp/README.md).
+
+- Prefer available HAWP MCP tools for their supported operations: `hawp_search`
+  for indexed context, `hawp_work_new` for a genuinely new item, and
+  `hawp_work_validate` before and after workflow changes. Confirm the server's
+  repository scope before any write. Use the local HAWP CLI if MCP is unavailable.
+- Check the backlog and existing plan before creating an item. Add new context,
+  decisions, changed constraints, and verification to that same plan when the
+  intent is unchanged. Preserve its UUID, artifacts, and historical evidence.
+- Discover the tools actually exposed by the connected server. Do not invent
+  `hawp_add` or `hawp_work_update`: when no update tool exists, edit the existing
+  plan and backlog directly, then validate. Do not create duplicate items as a
+  substitute for updating context.
+- Search indexes can be stale or incomplete. Confirm source files before edits
+  or status claims; no search hit does not establish that an item is absent.
+- Never overwrite unmatched work records or fabricate identity, outcome, or
+  verification. Keep unresolved matches for explicit review.
+
 ### Learning & Examples
 
 - **Authoring guidance**: [references/authoring-patterns.md](references/authoring-patterns.md) — guidance for recurring task types
@@ -80,10 +101,18 @@ HAWP is a **shaping protocol**, not a runtime. Better results come from stronger
 
 ### Workflow Guides (Recommended Order)
 
-1. **[usage/init.md](usage/init.md)** — one-time setup for a new project
-2. **[usage/intake-workflow.md](usage/intake-workflow.md)** — intake loop for structured bug/task handling (investigation task first, then plan, for every item)
-3. **[usage/status-report.md](usage/status-report.md)** — context handoff and session continuity
-4. **[usage/workflow-loop.md](usage/workflow-loop.md)** — multi-iteration work across sessions (instruction-based; autonomous or gated; review/approve/retry without CLI)
+1. **[usage/hawp-first-workflow.md](usage/hawp-first-workflow.md)** — use HAWP search and existing work records to gather context before acting
+2. **[usage/init.md](usage/init.md)** — one-time setup for a new project
+3. **[usage/intake-workflow.md](usage/intake-workflow.md)** — intake loop for structured bug/task handling (investigation task first, then plan, for every item)
+4. **[usage/status-report.md](usage/status-report.md)** — context handoff and session continuity
+5. **[usage/workflow-loop.md](usage/workflow-loop.md)** — multi-iteration work across sessions (instruction-based; autonomous or gated; review/approve/retry without CLI)
+6. **[usage/search.md](usage/search.md)** — index and search kit/work documents via CLI or MCP (`hawp_search` tool)
+
+### Coordination And Implementation Checks
+
+- **[usage/parallel-agent-worktrees.md](usage/parallel-agent-worktrees.md)** — ownership, base selection, and safe worktree integration for independent slices
+- **[usage/manager-branch.md](usage/manager-branch.md)** — optional separation of HAWP coordination from a product integration branch
+- **[usage/harness-guide.md](usage/harness-guide.md)** — choose the right slice, provider, or CLI/MCP verification guide
 
 ### Templates by Task Type
 
@@ -111,6 +140,7 @@ HAWP is a **shaping protocol**, not a runtime. Better results come from stronger
 **Agent instructions (optional):**
 
 - [instructions/clean-code-and-structure.md](instructions/clean-code-and-structure.md) — touch-only cleanup and justified splits
+- [instructions/typescript-conventions.md](instructions/typescript-conventions.md) — scoped TypeScript/Node.js import and script guidance
 
 ### Standards map (what to open first)
 

@@ -43,7 +43,8 @@ File tracking is a **manual convention** for now.
 
 **The backlog is a summary/report surface only.**
 
-- File tracking lives in `.hawp/work/active/<TASK-ID>-files.md`.
+- File tracking lives in `.hawp/work/active/{uuid}/files.md` for new UUID-native
+  work items. Legacy `TASK-*` items remain readable until closure.
 - The backlog may link to a work item and summarize status.
 - The backlog must not rebuild file ownership from scratch.
 - The backlog must not list files per task.
@@ -126,13 +127,25 @@ Why this model:
 
 ### File Location
 
-```
+**Default (folder-per-item):**
+
+```text
 .hawp/work/active/
-  TASK-030.md                    # Work item plan
-  TASK-030-files.md              # File tracking (separate from plan)
+  b7e2a4f9/
+    plan.md          # Work item plan
+    files.md         # File tracking (optional, co-located with plan)
 ```
 
-You may inline file tracking in the plan file for simple tasks with only a few files.
+**Legacy flat file — still accepted by the validator:**
+
+```text
+.hawp/work/active/
+  TASK-030.md            # Legacy work item plan
+  TASK-030-files.md      # Legacy file tracking
+```
+
+New work items should use the folder-per-item layout. You may inline file tracking
+directly in `plan.md` for simple tasks with only a few files.
 
 ### File Tracking Document Sections
 
@@ -149,8 +162,8 @@ You may inline file tracking in the plan file for simple tasks with only a few f
 
 When starting work on a HAWP task:
 
-1. Read the work item plan (`.hawp/work/active/TASK-XXX.md`).
-2. Read the file-tracking document (if it exists).
+1. Read the work item plan (`.hawp/work/active/{uuid}/plan.md` or legacy `.hawp/work/active/TASK-XXX.md`).
+2. Read the file-tracking document if it exists (`files.md` alongside the plan, or legacy `TASK-XXX-files.md`).
 3. Before editing any file:
    - Verify it is in "Owned Files".
    - Verify it is NOT in "Do-Not-Touch Files".
@@ -215,7 +228,13 @@ You may skip file tracking for:
 The backlog may reference work item file tracking:
 
 ```md
-| TASK-030 | task | Implement file-tracking v0.1 | in-progress | [plan](active/TASK-030.md) | Files: [tracking](active/TASK-030-files.md) |
+| b7e2a4f9 | task | Implement file-tracking v0.1 | in-progress | [plan](active/b7e2a4f9/plan.md) | |
+```
+
+Legacy format (still valid):
+
+```md
+| `TASK-030` | task | Implement file-tracking v0.1 | in-progress | [plan](active/TASK-030.md) | Files: [tracking](active/TASK-030-files.md) |
 ```
 
 The backlog must NOT:
