@@ -52,8 +52,12 @@ All component workflows are **`workflow_call`-only** with no direct `push`/`pull
 - To verify the packed consumer fixtures and `npm publish --dry-run`
 
 Adding either label emits a new `pull_request:labeled` event and starts a new
-orchestrator run. Removing a label does not cancel an already-running job; it
-only prevents that label from selecting the next run.
+orchestrator run, which supersedes the PR's in-flight run. Removing a label does
+not cancel an already-running job; it only prevents that label from selecting
+the next run. Any other label is ignored: its run gets a separate concurrency
+group (so it can't cancel the PR's real run) and every job skips. Opening a PR
+with labels already attached still fires one event per label; the superseded
+runs show as cancelled, and the last one runs the full selection.
 
 ### Push to dev (after merge)
 
@@ -61,13 +65,15 @@ only prevents that label from selecting the next run.
 
 Pushing to `dev` while a PR from `dev` is open fires two events for the same
 commit: `push` and `pull_request:synchronize`. Running cve/peers on both was
-pure duplicate work, so `push -> dev` is a no-op; the PR's `pull_request` run
-is the one that actually gates the commit.
+pure duplicate work, so `ci.yml` does not trigger on `push -> dev` at all (its
+`push` trigger lists only `main`); the PR's `pull_request` run is the one that
+actually gates the commit. This also keeps a second, mostly skipped "(push)"
+check set off `dev -> main` PRs.
 
 ```
   push -> dev
       ↓
-  (no jobs — see the PR's pull_request run for cve/peers)
+  (no CI run — see the PR's pull_request run for cve/peers)
 ```
 
 If you push to `dev` with **no open PR**, no CI runs until you open one (or
@@ -116,7 +122,7 @@ the publish-workflow dispatch if tag creation succeeded but the first dispatch a
 
 ### Weekly schedule
 
-**Drift detection** — Same as push to dev (cve, peers), no dry-run or docker. Two separate schedule
+**Drift detection** — Same as a plain PR run (cve, peers), no dry-run or docker. Two separate schedule
 triggers fire at the same cron: `ci.yml`'s own (running `cve` + `peers` as jobs) and
 `cve-scan.yml`'s standalone one (badge freshness — see the exception noted above). `peers` only
 runs once, via `ci.yml`.
@@ -202,9 +208,10 @@ Check the workflow logs on the PR:
 - **cve-scan failure** — Run `npm audit --omit=dev --audit-level=high` locally. Fix vulnerabilities or update overrides in `package.json` (via `npm pkg set overrides.<pkg>="version"`).
 - **peer-install-check failure** — Run `npm ci && npx tsx scripts/dev/install-peers.ts && npx tsx scripts/dev/check-peers.ts` locally.
 
-### Push to dev fails
+### Checks fail on a PR into dev
 
-Same as PR failures. Cve and peers are the only gates on dev.
+Same as PR failures. Cve and peers are the only default gates on dev; pushes
+to dev run no CI of their own.
 
 ### Push to main fails before release
 

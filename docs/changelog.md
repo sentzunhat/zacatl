@@ -58,6 +58,10 @@
   each badge's label, style and link, and also refreshes the "N tests" counts
   in the README text. It had been exiting with "No Coverage badge found",
   which failed `test:coverage` and the local `prepublish:only` chain.
+- CI no longer runs on pushes to `dev` (the open PR's run already covers the
+  commit), which removes the extra, mostly skipped "(push)" check set from
+  `dev → main` PRs. Labels other than `publish-dry-run` / `docker-smoke` no
+  longer start a run that could cancel the PR's in-flight pipeline.
 
 ### ⚠️ Migration
 
