@@ -121,12 +121,14 @@ const main = async (): Promise<void> => {
 
       if (testCount > 0) {
         newReadme = updateBadge(newReadme, 'Tests', String(testCount)) ?? newReadme;
-        // Prose mentions, e.g. "| 🧪 Tested | 671 tests, …" and "671 tests across 80 files".
-        newReadme = newReadme.replace(/(\|\s*🧪 Tested\s*\|\s*)\d+( tests)/, `$1${testCount}$2`);
-        newReadme = newReadme.replace(/^(\d+) tests across (\d+) files/m, (_m, _tests, files) => {
-          const fileCount = testFileCount > 0 ? testFileCount : Number(files);
-          return `${testCount} tests across ${fileCount} files`;
-        });
+        // Testing section prose, e.g. "671 tests across 80 files, 91.82% line coverage".
+        newReadme = newReadme.replace(
+          /^(\d+) tests across (\d+) files, [\d.]+%\+? line coverage/m,
+          (_m, _tests, files) => {
+            const fileCount = testFileCount > 0 ? testFileCount : Number(files);
+            return `${testCount} tests across ${fileCount} files, ${percentStr}% line coverage`;
+          },
+        );
       }
 
       await fs.writeFile(readmePath, newReadme, 'utf8');

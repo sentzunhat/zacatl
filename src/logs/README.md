@@ -20,5 +20,5 @@ Share one logger with Fastify and the Service:
 ```typescript
 const logger = createLogger();
 const fastify = Fastify({ loggerInstance: toFastifyLogger(logger) });
-new Service({ ...config, logger });
+new Service({ type: ServiceType.SERVER, logger, platforms, layers });
 ```

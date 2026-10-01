@@ -59,7 +59,12 @@ export class Service {
     }
 
     if (platforms != null) {
-      this.platforms = new Platforms(platforms, config.logger);
+      // ServiceConfig.logger flows into the platforms unless they set their own.
+      this.platforms = new Platforms(
+        platforms.logger == null && config.logger != null
+          ? { ...platforms, logger: config.logger }
+          : platforms,
+      );
     }
 
     if (run?.auto === true) {

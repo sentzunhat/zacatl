@@ -45,8 +45,8 @@ async function main() {
       });
     });
 
-    const serviceConfig = createServiceConfig(fastify, mongoose);
-    const service = new Service({ ...serviceConfig, logger });
+    const serviceConfig = createServiceConfig(fastify, mongoose, logger);
+    const service = new Service(serviceConfig);
     activeService = service;
 
     await service.start({ port: config.port });

@@ -25,6 +25,12 @@ export interface ServerConfig {
   port: number;
   /** REST entry points for route/hook registration */
   entryPoints?: RestApplicationEntryPoints;
+  /**
+   * Logger for Zacatl's server-side logs (e.g. Express adapter warnings).
+   * Filled from `PlatformsConfig.logger` / `ServiceConfig.logger` when unset;
+   * defaults to the Zacatl `logger`.
+   */
+  logger?: Logger;
 }
 
 /**
@@ -44,11 +50,8 @@ export class Server {
   private pageServer?: PageServer;
   private databaseServer?: DatabaseServer;
 
-  private readonly logger: Logger | undefined;
-
-  constructor(config: ServerConfig, logger?: Logger) {
+  constructor(config: ServerConfig) {
     this.config = config;
-    this.logger = logger;
 
     // Create shared adapters based on vendor (Fastify or Express)
     const adapters = this.createAdapters(config.server);
@@ -77,7 +80,7 @@ export class Server {
     } else if (config.vendor === ServerVendor.EXPRESS) {
       const instance = config.instance as Express;
       return {
-        api: createExpressApiAdapter(instance, prefixes, this.logger),
+        api: createExpressApiAdapter(instance, prefixes, this.config.logger),
         page: createExpressPageAdapter(instance),
       };
     } else {

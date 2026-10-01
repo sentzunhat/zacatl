@@ -56,6 +56,29 @@ describe('ServiceConfig.logger', () => {
     expect(createExpressApiAdapter).toHaveBeenLastCalledWith(expect.anything(), '', logger);
   });
 
+  it('keeps a logger set directly on the server config', () => {
+    const makeLogger = (): Logger => ({
+      log: vi.fn(),
+      info: vi.fn(),
+      trace: vi.fn(),
+      warn: vi.fn(),
+      error: vi.fn(),
+      fatal: vi.fn(),
+    });
+    const serviceLogger = makeLogger();
+    const serverLogger = makeLogger();
+    const config = expressServiceConfig(serviceLogger);
+    const server = config.platforms?.server;
+    if (server == null) throw new Error('server config missing');
+
+    new Service({
+      ...config,
+      platforms: { ...config.platforms, server: { ...server, logger: serverLogger } },
+    });
+
+    expect(createExpressApiAdapter).toHaveBeenLastCalledWith(expect.anything(), '', serverLogger);
+  });
+
   it('leaves the adapter on its default logger when none is configured', () => {
     new Service(expressServiceConfig());
 

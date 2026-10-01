@@ -61,12 +61,18 @@ own logs then go through the same logger as your app code.
 ```typescript
 import Fastify from 'fastify';
 import { createLogger, toFastifyLogger } from '@sentzunhat/zacatl/logs';
-import { Service } from '@sentzunhat/zacatl/service';
+import { Service, ServiceType } from '@sentzunhat/zacatl/service';
+import { ServerVendor } from '@sentzunhat/zacatl/service/platforms/server/types/server-config';
 
 const logger = createLogger(); // pino by default; or createLogger(new ConsoleLoggerAdapter())
 const fastify = Fastify({ loggerInstance: toFastifyLogger(logger) });
 
-const service = new Service({ ...serviceConfig, logger });
+const service = new Service({
+  type: ServiceType.SERVER,
+  logger, // same logger the app and Fastify use
+  platforms: { server: { /* ..., */ server: { vendor: ServerVendor.FASTIFY, instance: fastify } } },
+  // layers, localization, ...
+});
 
 // App code uses the same logger
 logger.error('Payment failed', { data: { orderId } });
@@ -80,7 +86,10 @@ logger.error('Payment failed', { data: { orderId } });
   Fastify's serialized `req` / `res` / `err` arrive in `input.data`; Fastify's
   `debug` maps to the adapter's `trace`. Set the minimum level with
   `toFastifyLogger(logger, { level: 'warn' })` (default `info`).
-- `ServiceConfig.logger` is optional and defaults to the Zacatl `logger`.
+- `ServiceConfig.logger` is optional and defaults to the Zacatl `logger`. The
+  Service hands it to its platforms through their configs
+  (`PlatformsConfig.logger`, `ServerConfig.logger`); a logger set directly on a
+  platform config takes precedence.
 - Fastify must receive the logger when it is created (`loggerInstance`); an
   instance created with `logger: false` stays silent.
 

@@ -19,9 +19,11 @@
   database or a circular value), the entry is dropped and a single
   `ZACATL_LOGGER_ADAPTER_FAILED` process warning is emitted. Logged keys such as
   `__proto__` or `constructor` are kept as plain data.
-- **`ServiceConfig.logger`** (optional, defaults to the Zacatl `logger`). The
-  Service passes it to its platforms, so Zacatl's own logs (for example Express
-  adapter warnings) use it instead of the global logger.
+- **`ServiceConfig.logger`** (optional, defaults to the Zacatl `logger`). It
+  flows to the platforms through their configs (`PlatformsConfig.logger`,
+  `ServerConfig.logger`, where a more specific logger wins), so Zacatl's own
+  logs (for example Express adapter warnings) use it instead of the global
+  logger.
 - `createLogger()` and the default `logger` / `consoleLogger` remember their
   adapter so `toFastifyLogger` can find the pino instance. Their public shape
   and signatures are unchanged.
@@ -31,6 +33,7 @@
 - The four Fastify examples use one shared logger instead of
   `Fastify({ logger: false })`, so request logs and handler errors are visible,
   and their error handlers log through `request.log` (with the request id).
+  The logger is part of the config their `createServiceConfig()` returns.
 
 ### 🧪 Verification
 

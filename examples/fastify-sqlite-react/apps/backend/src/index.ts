@@ -123,8 +123,8 @@ const main = async () => {
     initGreetingModel(sequelize);
 
     // Create and start service
-    const serviceConfig = createServiceConfig(fastify, sequelize);
-    const service = new Service({ ...serviceConfig, logger });
+    const serviceConfig = createServiceConfig(fastify, sequelize, logger);
+    const service = new Service(serviceConfig);
     activeService = service;
 
     await service.start({ port: config.port });
