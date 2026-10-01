@@ -1,3 +1,5 @@
+import type { Logger } from '@zacatl/logs';
+
 import { CLI } from './cli/cli';
 import { Desktop } from './desktop/desktop';
 import { Server } from './server/server';
@@ -14,11 +16,11 @@ export class Platforms {
   private readonly cli?: CLI;
   private readonly desktop?: Desktop;
 
-  constructor(config: PlatformsConfig) {
+  constructor(config: PlatformsConfig, logger?: Logger) {
     const { server, cli, desktop } = config;
 
     if (server) {
-      this.server = new Server(server);
+      this.server = new Server(server, logger);
     }
 
     if (cli) {

@@ -1,3 +1,5 @@
+import type { Logger } from '@zacatl/logs';
+
 import type { LayersConfig } from './layers/types';
 import type { PlatformsConfig } from './platforms/types';
 
@@ -55,6 +57,10 @@ export interface LocalizationConfig {
  * - `platforms` — platform-specific configuration (see `PlatformsConfig`).
  * - `localization` — localization settings.
  * - `run.auto` — whether the service should start automatically.
+ * - `logger` — logger the service uses for its own logs (defaults to Zacatl's
+ *   pino `logger`). Pass the same logger to Fastify with
+ *   `Fastify({ loggerInstance: toFastifyLogger(logger) })` so request logs and
+ *   handler errors go through it too.
  */
 export interface ServiceConfig {
   type?: ServiceType;
@@ -66,4 +72,6 @@ export interface ServiceConfig {
   localization?: LocalizationConfig;
 
   run?: { auto?: boolean };
+
+  logger?: Logger;
 }

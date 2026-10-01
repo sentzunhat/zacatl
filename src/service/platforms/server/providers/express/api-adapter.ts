@@ -1,7 +1,7 @@
 import type { Express, Request, Response, NextFunction } from 'express';
 import { createProxyMiddleware } from 'http-proxy-middleware';
 
-import { logger } from '@zacatl/logs';
+import { logger as defaultLogger, type Logger } from '@zacatl/logs';
 
 import { applyZodSchema } from './schema-helper';
 import type { RouteHandler } from '../../../../layers/application/entry-points/rest/fastify/handlers/route-handler';
@@ -12,7 +12,11 @@ import { normalizePrefix } from '../../shared/prefixes/normalize-prefix';
 /**
  * Express implementation of ApiServerPort.
  */
-export const createApiAdapter = (server: Express, apiPrefix = ''): ApiServerPort => {
+export const createApiAdapter = (
+  server: Express,
+  apiPrefix = '',
+  logger: Logger = defaultLogger,
+): ApiServerPort => {
   let httpServer: ReturnType<Express['listen']> | null = null;
 
   const getRouteUrl = (url: string): string => {

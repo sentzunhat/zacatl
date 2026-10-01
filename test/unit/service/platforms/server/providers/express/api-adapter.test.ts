@@ -158,6 +158,22 @@ describe('ExpressApiAdapter', () => {
       expect(mockServer.use).not.toHaveBeenCalled();
     });
 
+    it('logs adapter warnings through the logger it was given', () => {
+      const logger = {
+        log: vi.fn(),
+        info: vi.fn(),
+        trace: vi.fn(),
+        warn: vi.fn(),
+        error: vi.fn(),
+        fatal: vi.fn(),
+      };
+      const withLogger = createApiAdapter(mockServer as never, '', logger);
+
+      withLogger.registerHook({ name: 'onSend', execute: vi.fn() } as unknown as HookHandler);
+
+      expect(logger.warn).toHaveBeenCalledWith(expect.stringContaining("Hook 'onSend'"));
+    });
+
     it('forwards hook execution errors to next()', async () => {
       const handler: HookHandler = {
         name: 'preHandler',

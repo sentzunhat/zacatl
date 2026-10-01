@@ -339,6 +339,11 @@
       "import": "./build-src-esm/logs.js",
       "require": "./build-src-cjs/logs.js"
     },
+    "./logs/adapter-ref": {
+      "types": "./build-src-esm/logs/adapter-ref.d.ts",
+      "import": "./build-src-esm/logs/adapter-ref.js",
+      "require": "./build-src-cjs/logs/adapter-ref.js"
+    },
     "./logs/console": {
       "types": "./build-src-esm/logs/console.d.ts",
       "import": "./build-src-esm/logs/console.js",
@@ -363,6 +368,11 @@
       "types": "./build-src-esm/logs/console/types.d.ts",
       "import": "./build-src-esm/logs/console/types.js",
       "require": "./build-src-cjs/logs/console/types.js"
+    },
+    "./logs/fastify": {
+      "types": "./build-src-esm/logs/fastify.d.ts",
+      "import": "./build-src-esm/logs/fastify.js",
+      "require": "./build-src-cjs/logs/fastify.js"
     },
     "./logs/pino": {
       "types": "./build-src-esm/logs/pino.d.ts",

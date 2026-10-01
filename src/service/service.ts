@@ -59,7 +59,7 @@ export class Service {
     }
 
     if (platforms != null) {
-      this.platforms = new Platforms(platforms);
+      this.platforms = new Platforms(platforms, config.logger);
     }
 
     if (run?.auto === true) {

@@ -2,6 +2,7 @@ import type { Express } from 'express';
 import type { FastifyInstance } from 'fastify';
 
 import { CustomError, InternalServerError } from '@zacatl/error';
+import type { Logger } from '@zacatl/logs';
 
 import { ApiServer } from './api/api-server';
 import type { ApiServerPort } from './api/port';
@@ -43,8 +44,11 @@ export class Server {
   private pageServer?: PageServer;
   private databaseServer?: DatabaseServer;
 
-  constructor(config: ServerConfig) {
+  private readonly logger: Logger | undefined;
+
+  constructor(config: ServerConfig, logger?: Logger) {
     this.config = config;
+    this.logger = logger;
 
     // Create shared adapters based on vendor (Fastify or Express)
     const adapters = this.createAdapters(config.server);
@@ -73,7 +77,7 @@ export class Server {
     } else if (config.vendor === ServerVendor.EXPRESS) {
       const instance = config.instance as Express;
       return {
-        api: createExpressApiAdapter(instance, prefixes),
+        api: createExpressApiAdapter(instance, prefixes, this.logger),
         page: createExpressPageAdapter(instance),
       };
     } else {
