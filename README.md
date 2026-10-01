@@ -13,8 +13,8 @@
 [![CI](https://img.shields.io/github/actions/workflow/status/sentzunhat/zacatl/ci.yml?branch=main&style=flat-square&label=CI)](https://github.com/sentzunhat/zacatl/actions/workflows/ci.yml)
 [![CVE scan](https://img.shields.io/github/actions/workflow/status/sentzunhat/zacatl/cve-scan.yml?branch=main&style=flat-square&label=CVE%20scan)](https://github.com/sentzunhat/zacatl/actions/workflows/cve-scan.yml)
 [![Release](https://img.shields.io/github/actions/workflow/status/sentzunhat/zacatl/release.yml?style=flat-square&label=release)](https://github.com/sentzunhat/zacatl/actions/workflows/release.yml)
-[![Tests: 671](https://img.shields.io/badge/tests-671%20passing-brightgreen.svg?style=flat-square)](#-testing)
-[![Coverage: 91.82%](https://img.shields.io/badge/coverage-91.82%25-brightgreen.svg?style=flat-square)](#-testing)
+[![Tests: 683](https://img.shields.io/badge/tests-683%20passing-brightgreen.svg?style=flat-square)](#-testing)
+[![Coverage: 92.04%](https://img.shields.io/badge/coverage-92.04%25-brightgreen.svg?style=flat-square)](#-testing)
 
 **Stack**
 
@@ -66,7 +66,7 @@ Zacatl is useful when a service needs to stay understandable as it grows, or whe
 | 🌐 Server Framework Choice  | Fastify or Express — same domain logic, swap the adapter           |
 | 🌍 Internationalization     | Pluggable i18n with filesystem/memory adapters                     |
 | 📝 Production Observability | Structured logging and error tracking                              |
-| 🧪 Tested                   | 671 tests, 91%+ coverage — see [Testing](#-testing)                |
+| 🧪 Tested                   | 683 tests, 91%+ coverage — see [Testing](#-testing)                |
 
 ## 🧭 See It in a Real Service
 
@@ -275,7 +275,7 @@ npm test                 # Run all tests
 npm run test:coverage    # Coverage report
 ```
 
-671 tests across 80 files, 91%+ line coverage. CI runs the full suite plus type-check, lint, and an 8-example Docker smoke matrix before any release — see [docs/guidelines/ci-cd-workflow.md](./docs/guidelines/ci-cd-workflow.md) for exactly what gates what.
+683 tests across 82 files, 91%+ line coverage. CI runs the full suite plus type-check, lint, and an 8-example Docker smoke matrix before any release — see [docs/guidelines/ci-cd-workflow.md](./docs/guidelines/ci-cd-workflow.md) for exactly what gates what.
 
 ## 📋 Requirements
 
