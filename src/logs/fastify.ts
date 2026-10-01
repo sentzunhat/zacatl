@@ -21,6 +21,8 @@ interface BridgeState {
   level: string;
   bindings: Record<string, unknown>;
   serializers: Record<string, Serializer>;
+  // Shared by a bridge and all its children, so a broken adapter warns once.
+  failure: { reported: boolean };
 }
 
 const LEVEL_VALUES: Record<string, number> = {
@@ -43,6 +45,37 @@ const PORT_METHOD: Record<FastifyLogLevel, keyof LoggerPort> = {
   trace: 'trace',
 };
 
+// Own-property lookup only: keys such as `constructor`, `toString` or
+// `__proto__` in a logged object must never resolve to Object.prototype members.
+const ownSerializer = (
+  serializers: Record<string, Serializer>,
+  key: string,
+): Serializer | undefined => {
+  if (!Object.hasOwn(serializers, key)) return undefined;
+  const serializer = serializers[key];
+  return typeof serializer === 'function' ? serializer : undefined;
+};
+
+// defineProperty instead of assignment, so a `__proto__` key stays a plain
+// data field instead of replacing the object's prototype.
+const setField = (target: Record<string, unknown>, key: string, value: unknown): void => {
+  Object.defineProperty(target, key, {
+    value,
+    enumerable: true,
+    writable: true,
+    configurable: true,
+  });
+};
+
+const reportFailure = (state: BridgeState, error: unknown): void => {
+  if (state.failure.reported) return;
+  state.failure.reported = true;
+  const reason = error instanceof Error ? error.message : String(error);
+  process.emitWarning(`Zacatl logger adapter failed; log entries are being dropped: ${reason}`, {
+    code: 'ZACATL_LOGGER_ADAPTER_FAILED',
+  });
+};
+
 const serializeError = (error: Error): Record<string, unknown> => ({
   type: error.name,
   message: error.message,
@@ -57,31 +90,43 @@ const createBridge = (state: BridgeState): FastifyBaseLogger => {
         return;
       }
 
-      // Fastify and pino call styles: (msg, ...args), (obj, msg?, ...args), (err, msg?)
-      let fields: Record<string, unknown> = {};
-      let message = '';
-      if (first instanceof Error) {
-        fields = { err: first };
-        message = rest.length > 0 ? format(...rest) : first.message;
-      } else if (first !== null && typeof first === 'object') {
-        fields = { ...(first as Record<string, unknown>) };
-        message = rest.length > 0 ? format(...rest) : '';
-      } else if (first !== undefined) {
-        message = format(first, ...rest);
-      }
+      // Logging must never break the request path: a failing adapter or
+      // serializer (or an unserializable value) drops the entry instead of throwing.
+      try {
+        // Fastify and pino call styles: (msg, ...args), (obj, msg?, ...args), (err, msg?)
+        let fields: Record<string, unknown> = {};
+        let message = '';
+        if (first instanceof Error) {
+          fields = { err: first };
+          message = rest.length > 0 ? format(...rest) : first.message;
+        } else if (first !== null && typeof first === 'object') {
+          fields = { ...(first as Record<string, unknown>) };
+          message = rest.length > 0 ? format(...rest) : '';
+        } else if (first !== undefined) {
+          message = format(first, ...rest);
+        }
 
-      const data: Record<string, unknown> = { ...state.bindings };
-      for (const [key, value] of Object.entries(fields)) {
-        const serializer = state.serializers[key];
-        data[key] =
-          serializer != null
-            ? serializer(value)
-            : value instanceof Error
-              ? serializeError(value)
-              : value;
-      }
+        const data: Record<string, unknown> = { ...state.bindings };
+        for (const [key, value] of Object.entries(fields)) {
+          const serializer = ownSerializer(state.serializers, key);
+          setField(
+            data,
+            key,
+            serializer != null
+              ? serializer(value)
+              : value instanceof Error
+                ? serializeError(value)
+                : value,
+          );
+        }
 
-      state.port[PORT_METHOD[level]](message, Object.keys(data).length > 0 ? { data } : undefined);
+        state.port[PORT_METHOD[level]](
+          message,
+          Object.keys(data).length > 0 ? { data } : undefined,
+        );
+      } catch (error) {
+        reportFailure(state, error);
+      }
     };
 
   const bridge = {
@@ -102,6 +147,7 @@ const createBridge = (state: BridgeState): FastifyBaseLogger => {
         level: options?.level ?? bridge.level,
         bindings: { ...state.bindings, ...bindings },
         serializers: { ...state.serializers, ...(options?.serializers ?? {}) },
+        failure: state.failure,
       }),
   };
 
@@ -145,5 +191,6 @@ export const toFastifyLogger = (
     level: options?.level ?? 'info',
     bindings: {},
     serializers: {},
+    failure: { reported: false },
   });
 };

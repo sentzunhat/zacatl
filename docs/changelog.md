@@ -14,7 +14,11 @@
   Pino-backed loggers return the real pino instance; console and custom
   `LoggerPort` adapters (for example a file or SQLite writer) get a bridge that
   implements Fastify's logger contract, with child bindings (`reqId`) and
-  Fastify's serialized `req` / `res` / `err` in `input.data`.
+  Fastify's serialized `req` / `res` / `err` in `input.data`. The bridge never
+  throws into Fastify: if an adapter or serializer fails (for example a locked
+  database or a circular value), the entry is dropped and a single
+  `ZACATL_LOGGER_ADAPTER_FAILED` process warning is emitted. Logged keys such as
+  `__proto__` or `constructor` are kept as plain data.
 - **`ServiceConfig.logger`** (optional, defaults to the Zacatl `logger`). The
   Service passes it to its platforms, so Zacatl's own logs (for example Express
   adapter warnings) use it instead of the global logger.

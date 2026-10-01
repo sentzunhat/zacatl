@@ -1,9 +1,9 @@
 import { Writable } from 'node:stream';
 
 import Fastify, { type FastifyInstance } from 'fastify';
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { createLogger, logger as defaultLogger } from '../../../src/logs';
+import { ConsoleLoggerAdapter, createLogger, logger as defaultLogger } from '../../../src/logs';
 import { toFastifyLogger } from '../../../src/logs/fastify';
 import { PinoLoggerAdapter } from '../../../src/logs/pino/adapter';
 import type { LoggerInput, LoggerPort } from '../../../src/logs/types';
@@ -149,6 +149,68 @@ describe('toFastifyLogger', () => {
       log.warn('kept');
 
       expect(port.calls.map((call) => call.message)).toEqual(['kept']);
+    });
+  });
+
+  describe('failure isolation', () => {
+    it('keeps serving requests when the adapter throws, and warns once', async () => {
+      const warn = vi.spyOn(process, 'emitWarning').mockImplementation(() => undefined);
+      const fail = (): void => {
+        throw new Error('sqlite locked');
+      };
+      const port: LoggerPort = {
+        log: fail,
+        info: fail,
+        trace: fail,
+        warn: fail,
+        error: fail,
+        fatal: fail,
+      };
+
+      app = Fastify({ loggerInstance: toFastifyLogger(createLogger(port)) });
+      const api = createApiAdapter(app);
+      api.registerRoute(new OkHandler());
+      api.registerRoute(new BrokenHandler());
+
+      const ok = await app.inject({ method: 'GET', url: '/ok' });
+      const broken = await app.inject({ method: 'GET', url: '/broken' });
+
+      expect(ok.statusCode).toBe(200);
+      expect(broken.statusCode).toBe(500);
+      const adapterWarnings = warn.mock.calls.filter(
+        ([, options]) =>
+          (options as { code?: string } | undefined)?.code === 'ZACATL_LOGGER_ADAPTER_FAILED',
+      );
+      expect(adapterWarnings).toHaveLength(1);
+      warn.mockRestore();
+    });
+
+    it('does not throw on values the adapter cannot serialize', () => {
+      const warn = vi.spyOn(process, 'emitWarning').mockImplementation(() => undefined);
+      const log = toFastifyLogger(createLogger(new ConsoleLoggerAdapter({ colors: false })));
+      const circular: Record<string, unknown> = { name: 'loop' };
+      circular['self'] = circular;
+
+      expect(() => log.info({ circular }, 'circular value')).not.toThrow();
+      warn.mockRestore();
+    });
+
+    it('treats prototype-named keys as plain data', () => {
+      const port = createRecordingPort();
+      const log = toFastifyLogger(port);
+      const untrusted = JSON.parse(
+        '{"__proto__": {"isAdmin": true}, "constructor": "c", "toString": "t", "user": "x"}',
+      ) as Record<string, unknown>;
+
+      log.info(untrusted, 'request body');
+
+      const data = port.calls[0]?.data ?? {};
+      expect(Object.getPrototypeOf(data)).toBe(Object.prototype);
+      expect((data as { isAdmin?: boolean }).isAdmin).toBeUndefined();
+      expect(Object.getOwnPropertyDescriptor(data, '__proto__')?.value).toEqual({ isAdmin: true });
+      expect(data['constructor']).toBe('c');
+      expect(data['toString']).toBe('t');
+      expect(data['user']).toBe('x');
     });
   });
 

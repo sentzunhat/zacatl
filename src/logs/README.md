@@ -12,7 +12,7 @@ logger, createLogger, toFastifyLogger, ConsoleLoggerAdapter, PinoLoggerAdapter, 
 
 ```typescript
 import { logger } from '@sentzunhat/zacatl/logs';
-logger.info('Started', { port: 3000 });
+logger.info('Started', { data: { port: 3000 } });
 ```
 
 Share one logger with Fastify and the Service:
