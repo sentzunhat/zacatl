@@ -1,11 +1,11 @@
 import { describe, expect, it, vi } from 'vitest';
 
 import type { Logger } from '../../../src/logs/types';
-import { Service, ServiceType, type ServiceConfig } from '../../../src/service/service';
 import {
   ServerType,
   ServerVendor,
 } from '../../../src/service/platforms/server/types/server-config';
+import { Service, ServiceType, type ServiceConfig } from '../../../src/service/service';
 
 const { createExpressApiAdapter } = vi.hoisted(() => ({
   createExpressApiAdapter: vi.fn(() => ({
