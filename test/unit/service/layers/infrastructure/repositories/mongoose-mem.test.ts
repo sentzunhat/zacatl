@@ -3,23 +3,24 @@ import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 
 import { mongoose, Schema } from '@zacatl/third-party/databases/mongoose';
 
+const userSchema = new Schema(
+  {
+    name: { type: String, required: true },
+  },
+  { timestamps: true },
+);
+
+// mongoose 9.10+ models carry an `id` virtual, so a hand-written Model<unknown>
+// annotation no longer matches; let mongoose infer the type from the schema.
+const userModel = mongoose.model('MemUser', userSchema);
+
 describe('BaseRepository (mongodb-memory-server)', () => {
   let mongoServer: MongoMemoryServer;
-  let userModel: mongoose.Model<unknown>;
 
   beforeAll(async () => {
     mongoServer = await MongoMemoryServer.create();
     const uri = mongoServer.getUri();
     await mongoose.connect(uri, { dbName: 'test' });
-
-    const userSchema = new Schema(
-      {
-        name: { type: String, required: true },
-      },
-      { timestamps: true },
-    );
-
-    userModel = mongoose.model('MemUser', userSchema);
   });
 
   afterAll(async () => {
