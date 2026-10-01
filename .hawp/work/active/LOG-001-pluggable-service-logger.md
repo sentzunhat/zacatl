@@ -53,3 +53,4 @@ Fastify example builds.
 ## Log
 
 - 2026-10-01: Opened; design approved by owner 2026-09-30 (follow-up PR, examples switched to a real logger).
+- 2026-10-01: Implemented on `feature/pluggable-service-logger`: `toFastifyLogger`, adapter refs, `ServiceConfig.logger`, four Fastify examples on a shared logger, docs. Validation: 680 tests, type check, lint, build, optional-peer check (301 builds), consumer smokes, four example builds, and a live run of `fastify-sqlite-react` showing `incoming request` / `request completed` with `reqId` through the Zacatl logger.

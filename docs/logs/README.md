@@ -52,6 +52,60 @@ import { createLogger, PinoLoggerAdapter } from '@sentzunhat/zacatl/logs';
 const logger = createLogger(new PinoLoggerAdapter());
 ```
 
+## One Logger for the Service and Fastify
+
+Create the logger once and hand it to both Fastify and the Service. Fastify's
+`request.log` / `reply.log` (request logs, handled route errors) and Zacatl's
+own logs then go through the same logger as your app code.
+
+```typescript
+import Fastify from 'fastify';
+import { createLogger, toFastifyLogger } from '@sentzunhat/zacatl/logs';
+import { Service } from '@sentzunhat/zacatl/service';
+
+const logger = createLogger(); // pino by default; or createLogger(new ConsoleLoggerAdapter())
+const fastify = Fastify({ loggerInstance: toFastifyLogger(logger) });
+
+const service = new Service({ ...serviceConfig, logger });
+
+// App code uses the same logger
+logger.error('Payment failed', { data: { orderId } });
+```
+
+- **Pino-backed loggers** (`createLogger()`, `createLogger(new PinoLoggerAdapter(...))`,
+  the default `logger`): `toFastifyLogger` returns the real pino instance, so
+  Fastify keeps pino's performance and its `req`/`res`/`err` serializers.
+- **Console and custom adapters**: `toFastifyLogger` returns a bridge that
+  implements Fastify's logger contract. Child bindings (such as `reqId`) and
+  Fastify's serialized `req` / `res` / `err` arrive in `input.data`; Fastify's
+  `debug` maps to the adapter's `trace`. Set the minimum level with
+  `toFastifyLogger(logger, { level: 'warn' })` (default `info`).
+- `ServiceConfig.logger` is optional and defaults to the Zacatl `logger`.
+- Fastify must receive the logger when it is created (`loggerInstance`); an
+  instance created with `logger: false` stays silent.
+
+### Custom Adapter (e.g. a SQLite or file writer)
+
+Implement `LoggerPort` and pass it to `createLogger`; it works for app code,
+the Service, and Fastify (through the bridge):
+
+```typescript
+import type { LoggerInput, LoggerPort } from '@sentzunhat/zacatl/logs';
+
+class SqliteLogWriter implements LoggerPort {
+  constructor(private readonly insert: (level: string, message: string, data: unknown) => void) {}
+  log(message: string, input?: LoggerInput) { this.insert('info', message, input?.data); }
+  info(message: string, input?: LoggerInput) { this.insert('info', message, input?.data); }
+  trace(message: string, input?: LoggerInput) { this.insert('trace', message, input?.data); }
+  warn(message: string, input?: LoggerInput) { this.insert('warn', message, input?.data); }
+  error(message: string, input?: LoggerInput) { this.insert('error', message, input?.data); }
+  fatal(message: string, input?: LoggerInput) { this.insert('fatal', message, input?.data); }
+}
+
+const logger = createLogger(new SqliteLogWriter(writeRow));
+const fastify = Fastify({ loggerInstance: toFastifyLogger(logger) });
+```
+
 ## Log Levels
 
 ```typescript

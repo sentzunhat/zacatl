@@ -2,6 +2,39 @@
 
 ---
 
+## [Unreleased]
+
+**Status**: In progress on `feature/pluggable-service-logger` (target 0.0.63).
+
+### ✨ Features
+
+- **One logger for the app, the Service and Fastify.** New
+  `toFastifyLogger(logger)` in `@sentzunhat/zacatl/logs` turns a Zacatl logger
+  into a Fastify logger: `Fastify({ loggerInstance: toFastifyLogger(logger) })`.
+  Pino-backed loggers return the real pino instance; console and custom
+  `LoggerPort` adapters (for example a file or SQLite writer) get a bridge that
+  implements Fastify's logger contract, with child bindings (`reqId`) and
+  Fastify's serialized `req` / `res` / `err` in `input.data`.
+- **`ServiceConfig.logger`** (optional, defaults to the Zacatl `logger`). The
+  Service passes it to its platforms, so Zacatl's own logs (for example Express
+  adapter warnings) use it instead of the global logger.
+- `createLogger()` and the default `logger` / `consoleLogger` remember their
+  adapter so `toFastifyLogger` can find the pino instance. Their public shape
+  and signatures are unchanged.
+
+### 📚 Examples
+
+- The four Fastify examples use one shared logger instead of
+  `Fastify({ logger: false })`, so request logs and handler errors are visible,
+  and their error handlers log through `request.log` (with the request id).
+
+### 🧪 Verification
+
+- New tests: pino passthrough, a custom adapter receiving Fastify request and
+  handled-error logs, pino call styles and levels on the bridge,
+  `ServiceConfig.logger` reaching the server adapters, and the Express adapter
+  logging through an injected logger.
+
 ## [0.0.62] - 2026-09-30
 
 **Status**: Release candidate for the automated `main` release path

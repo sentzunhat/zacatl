@@ -6,11 +6,19 @@ Structured logging with pluggable adapters (Pino, console).
 
 ## Exports
 
-logger, createLogger, ConsoleLoggerAdapter, PinoLoggerAdapter, createPinoConfig
+logger, createLogger, toFastifyLogger, ConsoleLoggerAdapter, PinoLoggerAdapter, createPinoConfig
 
 ## Quick use
 
 ```typescript
 import { logger } from '@sentzunhat/zacatl/logs';
 logger.info('Started', { port: 3000 });
+```
+
+Share one logger with Fastify and the Service:
+
+```typescript
+const logger = createLogger();
+const fastify = Fastify({ loggerInstance: toFastifyLogger(logger) });
+new Service({ ...config, logger });
 ```
