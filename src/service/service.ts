@@ -1,7 +1,8 @@
 import { InternalServerError } from '@zacatl/error';
 import { configureI18nNode } from '@zacatl/localization';
+import { logger as defaultLogger, LoggerToken } from '@zacatl/logs';
 
-import { createChildContainer } from '../dependency-injection/container';
+import { createChildContainer, registerValue } from '../dependency-injection/container';
 import { registerMongooseIndexOptions } from './layers/infrastructure/orm/mongoose/index-policy';
 import { Layers } from './layers/layers';
 import { Platforms } from './platforms/platforms';
@@ -55,6 +56,8 @@ export class Service {
 
     if (layers != null) {
       const serviceContainer = createChildContainer();
+      // Repositories, domain services and handlers can @inject(LoggerToken).
+      registerValue(LoggerToken, config.logger ?? defaultLogger, serviceContainer);
       this.layers = new Layers(layers, serviceContainer);
     }
 

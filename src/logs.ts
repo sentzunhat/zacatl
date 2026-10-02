@@ -14,3 +14,4 @@ export {
   type PinoConfigOptions,
 } from './logs/pino';
 export { toFastifyLogger, type FastifyLoggerOptions } from './logs/fastify';
+export { LoggerToken } from './logs/token';

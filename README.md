@@ -13,8 +13,8 @@
 [![CI](https://img.shields.io/github/actions/workflow/status/sentzunhat/zacatl/ci.yml?branch=main&style=flat-square&label=CI)](https://github.com/sentzunhat/zacatl/actions/workflows/ci.yml)
 [![CVE scan](https://img.shields.io/github/actions/workflow/status/sentzunhat/zacatl/cve-scan.yml?branch=main&style=flat-square&label=CVE%20scan)](https://github.com/sentzunhat/zacatl/actions/workflows/cve-scan.yml)
 [![Release](https://img.shields.io/github/actions/workflow/status/sentzunhat/zacatl/release.yml?style=flat-square&label=release)](https://github.com/sentzunhat/zacatl/actions/workflows/release.yml)
-[![Tests: 684](https://img.shields.io/badge/tests-684%20passing-brightgreen.svg?style=flat-square)](#-testing)
-[![Coverage: 92.03%](https://img.shields.io/badge/coverage-92.03%25-brightgreen.svg?style=flat-square)](#-testing)
+[![Tests: 687](https://img.shields.io/badge/tests-687%20passing-brightgreen.svg?style=flat-square)](#-testing)
+[![Coverage: 92.01%](https://img.shields.io/badge/coverage-92.01%25-brightgreen.svg?style=flat-square)](#-testing)
 
 **Stack**
 
@@ -275,7 +275,7 @@ npm test                 # Run all tests
 npm run test:coverage    # Coverage report
 ```
 
-684 tests across 82 files, 92.03% line coverage. CI runs the full suite plus type-check, lint, and an 8-example Docker smoke matrix before any release — see [docs/guidelines/ci-cd-workflow.md](./docs/guidelines/ci-cd-workflow.md) for exactly what gates what.
+687 tests across 83 files, 92.01% line coverage. CI runs the full suite plus type-check, lint, and an 8-example Docker smoke matrix before any release — see [docs/guidelines/ci-cd-workflow.md](./docs/guidelines/ci-cd-workflow.md) for exactly what gates what.
 
 ## 📋 Requirements
 

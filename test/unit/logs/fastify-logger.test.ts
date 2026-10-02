@@ -63,7 +63,14 @@ describe('toFastifyLogger', () => {
       const adapter = new PinoLoggerAdapter({ level: 'info' });
 
       expect(toFastifyLogger(adapter)).toBe(adapter.getPinoInstance());
-      expect(toFastifyLogger(createLogger(adapter))).toBe(adapter.getPinoInstance());
+    });
+
+    it('bridges a createLogger() wrapper instead of unwrapping it', () => {
+      const adapter = new PinoLoggerAdapter({ level: 'info' });
+      const bridged = toFastifyLogger(createLogger(adapter));
+
+      expect(bridged).not.toBe(adapter.getPinoInstance());
+      expect(typeof bridged.child).toBe('function');
       expect(typeof toFastifyLogger(defaultLogger).child).toBe('function');
     });
 
@@ -77,9 +84,10 @@ describe('toFastifyLogger', () => {
           callback();
         },
       });
-      const logger = createLogger(new PinoLoggerAdapter({ level: 'info' }, destination));
+      const adapter = new PinoLoggerAdapter({ level: 'info' }, destination);
+      const logger = createLogger(adapter);
 
-      app = Fastify({ loggerInstance: toFastifyLogger(logger) });
+      app = Fastify({ loggerInstance: toFastifyLogger(adapter) });
       createApiAdapter(app).registerRoute(new OkHandler());
       await app.inject({ method: 'GET', url: '/ok' });
       logger.info('app log');

@@ -2,7 +2,6 @@ import { format } from 'node:util';
 
 import type { FastifyBaseLogger } from 'fastify';
 
-import { getLoggerAdapter } from './adapter-ref';
 import type { Logger, LoggerPort } from './types';
 
 type FastifyLogLevel = 'fatal' | 'error' | 'warn' | 'info' | 'debug' | 'trace';
@@ -155,39 +154,40 @@ const createBridge = (state: BridgeState): FastifyBaseLogger => {
 };
 
 /**
- * Turn a Zacatl logger into a Fastify logger, so `request.log` / `reply.log`
- * write through the same logger as the rest of the app.
+ * Turn a Zacatl logger adapter into a Fastify logger, so `request.log` /
+ * `reply.log` write through the same destination as the rest of the app.
  *
- * - Pino-backed loggers (`createLogger()` with the default or a
- *   `PinoLoggerAdapter`, or the default `logger`) return the real pino
- *   instance, keeping pino's performance and Fastify's serializers.
- * - Console and custom `LoggerPort` adapters (e.g. a file or SQLite writer)
- *   get a bridge implementing Fastify's logger contract (`level`, `child()`,
- *   `info(obj, msg)`); child bindings such as `reqId` and Fastify's
- *   `req`/`res`/`err` serializers end up in `input.data`.
+ * - A `PinoLoggerAdapter` (anything with `getPinoInstance()`) returns its real
+ *   pino instance, keeping pino's performance and Fastify's serializers.
+ * - Console adapters, custom `LoggerPort` adapters (e.g. a file or SQLite
+ *   writer) and plain `Logger` objects get a bridge implementing Fastify's
+ *   logger contract (`level`, `child()`, `info(obj, msg)`); child bindings
+ *   such as `reqId` and Fastify's `req`/`res`/`err` serializers end up in
+ *   `input.data`.
+ *
+ * Pass the adapter, not the `createLogger()` wrapper, to get the pino fast path:
  *
  * @example
  * ```typescript
  * import Fastify from 'fastify';
  * import { createLogger, PinoLoggerAdapter, toFastifyLogger } from '@sentzunhat/zacatl/logs';
  *
- * const logger = createLogger(new PinoLoggerAdapter());
- * const fastify = Fastify({ loggerInstance: toFastifyLogger(logger) });
+ * const adapter = new PinoLoggerAdapter();
+ * const logger = createLogger(adapter);
+ * const fastify = Fastify({ loggerInstance: toFastifyLogger(adapter) });
  * ```
  */
 export const toFastifyLogger = (
-  logger: Logger | LoggerPort,
+  source: LoggerPort | Logger,
   options?: FastifyLoggerOptions,
 ): FastifyBaseLogger => {
-  const adapter = getLoggerAdapter(logger);
-
-  const pinoSource = adapter as Partial<{ getPinoInstance: () => unknown }>;
+  const pinoSource = source as Partial<{ getPinoInstance: () => unknown }>;
   if (typeof pinoSource.getPinoInstance === 'function') {
     return pinoSource.getPinoInstance() as FastifyBaseLogger;
   }
 
   return createBridge({
-    port: adapter,
+    port: source,
     level: options?.level ?? 'info',
     bindings: {},
     serializers: {},

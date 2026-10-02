@@ -1,4 +1,3 @@
-import { withLoggerAdapter } from '../adapter-ref';
 import type { Logger } from '../types';
 import { ConsoleLoggerAdapter } from './adapter';
 import { createConsoleConfig } from './config';
@@ -17,14 +16,11 @@ import { createConsoleConfig } from './config';
  */
 const consoleLoggerAdapter = new ConsoleLoggerAdapter(createConsoleConfig());
 
-export const consoleLogger: Logger = withLoggerAdapter<Logger>(
-  {
-    log: (message, input) => consoleLoggerAdapter.log(message, input),
-    info: (message, input) => consoleLoggerAdapter.info(message, input),
-    trace: (message, input) => consoleLoggerAdapter.trace(message, input),
-    warn: (message, input) => consoleLoggerAdapter.warn(message, input),
-    error: (message, input) => consoleLoggerAdapter.error(message, input),
-    fatal: (message, input) => consoleLoggerAdapter.fatal(message, input),
-  },
-  consoleLoggerAdapter,
-);
+export const consoleLogger: Logger = {
+  log: (message, input) => consoleLoggerAdapter.log(message, input),
+  info: (message, input) => consoleLoggerAdapter.info(message, input),
+  trace: (message, input) => consoleLoggerAdapter.trace(message, input),
+  warn: (message, input) => consoleLoggerAdapter.warn(message, input),
+  error: (message, input) => consoleLoggerAdapter.error(message, input),
+  fatal: (message, input) => consoleLoggerAdapter.fatal(message, input),
+};

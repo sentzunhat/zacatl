@@ -10,7 +10,7 @@ import {
   serializerCompiler,
   validatorCompiler,
 } from '@sentzunhat/zacatl/third-party/fastify';
-import { createLogger, toFastifyLogger } from '@sentzunhat/zacatl/logs';
+import { createLogger, PinoLoggerAdapter, toFastifyLogger } from '@sentzunhat/zacatl/logs';
 import { Sequelize, type SequelizeOptions } from '@sentzunhat/zacatl/third-party/databases/sequelize';
 import { Service } from '@sentzunhat/zacatl/service';
 import { API_PREFIX, config, createServiceConfig } from './config';
@@ -74,9 +74,10 @@ const main = async () => {
 
   try {
     // Initialize Fastify
-    // One logger for the app, Zacatl, and Fastify's request.log / reply.log
-    const logger = createLogger();
-    const fastify = Fastify({ loggerInstance: toFastifyLogger(logger) });
+    // One pino adapter for the app, Zacatl, and Fastify's request.log / reply.log
+    const loggerAdapter = new PinoLoggerAdapter();
+    const logger = createLogger(loggerAdapter);
+    const fastify = Fastify({ loggerInstance: toFastifyLogger(loggerAdapter) });
 
     // Set up Zod validation for Fastify
     fastify.setValidatorCompiler(validatorCompiler);
