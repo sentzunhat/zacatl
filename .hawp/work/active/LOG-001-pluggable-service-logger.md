@@ -22,16 +22,19 @@ a custom adapter (e.g. a future SQLite log writer) — that the service uses and
 that Fastify's `request.log` / `reply.log` go through; app code can also call
 `logger.error(...)` directly.
 
-## Plan
+## Plan (final shape after owner review, 2026-10-02)
 
-1. `toFastifyLogger(logger | adapter)` (additive, `@sentzunhat/zacatl/logs`):
-   pino-backed loggers return the real pino instance; console/custom adapters
-   get a bridge implementing `level`, `child()` (bindings merged into `data`)
-   and Fastify's `(obj, msg)` call style.
-2. `createLogger()` / default `logger` keep a reference to their adapter so
-   the bridge can find the pino instance. No signature changes.
-3. `ServiceConfig.logger?: Logger` (default: Zacatl's pino logger), passed to
-   the platforms so Zacatl's own logs (e.g. Express adapter warnings) use it.
+1. `toFastifyLogger(adapter)` (additive, `@sentzunhat/zacatl/logs`): an
+   adapter with `getPinoInstance()` returns the real pino instance; console /
+   custom adapters and plain `Logger` objects get a bridge implementing
+   `level`, `child()` (bindings merged into `data`) and Fastify's
+   `(obj, msg)` call style. No hidden adapter link on `createLogger()`.
+2. `LoggerToken`: the Service registers its logger in its own DI container so
+   layer classes can `@inject(LoggerToken)`.
+3. `ServiceConfig.logger?: Logger` (default: Zacatl's pino logger), handed to
+   the platforms through `PlatformsConfig.logger` / `ServerConfig.logger`
+   (more specific wins) so Zacatl's own logs (e.g. Express adapter warnings)
+   use it.
 4. Fastify examples: `logger: false` → shared logger via `toFastifyLogger`.
 5. Tests: pino passthrough, console/custom bridge (levels, child bindings,
    `(obj, msg)` mapping), real-Fastify request/handled-error logs reaching a

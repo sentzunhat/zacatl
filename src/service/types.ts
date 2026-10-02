@@ -58,9 +58,10 @@ export interface LocalizationConfig {
  * - `localization` — localization settings.
  * - `run.auto` — whether the service should start automatically.
  * - `logger` — logger the service uses for its own logs (defaults to Zacatl's
- *   pino `logger`). Pass the same logger to Fastify with
- *   `Fastify({ loggerInstance: toFastifyLogger(logger) })` so request logs and
- *   handler errors go through it too.
+ *   pino `logger`); also registered under `LoggerToken` for injection. Give
+ *   Fastify the adapter it was built from,
+ *   `Fastify({ loggerInstance: toFastifyLogger(adapter) })`, so request logs
+ *   and handler errors go through the same destination.
  */
 export interface ServiceConfig {
   type?: ServiceType;

@@ -39,10 +39,14 @@
 
 ### 🧪 Verification
 
-- New tests: pino passthrough, a custom adapter receiving Fastify request and
-  handled-error logs, pino call styles and levels on the bridge,
-  `ServiceConfig.logger` reaching the server adapters, and the Express adapter
-  logging through an injected logger.
+- New tests: pino passthrough for an adapter (and the bridge for a
+  `createLogger()` wrapper), a custom adapter receiving Fastify request and
+  handled-error logs, pino call styles and levels on the bridge, failure
+  isolation (throwing adapter, circular values, prototype-named keys),
+  `ServiceConfig.logger` reaching the server adapters with platform-level
+  precedence, `LoggerToken` injection for `@injectable()` and `@singleton()`
+  classes (including two Services with different loggers), and the Express
+  adapter logging through an injected logger.
 
 ## [0.0.62] - 2026-09-30
 
