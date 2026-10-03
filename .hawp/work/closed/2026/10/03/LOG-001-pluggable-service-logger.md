@@ -1,7 +1,7 @@
 # LOG-001 — Pluggable service logger shared with Fastify
 
 **UUID:** `LOG-001` · **Type:** feature · **Priority:** P2 · **Reported:** 2026-10-01
-**Status:** in-progress · **Branch:** `feature/pluggable-service-logger` · **Target:** 0.0.63
+**Status:** done · **Branch:** `feature/pluggable-service-logger` (PR #118) · **Released:** 0.0.63 (2026-10-03)
 
 ## Problem
 
@@ -66,3 +66,4 @@ Fastify example builds.
 - 2026-10-03: Owner review: logger removed from `PlatformsConfig` / `ServerConfig`; `Layers` registers `LoggerToken` (Service passes `config.logger`). Platforms, Server and the Express adapter are back to their `dev` versions.
 - 2026-10-03: Owner clarification: Fastify and Express adapters must use the Service logger too. Final shape: the Service registers `LoggerToken` in its own container and passes that container to `Layers` and `Platforms`; `Server` resolves the logger for both adapters. The Fastify adapter logs handled route errors through it (with `reqId`, method, URL, status, plain `err`).
 - 2026-10-03: Owner review: restore Fastify `reply.log` for the adapter's handled-error log. Swapping `request.log` / `reply.log` during the handler was tried and rejected — `reply.send()` completes inside the handler, so Fastify's own "request completed" log would have moved to the Service logger (and lost Fastify's serializers). Final: Fastify native `reply.log`; Express gets a Service-bound `req.log` / `reply.log`.
+- 2026-10-03: Merged to `dev` (#118) and released in 0.0.63 via #121 (npm, tag `v0.0.63`, GitHub Release). Closed. Evidence: `.hawp/work/evidence/2026/10/03/78dba5ff-0cd1-442e-86e3-f7faf701a4b5/evidence.md`.
