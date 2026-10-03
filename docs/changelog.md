@@ -21,14 +21,19 @@
   database or a circular value), the entry is dropped and a single
   `ZACATL_LOGGER_ADAPTER_FAILED` process warning is emitted. Logged keys such
   as `__proto__` or `constructor` are kept as plain data.
-- **`LoggerToken`** for dependency injection: the Service registers its logger
-  in its own container, so repositories, domain services and handlers can
-  `@inject(LoggerToken) logger: Logger`.
-- **`ServiceConfig.logger`** (optional, defaults to the Zacatl `logger`). It
-  flows to the platforms through their configs (`PlatformsConfig.logger`,
-  `ServerConfig.logger`, where a more specific logger wins), so Zacatl's own
-  logs (for example Express adapter warnings) use it instead of the global
-  logger.
+- **`ServiceConfig.logger`** (optional, defaults to the Zacatl `logger`) and
+  **`LoggerToken`**: the Service registers the logger once in its own DI
+  container (like the database instances), shared by its layers and
+  platforms. Repositories, domain services and handlers can
+  `@inject(LoggerToken) logger: Logger`, and the Fastify and Express adapters
+  use it for Zacatl's own logs (handled route errors with `reqId`, method,
+  URL and status; registration warnings).
+- **`request.log` / `reply.log` on Express too.** Handlers are typed against
+  Fastify's request, so on Express `request.log` was `undefined` at runtime.
+  The Express adapter now attaches a request-scoped, pino-style logger
+  (generated `reqId`, never read from request headers) that writes through
+  `ServiceConfig.logger`, and keeps a `req.log` another middleware already
+  set.
 
 ### 📚 Examples
 
@@ -43,10 +48,10 @@
   `createLogger()` wrapper), a custom adapter receiving Fastify request and
   handled-error logs, pino call styles and levels on the bridge, failure
   isolation (throwing adapter, circular values, prototype-named keys),
-  `ServiceConfig.logger` reaching the server adapters with platform-level
-  precedence, `LoggerToken` injection for `@injectable()` and `@singleton()`
-  classes (including two Services with different loggers), and the Express
-  adapter logging through an injected logger.
+  `LoggerToken` injection of `ServiceConfig.logger` (or the default) for
+  `@injectable()` and `@singleton()` classes, including two Services with
+  different loggers, `ServiceConfig.logger` reaching the Fastify and Express
+  adapters, and handled route errors logged through it.
 
 ## [0.0.62] - 2026-09-30
 

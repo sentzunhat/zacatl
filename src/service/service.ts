@@ -54,20 +54,19 @@ export class Service {
       }
     }
 
+    // One container per Service, shared by its layers and platforms. The logger
+    // is registered here once (like the database instances above), so
+    // repositories, domain services, handlers and the Fastify/Express adapters
+    // all use ServiceConfig.logger (default: the Zacatl logger).
+    const serviceContainer = createChildContainer();
+    registerValue(LoggerToken, config.logger ?? defaultLogger, serviceContainer);
+
     if (layers != null) {
-      const serviceContainer = createChildContainer();
-      // Repositories, domain services and handlers can @inject(LoggerToken).
-      registerValue(LoggerToken, config.logger ?? defaultLogger, serviceContainer);
       this.layers = new Layers(layers, serviceContainer);
     }
 
     if (platforms != null) {
-      // ServiceConfig.logger flows into the platforms unless they set their own.
-      this.platforms = new Platforms(
-        platforms.logger == null && config.logger != null
-          ? { ...platforms, logger: config.logger }
-          : platforms,
-      );
+      this.platforms = new Platforms(platforms, serviceContainer);
     }
 
     if (run?.auto === true) {

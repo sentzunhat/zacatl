@@ -2,7 +2,8 @@ import type { Express } from 'express';
 import type { FastifyInstance } from 'fastify';
 
 import { CustomError, InternalServerError } from '@zacatl/error';
-import type { Logger } from '@zacatl/logs';
+import { logger as defaultLogger, LoggerToken, type Logger } from '@zacatl/logs';
+import type { DependencyContainer } from '@zacatl/third-party/dependency-injection/tsyringe';
 
 import { ApiServer } from './api/api-server';
 import type { ApiServerPort } from './api/port';
@@ -25,12 +26,6 @@ export interface ServerConfig {
   port: number;
   /** REST entry points for route/hook registration */
   entryPoints?: RestApplicationEntryPoints;
-  /**
-   * Logger for Zacatl's server-side logs (e.g. Express adapter warnings).
-   * Filled from `PlatformsConfig.logger` / `ServiceConfig.logger` when unset;
-   * defaults to the Zacatl `logger`.
-   */
-  logger?: Logger;
 }
 
 /**
@@ -50,8 +45,16 @@ export class Server {
   private pageServer?: PageServer;
   private databaseServer?: DatabaseServer;
 
-  constructor(config: ServerConfig) {
+  private readonly logger: Logger;
+
+  constructor(config: ServerConfig, container?: DependencyContainer) {
     this.config = config;
+    // The Service registers its logger in the container it shares with the
+    // layers; standalone servers fall back to the Zacatl logger.
+    this.logger =
+      container?.isRegistered(LoggerToken, true) === true
+        ? container.resolve(LoggerToken)
+        : defaultLogger;
 
     // Create shared adapters based on vendor (Fastify or Express)
     const adapters = this.createAdapters(config.server);
@@ -74,13 +77,13 @@ export class Server {
     if (config.vendor === ServerVendor.FASTIFY) {
       const instance = config.instance as FastifyInstance;
       return {
-        api: createFastifyApiAdapter(instance, prefixes),
+        api: createFastifyApiAdapter(instance, prefixes, this.logger),
         page: createFastifyPageAdapter(instance),
       };
     } else if (config.vendor === ServerVendor.EXPRESS) {
       const instance = config.instance as Express;
       return {
-        api: createExpressApiAdapter(instance, prefixes, this.config.logger),
+        api: createExpressApiAdapter(instance, prefixes, this.logger),
         page: createExpressPageAdapter(instance),
       };
     } else {

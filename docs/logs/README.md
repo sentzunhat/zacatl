@@ -89,12 +89,24 @@ logger.error('Payment failed', { data: { orderId } });
   `debug` maps to the adapter's `trace`. Set the minimum level with
   `toFastifyLogger(logger, { level: 'warn' })` (default `info`).
 - `ServiceConfig.logger` is optional and defaults to the Zacatl `logger`. The
-  Service hands it to its platforms through their configs
-  (`PlatformsConfig.logger`, `ServerConfig.logger`); a logger set directly on a
-  platform config takes precedence.
-- The Service also registers it in its DI container under `LoggerToken`, so
-  repositories, domain services and handlers can inject it (see
-  [Dependency Injection](#dependency-injection)).
+  Service registers it under `LoggerToken` in its own DI container (like the
+  database instances), shared by its layers and platforms:
+  - repositories, domain services and handlers can inject it (see
+    [Dependency Injection](#dependency-injection));
+  - the Fastify and Express adapters use it for Zacatl's own logs — handled
+    route errors (with `reqId`, method, URL and status) and registration
+    warnings. Fastify's own request logs come from `loggerInstance`.
+- Handlers can use `request.log` / `reply.log` on both frameworks with the same
+  pino-style API. Fastify provides them natively; on Express the adapter
+  attaches a request-scoped logger (generated `reqId`, never taken from
+  request headers) that writes through `ServiceConfig.logger`, unless another
+  middleware (e.g. pino-http) already set `req.log`.
+
+```typescript
+async handler(request: Request<CreateBody>) {
+  request.log.info({ userId: request.body.userId }, 'creating order'); // Fastify or Express
+}
+```
 - Fastify must receive the logger when it is created (`loggerInstance`); an
   instance created with `logger: false` stays silent.
 

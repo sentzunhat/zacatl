@@ -102,9 +102,10 @@ describe('toFastifyLogger', () => {
   describe('console and custom adapters', () => {
     it('routes Fastify request and handler-error logs through the adapter', async () => {
       const port = createRecordingPort();
+      const logger = createLogger(port);
 
-      app = Fastify({ loggerInstance: toFastifyLogger(createLogger(port)) });
-      const api = createApiAdapter(app);
+      app = Fastify({ loggerInstance: toFastifyLogger(port) });
+      const api = createApiAdapter(app, '', logger);
       api.registerRoute(new OkHandler());
       api.registerRoute(new BrokenHandler());
 

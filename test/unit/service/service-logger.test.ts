@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 
+import { logger as defaultLogger } from '../../../src/logs';
 import type { Logger } from '../../../src/logs/types';
 import {
   ServerType,
@@ -7,31 +8,40 @@ import {
 } from '../../../src/service/platforms/server/types/server-config';
 import { Service, ServiceType, type ServiceConfig } from '../../../src/service/service';
 
-const { createExpressApiAdapter } = vi.hoisted(() => ({
-  createExpressApiAdapter: vi.fn(() => ({
+const { createExpressApiAdapter, createFastifyApiAdapter } = vi.hoisted(() => {
+  const port = (): Record<string, unknown> => ({
     registerRoute: vi.fn(),
     registerHook: vi.fn(),
     registerProxy: vi.fn(),
     listen: vi.fn(),
     close: vi.fn(),
-  })),
-}));
+  });
+  return { createExpressApiAdapter: vi.fn(port), createFastifyApiAdapter: vi.fn(port) };
+});
 
 vi.mock('../../../src/service/platforms/server/providers/express/api-adapter', () => ({
   createApiAdapter: createExpressApiAdapter,
 }));
+vi.mock('../../../src/service/platforms/server/providers/fastify/api-adapter', () => ({
+  createApiAdapter: createFastifyApiAdapter,
+}));
 
-const expressServiceConfig = (logger?: Logger): ServiceConfig => ({
+const makeLogger = (): Logger => ({
+  log: vi.fn(),
+  info: vi.fn(),
+  trace: vi.fn(),
+  warn: vi.fn(),
+  error: vi.fn(),
+  fatal: vi.fn(),
+});
+
+const serviceConfig = (vendor: ServerVendor, logger?: Logger): ServiceConfig => ({
   type: ServiceType.SERVER,
   layers: { application: { entryPoints: { rest: { routes: [] } } } },
   platforms: {
     server: {
-      name: 'test',
-      server: {
-        type: ServerType.SERVER,
-        vendor: ServerVendor.EXPRESS,
-        instance: { use: vi.fn() } as unknown as never,
-      },
+      name: 'logger-wiring',
+      server: { type: ServerType.SERVER, vendor, instance: { use: vi.fn() } as unknown as never },
       databases: [],
       port: 0,
     },
@@ -40,49 +50,26 @@ const expressServiceConfig = (logger?: Logger): ServiceConfig => ({
   ...(logger != null ? { logger } : {}),
 });
 
-describe('ServiceConfig.logger', () => {
-  it('passes the configured logger to the server adapters', () => {
-    const logger: Logger = {
-      log: vi.fn(),
-      info: vi.fn(),
-      trace: vi.fn(),
-      warn: vi.fn(),
-      error: vi.fn(),
-      fatal: vi.fn(),
-    };
+describe('ServiceConfig.logger reaches the framework adapters', () => {
+  it('passes the configured logger to the Express adapter', () => {
+    const logger = makeLogger();
 
-    new Service(expressServiceConfig(logger));
+    new Service(serviceConfig(ServerVendor.EXPRESS, logger));
 
     expect(createExpressApiAdapter).toHaveBeenLastCalledWith(expect.anything(), '', logger);
   });
 
-  it('keeps a logger set directly on the server config', () => {
-    const makeLogger = (): Logger => ({
-      log: vi.fn(),
-      info: vi.fn(),
-      trace: vi.fn(),
-      warn: vi.fn(),
-      error: vi.fn(),
-      fatal: vi.fn(),
-    });
-    const serviceLogger = makeLogger();
-    const serverLogger = makeLogger();
-    const config = expressServiceConfig(serviceLogger);
-    const server = config.platforms?.server;
-    if (server == null) throw new Error('server config missing');
+  it('passes the configured logger to the Fastify adapter', () => {
+    const logger = makeLogger();
 
-    new Service({
-      ...config,
-      platforms: { ...config.platforms, server: { ...server, logger: serverLogger } },
-    });
+    new Service(serviceConfig(ServerVendor.FASTIFY, logger));
 
-    expect(createExpressApiAdapter).toHaveBeenLastCalledWith(expect.anything(), '', serverLogger);
+    expect(createFastifyApiAdapter).toHaveBeenLastCalledWith(expect.anything(), '', logger);
   });
 
-  it('leaves the adapter on its default logger when none is configured', () => {
-    new Service(expressServiceConfig());
+  it('uses the Zacatl logger when none is configured', () => {
+    new Service(serviceConfig(ServerVendor.EXPRESS));
 
-    const lastCall = createExpressApiAdapter.mock.calls.at(-1) as unknown[] | undefined;
-    expect(lastCall?.[2]).toBeUndefined();
+    expect(createExpressApiAdapter).toHaveBeenLastCalledWith(expect.anything(), '', defaultLogger);
   });
 });

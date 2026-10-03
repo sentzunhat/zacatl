@@ -1,7 +1,9 @@
 import type { Express, Request, Response, NextFunction } from 'express';
+import type { FastifyBaseLogger } from 'fastify';
 import { createProxyMiddleware } from 'http-proxy-middleware';
 
-import { logger as defaultLogger, type Logger } from '@zacatl/logs';
+import { logger as defaultLogger, toFastifyLogger, type Logger } from '@zacatl/logs';
+import { uuidv4 } from '@zacatl/third-party/uuid';
 
 import { applyZodSchema } from './schema-helper';
 import type { RouteHandler } from '../../../../layers/application/entry-points/rest/fastify/handlers/route-handler';
@@ -18,6 +20,23 @@ export const createApiAdapter = (
   logger: Logger = defaultLogger,
 ): ApiServerPort => {
   let httpServer: ReturnType<Express['listen']> | null = null;
+
+  // Handlers are typed against Fastify's request, so give Express requests the
+  // same pino-style `log` (bound to a per-request `reqId`) that Fastify's
+  // `request.log` / `reply.log` have, writing through the Service's logger.
+  const baseRequestLogger = toFastifyLogger(logger);
+  const attachRequestLogger = (req: Request, res: Response): FastifyBaseLogger => {
+    const carrier = req as Request & { id?: unknown; log?: FastifyBaseLogger };
+    // Keep a logger another middleware (e.g. pino-http) already attached.
+    if (carrier.log == null) {
+      // Generated, never taken from request headers.
+      const reqId = typeof carrier.id === 'string' ? carrier.id : uuidv4();
+      carrier.log = baseRequestLogger.child({ reqId });
+    }
+    const response = res as Response & { log?: FastifyBaseLogger };
+    response.log ??= carrier.log;
+    return carrier.log;
+  };
 
   const getRouteUrl = (url: string): string => {
     const prefix = normalizePrefix(apiPrefix);
@@ -57,9 +76,11 @@ export const createApiAdapter = (
       register.call(server, url, async (req: Request, res: Response, next: NextFunction) => {
         try {
           await applyZodSchema(handler.schema, req);
+          const requestLog = attachRequestLogger(req, res);
 
           const replyAdapter = {
             sent: false as boolean,
+            log: requestLog,
             setStatus: (statusCode: number) => {
               res.status(statusCode);
               return replyAdapter;
@@ -100,6 +121,7 @@ export const createApiAdapter = (
               request: Request,
               reply: Response,
             ) => Promise<void>;
+            attachRequestLogger(req, res);
             await execute(req, res);
             next();
           } catch (err) {

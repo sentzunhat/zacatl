@@ -1,6 +1,7 @@
 import proxy from '@fastify/http-proxy';
 import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 
+import { logger as defaultLogger, type Logger } from '@zacatl/logs';
 import type { ZodTypeProvider } from '@zacatl/third-party/fastify';
 
 import type { RouteHandler } from '../../../../layers/application/entry-points/rest/fastify/handlers/route-handler';
@@ -11,9 +12,17 @@ import { normalizePrefix } from '../../shared/prefixes/normalize-prefix';
 /**
  * Fastify implementation of ApiServerPort.
  */
+// Plain fields only: adapters receive `data` as-is, where an Error instance
+// would serialize to `{}`, and arbitrary error properties stay out of logs.
+const describeError = (error: unknown): Record<string, unknown> =>
+  error instanceof Error
+    ? { type: error.name, message: error.message, stack: error.stack }
+    : { message: String(error) };
+
 export const createApiAdapter = (
   server: FastifyInstance,
   apiPrefix = '',
+  logger: Logger = defaultLogger,
 ): ApiServerPort => {
   const getRouteUrl = (url: string): string => {
     const prefix = normalizePrefix(apiPrefix);
@@ -48,12 +57,20 @@ export const createApiAdapter = (
               throw error;
             }
 
-            // The error response is already out; log once here instead of letting
-            // Fastify log "Promise errored, but reply.sent = true was set".
+            // The error response is already out; log once through the Service's
+            // logger instead of letting Fastify log "Promise errored, but
+            // reply.sent = true was set".
+            const data = {
+              reqId: request.id,
+              method: request.method,
+              url: request.url,
+              statusCode: reply.statusCode,
+              err: describeError(error),
+            };
             if (reply.statusCode >= 500) {
-              reply.log.error({ err: error }, 'Route handler failed');
+              logger.error('Route handler failed', { data });
             } else {
-              reply.log.info({ err: error }, 'Route handler rejected request');
+              logger.info('Route handler rejected request', { data });
             }
 
             return reply;

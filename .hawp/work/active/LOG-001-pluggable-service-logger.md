@@ -29,12 +29,17 @@ that Fastify's `request.log` / `reply.log` go through; app code can also call
    custom adapters and plain `Logger` objects get a bridge implementing
    `level`, `child()` (bindings merged into `data`) and Fastify's
    `(obj, msg)` call style. No hidden adapter link on `createLogger()`.
-2. `LoggerToken`: the Service registers its logger in its own DI container so
-   layer classes can `@inject(LoggerToken)`.
-3. `ServiceConfig.logger?: Logger` (default: Zacatl's pino logger), handed to
-   the platforms through `PlatformsConfig.logger` / `ServerConfig.logger`
-   (more specific wins) so Zacatl's own logs (e.g. Express adapter warnings)
-   use it.
+2. `LoggerToken`: the Service registers `ServiceConfig.logger?: Logger`
+   (default: Zacatl's pino logger) once in its own container (like the
+   database instances), shared by `Layers` and `Platforms`; layer classes can
+   `@inject(LoggerToken)`.
+3. Platforms: no logger fields on `PlatformsConfig` / `ServerConfig`. `Server`
+   resolves `LoggerToken` from the shared container and hands it to the
+   Fastify and Express adapters, which log Zacatl's own messages (handled
+   route errors, registration warnings) through it.
+   Express requests also get a request-scoped `req.log` / reply `log`
+   (pino-style, generated `reqId`) so handlers can use `request.log` on both
+   frameworks.
 4. Fastify examples: `logger: false` → shared logger via `toFastifyLogger`.
 5. Tests: pino passthrough, console/custom bridge (levels, child bindings,
    `(obj, msg)` mapping), real-Fastify request/handled-error logs reaching a
@@ -58,3 +63,5 @@ Fastify example builds.
 - 2026-10-01: Opened; design approved by owner 2026-09-30 (follow-up PR, examples switched to a real logger).
 - 2026-10-01: Implemented on `feature/pluggable-service-logger`: `toFastifyLogger`, adapter refs, `ServiceConfig.logger`, four Fastify examples on a shared logger, docs. Validation: 680 tests, type check, lint, build, optional-peer check (301 builds), consumer smokes, four example builds, and a live run of `fastify-sqlite-react` showing `incoming request` / `request completed` with `reqId` through the Zacatl logger.
 - 2026-10-02: Owner review: replaced the hidden Symbol adapter link with an explicit adapter (`toFastifyLogger(adapter)`; `getPinoInstance()` fast path, bridge otherwise) and added `LoggerToken` — the Service registers its logger in its own DI container so layer classes can `@inject(LoggerToken)`. Validation on Node 26.3.0 (`.nvmrc`): 687 tests, type check, lint baseline, build, optional-peer check (301 builds), consumer smokes, four example builds.
+- 2026-10-03: Owner review: logger removed from `PlatformsConfig` / `ServerConfig`; `Layers` registers `LoggerToken` (Service passes `config.logger`). Platforms, Server and the Express adapter are back to their `dev` versions.
+- 2026-10-03: Owner clarification: Fastify and Express adapters must use the Service logger too. Final shape: the Service registers `LoggerToken` in its own container and passes that container to `Layers` and `Platforms`; `Server` resolves the logger for both adapters. The Fastify adapter logs handled route errors through it (with `reqId`, method, URL, status, plain `err`).

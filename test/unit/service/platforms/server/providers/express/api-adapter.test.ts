@@ -256,6 +256,71 @@ describe('ExpressApiAdapter', () => {
       expect(res.end).toHaveBeenCalled();
     });
 
+    it('gives handlers a request-scoped req.log / reply.log through the Service logger', async () => {
+      const logger = {
+        log: vi.fn(),
+        info: vi.fn(),
+        trace: vi.fn(),
+        warn: vi.fn(),
+        error: vi.fn(),
+        fatal: vi.fn(),
+      };
+      const withLogger = createApiAdapter(mockServer as never, '', logger);
+      const handler: RouteHandler = {
+        method: 'GET',
+        url: '/logs',
+        execute: vi.fn(
+          async (
+            req: { log: { info: (obj: object, msg: string) => void } },
+            reply: { log: { warn: (msg: string) => void } },
+          ) => {
+            req.log.info({ userId: 7 }, 'handler ran');
+            reply.log.warn('reply side');
+          },
+        ),
+      } as unknown as RouteHandler;
+      withLogger.registerRoute(handler);
+
+      const routeFn = mockServer.get.mock.calls[0]?.[1] as (
+        req: unknown,
+        res: unknown,
+        next: (err?: unknown) => void,
+      ) => Promise<void>;
+      const res = { headersSent: false, status: vi.fn().mockReturnThis(), end: vi.fn(), json: vi.fn(), setHeader: vi.fn() };
+      // A client-supplied request id must not become the log reqId.
+      // eslint-disable-next-line @typescript-eslint/naming-convention -- real HTTP header name
+      await routeFn({ headers: { 'x-request-id': 'spoofed' } }, res, vi.fn());
+
+      expect(logger.info).toHaveBeenCalledWith('handler ran', {
+        data: { reqId: expect.any(String), userId: 7 },
+      });
+      const reqId = (logger.info.mock.calls[0]?.[1] as { data: { reqId: string } }).data.reqId;
+      expect(reqId).not.toBe('spoofed');
+      expect(logger.warn).toHaveBeenCalledWith('reply side', { data: { reqId } });
+    });
+
+    it('keeps a req.log that another middleware already attached', async () => {
+      const handler: RouteHandler = {
+        method: 'GET',
+        url: '/existing-log',
+        execute: vi.fn(async (req: { log: { info: (msg: string) => void } }) => {
+          req.log.info('from existing logger');
+        }),
+      } as unknown as RouteHandler;
+      adapter.registerRoute(handler);
+
+      const routeFn = mockServer.get.mock.calls[0]?.[1] as (
+        req: unknown,
+        res: unknown,
+        next: (err?: unknown) => void,
+      ) => Promise<void>;
+      const existing = { info: vi.fn(), child: vi.fn() };
+      const res = { headersSent: false, status: vi.fn().mockReturnThis(), end: vi.fn(), json: vi.fn(), setHeader: vi.fn() };
+      await routeFn({ log: existing }, res, vi.fn());
+
+      expect(existing.info).toHaveBeenCalledWith('from existing logger');
+    });
+
     it('reply adapter maps code/send/header onto the Express response', async () => {
       const handler: RouteHandler = {
         method: 'GET',
