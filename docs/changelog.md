@@ -2,9 +2,9 @@
 
 ---
 
-## [Unreleased]
+## [0.0.64] - 2026-10-03
 
-**Status**: In progress on `fix/dependency-updates` (next patch release).
+**Status**: Release candidate for the automated `main` release path
 
 ### 📦 Dependencies
 
@@ -22,8 +22,20 @@
 - Example lockfiles refreshed with in-range `npm audit fix` (no `--force`):
   all eight framework examples go from 1–5 advisories each (up to 2 high) to
   0; `node-sqlite-store` was already clean. Only lockfiles changed.
+- Example lockfiles no longer carry `http-proxy-middleware` (and its
+  `micromatch` / `braces` chain) through the linked Zacatl package, now that
+  it is an optional peer (0.0.63).
 - Peer dependency ranges are unchanged. Majors are left for their own work
-  items: ESLint 10 (`ESLINT-010`), vitest 5, TypeScript 7.
+  items: ESLint 10 (`ESLINT-010`), vitest 5, TypeScript 7. Releases published
+  in the last two days (`pino` 10.4.0, `mongoose` 9.10.4, `@types/node`
+  26.6.4) are left for the next update round.
+
+### 🧪 Verification
+
+- `npm test`, `npm run type:check`, `npm run lint:silent`, `npm run build`,
+  `npm run prepare-publish && npm run check:optional-peers`,
+  `npm run smoke:consumers`, `npm audit --omit=dev` (0), and every example
+  backend built from `npm ci`.
 
 ## [0.0.63] - 2026-10-03
 
