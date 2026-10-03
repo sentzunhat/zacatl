@@ -14,7 +14,7 @@
 [![CVE scan](https://img.shields.io/github/actions/workflow/status/sentzunhat/zacatl/cve-scan.yml?branch=main&style=flat-square&label=CVE%20scan)](https://github.com/sentzunhat/zacatl/actions/workflows/cve-scan.yml)
 [![Release](https://img.shields.io/github/actions/workflow/status/sentzunhat/zacatl/release.yml?style=flat-square&label=release)](https://github.com/sentzunhat/zacatl/actions/workflows/release.yml)
 [![Tests: 690](https://img.shields.io/badge/tests-690%20passing-brightgreen.svg?style=flat-square)](#-testing)
-[![Coverage: 92.08%](https://img.shields.io/badge/coverage-92.08%25-brightgreen.svg?style=flat-square)](#-testing)
+[![Coverage: 92.07%](https://img.shields.io/badge/coverage-92.07%25-brightgreen.svg?style=flat-square)](#-testing)
 
 **Stack**
 
@@ -275,7 +275,7 @@ npm test                 # Run all tests
 npm run test:coverage    # Coverage report
 ```
 
-690 tests across 83 files, 92.08% line coverage. CI runs the full suite plus type-check, lint, and an 8-example Docker smoke matrix before any release — see [docs/guidelines/ci-cd-workflow.md](./docs/guidelines/ci-cd-workflow.md) for exactly what gates what.
+690 tests across 83 files, 92.07% line coverage. CI runs the full suite plus type-check, lint, and an 8-example Docker smoke matrix before any release — see [docs/guidelines/ci-cd-workflow.md](./docs/guidelines/ci-cd-workflow.md) for exactly what gates what.
 
 ## 📋 Requirements
 

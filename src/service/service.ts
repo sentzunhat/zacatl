@@ -56,8 +56,9 @@ export class Service {
 
     // One container per Service, shared by its layers and platforms. The logger
     // is registered here once (like the database instances above), so
-    // repositories, domain services, handlers and the Fastify/Express adapters
-    // all use ServiceConfig.logger (default: the Zacatl logger).
+    // repositories, domain services, handlers and the Express adapter all use
+    // ServiceConfig.logger (default: the Zacatl logger). Fastify keeps its own
+    // request logger (`loggerInstance`), which apps point at the same adapter.
     const serviceContainer = createChildContainer();
     registerValue(LoggerToken, config.logger ?? defaultLogger, serviceContainer);
 

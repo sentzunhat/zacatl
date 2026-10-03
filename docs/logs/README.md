@@ -93,9 +93,12 @@ logger.error('Payment failed', { data: { orderId } });
   database instances), shared by its layers and platforms:
   - repositories, domain services and handlers can inject it (see
     [Dependency Injection](#dependency-injection));
-  - the Fastify and Express adapters use it for Zacatl's own logs — handled
-    route errors (with `reqId`, method, URL and status) and registration
-    warnings. Fastify's own request logs come from `loggerInstance`.
+  - the Express adapter uses it for Zacatl's own logs (registration warnings)
+    and for the request-scoped `req.log` / `reply.log` below.
+- On Fastify, `request.log` / `reply.log` are Fastify's own request loggers;
+  Zacatl's Fastify adapter logs handled route errors through `reply.log`.
+  Create Fastify with `loggerInstance: toFastifyLogger(adapter)` so they write
+  through the same adapter as `ServiceConfig.logger`.
 - Handlers can use `request.log` / `reply.log` on both frameworks with the same
   pino-style API. Fastify provides them natively; on Express the adapter
   attaches a request-scoped logger (generated `reqId`, never taken from

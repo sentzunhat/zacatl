@@ -59,7 +59,7 @@ export interface LocalizationConfig {
  * - `run.auto` — whether the service should start automatically.
  * - `logger` — logger for the service (defaults to Zacatl's pino `logger`).
  *   Registered under `LoggerToken` in the Service's container, shared by its
- *   layers (`@inject(LoggerToken)`) and the Fastify/Express adapters. Give Fastify the
+ *   layers (`@inject(LoggerToken)`) and the Express adapter. Give Fastify the
  *   adapter it was built from, `Fastify({ loggerInstance: toFastifyLogger(adapter) })`,
  *   so request logs and handler errors go through the same destination.
  */

@@ -1,12 +1,13 @@
 import { Writable } from 'node:stream';
 
-import Fastify, { type FastifyInstance } from 'fastify';
+import Fastify, { type FastifyInstance, type FastifyReply } from 'fastify';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { ConsoleLoggerAdapter, createLogger, logger as defaultLogger } from '../../../src/logs';
 import { toFastifyLogger } from '../../../src/logs/fastify';
 import { PinoLoggerAdapter } from '../../../src/logs/pino/adapter';
 import type { LoggerInput, LoggerPort } from '../../../src/logs/types';
+import type { Request } from '../../../src/service/layers/application/entry-points/rest/fastify/handlers/abstract';
 import { GetRouteHandler } from '../../../src/service/layers/application/entry-points/rest/fastify/handlers/get-route-handler';
 import { createApiAdapter } from '../../../src/service/platforms/server/providers/fastify/api-adapter';
 
@@ -37,6 +38,25 @@ class OkHandler extends GetRouteHandler<void, void, { ok: boolean }> {
 
   async handler(): Promise<{ ok: boolean }> {
     return { ok: true };
+  }
+}
+
+class LoggingHandler extends GetRouteHandler<void, void, { ok: boolean }> {
+  constructor() {
+    super({ url: '/logging', schema: {} });
+  }
+
+  async handler(request: Request<void, void>): Promise<{ ok: boolean }> {
+    request.log.info({ step: 'start' }, 'handler via request.log');
+    return { ok: true };
+  }
+
+  override async execute(
+    request: Request<void, void>,
+    reply: FastifyReply,
+  ): Promise<{ ok: boolean }> {
+    reply.log.warn('handler via reply.log');
+    return super.execute(request, reply);
   }
 }
 
@@ -102,10 +122,9 @@ describe('toFastifyLogger', () => {
   describe('console and custom adapters', () => {
     it('routes Fastify request and handler-error logs through the adapter', async () => {
       const port = createRecordingPort();
-      const logger = createLogger(port);
 
       app = Fastify({ loggerInstance: toFastifyLogger(port) });
-      const api = createApiAdapter(app, '', logger);
+      const api = createApiAdapter(app);
       api.registerRoute(new OkHandler());
       api.registerRoute(new BrokenHandler());
 
@@ -126,6 +145,21 @@ describe('toFastifyLogger', () => {
       expect(failed).toHaveLength(1);
       expect(failed[0]?.level).toBe('error');
       expect(failed[0]?.data['err']).toMatchObject({ type: 'Error', message: 'boom' });
+    });
+
+    it('lets handlers use request.log / reply.log, bound to the request id', async () => {
+      const port = createRecordingPort();
+
+      app = Fastify({ loggerInstance: toFastifyLogger(port) });
+      createApiAdapter(app).registerRoute(new LoggingHandler());
+      await app.inject({ method: 'GET', url: '/logging' });
+
+      const fromRequest = port.calls.find((call) => call.message === 'handler via request.log');
+      const fromReply = port.calls.find((call) => call.message === 'handler via reply.log');
+      expect(fromRequest).toMatchObject({ level: 'info', data: { step: 'start' } });
+      expect(fromRequest?.data['reqId']).toBeDefined();
+      expect(fromReply).toMatchObject({ level: 'warn' });
+      expect(fromReply?.data['reqId']).toBe(fromRequest?.data['reqId']);
     });
 
     it('supports pino call styles, child bindings and levels', () => {

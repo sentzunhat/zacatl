@@ -34,12 +34,12 @@ that Fastify's `request.log` / `reply.log` go through; app code can also call
    database instances), shared by `Layers` and `Platforms`; layer classes can
    `@inject(LoggerToken)`.
 3. Platforms: no logger fields on `PlatformsConfig` / `ServerConfig`. `Server`
-   resolves `LoggerToken` from the shared container and hands it to the
-   Fastify and Express adapters, which log Zacatl's own messages (handled
-   route errors, registration warnings) through it.
-   Express requests also get a request-scoped `req.log` / reply `log`
-   (pino-style, generated `reqId`) so handlers can use `request.log` on both
-   frameworks.
+   resolves `LoggerToken` from the shared container for the Express adapter,
+   which logs Zacatl's own messages through it and gives Express requests a
+   request-scoped `req.log` / reply `log` (pino-style, generated `reqId`).
+   Fastify keeps its native `request.log` / `reply.log` (the adapter logs
+   handled route errors through `reply.log`); apps point Fastify at the same
+   adapter with `loggerInstance: toFastifyLogger(adapter)`.
 4. Fastify examples: `logger: false` → shared logger via `toFastifyLogger`.
 5. Tests: pino passthrough, console/custom bridge (levels, child bindings,
    `(obj, msg)` mapping), real-Fastify request/handled-error logs reaching a
@@ -65,3 +65,4 @@ Fastify example builds.
 - 2026-10-02: Owner review: replaced the hidden Symbol adapter link with an explicit adapter (`toFastifyLogger(adapter)`; `getPinoInstance()` fast path, bridge otherwise) and added `LoggerToken` — the Service registers its logger in its own DI container so layer classes can `@inject(LoggerToken)`. Validation on Node 26.3.0 (`.nvmrc`): 687 tests, type check, lint baseline, build, optional-peer check (301 builds), consumer smokes, four example builds.
 - 2026-10-03: Owner review: logger removed from `PlatformsConfig` / `ServerConfig`; `Layers` registers `LoggerToken` (Service passes `config.logger`). Platforms, Server and the Express adapter are back to their `dev` versions.
 - 2026-10-03: Owner clarification: Fastify and Express adapters must use the Service logger too. Final shape: the Service registers `LoggerToken` in its own container and passes that container to `Layers` and `Platforms`; `Server` resolves the logger for both adapters. The Fastify adapter logs handled route errors through it (with `reqId`, method, URL, status, plain `err`).
+- 2026-10-03: Owner review: restore Fastify `reply.log` for the adapter's handled-error log. Swapping `request.log` / `reply.log` during the handler was tried and rejected — `reply.send()` completes inside the handler, so Fastify's own "request completed" log would have moved to the Service logger (and lost Fastify's serializers). Final: Fastify native `reply.log`; Express gets a Service-bound `req.log` / `reply.log`.

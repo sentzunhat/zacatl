@@ -8,7 +8,7 @@ import type { Logger } from './types';
  * The Service registers `ServiceConfig.logger` (or the default Zacatl `logger`)
  * under this token in its own container, shared by its layers and platforms,
  * so repositories, domain services and handlers can inject it, and the
- * Fastify/Express adapters log through it:
+ * Express adapter logs through it:
  *
  * @example
  * ```typescript

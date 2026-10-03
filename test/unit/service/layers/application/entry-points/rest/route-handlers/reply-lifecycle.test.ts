@@ -1,10 +1,9 @@
 import { Writable } from 'node:stream';
 
 import Fastify, { type FastifyInstance, type FastifyReply } from 'fastify';
-import { afterEach, beforeEach, describe, expect, it, vi, type Mock } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
 import { NotFoundError } from '../../../../../../../../src/error';
-import type { Logger } from '../../../../../../../../src/logs/types';
 import type { Request } from '../../../../../../../../src/service/layers/application/entry-points/rest/fastify/handlers/abstract';
 import { GetRouteHandler } from '../../../../../../../../src/service/layers/application/entry-points/rest/fastify/handlers/get-route-handler';
 import { PostRouteHandler } from '../../../../../../../../src/service/layers/application/entry-points/rest/fastify/handlers/post-route-handler';
@@ -93,15 +92,6 @@ const throwingPlainHandler: RouteHandler = {
   },
 };
 
-const makeServiceLogger = (): { [K in keyof Logger]: Mock<Logger[K]> } => ({
-  log: vi.fn<Logger['log']>(),
-  info: vi.fn<Logger['info']>(),
-  trace: vi.fn<Logger['trace']>(),
-  warn: vi.fn<Logger['warn']>(),
-  error: vi.fn<Logger['error']>(),
-  fatal: vi.fn<Logger['fatal']>(),
-});
-
 const isDoubleSendLog = (line: LogLine): boolean =>
   line.code === 'FST_ERR_REP_ALREADY_SENT' ||
   line.err?.code === 'FST_ERR_REP_ALREADY_SENT' ||
@@ -111,7 +101,6 @@ const isDoubleSendLog = (line: LogLine): boolean =>
 describe('Fastify route reply lifecycle (real Fastify)', () => {
   let app: FastifyInstance;
   let logs: LogLine[];
-  let serviceLogger: ReturnType<typeof makeServiceLogger>;
 
   beforeEach(async () => {
     logs = [];
@@ -127,8 +116,7 @@ describe('Fastify route reply lifecycle (real Fastify)', () => {
     });
 
     app = Fastify({ logger: { level: 'trace', stream } });
-    serviceLogger = makeServiceLogger();
-    const adapter = createApiAdapter(app, '', serviceLogger);
+    const adapter = createApiAdapter(app);
     adapter.registerRoute(new GetItemHandler());
     adapter.registerRoute(new CreateItemHandler());
     adapter.registerRoute(new MissingItemHandler());
@@ -172,16 +160,9 @@ describe('Fastify route reply lifecycle (real Fastify)', () => {
     expect(response.json()).toEqual({ message: 'Item not found' });
     expect(logs.filter(isDoubleSendLog)).toEqual([]);
     expect(logs.filter((line) => line.level >= 40)).toEqual([]);
-    expect(serviceLogger.info).toHaveBeenCalledTimes(1);
-    expect(serviceLogger.info).toHaveBeenCalledWith('Route handler rejected request', {
-      data: expect.objectContaining({
-        reqId: expect.any(String),
-        method: 'GET',
-        url: '/missing',
-        statusCode: 404,
-        err: expect.objectContaining({ message: 'Item not found' }),
-      }),
-    });
+    expect(
+      logs.filter((line) => line.level === 30 && line.msg === 'Route handler rejected request'),
+    ).toHaveLength(1);
   });
 
   it('keeps status codes set by execute() overrides', async () => {
@@ -220,14 +201,6 @@ describe('Fastify route reply lifecycle (real Fastify)', () => {
 
     expect(response.statusCode).toBe(500);
     expect(logs.filter(isDoubleSendLog)).toEqual([]);
-    // Logged once, through the Service's logger (not Fastify's).
-    expect(logs.filter((line) => line.level >= 50)).toEqual([]);
-    expect(serviceLogger.error).toHaveBeenCalledTimes(1);
-    expect(serviceLogger.error).toHaveBeenCalledWith('Route handler failed', {
-      data: expect.objectContaining({
-        statusCode: 500,
-        err: expect.objectContaining({ type: 'Error', message: 'boom' }),
-      }),
-    });
+    expect(logs.filter((line) => line.level >= 50)).toHaveLength(1);
   });
 });

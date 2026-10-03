@@ -77,7 +77,7 @@ export class Server {
     if (config.vendor === ServerVendor.FASTIFY) {
       const instance = config.instance as FastifyInstance;
       return {
-        api: createFastifyApiAdapter(instance, prefixes, this.logger),
+        api: createFastifyApiAdapter(instance, prefixes),
         page: createFastifyPageAdapter(instance),
       };
     } else if (config.vendor === ServerVendor.EXPRESS) {

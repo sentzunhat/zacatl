@@ -25,9 +25,10 @@
   **`LoggerToken`**: the Service registers the logger once in its own DI
   container (like the database instances), shared by its layers and
   platforms. Repositories, domain services and handlers can
-  `@inject(LoggerToken) logger: Logger`, and the Fastify and Express adapters
-  use it for Zacatl's own logs (handled route errors with `reqId`, method,
-  URL and status; registration warnings).
+  `@inject(LoggerToken) logger: Logger`, and the Express adapter uses it for
+  Zacatl's own logs. On Fastify, Zacatl's logs (handled route errors) go
+  through `reply.log`, which is your logger when Fastify is created with
+  `loggerInstance: toFastifyLogger(adapter)`.
 - **`request.log` / `reply.log` on Express too.** Handlers are typed against
   Fastify's request, so on Express `request.log` was `undefined` at runtime.
   The Express adapter now attaches a request-scoped, pino-style logger
