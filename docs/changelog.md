@@ -2,9 +2,9 @@
 
 ---
 
-## [Unreleased]
+## [0.0.63] - 2026-10-03
 
-**Status**: In progress on `feature/pluggable-service-logger` (target 0.0.63).
+**Status**: Release candidate for the automated `main` release path
 
 ### ✨ Features
 
