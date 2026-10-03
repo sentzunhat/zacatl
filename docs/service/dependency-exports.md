@@ -58,7 +58,7 @@ import {
   NextFunction,
 } from '@sentzunhat/zacatl/third-party/express';
 
-// HTTP Proxy Middleware (Express/Fastify)
+// HTTP Proxy Middleware (Express proxies; optional peer: npm install http-proxy-middleware)
 import {
   createProxyMiddleware,
   ProxyOptions,
@@ -318,7 +318,7 @@ Zacatl exports all dependencies via subpaths:
 // ✅ Library exports framework adapters
 export * from './fastify';
 export * from './express';
-export * from './http-proxy-middleware';
+// http-proxy-middleware is an optional peer: subpath only
 
 // ✅ ORM exports available via subpaths to avoid conflicts
 // @sentzunhat/zacatl/third-party/databases/mongoose

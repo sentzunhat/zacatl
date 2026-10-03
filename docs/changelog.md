@@ -43,6 +43,24 @@
   and their error handlers log through `request.log` (with the request id).
   The logger is part of the config their `createServiceConfig()` returns.
 
+### 🔒 Security
+
+- **`http-proxy-middleware` is now an optional peer dependency.** It pulled
+  `micromatch` → `braces` into every install, and `braces` ≤ 3.0.3 has a
+  high-severity advisory with no fixed release (GHSA-vfj7-8cjw-p6xm; it
+  affects glob-pattern expansion, which Zacatl's proxy does not use). The
+  Express adapter now loads it only when a gateway proxy is configured, and
+  logs one clear error if it is missing. `npm audit --omit=dev` reports 0
+  vulnerabilities again. It is no longer re-exported from the
+  `@sentzunhat/zacatl/third-party` barrel.
+
+### ⚠️ Migration
+
+- Apps that use Express gateway proxies (`ServerType.GATEWAY` with `gateway.proxies`):
+  `npm install http-proxy-middleware`. Import it from
+  `@sentzunhat/zacatl/third-party/http-proxy-middleware` (no longer from the
+  `third-party` barrel). Fastify proxies are unchanged.
+
 ### 🧪 Verification
 
 - New tests: pino passthrough for an adapter (and the bridge for a

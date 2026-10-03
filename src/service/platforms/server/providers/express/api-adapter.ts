@@ -1,6 +1,6 @@
 import type { Express, Request, Response, NextFunction } from 'express';
 import type { FastifyBaseLogger } from 'fastify';
-import { createProxyMiddleware } from 'http-proxy-middleware';
+import type { Options as ProxyOptions, RequestHandler as ProxyHandler } from 'http-proxy-middleware';
 
 import { logger as defaultLogger, toFastifyLogger, type Logger } from '@zacatl/logs';
 import { uuidv4 } from '@zacatl/third-party/uuid';
@@ -137,16 +137,30 @@ export const createApiAdapter = (
     },
 
     registerProxy: (config: ProxyConfig): void => {
-      server.use(
-        config.prefix,
-        createProxyMiddleware({
-          target: config.upstream,
-          changeOrigin: true,
-          ...(config.rewritePrefix != null
-            ? { pathRewrite: { [`^${config.prefix.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`]: config.rewritePrefix } }
-            : {}),
-        }),
+      const options: ProxyOptions = {
+        target: config.upstream,
+        changeOrigin: true,
+        ...(config.rewritePrefix != null
+          ? { pathRewrite: { [`^${config.prefix.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`]: config.rewritePrefix } }
+          : {}),
+      };
+
+      // http-proxy-middleware is an optional peer: load it only when a proxy is
+      // configured, so apps without Express proxies never install it.
+      const proxyReady: Promise<ProxyHandler> = import('http-proxy-middleware').then(
+        ({ createProxyMiddleware }) => createProxyMiddleware(options),
       );
+      proxyReady.catch((error: unknown) => {
+        logger.error(
+          `ExpressApiAdapter: proxy for '${config.prefix}' needs the optional peer ` +
+            `'http-proxy-middleware' (npm install http-proxy-middleware).`,
+          { data: { err: error instanceof Error ? error.message : String(error) } },
+        );
+      });
+
+      server.use(config.prefix, (req: Request, res: Response, next: NextFunction) => {
+        proxyReady.then((proxy) => proxy(req, res, next), next);
+      });
     },
 
     listen: async (port: number): Promise<void> => {

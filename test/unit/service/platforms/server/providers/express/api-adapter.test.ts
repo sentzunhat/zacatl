@@ -398,21 +398,61 @@ describe('ExpressApiAdapter', () => {
   });
 
   describe('registerProxy', () => {
-    it('should apply proxy middleware', () => {
-      const config = {
-        upstream: 'http://upstream',
-        prefix: '/api',
-        rewritePrefix: '/remote',
+    const registeredProxyMiddleware = (): ((
+      req: unknown,
+      res: unknown,
+      next: (err?: unknown) => void,
+    ) => void) => {
+      const call = mockServer.use.mock.calls.at(-1);
+      expect(call?.[0]).toBe('/api');
+      return call?.[1] as (req: unknown, res: unknown, next: (err?: unknown) => void) => void;
+    };
+
+    it('loads http-proxy-middleware lazily and forwards requests to it', async () => {
+      const proxy = vi.fn();
+      vi.mocked(createProxyMiddleware).mockReturnValueOnce(proxy as never);
+
+      adapter.registerProxy({ upstream: 'http://upstream', prefix: '/api', rewritePrefix: '/remote' });
+
+      await vi.waitFor(() =>
+        expect(createProxyMiddleware).toHaveBeenCalledWith({
+          target: 'http://upstream',
+          changeOrigin: true,
+          pathRewrite: expect.any(Object),
+        }),
+      );
+      const req = {};
+      const res = {};
+      const next = vi.fn();
+      registeredProxyMiddleware()(req, res, next);
+
+      await vi.waitFor(() => expect(proxy).toHaveBeenCalledWith(req, res, next));
+    });
+
+    it('logs once and passes the error on when the optional peer cannot load', async () => {
+      const logger = {
+        log: vi.fn(),
+        info: vi.fn(),
+        trace: vi.fn(),
+        warn: vi.fn(),
+        error: vi.fn(),
+        fatal: vi.fn(),
       };
-
-      adapter.registerProxy(config);
-
-      expect(createProxyMiddleware).toHaveBeenCalledWith({
-        target: 'http://upstream',
-        changeOrigin: true,
-        pathRewrite: expect.any(Object),
+      vi.mocked(createProxyMiddleware).mockImplementationOnce(() => {
+        throw new Error("Cannot find package 'http-proxy-middleware'");
       });
-      expect(mockServer.use).toHaveBeenCalledWith('/api', 'proxy-middleware');
+      const withLogger = createApiAdapter(mockServer as never, '', logger);
+
+      withLogger.registerProxy({ upstream: 'http://upstream', prefix: '/api' });
+
+      await vi.waitFor(() => expect(logger.error).toHaveBeenCalledTimes(1));
+      expect(logger.error).toHaveBeenCalledWith(
+        expect.stringContaining("optional peer 'http-proxy-middleware'"),
+        expect.anything(),
+      );
+      const next = vi.fn();
+      registeredProxyMiddleware()({}, {}, next);
+      await vi.waitFor(() => expect(next).toHaveBeenCalledWith(expect.any(Error)));
     });
   });
 });
