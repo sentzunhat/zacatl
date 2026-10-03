@@ -3,6 +3,12 @@
 Rows compacted out of `BACKLOG.md` → Recently Closed. Newest first.
 Plan files (when they exist) live under `.hawp/work/closed/YYYY/MM/DD/`.
 
+## Archived 2026-10-03
+
+| ID | Type | Title | Closed | Plan |
+| --- | --- | --- | --- | --- |
+| `9c4f0a58`                      | `security`    | P1: Mongoose index lifecycle controls for safe production boot                                                                                 | 2026-07-21 | [closed/2026/07/21/9c4f0a58-mongoose-index-lifecycle-controls.md](2026/07/21/9c4f0a58-mongoose-index-lifecycle-controls.md) |
+
 ## Archived 2026-10-01
 
 | ID | Type | Title | Closed | Plan |
