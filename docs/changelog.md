@@ -2,6 +2,76 @@
 
 ---
 
+## [Unreleased]
+
+**Status**: In progress on `feature/pluggable-service-logger` (target 0.0.63).
+
+### ✨ Features
+
+- **One logger for the app, the Service and Fastify.** New
+  `toFastifyLogger(adapter)` in `@sentzunhat/zacatl/logs` turns a logger
+  adapter into a Fastify logger:
+  `Fastify({ loggerInstance: toFastifyLogger(adapter) })` alongside
+  `createLogger(adapter)` for the app. A `PinoLoggerAdapter` returns its real
+  pino instance; console and custom `LoggerPort` adapters (for example a file
+  or SQLite writer) and plain `Logger` objects get a bridge that implements
+  Fastify's logger contract, with child bindings (`reqId`) and Fastify's
+  serialized `req` / `res` / `err` in `input.data`. The bridge never throws
+  into Fastify: if an adapter or serializer fails (for example a locked
+  database or a circular value), the entry is dropped and a single
+  `ZACATL_LOGGER_ADAPTER_FAILED` process warning is emitted. Logged keys such
+  as `__proto__` or `constructor` are kept as plain data.
+- **`ServiceConfig.logger`** (optional, defaults to the Zacatl `logger`) and
+  **`LoggerToken`**: the Service registers the logger once in its own DI
+  container (like the database instances), shared by its layers and
+  platforms. Repositories, domain services and handlers can
+  `@inject(LoggerToken) logger: Logger`, and the Express adapter uses it for
+  Zacatl's own logs. On Fastify, Zacatl's logs (handled route errors) go
+  through `reply.log`, which is your logger when Fastify is created with
+  `loggerInstance: toFastifyLogger(adapter)`.
+- **`request.log` / `reply.log` on Express too.** Handlers are typed against
+  Fastify's request, so on Express `request.log` was `undefined` at runtime.
+  The Express adapter now attaches a request-scoped, pino-style logger
+  (generated `reqId`, never read from request headers) that writes through
+  `ServiceConfig.logger`, and keeps a `req.log` another middleware already
+  set.
+
+### 📚 Examples
+
+- The four Fastify examples use one shared logger instead of
+  `Fastify({ logger: false })`, so request logs and handler errors are visible,
+  and their error handlers log through `request.log` (with the request id).
+  The logger is part of the config their `createServiceConfig()` returns.
+
+### 🔒 Security
+
+- **`http-proxy-middleware` is now an optional peer dependency.** It pulled
+  `micromatch` → `braces` into every install, and `braces` ≤ 3.0.3 has a
+  high-severity advisory with no fixed release (GHSA-vfj7-8cjw-p6xm; it
+  affects glob-pattern expansion, which Zacatl's proxy does not use). The
+  Express adapter now loads it only when a gateway proxy is configured, and
+  logs one clear error if it is missing. `npm audit --omit=dev` reports 0
+  vulnerabilities again. It is no longer re-exported from the
+  `@sentzunhat/zacatl/third-party` barrel.
+
+### ⚠️ Migration
+
+- Apps that use Express gateway proxies (`ServerType.GATEWAY` with `gateway.proxies`):
+  `npm install http-proxy-middleware`. Import it from
+  `@sentzunhat/zacatl/third-party/http-proxy-middleware` (no longer from the
+  `third-party` barrel). Fastify proxies are unchanged.
+
+### 🧪 Verification
+
+- New tests: pino passthrough for an adapter (and the bridge for a
+  `createLogger()` wrapper), a custom adapter receiving Fastify request and
+  handled-error logs, pino call styles and levels on the bridge, failure
+  isolation (throwing adapter, circular values, prototype-named keys),
+  `LoggerToken` injection of `ServiceConfig.logger` (or the default) for
+  `@injectable()` and `@singleton()` classes, including two Services with
+  different loggers, `ServiceConfig.logger` reaching the Fastify and Express
+  adapters, and handled route errors logged through it.
+
 ## [0.0.62] - 2026-09-30
 
 **Status**: Release candidate for the automated `main` release path

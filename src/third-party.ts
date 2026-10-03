@@ -5,5 +5,4 @@ export * from './third-party/i18n';
 export * from './third-party/js-yaml';
 export * from './third-party/fastify';
 export * from './third-party/express';
-export * from './third-party/http-proxy-middleware';
 export * from './third-party/dependency-injection/reflect-metadata';

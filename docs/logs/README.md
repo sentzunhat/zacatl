@@ -52,6 +52,90 @@ import { createLogger, PinoLoggerAdapter } from '@sentzunhat/zacatl/logs';
 const logger = createLogger(new PinoLoggerAdapter());
 ```
 
+## One Logger for the Service and Fastify
+
+Create the adapter once, give Fastify the adapter and the Service the logger.
+Fastify's `request.log` / `reply.log` (request logs, handled route errors),
+Zacatl's own logs and your app code then all write through the same adapter.
+
+```typescript
+import Fastify from 'fastify';
+import { createLogger, PinoLoggerAdapter, toFastifyLogger } from '@sentzunhat/zacatl/logs';
+import { Service, ServiceType } from '@sentzunhat/zacatl/service';
+import { ServerVendor } from '@sentzunhat/zacatl/service/platforms/server/types/server-config';
+
+const adapter = new PinoLoggerAdapter(); // or new ConsoleLoggerAdapter(), or your own LoggerPort
+const logger = createLogger(adapter);
+const fastify = Fastify({ loggerInstance: toFastifyLogger(adapter) });
+
+const service = new Service({
+  type: ServiceType.SERVER,
+  logger, // same logger the app and Fastify use
+  platforms: { server: { /* ..., */ server: { vendor: ServerVendor.FASTIFY, instance: fastify } } },
+  // layers, localization, ...
+});
+
+// App code uses the same logger
+logger.error('Payment failed', { data: { orderId } });
+```
+
+- **`PinoLoggerAdapter`**: `toFastifyLogger(adapter)` returns its real pino
+  instance (via `getPinoInstance()`), so Fastify keeps pino's performance and
+  its `req`/`res`/`err` serializers. Pass the adapter, not the `createLogger()`
+  wrapper, to get this fast path.
+- **Console and custom adapters, or a plain `Logger`**: `toFastifyLogger` returns a bridge that
+  implements Fastify's logger contract. Child bindings (such as `reqId`) and
+  Fastify's serialized `req` / `res` / `err` arrive in `input.data`; Fastify's
+  `debug` maps to the adapter's `trace`. Set the minimum level with
+  `toFastifyLogger(logger, { level: 'warn' })` (default `info`).
+- `ServiceConfig.logger` is optional and defaults to the Zacatl `logger`. The
+  Service registers it under `LoggerToken` in its own DI container (like the
+  database instances), shared by its layers and platforms:
+  - repositories, domain services and handlers can inject it (see
+    [Dependency Injection](#dependency-injection));
+  - the Express adapter uses it for Zacatl's own logs (registration warnings)
+    and for the request-scoped `req.log` / `reply.log` below.
+- On Fastify, `request.log` / `reply.log` are Fastify's own request loggers;
+  Zacatl's Fastify adapter logs handled route errors through `reply.log`.
+  Create Fastify with `loggerInstance: toFastifyLogger(adapter)` so they write
+  through the same adapter as `ServiceConfig.logger`.
+- Handlers can use `request.log` / `reply.log` on both frameworks with the same
+  pino-style API. Fastify provides them natively; on Express the adapter
+  attaches a request-scoped logger (generated `reqId`, never taken from
+  request headers) that writes through `ServiceConfig.logger`, unless another
+  middleware (e.g. pino-http) already set `req.log`.
+
+```typescript
+async handler(request: Request<CreateBody>) {
+  request.log.info({ userId: request.body.userId }, 'creating order'); // Fastify or Express
+}
+```
+- Fastify must receive the logger when it is created (`loggerInstance`); an
+  instance created with `logger: false` stays silent.
+
+### Custom Adapter (e.g. a SQLite or file writer)
+
+Implement `LoggerPort` and pass it to `createLogger`; it works for app code,
+the Service, and Fastify (through the bridge):
+
+```typescript
+import type { LoggerInput, LoggerPort } from '@sentzunhat/zacatl/logs';
+
+class SqliteLogWriter implements LoggerPort {
+  constructor(private readonly insert: (level: string, message: string, data: unknown) => void) {}
+  log(message: string, input?: LoggerInput) { this.insert('info', message, input?.data); }
+  info(message: string, input?: LoggerInput) { this.insert('info', message, input?.data); }
+  trace(message: string, input?: LoggerInput) { this.insert('trace', message, input?.data); }
+  warn(message: string, input?: LoggerInput) { this.insert('warn', message, input?.data); }
+  error(message: string, input?: LoggerInput) { this.insert('error', message, input?.data); }
+  fatal(message: string, input?: LoggerInput) { this.insert('fatal', message, input?.data); }
+}
+
+const adapter = new SqliteLogWriter(writeRow);
+const logger = createLogger(adapter);
+const fastify = Fastify({ loggerInstance: toFastifyLogger(adapter) });
+```
+
 ## Log Levels
 
 ```typescript
@@ -283,27 +367,20 @@ import { logger } from './utils/logger';
 logger.info('Application started');
 ```
 
-### DI Container
+### DI Container (`LoggerToken`)
+
+The Service registers its logger (`ServiceConfig.logger`, or the default Zacatl
+`logger`) under `LoggerToken` in its own DI container. Repositories, domain
+services and handlers inject it like any other dependency, and each Service
+gets its own registration:
 
 ```typescript
-import { container, inject, singleton } from '@sentzunhat/zacatl/third-party/dependency-injection/tsyringe';
-import type { LoggerInput } from '@sentzunhat/zacatl/logs';
-import { createLogger, PinoLoggerAdapter } from '@sentzunhat/zacatl/logs';
+import { inject, singleton } from '@sentzunhat/zacatl/third-party/dependency-injection/tsyringe';
+import { LoggerToken, type Logger } from '@sentzunhat/zacatl/logs';
 
 @singleton()
-class AppLogger {
-  private readonly logger = createLogger(new PinoLoggerAdapter());
-
-  info(message: string, input?: LoggerInput) {
-    this.logger.info(message, input);
-  }
-}
-
-container.registerSingleton(AppLogger, AppLogger);
-
-// In your services
-class UserService {
-  constructor(@inject(AppLogger) private logger: AppLogger) {}
+export class UserService {
+  constructor(@inject(LoggerToken) private readonly logger: Logger) {}
 
   async createUser(data: UserData) {
     this.logger.info('Creating user', { data });

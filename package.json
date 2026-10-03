@@ -144,6 +144,7 @@
     "eslint-import-resolver-typescript": "^4.4.5",
     "eslint-plugin-import": "^2.32.0",
     "get-tsconfig": "^4.14.2",
+    "http-proxy-middleware": "^4.2.0",
     "mongodb": "^7.2.0",
     "mongodb-memory-server": "^11.2.0",
     "mongoose": "^9.9.2",
@@ -170,7 +171,6 @@
     "express": "^5.2.1",
     "fastify": "^5.12.5",
     "fastify-type-provider-zod": "^7.0.0",
-    "http-proxy-middleware": "^4.2.0",
     "i18n": "0.15.3",
     "js-yaml": "^5.4.2",
     "jsonc-parser": "^3.3.1",
@@ -182,6 +182,7 @@
     "zod": "^4.4.3"
   },
   "peerDependencies": {
+    "http-proxy-middleware": "^4.2.0",
     "mongodb": "^7.2.0",
     "mongoose": "^9.7.4",
     "pg": "^8.22.0",
@@ -189,10 +190,13 @@
     "sqlite3": "^6.0.1"
   },
   "peerDependenciesMeta": {
-    "mongoose": {
+    "http-proxy-middleware": {
       "optional": true
     },
     "mongodb": {
+      "optional": true
+    },
+    "mongoose": {
       "optional": true
     },
     "pg": {
@@ -364,6 +368,11 @@
       "import": "./build-src-esm/logs/console/types.js",
       "require": "./build-src-cjs/logs/console/types.js"
     },
+    "./logs/fastify": {
+      "types": "./build-src-esm/logs/fastify.d.ts",
+      "import": "./build-src-esm/logs/fastify.js",
+      "require": "./build-src-cjs/logs/fastify.js"
+    },
     "./logs/pino": {
       "types": "./build-src-esm/logs/pino.d.ts",
       "import": "./build-src-esm/logs/pino.js",
@@ -388,6 +397,11 @@
       "types": "./build-src-esm/logs/pino/types.d.ts",
       "import": "./build-src-esm/logs/pino/types.js",
       "require": "./build-src-cjs/logs/pino/types.js"
+    },
+    "./logs/token": {
+      "types": "./build-src-esm/logs/token.d.ts",
+      "import": "./build-src-esm/logs/token.js",
+      "require": "./build-src-cjs/logs/token.js"
     },
     "./logs/types": {
       "types": "./build-src-esm/logs/types.d.ts",

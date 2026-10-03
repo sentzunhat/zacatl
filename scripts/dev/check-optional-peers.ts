@@ -6,8 +6,9 @@
  * process — so one entry cannot mask another's missing setup, such as a
  * polyfill an earlier import installed — while the packages listed as optional
  * in `peerDependenciesMeta` are unresolvable, the way they are in a consumer
- * app that never installed them. Only `./third-party/databases/<peer>` may
- * fail, and only because its own peer is missing.
+ * app that never installed them. Only `./third-party/databases/<peer>` and
+ * `./third-party/<peer>` (e.g. `http-proxy-middleware`) may fail, and only
+ * because their own peer is missing.
  *
  * Checks the prepared package in `publish/` (run after `npm run prepare-publish`),
  * which is the layout that ships to npm; pass another directory as the first
@@ -83,7 +84,7 @@ const main = async (): Promise<number> => {
   const checks: Check[] = [];
   for (const [subpath, target] of Object.entries(pkg.exports)) {
     if (typeof target === 'string') continue;
-    const peer = /^\.\/third-party\/databases\/(.+)$/.exec(subpath)?.[1];
+    const peer = /^\.\/third-party\/(?:databases\/)?(.+)$/.exec(subpath)?.[1];
     const ownPeer = peer != null && optionalPeers.includes(peer) ? peer : undefined;
     if (target.import != null)
       checks.push({ subpath, format: 'esm', file: target.import, ownPeer });

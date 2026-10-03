@@ -1,7 +1,8 @@
 import { InternalServerError } from '@zacatl/error';
 import { configureI18nNode } from '@zacatl/localization';
+import { logger as defaultLogger, LoggerToken } from '@zacatl/logs';
 
-import { createChildContainer } from '../dependency-injection/container';
+import { createChildContainer, registerValue } from '../dependency-injection/container';
 import { registerMongooseIndexOptions } from './layers/infrastructure/orm/mongoose/index-policy';
 import { Layers } from './layers/layers';
 import { Platforms } from './platforms/platforms';
@@ -53,13 +54,20 @@ export class Service {
       }
     }
 
+    // One container per Service, shared by its layers and platforms. The logger
+    // is registered here once (like the database instances above), so
+    // repositories, domain services, handlers and the Express adapter all use
+    // ServiceConfig.logger (default: the Zacatl logger). Fastify keeps its own
+    // request logger (`loggerInstance`), which apps point at the same adapter.
+    const serviceContainer = createChildContainer();
+    registerValue(LoggerToken, config.logger ?? defaultLogger, serviceContainer);
+
     if (layers != null) {
-      const serviceContainer = createChildContainer();
       this.layers = new Layers(layers, serviceContainer);
     }
 
     if (platforms != null) {
-      this.platforms = new Platforms(platforms);
+      this.platforms = new Platforms(platforms, serviceContainer);
     }
 
     if (run?.auto === true) {

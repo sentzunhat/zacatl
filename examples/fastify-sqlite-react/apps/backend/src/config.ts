@@ -4,6 +4,7 @@
  */
 
 import type { FastifyInstance } from '@sentzunhat/zacatl/third-party/fastify';
+import type { Logger } from '@sentzunhat/zacatl/logs';
 import type { Sequelize } from '@sentzunhat/zacatl/third-party/databases/sequelize';
 import { fileURLToPath } from 'url';
 import { existsSync } from 'node:fs';
@@ -52,9 +53,10 @@ export const config: AppConfig = {
 
 export const API_PREFIX = '/api';
 
-export const createServiceConfig = (fastify: FastifyInstance, sequelize: Sequelize) => {
+export const createServiceConfig = (fastify: FastifyInstance, sequelize: Sequelize, logger: Logger) => {
   return {
     type: ServiceType.SERVER,
+    logger,
     localization: {
       locales: {
         default: 'en',

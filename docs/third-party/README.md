@@ -66,7 +66,7 @@ src/third-party/
 ├── eslint.ts                 # ESLint plugins re-export (subpath only)
 ├── express.ts                # Express re-export (subpath only)
 ├── fastify.ts                # Fastify + ZodTypeProvider
-├── http-proxy-middleware.ts  # HTTP proxy re-export (subpath only)
+├── http-proxy-middleware.ts  # HTTP proxy re-export (subpath only; optional peer)
 ├── i18n.ts                   # i18n re-export (subpath only)
 ├── js-yaml.ts                # YAML parser re-export (subpath only)
 ├── pino.ts                   # Pino logger re-export (subpath only)
@@ -87,7 +87,7 @@ Zacatl uses these third-party versions:
 - **express**: ^5.2.1
 - **fastify**: ^5.7.4
 - **pino**: ^10.3.0
-- All other utilities (uuid, i18n, js-yaml, http-proxy-middleware, reflect-metadata)
+- All other utilities (uuid, i18n, js-yaml, reflect-metadata)
 
 ### Optional Peer Dependencies (install based on adapter usage)
 
@@ -96,6 +96,7 @@ Zacatl uses these third-party versions:
 - **sequelize**: ^6.37.8 (SQL adapter)
 - **sqlite3**: ^6.0.1 (SQLite ecosystem support)
 - **pg**: ^8.22.0 (PostgreSQL ecosystem support)
+- **http-proxy-middleware**: ^4.2.0 (Express gateway proxies only; loaded when a proxy is configured)
 
 ### Additional Drivers (not provided by Zacatl)
 
@@ -136,7 +137,7 @@ npm install sqlite3           # SQLite
 ## Dependency policy
 
 - Core web/runtime dependencies are installed transitively with Zacatl.
-- ORM/database ecosystems are declared as optional peers (`mongoose`, `sequelize`, `sqlite3`, `pg`, `mongodb`); install only what your project uses.
+- ORM/database ecosystems and the Express proxy library are declared as optional peers (`mongoose`, `sequelize`, `sqlite3`, `pg`, `mongodb`, `http-proxy-middleware`); install only what your project uses.
 - SQL dialect extras (for example `mysql2`, `pg-hstore`) are not provided by Zacatl and must be installed by consumers when needed.
 
 Use `npm run check:peers` to validate your environment before publishing or releasing.
