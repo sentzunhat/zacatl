@@ -22,6 +22,9 @@ vi.mock('sequelize', () => {
 vi.mock('mongoose', () => {
   throw new Error('mongoose must not be imported by the node:sqlite path');
 });
+vi.mock('http-proxy-middleware', () => {
+  throw new Error('http-proxy-middleware must only load when an Express proxy is configured');
+});
 
 describe('node:sqlite BaseRepository without optional database peers', () => {
   it('imports and round-trips a record without sqlite3, sequelize or mongoose', async () => {
@@ -52,12 +55,13 @@ describe('node:sqlite BaseRepository without optional database peers', () => {
 });
 
 describe('third-party barrel without optional database peers', () => {
-  it('loads without sqlite3, sequelize or mongoose', async () => {
+  it('loads without sqlite3, sequelize, mongoose or http-proxy-middleware', async () => {
     const barrel = await import('../../../../../../../src/third-party');
 
     expect(barrel.z).toBeDefined();
     expect(barrel.uuidv4).toBeTypeOf('function');
     expect('sqlite3' in barrel).toBe(false);
+    expect('createProxyMiddleware' in barrel).toBe(false);
   });
 });
 

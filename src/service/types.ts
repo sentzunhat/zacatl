@@ -1,3 +1,5 @@
+import type { Logger } from '@zacatl/logs';
+
 import type { LayersConfig } from './layers/types';
 import type { PlatformsConfig } from './platforms/types';
 
@@ -55,6 +57,11 @@ export interface LocalizationConfig {
  * - `platforms` — platform-specific configuration (see `PlatformsConfig`).
  * - `localization` — localization settings.
  * - `run.auto` — whether the service should start automatically.
+ * - `logger` — logger for the service (defaults to Zacatl's pino `logger`).
+ *   Registered under `LoggerToken` in the Service's container, shared by its
+ *   layers (`@inject(LoggerToken)`) and the Express adapter. Give Fastify the
+ *   adapter it was built from, `Fastify({ loggerInstance: toFastifyLogger(adapter) })`,
+ *   so request logs and handler errors go through the same destination.
  */
 export interface ServiceConfig {
   type?: ServiceType;
@@ -66,4 +73,6 @@ export interface ServiceConfig {
   localization?: LocalizationConfig;
 
   run?: { auto?: boolean };
+
+  logger?: Logger;
 }

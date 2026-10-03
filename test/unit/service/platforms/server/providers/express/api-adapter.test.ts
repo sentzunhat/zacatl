@@ -158,6 +158,22 @@ describe('ExpressApiAdapter', () => {
       expect(mockServer.use).not.toHaveBeenCalled();
     });
 
+    it('logs adapter warnings through the logger it was given', () => {
+      const logger = {
+        log: vi.fn(),
+        info: vi.fn(),
+        trace: vi.fn(),
+        warn: vi.fn(),
+        error: vi.fn(),
+        fatal: vi.fn(),
+      };
+      const withLogger = createApiAdapter(mockServer as never, '', logger);
+
+      withLogger.registerHook({ name: 'onSend', execute: vi.fn() } as unknown as HookHandler);
+
+      expect(logger.warn).toHaveBeenCalledWith(expect.stringContaining("Hook 'onSend'"));
+    });
+
     it('forwards hook execution errors to next()', async () => {
       const handler: HookHandler = {
         name: 'preHandler',
@@ -240,6 +256,71 @@ describe('ExpressApiAdapter', () => {
       expect(res.end).toHaveBeenCalled();
     });
 
+    it('gives handlers a request-scoped req.log / reply.log through the Service logger', async () => {
+      const logger = {
+        log: vi.fn(),
+        info: vi.fn(),
+        trace: vi.fn(),
+        warn: vi.fn(),
+        error: vi.fn(),
+        fatal: vi.fn(),
+      };
+      const withLogger = createApiAdapter(mockServer as never, '', logger);
+      const handler: RouteHandler = {
+        method: 'GET',
+        url: '/logs',
+        execute: vi.fn(
+          async (
+            req: { log: { info: (obj: object, msg: string) => void } },
+            reply: { log: { warn: (msg: string) => void } },
+          ) => {
+            req.log.info({ userId: 7 }, 'handler ran');
+            reply.log.warn('reply side');
+          },
+        ),
+      } as unknown as RouteHandler;
+      withLogger.registerRoute(handler);
+
+      const routeFn = mockServer.get.mock.calls[0]?.[1] as (
+        req: unknown,
+        res: unknown,
+        next: (err?: unknown) => void,
+      ) => Promise<void>;
+      const res = { headersSent: false, status: vi.fn().mockReturnThis(), end: vi.fn(), json: vi.fn(), setHeader: vi.fn() };
+      // A client-supplied request id must not become the log reqId.
+      // eslint-disable-next-line @typescript-eslint/naming-convention -- real HTTP header name
+      await routeFn({ headers: { 'x-request-id': 'spoofed' } }, res, vi.fn());
+
+      expect(logger.info).toHaveBeenCalledWith('handler ran', {
+        data: { reqId: expect.any(String), userId: 7 },
+      });
+      const reqId = (logger.info.mock.calls[0]?.[1] as { data: { reqId: string } }).data.reqId;
+      expect(reqId).not.toBe('spoofed');
+      expect(logger.warn).toHaveBeenCalledWith('reply side', { data: { reqId } });
+    });
+
+    it('keeps a req.log that another middleware already attached', async () => {
+      const handler: RouteHandler = {
+        method: 'GET',
+        url: '/existing-log',
+        execute: vi.fn(async (req: { log: { info: (msg: string) => void } }) => {
+          req.log.info('from existing logger');
+        }),
+      } as unknown as RouteHandler;
+      adapter.registerRoute(handler);
+
+      const routeFn = mockServer.get.mock.calls[0]?.[1] as (
+        req: unknown,
+        res: unknown,
+        next: (err?: unknown) => void,
+      ) => Promise<void>;
+      const existing = { info: vi.fn(), child: vi.fn() };
+      const res = { headersSent: false, status: vi.fn().mockReturnThis(), end: vi.fn(), json: vi.fn(), setHeader: vi.fn() };
+      await routeFn({ log: existing }, res, vi.fn());
+
+      expect(existing.info).toHaveBeenCalledWith('from existing logger');
+    });
+
     it('reply adapter maps code/send/header onto the Express response', async () => {
       const handler: RouteHandler = {
         method: 'GET',
@@ -317,21 +398,61 @@ describe('ExpressApiAdapter', () => {
   });
 
   describe('registerProxy', () => {
-    it('should apply proxy middleware', () => {
-      const config = {
-        upstream: 'http://upstream',
-        prefix: '/api',
-        rewritePrefix: '/remote',
+    const registeredProxyMiddleware = (): ((
+      req: unknown,
+      res: unknown,
+      next: (err?: unknown) => void,
+    ) => void) => {
+      const call = mockServer.use.mock.calls.at(-1);
+      expect(call?.[0]).toBe('/api');
+      return call?.[1] as (req: unknown, res: unknown, next: (err?: unknown) => void) => void;
+    };
+
+    it('loads http-proxy-middleware lazily and forwards requests to it', async () => {
+      const proxy = vi.fn();
+      vi.mocked(createProxyMiddleware).mockReturnValueOnce(proxy as never);
+
+      adapter.registerProxy({ upstream: 'http://upstream', prefix: '/api', rewritePrefix: '/remote' });
+
+      await vi.waitFor(() =>
+        expect(createProxyMiddleware).toHaveBeenCalledWith({
+          target: 'http://upstream',
+          changeOrigin: true,
+          pathRewrite: expect.any(Object),
+        }),
+      );
+      const req = {};
+      const res = {};
+      const next = vi.fn();
+      registeredProxyMiddleware()(req, res, next);
+
+      await vi.waitFor(() => expect(proxy).toHaveBeenCalledWith(req, res, next));
+    });
+
+    it('logs once and passes the error on when the optional peer cannot load', async () => {
+      const logger = {
+        log: vi.fn(),
+        info: vi.fn(),
+        trace: vi.fn(),
+        warn: vi.fn(),
+        error: vi.fn(),
+        fatal: vi.fn(),
       };
-
-      adapter.registerProxy(config);
-
-      expect(createProxyMiddleware).toHaveBeenCalledWith({
-        target: 'http://upstream',
-        changeOrigin: true,
-        pathRewrite: expect.any(Object),
+      vi.mocked(createProxyMiddleware).mockImplementationOnce(() => {
+        throw new Error("Cannot find package 'http-proxy-middleware'");
       });
-      expect(mockServer.use).toHaveBeenCalledWith('/api', 'proxy-middleware');
+      const withLogger = createApiAdapter(mockServer as never, '', logger);
+
+      withLogger.registerProxy({ upstream: 'http://upstream', prefix: '/api' });
+
+      await vi.waitFor(() => expect(logger.error).toHaveBeenCalledTimes(1));
+      expect(logger.error).toHaveBeenCalledWith(
+        expect.stringContaining("optional peer 'http-proxy-middleware'"),
+        expect.anything(),
+      );
+      const next = vi.fn();
+      registeredProxyMiddleware()({}, {}, next);
+      await vi.waitFor(() => expect(next).toHaveBeenCalledWith(expect.any(Error)));
     });
   });
 });

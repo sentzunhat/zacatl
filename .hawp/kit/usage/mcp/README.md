@@ -29,7 +29,7 @@ native-binary/config migration is implemented; existing legacy files may remain
 for compatibility and are intentionally not removed. The core
 source launcher is retired; releases supply the native binary separately from
 the kit/provider bundle. Use a binary built for the host;
-the checked-in maintainer binary is not a universal executable.
+the repo-local maintainer binary is built from source and is not a universal executable.
 
 The examples use `--repo-root`, added on the v0.0.24 branch. Verify that the
 installed binary supports it; do not assume an older published binary does.

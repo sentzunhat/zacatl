@@ -3,6 +3,12 @@
 Rows compacted out of `BACKLOG.md` → Recently Closed. Newest first.
 Plan files (when they exist) live under `.hawp/work/closed/YYYY/MM/DD/`.
 
+## Archived 2026-10-01
+
+| ID | Type | Title | Closed | Plan |
+| --- | --- | --- | --- | --- |
+| `0.0.58`                        | `release`     | Dry-run release preparation and publish-folder verification                                                                                    | 2026-07-21 | [closed/2026/07/21/release-0.0.58-dry-run-prep.md](2026/07/21/release-0.0.58-dry-run-prep.md)                               |
+
 ## Archived 2026-09-29
 
 | ID | Type | Title | Closed | Plan |

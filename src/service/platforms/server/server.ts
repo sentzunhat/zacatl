@@ -2,6 +2,8 @@ import type { Express } from 'express';
 import type { FastifyInstance } from 'fastify';
 
 import { CustomError, InternalServerError } from '@zacatl/error';
+import { logger as defaultLogger, LoggerToken, type Logger } from '@zacatl/logs';
+import type { DependencyContainer } from '@zacatl/third-party/dependency-injection/tsyringe';
 
 import { ApiServer } from './api/api-server';
 import type { ApiServerPort } from './api/port';
@@ -43,8 +45,16 @@ export class Server {
   private pageServer?: PageServer;
   private databaseServer?: DatabaseServer;
 
-  constructor(config: ServerConfig) {
+  private readonly logger: Logger;
+
+  constructor(config: ServerConfig, container?: DependencyContainer) {
     this.config = config;
+    // The Service registers its logger in the container it shares with the
+    // layers; standalone servers fall back to the Zacatl logger.
+    this.logger =
+      container?.isRegistered(LoggerToken, true) === true
+        ? container.resolve(LoggerToken)
+        : defaultLogger;
 
     // Create shared adapters based on vendor (Fastify or Express)
     const adapters = this.createAdapters(config.server);
@@ -73,7 +83,7 @@ export class Server {
     } else if (config.vendor === ServerVendor.EXPRESS) {
       const instance = config.instance as Express;
       return {
-        api: createExpressApiAdapter(instance, prefixes),
+        api: createExpressApiAdapter(instance, prefixes, this.logger),
         page: createExpressPageAdapter(instance),
       };
     } else {

@@ -15,6 +15,7 @@ import {
   ServerVendor,
 } from '@sentzunhat/zacatl/service/platforms/server/types/server-config';
 import type { FastifyInstance } from '@sentzunhat/zacatl/third-party/fastify';
+import type { Logger } from '@sentzunhat/zacatl/logs';
 import type { Mongoose } from 'mongoose';
 import { repositories } from './infrastructure/greetings/repositories/repositories';
 import { GreetingServiceAdapter } from './domain/greetings/service/adapter';
@@ -89,7 +90,7 @@ const shouldCreateIndexesOnBoot =
   process.env.APP_ENV === 'development' ||
   process.env.NODE_ENV === 'test';
 
-export const createServiceConfig = (fastify: FastifyInstance, mongoose: Mongoose) => {
+export const createServiceConfig = (fastify: FastifyInstance, mongoose: Mongoose, logger: Logger) => {
   const routes = [
     GetAllGreetingsHandler,
     GetGreetingByIdHandler,
@@ -102,6 +103,7 @@ export const createServiceConfig = (fastify: FastifyInstance, mongoose: Mongoose
 
   return {
     type: ServiceType.SERVER,
+    logger,
     localization: {
       builtInLocalesDir,
     },

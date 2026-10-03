@@ -10,6 +10,7 @@ import {
   serializerCompiler,
   validatorCompiler,
 } from '@sentzunhat/zacatl/third-party/fastify';
+import { createLogger, PinoLoggerAdapter, toFastifyLogger } from '@sentzunhat/zacatl/logs';
 import { Sequelize, type SequelizeOptions } from '@sentzunhat/zacatl/third-party/databases/sequelize';
 import { Service } from '@sentzunhat/zacatl/service';
 import { API_PREFIX, config, createServiceConfig } from './config';
@@ -73,7 +74,10 @@ const main = async () => {
 
   try {
     // Initialize Fastify
-    const fastify = Fastify({ logger: false });
+    // One pino adapter for the app, Zacatl, and Fastify's request.log / reply.log
+    const loggerAdapter = new PinoLoggerAdapter();
+    const logger = createLogger(loggerAdapter);
+    const fastify = Fastify({ loggerInstance: toFastifyLogger(loggerAdapter) });
 
     // Set up Zod validation for Fastify
     fastify.setValidatorCompiler(validatorCompiler);
@@ -83,8 +87,12 @@ const main = async () => {
     fastify.setErrorHandler(async (error: FastifyError, request, reply) => {
       const statusCode = error.statusCode || 500;
 
-      // Log error for debugging
-      console.error(`[${request.method}] ${request.url}:`, error.message);
+      // Log through the shared logger (includes the request id)
+      if (statusCode >= 500) {
+        request.log.error({ err: error }, 'Request failed');
+      } else {
+        request.log.info({ err: error }, 'Request rejected');
+      }
 
       if (error.code === 'FST_ERR_VALIDATION') {
         await reply.status(400).send({
@@ -116,7 +124,7 @@ const main = async () => {
     initGreetingModel(sequelize);
 
     // Create and start service
-    const serviceConfig = createServiceConfig(fastify, sequelize);
+    const serviceConfig = createServiceConfig(fastify, sequelize, logger);
     const service = new Service(serviceConfig);
     activeService = service;
 
