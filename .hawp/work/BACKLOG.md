@@ -31,8 +31,7 @@ Items `e1f4b2a0`, `a3d81c6e`, `b7c92f1d`, `c4e05a92` descend from AUDIT-004 (202
 
 | ID                | Type        | Title                                                                                                                                                                                                                                                                          | Status      | Plan                                                        |
 | ----------------- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------- | ----------------------------------------------------------- |
-| `DEPS-063` | maintenance | P2: Minor/patch dependency updates (root + example lockfiles), majors excluded — target 0.0.64, PR #119 → `dev` | in-progress | `.hawp/work/active/DEPS-063-minor-patch-dependency-updates.md` |
-| `EXPRESS-400` | bug | P2: Express request validation errors return 500 instead of 400 (ZodError has no statusCode) — separate PR after #119 | inbox | `.hawp/work/active/EXPRESS-400-validation-status.md` |
+| `EXPRESS-400` | bug | P2: Express request validation errors return 500 instead of 400 (ZodError has no statusCode) — separate PR | inbox | `.hawp/work/active/EXPRESS-400-validation-status.md` |
 | `83cef132` | tooling | P3: Update the `.hawp` folder to HAWP 0.0.24 (kit, rules, provider pointers) — after 0.0.64 | inbox | `.hawp/work/active/83cef132-c1df-402c-9504-a0df1cdf7567/plan.md` |
 | `ac0c4acf` | improvement | P3: Work items on UUID IDs and folder-per-item layout (plans, evidence, status) — after `83cef132` | inbox | `.hawp/work/active/ac0c4acf-c90a-4a32-a66a-b058577368f6/plan.md` |
 | `b4f0c8a1`        | docs        | P2: README overhaul + CI badge polish — quick iterations, batched until v0.1.0 cutover, no release needed per-iteration                                                                                                                                                        | in-progress | `.hawp/work/active/b4f0c8a1-readme-and-ci-badge-polish.md`  |
@@ -51,10 +50,11 @@ Items `e1f4b2a0`, `a3d81c6e`, `b7c92f1d`, `c4e05a92` descend from AUDIT-004 (202
 Keep this section short (last 5–10 items or last 14–30 days). Compacted 2026-07-27 — 25 older rows
 moved to [closed/BACKLOG-ARCHIVE.md](closed/BACKLOG-ARCHIVE.md#archived-2026-07-27); 2 more on
 2026-09-29 ([archive](closed/BACKLOG-ARCHIVE.md#archived-2026-09-29)), 1 on 2026-10-01, 1 on
-2026-10-03.
+2026-10-03, 1 on 2026-10-04.
 
 | ID                              | Type          | Title                                                                                                                                          | Closed     | Plan                                                                                                                               |
 | ------------------------------- | ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- | ---------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| `DEPS-063` | `maintenance` | In-major dependency updates and example lockfile audit fixes (all nine examples at 0 advisories) — released in 0.0.64 | 2026-10-04 | [evidence/2026/10/04/bacf99c4…/evidence.md](evidence/2026/10/04/bacf99c4-236e-4bd1-ae54-8d96713b383a/evidence.md) |
 | `LOG-001` | `feature` | Shared logger for the Service, Fastify and Express (`toFastifyLogger`, `ServiceConfig.logger`, `LoggerToken`) — released in 0.0.63 | 2026-10-03 | [evidence/2026/10/03/78dba5ff…/evidence.md](evidence/2026/10/03/78dba5ff-0cd1-442e-86e3-f7faf701a4b5/evidence.md) |
 | `RUNTIME-FIX-001` | `bug` | node:sqlite without `sqlite3`, barrel polyfill fix, Fastify double-send fix, production audit fixes — released in 0.0.62 | 2026-10-01 | [evidence/2026/10/01/release-0.0.62-evidence.md](evidence/2026/10/01/release-0.0.62-evidence.md) |
 | `0.0.61` | `release` | 0.0.61 — README badge corrections released (tag, GitHub Release, npm) | 2026-08-16 | [evidence/2026/09/29/backlog-sync-release-evidence.md](evidence/2026/09/29/backlog-sync-release-evidence.md) |
@@ -64,7 +64,6 @@ moved to [closed/BACKLOG-ARCHIVE.md](closed/BACKLOG-ARCHIVE.md#archived-2026-07-
 | `871e98ef`                      | `release`     | P2: v0.0.59 — 4 Dependabot PRs merged, 2 closed superseded, 2 closed blocked on ESLint 10, 9 CVE alerts fixed across examples, released to npm | 2026-07-27 | [closed/2026/07/27/871e98ef-v0.0.59-dependency-bumps.md](closed/2026/07/27/871e98ef-v0.0.59-dependency-bumps.md)                   |
 | `refactor-collapse-duplication` | `refactoring` | P2: Collapse BaseRepository/handler duplication, normalize Sequelize adapter errors — 75 net lines removed, 0 API breaks                       | 2026-07-26 | [closed/2026/07/26/refactor-duplication-collapse.md](closed/2026/07/26/refactor-duplication-collapse.md)                           |
 | `75df2542`                      | `tooling`     | P1: CI release workflow — orchestrator redesign, no duplicate runs, all checks gate release to npm                                             | 2026-07-25 | [closed/2026/07/25/75df2542-ci-workflow-redesign.md](closed/2026/07/25/75df2542-ci-workflow-redesign.md)                           |
-| `754afa86`                      | `security`    | P1: npm token rotation + CI setup — owner added NPM_TOKEN secret, workflow unblocked                                                           | 2026-07-25 | [closed/2026/07/25/754afa86-91f4-4a46-8094-756eab1f3f68.md](closed/2026/07/25/754afa86-91f4-4a46-8094-756eab1f3f68.md)                                                                                   |
 
 Older closed rows: [closed/BACKLOG-ARCHIVE.md](closed/BACKLOG-ARCHIVE.md).
 

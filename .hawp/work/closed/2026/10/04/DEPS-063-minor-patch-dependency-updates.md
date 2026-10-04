@@ -1,7 +1,7 @@
 # DEPS-063 — Minor/patch dependency updates and example lockfile refresh
 
 **UUID:** `DEPS-063` · **Type:** maintenance/security · **Priority:** P2 · **Reported:** 2026-10-01
-**Status:** in-progress · **Branch:** `fix/dependency-updates` (PR #119 → `dev`) · **Target:** 0.0.64
+**Status:** done · **Branch:** `fix/dependency-updates` (PR #119 → `dev`) · **Released:** 0.0.64 (2026-10-04)
 
 ## Goal
 
@@ -42,3 +42,4 @@ Publish dry-run + Docker smoke jobs on the PR.
 - 2026-10-01: Example lockfiles: in-range `npm audit fix` in all eight framework examples -> 0 advisories each (node-sqlite-store already clean); every example backend builds from `npm ci`.
 - 2026-10-03: New high advisory `braces` ≤ 3.0.3 (GHSA-vfj7-8cjw-p6xm, no fixed release) reached production via `http-proxy-middleware` → `micromatch`. Owner decision: make `http-proxy-middleware` an optional peer (lazy-loaded by the Express adapter only when a gateway proxy is configured; removed from the `third-party` barrel). `npm audit --omit=dev`: 0. pino 10.4.0 / @types/node 26.6.4 (published 2026-10-02) deliberately not adopted yet.
 - 2026-10-03: 0.0.63 released without these updates (#121). Branch rebased onto `dev` (= `main`, `8e832b7c`); retargeted to the next patch: `package.json` 0.0.64, changelog `[Unreleased]` → `[0.0.64]`. `npm outdated` lists only the excluded majors plus `pino` 10.4.0, `mongoose` 9.10.4 and `@types/node` 26.6.4 (published 2026-10-01 → 2026-10-03; no security fix; left for the next round). `npm audit --omit=dev`: 0; full audit: 7 high, all the dev-only `braces` chain (via `tsc-alias` and the `http-proxy-middleware` devDependency), no fixed release.
+- 2026-10-04: Merged to `dev` (#119) and released in 0.0.64 via #124 (npm with provenance, tag `v0.0.64`, GitHub Release). Closed. Evidence: `.hawp/work/evidence/2026/10/04/bacf99c4-236e-4bd1-ae54-8d96713b383a/evidence.md`. Superseded Dependabot PRs: closing awaits owner approval.

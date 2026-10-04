@@ -3,6 +3,12 @@
 Rows compacted out of `BACKLOG.md` → Recently Closed. Newest first.
 Plan files (when they exist) live under `.hawp/work/closed/YYYY/MM/DD/`.
 
+## Archived 2026-10-04
+
+| ID | Type | Title | Closed | Plan |
+| --- | --- | --- | --- | --- |
+| `754afa86`                      | `security`    | P1: npm token rotation + CI setup — owner added NPM_TOKEN secret, workflow unblocked                                                           | 2026-07-25 | [closed/2026/07/25/754afa86-91f4-4a46-8094-756eab1f3f68.md](2026/07/25/754afa86-91f4-4a46-8094-756eab1f3f68.md)                                                                                   |
+
 ## Archived 2026-10-03
 
 | ID | Type | Title | Closed | Plan |
