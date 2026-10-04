@@ -1,7 +1,9 @@
 import { InternalServerError } from '@zacatl/error';
+import { inject, injectable } from '@zacatl/third-party/dependency-injection/tsyringe';
 
 import type { CliConfig } from './types';
 import type { CliApplicationEntryPoints } from '../../layers/application/types';
+import { CliConfigToken } from '../tokens';
 
 /**
  * CLI platform stub for ServiceType.CLI execution.
@@ -12,11 +14,12 @@ import type { CliApplicationEntryPoints } from '../../layers/application/types';
  * @example
  * const cli = new CLI({ name: "my-cli", version: "0.1.0" });
  */
+@injectable()
 export class CLI {
   private readonly name: string;
   private readonly version: string;
 
-  constructor(config: CliConfig) {
+  constructor(@inject(CliConfigToken) config: CliConfig) {
     this.name = config.name;
     this.version = config.version;
   }

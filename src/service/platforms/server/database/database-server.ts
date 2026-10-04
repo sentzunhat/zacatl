@@ -1,21 +1,32 @@
 import { CustomError } from '@zacatl/error';
+import { inject, injectable } from '@zacatl/third-party/dependency-injection/tsyringe';
+import type { DependencyContainer } from '@zacatl/third-party/dependency-injection/tsyringe';
 
 import { createDatabaseAdapter } from './adapters/factory';
 import type { DatabaseConfig, DatabaseServerPort } from './port';
+import { getContainer } from '../../../../dependency-injection/container';
+import { DatabaseConfigsToken, DatabaseContainerToken, DatabaseServiceNameToken } from '../tokens';
 
 /**
  * DatabaseServer - Encapsulates database connection logic
  * Handles multiple database connections and configuration
  * Supports: Mongoose (MongoDB), Sequelize (SQL databases)
  */
+@injectable()
 export class DatabaseServer {
   private readonly serviceName: string;
   private readonly databases: DatabaseConfig[];
+  private readonly container: DependencyContainer;
   private readonly adapters: Map<string, DatabaseServerPort> = new Map();
 
-  constructor(serviceName: string, databases: DatabaseConfig[]) {
+  constructor(
+    @inject(DatabaseServiceNameToken) serviceName: string,
+    @inject(DatabaseConfigsToken) databases: DatabaseConfig[],
+    @inject(DatabaseContainerToken) container?: DependencyContainer,
+  ) {
     this.serviceName = serviceName;
     this.databases = databases;
+    this.container = container ?? getContainer();
   }
 
   /**
@@ -37,7 +48,7 @@ export class DatabaseServer {
 
       try {
         const adapter = createDatabaseAdapter(database.vendor);
-        await adapter.connect(this.serviceName, database);
+        await adapter.connect(this.serviceName, database, this.container);
 
         // Store adapter keyed by connection name (or vendor for single-database setups).
         // This allows multiple same-vendor databases to be tracked independently.

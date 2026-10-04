@@ -1,6 +1,12 @@
 # Architecture & Module Organization
 
-This guide covers folder structure, layering patterns, module boundaries, and dependency management for a scalable TypeScript project.
+This guide covers folder structure, layering patterns, module boundaries, and dependency management for a scalable TypeScript project. For Zacatl's current module ownership and implementation status, use the [Service architecture map](../service/architecture.md).
+
+The agreed ownership is `Service` for lifecycle coordination, `Layers →
+Infrastructure` for database connections, ORM adapters and repositories, and
+`Platforms → Server` for HTTP, API routes and pages. The source tree below is
+the current transitional layout: connection setup still sits under Server and
+its relocation is a separate work item.
 
 ## Table of Contents
 
@@ -129,11 +135,14 @@ src/
 
 ## Layered Architecture
 
-Zacatl uses **Hexagonal (Ports & Adapters) Architecture** with four main layers:
+Zacatl's `Service` manages two sibling modules: `Layers` and `Platforms`.
+`Layers` contains the three hexagonal layers below. `Platforms` hosts runtimes
+beside that stack; it is not a fourth hexagonal layer. Each module may own local
+ports and adapters.
 
 ### 1. Application Layer
 
-**Purpose:** User-facing use cases, HTTP handlers, CLI commands
+**Purpose:** Entry points and user-facing use cases; REST handlers are implemented, while CLI commands are planned
 
 **Contains:**
 
@@ -249,7 +258,7 @@ export class PinoLoggerAdapter implements LoggerPort {
 }
 ```
 
-### 4. Platforms Layer
+### Platforms module (sibling of Layers)
 
 **Purpose:** Runtime initialization, HTTP server setup, DI wiring
 
@@ -295,17 +304,16 @@ const service = new Service({
 ### Layer Dependency Rules
 
 ```
-Application → (depends on) → Domain
-      ↓
-Infrastructure → (depends on) → Domain
-      ↓
-Platforms → (orchestrates all layers)
+Service → (coordinates) → Layers + Platforms
+Application → (uses) → Domain contracts
+Infrastructure → (implements) → Domain ports
+Platforms → (hosts) → HTTP and database runtime adapters
 ```
 
 **Golden Rule:**
 
-- ✅ Application can use Domain
-- ✅ Infrastructure can use Domain
+- ✅ Application can use Domain contracts
+- ✅ Infrastructure can implement Domain ports
 - ❌ Domain should NOT depend on Application or Infrastructure
 - ❌ Circle dependencies are forbidden
 
@@ -629,7 +637,7 @@ export interface ApiServerPort {
   registerRoute(handler: RouteHandler): void;
   registerHook(handler: HookHandler): void;
   registerProxy(config: ProxyConfig): void;
-  listen(port: number): Promise<void>;
+  listen(host: string, port: number): Promise<void>;
   getRawServer(): unknown;
 }
 
@@ -642,7 +650,7 @@ export const createApiAdapter = (
   registerRoute: (handler) => { /* fastify-specific wiring */ },
   registerHook: (handler) => { /* ... */ },
   registerProxy: (config) => { /* ... */ },
-  listen: async (port) => { /* ... */ },
+  listen: async (host, port) => { /* listen on host and port */ },
   getRawServer: () => server,
 });
 
@@ -657,7 +665,7 @@ export const createApiAdapter = (
   registerRoute: (handler) => { /* express-specific wiring */ },
   registerHook: (handler) => { /* ... */ },
   registerProxy: (config) => { /* ... */ },
-  listen: async (port) => { /* ... */ },
+  listen: async (host, port) => { /* listen on host and port */ },
   getRawServer: () => server,
 });
 ```

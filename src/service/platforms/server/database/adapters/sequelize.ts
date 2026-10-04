@@ -1,6 +1,8 @@
 import type { Sequelize } from 'sequelize';
 
 import { CustomError } from '@zacatl/error';
+import type { DependencyContainer } from '@zacatl/third-party/dependency-injection/tsyringe';
+
 
 import { registerOrmInstance } from '../orm-instance';
 import { DatabaseVendor, type DatabaseServerPort, type DatabaseConfig } from '../port';
@@ -8,7 +10,11 @@ import { DatabaseVendor, type DatabaseServerPort, type DatabaseConfig } from '..
 export class SequelizeAdapter implements DatabaseServerPort {
   private sequelizeInstance: Sequelize | null = null;
 
-  async connect(_serviceName: string, config: DatabaseConfig): Promise<void> {
+  async connect(
+    _serviceName: string,
+    config: DatabaseConfig,
+    container?: DependencyContainer,
+  ): Promise<void> {
     const { instance, connection, onDatabaseConnected } = config;
     const sequelize = instance as Sequelize;
 
@@ -27,7 +33,7 @@ export class SequelizeAdapter implements DatabaseServerPort {
     }
 
     this.sequelizeInstance = sequelize;
-    registerOrmInstance(DatabaseVendor.SEQUELIZE, connection, sequelize);
+    registerOrmInstance(DatabaseVendor.SEQUELIZE, connection, sequelize, container);
   }
 
   async disconnect(): Promise<void> {

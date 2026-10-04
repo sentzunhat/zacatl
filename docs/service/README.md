@@ -1,10 +1,19 @@
 # Server Platform API
 
-Complete API reference for the server platform, including HTTP servers, page servers, and database connections.
+API reference for the current server platform, including HTTP servers, page servers, and the transitional database connection configuration.
 
 ## Overview
 
-The server platform provides infrastructure for building web applications with REST APIs, static file hosting, and database connectivity. It uses the **Hexagonal Architecture** (Ports and Adapters pattern) to abstract HTTP server implementations (Fastify, Express) and database vendors (Mongoose, Sequelize, SQLite).
+The server platform hosts REST APIs and static pages. Database connection
+configuration and setup currently live under `platforms.server`, but the agreed
+ownership is `Layers → Infrastructure` for connections, ORM adapters and
+repositories. The physical move and any consumer migration belong to a separate
+work item. Service-managed ORM instances and Mongoose index policy are already
+scoped per Service; direct/manual adapter use keeps the global fallback.
+
+For the relationship between `Service`, the sibling `Layers` and `Platforms`
+modules, and their nested ports and adapters, see the
+[Service architecture map](./architecture.md).
 
 ## Platform Status in Current `src`
 
@@ -52,10 +61,10 @@ type ServerConfig = {
 
 - `name` - Unique name for the server instance
 - `server` - HTTP server configuration (Fastify or Express)
-- `databases` - Array of database connections (Mongoose, Sequelize)
+- `databases` - Transitional array of database connections (Mongoose, Sequelize or node:sqlite)
 - `page` - Optional page server configuration for SPAs and static files
-- `port` - Port number to listen on
 - `entryPoints` - REST application routes and hooks (usually defined in `layers.application` instead)
+- `port` - Port number to listen on; defaults to `9669` and can be overridden by `Service.start({ port })`
 
 ---
 
@@ -68,6 +77,7 @@ type HttpServerConfig = {
   type: ServerType; // "SERVER" | "GATEWAY"
   vendor: ServerVendor; // "FASTIFY" | "EXPRESS"
   instance: unknown; // FastifyInstance | Express
+  host?: string; // Bind address; defaults to 0.0.0.0 for container reachability
   gateway?: GatewayService; // Required if type is GATEWAY
   prefixes?: ApiPrefixes; // Named route prefixes (e.g. { api: "/api", webhooks: "/webhooks" })
 };
@@ -78,6 +88,7 @@ type HttpServerConfig = {
 - `type` - Server type: `SERVER` (standard REST API) or `GATEWAY` (reverse proxy)
 - `vendor` - HTTP framework: `FASTIFY` or `EXPRESS`
 - `instance` - The Fastify or Express instance (create before passing to config)
+- `host` - Optional bind address; `Service.start({ host })` overrides it. Defaults to `0.0.0.0` for Docker port publishing.
 - `prefixes` - Named route prefixes used by the server and SPA fallback guards
 - `gateway` - Gateway configuration with proxy routes (required when `type` is `GATEWAY`)
 
@@ -91,7 +102,7 @@ Configuration for serving frontend applications (React, Vue, Svelte, etc.) and s
 type PageServerConfig = {
   devServerUrl?: string;
   staticDir?: string;
-  customRegister?: (server: unknown) => Promise<void> | void;
+  customRegister?: (adapter: unknown, rawServer?: unknown) => Promise<void> | void;
   prefixes?: ApiPrefixes;
 };
 ```
@@ -100,7 +111,7 @@ type PageServerConfig = {
 
 - `devServerUrl` - Development server URL for proxying (e.g., Vite dev server at `http://localhost:5173`)
 - `staticDir` - Directory containing built static files (e.g., `./dist/client`)
-- `customRegister` - Custom registration function for advanced server configuration
+- `customRegister` - Custom registration callback. Its first argument is Zacatl's page adapter; the second is the underlying Fastify or Express instance.
 - `prefixes` - API route prefixes to exclude from SPA fallback (default: `{ api: "/api" }`)
 
 ---
@@ -226,7 +237,7 @@ interface ApiServerPort {
   registerRoute(handler: RouteHandler): void;
   registerHook(handler: HookHandler): void;
   registerProxy(config: ProxyConfig): void;
-  listen(port: number): Promise<void>;
+  listen(host: string, port: number): Promise<void>;
   getRawServer(): unknown;
 }
 ```
@@ -236,8 +247,13 @@ interface ApiServerPort {
 - `registerRoute()` - Register a REST route handler
 - `registerHook()` - Register middleware/hook (CORS, helmet, etc.)
 - `registerProxy()` - Register a reverse proxy route (gateway mode)
-- `listen()` - Start listening on specified port
+- `listen(host, port)` - Start listening on the supplied host and port
 - `getRawServer()` - Get the underlying Fastify or Express instance
+
+This is an intentional breaking adapter contract during pre-0.1.0 development:
+custom adapters must accept and use both host and port. The built-in Fastify and
+Express adapters do so; Zacatl's Service defaults to `0.0.0.0` for container
+reachability.
 
 ---
 
@@ -249,7 +265,8 @@ Port interface for frontend/page servers. Handles static files and SPA routing.
 interface PageServerPort {
   registerStaticFiles(config: StaticConfig): void;
   registerSpaFallback(prefixes: ApiPrefixes, staticDir: string): void;
-  register(server: unknown): Promise<void>;
+  register(): Promise<void>;
+  getRawServer?(): unknown;
 }
 ```
 
@@ -257,7 +274,8 @@ interface PageServerPort {
 
 - `registerStaticFiles()` - Serve static files from a directory
 - `registerSpaFallback()` - Enable SPA routing (fallback to index.html for non-API routes)
-- `register()` - Custom registration handler
+- `register()` - Complete adapter registration
+- `getRawServer()` - Optional access to the underlying Fastify or Express instance
 
 ---
 
@@ -683,8 +701,8 @@ const service = new Service({
   platforms: {
     server: {
       page: {
-        customRegister: async (server) => {
-          const fastify = server as FastifyInstance;
+        customRegister: async (_adapter, rawServer) => {
+          const fastify = rawServer as FastifyInstance;
           // Register custom plugins, middleware, etc.
           await fastify.register(somePlugin);
         },

@@ -1,8 +1,11 @@
 import { type QueryFilter, type Mongoose } from '@zacatl/third-party/databases/mongoose';
-import type { InjectionToken } from '@zacatl/third-party/dependency-injection/tsyringe';
+import type { DependencyContainer, InjectionToken } from '@zacatl/third-party/dependency-injection/tsyringe';
 
-import { getMongooseIndexOptions, registerMongooseIndexModel } from './index-policy';
-import { getContainer, resolveDependency } from '../../../../../dependency-injection';
+import {
+  globalMongooseIndexRegistry,
+  MongooseIndexRegistryToken,
+  type MongooseIndexRegistry,
+} from './index-policy';
 import { InternalServerError, ValidationError } from '../../../../../error';
 import type {
   MongooseRepositoryConfig,
@@ -12,7 +15,8 @@ import type {
   QueryOptions,
 } from '../../repositories/types';
 import { DEFAULT_QUERY_LIMIT } from '../../repositories/types';
-import { createDatabaseToken } from '../tokens/factory';
+import { getOrmConstructionScope } from '../scope';
+import { createDatabaseToken, createLegacyDatabaseToken } from '../tokens/factory';
 
 /**
  * Mongoose ORM adapter - handles Mongoose-specific database operations
@@ -28,9 +32,15 @@ export class MongooseAdapter<D, I extends object, O extends object> implements O
   private _model: MongooseRepositoryModel<D> | undefined;
   private _readyPromise: Promise<void> | undefined;
   private readonly config: MongooseRepositoryConfig<D>;
+  private readonly container: DependencyContainer;
+  private readonly indexRegistry: MongooseIndexRegistry;
 
   constructor(config: MongooseRepositoryConfig<D>) {
     this.config = config;
+    this.container = getOrmConstructionScope();
+    this.indexRegistry = this.container.isRegistered(MongooseIndexRegistryToken, false)
+      ? this.container.resolve(MongooseIndexRegistryToken)
+      : globalMongooseIndexRegistry;
   }
 
   // Satisfies ORMPort<MongooseRepositoryModel<D>, ...>
@@ -62,9 +72,12 @@ export class MongooseAdapter<D, I extends object, O extends object> implements O
 
   private resolveModel(): MongooseRepositoryModel<D> {
     const connectionName = this.config.connection?.name ?? 'MONGOOSE';
-    const token = createDatabaseToken('MONGOOSE', connectionName) as InjectionToken<Mongoose>;
+    const canonicalToken = createDatabaseToken('MONGOOSE', connectionName) as InjectionToken<Mongoose>;
+    const legacyToken = createLegacyDatabaseToken('MONGOOSE', connectionName) as InjectionToken<Mongoose>;
+    const container = this.container;
+    const token = container.isRegistered(canonicalToken, false) ? canonicalToken : legacyToken;
 
-    if (!getContainer().isRegistered(token)) {
+    if (!container.isRegistered(token, false)) {
       throw new InternalServerError({
         message: 'Mongoose instance not registered in DI container',
         reason:
@@ -76,7 +89,7 @@ export class MongooseAdapter<D, I extends object, O extends object> implements O
       });
     }
 
-    const resolved = resolveDependency<Mongoose>(token);
+    const resolved = container.resolve<Mongoose>(token);
 
     if (resolved == null) {
       throw new InternalServerError({
@@ -117,9 +130,9 @@ export class MongooseAdapter<D, I extends object, O extends object> implements O
     const model = this.getOrCreateModel();
     const connectionName = this.config.connection?.name ?? 'MONGOOSE';
     const bootMode =
-      this.config.indexes?.bootMode ?? getMongooseIndexOptions(connectionName).bootMode;
+      this.config.indexes?.bootMode ?? this.indexRegistry.getOptions(connectionName).bootMode;
 
-    registerMongooseIndexModel(
+    this.indexRegistry.registerModel(
       connectionName,
       model as unknown as MongooseRepositoryModel<unknown>,
     );

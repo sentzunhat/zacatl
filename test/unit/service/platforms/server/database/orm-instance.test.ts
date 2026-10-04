@@ -46,6 +46,18 @@ describe('orm-instance helpers', () => {
       expect(resolveDependency(token)).toBe(instance);
     });
 
+    it('keeps the legacy global symbol registered for existing consumers', () => {
+      const instance = { kind: 'sequelize' } as unknown as DatabaseInstance;
+      registerOrmInstance(
+        DatabaseVendor.SEQUELIZE,
+        { url: 'sqlite::memory:', name: DatabaseVendor.SEQUELIZE },
+        instance,
+      );
+
+      expect(resolveDependency(Symbol.for('db:SEQUELIZE:SEQUELIZE'))).toBe(instance);
+      expect(resolveDependency(SequelizeToken)).toBe(instance);
+    });
+
     it.each([undefined, null])('is a no-op when instance is %s', (instance) => {
       const connection: DatabaseConnection = { url: 'mongodb://localhost/test', name: DatabaseVendor.MONGOOSE };
       registerOrmInstance(DatabaseVendor.MONGOOSE, connection, instance as never);

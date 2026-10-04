@@ -82,6 +82,15 @@ describe('SequelizeAdapter', () => {
       expect(() => new SequelizeAdapter(mockConfig)).not.toThrow();
     });
 
+    it('resolves instances registered manually with the previous global symbol', () => {
+      clearContainer();
+      const instance = { model: (_name: string) => MockModel };
+      container.register(Symbol.for('db:SEQUELIZE:SEQUELIZE'), { useValue: instance });
+      const localAdapter = new SequelizeAdapter(mockConfig);
+
+      expect(localAdapter.model).toBe(MockModel);
+    });
+
     it('throws InternalServerError on first model access when DI token is not registered', () => {
       clearContainer();
       const localAdapter = new SequelizeAdapter(mockConfig);

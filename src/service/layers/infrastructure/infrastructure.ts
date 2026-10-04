@@ -1,9 +1,15 @@
 import { resolveDependencies } from '@zacatl/dependency-injection';
 import { InternalServerError } from '@zacatl/error';
-import type { DependencyContainer } from '@zacatl/third-party/dependency-injection/tsyringe';
+import {
+  inject,
+  injectable,
+  type DependencyContainer,
+} from '@zacatl/third-party/dependency-injection/tsyringe';
 
+import { withOrmConstructionScope } from './orm/scope';
+import { InfrastructureConfigToken, InfrastructureContainerToken } from './tokens';
 import type { InfrastructureConfig, InfrastructureUnknownRepository } from './types';
-import { ensureRegisteredSingleton } from '../../../dependency-injection/container';
+import { ensureRegisteredSingleton, getContainer } from '../../../dependency-injection/container';
 
 export type { InfrastructureConfig };
 
@@ -13,12 +19,16 @@ export type { InfrastructureConfig };
  * Responsible for registering infrastructure-level components (repositories)
  * in the DI container and performing basic lifecycle hooks.
  */
+@injectable()
 export class Infrastructure {
   protected config: InfrastructureConfig;
   private readonly repositories: InfrastructureUnknownRepository[] = [];
   private readonly container: DependencyContainer | undefined;
 
-  constructor(config: InfrastructureConfig, container?: DependencyContainer) {
+  constructor(
+    @inject(InfrastructureConfigToken) config: InfrastructureConfig,
+    @inject(InfrastructureContainerToken) container?: DependencyContainer,
+  ) {
     this.config = config;
     this.container = container;
 
@@ -40,9 +50,12 @@ export class Infrastructure {
       ensureRegisteredSingleton(repository, this.container);
     }
 
-    const resolvedRepositories = resolveDependencies<InfrastructureUnknownRepository>(
-      this.config.repositories,
-      this.container,
+    const resolvedRepositories = withOrmConstructionScope(
+      this.container ?? getContainer(),
+      () => resolveDependencies<InfrastructureUnknownRepository>(
+        this.config.repositories ?? [],
+        this.container,
+      ),
     );
 
     if (resolvedRepositories.length !== this.config.repositories.length) {

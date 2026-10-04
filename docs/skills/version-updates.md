@@ -4,16 +4,24 @@ This document defines the versioning strategy and release procedure for Zacatl.
 
 ## Semantic Versioning
 
-Zacatl follows [Semantic Versioning 2.0.0](https://semver.org/):
+Zacatl uses a three-part version number, with an explicit `0.0.x` initial
+development policy before the usual pre-1.0 version rules below:
 
 **Format:** `MAJOR.MINOR.PATCH` (e.g., `0.0.39`)
 
 ### Version 0.x.x (Pre-1.0 - Current Phase)
 
-During pre-1.0 development:
+Before the first `0.1.0` release, Zacatl is in the `0.0.x` initial
+development series. The public API is not yet stable, and a `0.0.x` patch
+release may include breaking changes, new features, bug fixes, documentation,
+or other improvements. Increment the patch number for each published
+development release; do not treat a `0.0.x` increment as a compatibility
+promise.
 
-- **PATCH** (`0.0.x`) - Bug fixes, documentation updates, minor improvements
-- **MINOR** (`0.x.0`) - New features, breaking changes (allowed in 0.x)
+Starting with `0.1.0`, use these rules for later pre-1.0 releases:
+
+- **PATCH** (`0.x.y`) - Bug fixes, documentation updates, minor improvements
+- **MINOR** (`0.(x+1).0`) - New features and breaking changes
 - **MAJOR** (`x.0.0`) - Reserved for 1.0.0 stable release
 
 ### Version 1.x.x+ (Post-1.0 - Future)
@@ -28,9 +36,11 @@ After 1.0.0 release:
 
 ## When to Increment
 
-### Patch Version (0.0.x → 0.0.x+1)
+### Patch Version (for example, 0.1.0 → 0.1.1)
 
-Increment for:
+Before `0.1.0`, increment for each development publication. This series may
+contain breaking changes and improvements because the API is still evolving.
+From `0.1.0` onward, increment for:
 
 - ✅ Bug fixes (no API changes)
 - ✅ Documentation improvements
@@ -47,9 +57,9 @@ Increment for:
 - Optimizing internal algorithms
 - Adding missing JSDoc comments
 
-### Minor Version (0.x.0 → 0.x+1.0)
+### Minor Version (from 0.1.0: 0.x.0 → 0.(x+1).0)
 
-Increment for:
+From `0.1.0` onward, increment for:
 
 - ✅ New features or modules
 - ✅ New public APIs
@@ -92,11 +102,17 @@ Review changes since last release:
 git log v0.0.39..HEAD --oneline
 ```
 
-Ask:
+Ask (for releases from `0.1.0` onward):
 
 - Are there breaking changes? → **Minor** (in 0.x) / **Major** (in 1.x+)
 - Are there new features? → **Minor**
 - Only fixes/docs? → **Patch**
+
+For a release before `0.1.0`, use the next `0.0.x` patch version even when
+the development changes include new features or breaking API changes. Call
+out those changes clearly in the changelog and migration guidance. The first
+`0.1.0` release establishes the point from which the pre-1.0 minor-bump rule
+above applies.
 
 ### 2. Update package.json
 

@@ -3,8 +3,8 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 import { z } from '@zacatl/third-party/zod';
 
-import type { HookHandler } from '../../../../../../../src/service/layers/application/entry-points/rest/hook-handlers/hook-handler';
 import type { RouteHandler } from '../../../../../../../src/service/layers/application/entry-points/rest/fastify/handlers/route-handler';
+import type { HookHandler } from '../../../../../../../src/service/layers/application/entry-points/rest/hook-handlers/hook-handler';
 import { createApiAdapter } from '../../../../../../../src/service/platforms/server/providers/fastify/api-adapter';
 
 type MockFastifyServer = {
@@ -12,6 +12,7 @@ type MockFastifyServer = {
   route: ReturnType<typeof vi.fn>;
   addHook: ReturnType<typeof vi.fn>;
   register: ReturnType<typeof vi.fn<() => Promise<void>>>;
+  listen: ReturnType<typeof vi.fn>;
 };
 
 describe('FastifyApiAdapter', () => {
@@ -25,8 +26,17 @@ describe('FastifyApiAdapter', () => {
       route: vi.fn(),
       addHook: vi.fn(),
       register: vi.fn().mockResolvedValue(undefined),
+      listen: vi.fn().mockResolvedValue(undefined),
     };
     adapter = createApiAdapter(mockServer as unknown as FastifyInstance);
+  });
+
+  it('binds to the selected host and port', async () => {
+    await adapter.listen('0.0.0.0', 3000);
+    expect(mockServer.listen).toHaveBeenCalledWith({ port: 3000, host: '0.0.0.0' });
+
+    await adapter.listen('127.0.0.1', 3001);
+    expect(mockServer.listen).toHaveBeenLastCalledWith({ port: 3001, host: '127.0.0.1' });
   });
 
   describe('registerRoute', () => {

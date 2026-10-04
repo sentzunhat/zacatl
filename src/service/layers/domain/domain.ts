@@ -1,13 +1,22 @@
-import type { DependencyContainer } from '@zacatl/third-party/dependency-injection/tsyringe';
+import {
+  inject,
+  injectable,
+  type DependencyContainer,
+} from '@zacatl/third-party/dependency-injection/tsyringe';
 
+import { DomainConfigToken, DomainContainerToken } from './tokens';
 import type { DomainConfig } from './types';
 import { ensureRegisteredSingleton } from '../../../dependency-injection/container';
 
+@injectable()
 export class Domain {
   protected config: DomainConfig;
   private readonly container: DependencyContainer | undefined;
 
-  constructor(config: DomainConfig, container?: DependencyContainer) {
+  constructor(
+    @inject(DomainConfigToken) config: DomainConfig,
+    @inject(DomainContainerToken) container?: DependencyContainer,
+  ) {
     this.config = config;
     this.container = container;
 

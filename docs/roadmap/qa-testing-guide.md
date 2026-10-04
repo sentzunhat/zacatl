@@ -140,7 +140,7 @@ describe('Integration: /greetings endpoints', () => {
         },
       },
     });
-    await service.start({ port: 0 });
+    await service.start({ host: '127.0.0.1', port: 0 });
   });
 
   it('GET /greetings returns 200 with array', async () => {
@@ -299,7 +299,7 @@ If adding a **third framework** (e.g., Hono, Elysia, etc.):
    - `registerRoute(handler)` - Register single handler
    - `registerHook(handler)` - Register middleware/interceptor
    - `registerProxy(config)` - Register proxy routes
-   - `listen(port)` - Start server
+   - `listen(host, port)` - Start server on the supplied host and port
    - `getRawServer()` - Return framework instance
 
 2. **Handler Base Class**: Create abstract class matching Fastify/Express pattern:

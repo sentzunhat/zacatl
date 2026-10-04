@@ -66,7 +66,7 @@ const service = new Service({
   },
 });
 
-await service.start({ port: 3000 });
+await service.start({ host: '0.0.0.0', port: 3000 });
 ```
 
 ## Step-by-Step Setup
@@ -276,7 +276,7 @@ const service = new Service({
   },
 });
 
-await service.start({ port: 3000 });
+await service.start({ host: '0.0.0.0', port: 3000 });
 ```
 
 ## Database Connection Flow

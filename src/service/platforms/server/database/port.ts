@@ -3,6 +3,8 @@ import type { DatabaseSync } from 'node:sqlite';
 import type { Mongoose } from 'mongoose';
 import type { Sequelize } from 'sequelize';
 
+import type { DependencyContainer } from '@zacatl/third-party/dependency-injection/tsyringe';
+
 import type { Optional } from '../../../../utils/optionals';
 import type { MongooseRepositoryIndexOptions } from '../../../layers/infrastructure/orm/mongoose/index-policy';
 
@@ -64,6 +66,6 @@ export interface DatabaseConfig {
  * Abstracts database implementations (Mongoose, Sequelize)
  */
 export interface DatabaseServerPort {
-  connect(serviceName: string, config: DatabaseConfig): Promise<void>;
+  connect(serviceName: string, config: DatabaseConfig, container?: DependencyContainer): Promise<void>;
   disconnect?(): Promise<void>;
 }

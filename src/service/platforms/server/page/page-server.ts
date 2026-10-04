@@ -1,7 +1,9 @@
 import { CustomError } from '@zacatl/error';
+import { inject, injectable } from '@zacatl/third-party/dependency-injection/tsyringe';
 
 import type { ServerConfig } from '../server';
 import { type ApiPrefixes, type PageServerPort, type StaticConfig } from './port';
+import { PageServerAdapterToken, PageServerConfigToken } from '../tokens';
 
 /**
  * PageServer - Encapsulates frontend/page rendering logic
@@ -9,11 +11,15 @@ import { type ApiPrefixes, type PageServerPort, type StaticConfig } from './port
  * Handles static files, SPA routing, and page module registration
  * Supports frameworks: React, Vue, Svelte, Angular, etc.
  */
+@injectable()
 export class PageServer {
   private readonly config: ServerConfig;
   private readonly adapter: PageServerPort;
 
-  constructor(config: ServerConfig, adapter: PageServerPort) {
+  constructor(
+    @inject(PageServerConfigToken) config: ServerConfig,
+    @inject(PageServerAdapterToken) adapter: PageServerPort,
+  ) {
     this.config = config;
     this.adapter = adapter;
   }
@@ -98,7 +104,7 @@ export class PageServer {
     }
 
     if (customRegister != null) {
-      await customRegister(this.adapter);
+      await customRegister(this.adapter, this.adapter.getRawServer?.());
     }
   }
 

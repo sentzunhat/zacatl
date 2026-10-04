@@ -49,7 +49,7 @@ const service = new Service({
   },
 });
 
-await service.start({ port: 3000 });
+await service.start({ host: '0.0.0.0', port: 3000 });
 ```
 
 ## Handler Structure
@@ -109,7 +109,7 @@ app.use((err, req, res, _next) => {
 });
 
 const service = new Service({ ..., platforms: { server: { ..., server: { vendor: ServerVendor.EXPRESS, instance: app } } } });
-await service.start({ port: 3000 });
+await service.start({ host: '0.0.0.0', port: 3000 });
 ```
 
 ## Full Example

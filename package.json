@@ -1,7 +1,7 @@
 {
   "name": "@sentzunhat/zacatl",
   "type": "module",
-  "version": "0.0.64",
+  "version": "0.0.65",
   "packageManager": "npm@12.0.0",
   "repository": {
     "type": "git",
@@ -133,12 +133,12 @@
     "@types/express": "^5.0.6",
     "@types/i18n": "^0.13.12",
     "@types/js-yaml": "^4.0.9",
-    "@types/node": "^26.6.3",
+    "@types/node": "^26.6.5",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
-    "@typescript-eslint/eslint-plugin": "^8.71.0",
-    "@typescript-eslint/parser": "^8.71.0",
-    "@vitejs/plugin-react": "^6.1.1",
+    "@typescript-eslint/eslint-plugin": "^8.71.2",
+    "@typescript-eslint/parser": "^8.71.2",
+    "@vitejs/plugin-react": "^6.1.2",
     "@vitest/coverage-istanbul": "^4.1.11",
     "eslint": "^9.39.4",
     "eslint-import-resolver-typescript": "^4.4.5",
@@ -147,39 +147,39 @@
     "http-proxy-middleware": "^4.2.0",
     "mongodb": "^7.2.0",
     "mongodb-memory-server": "^11.3.0",
-    "mongoose": "^9.10.3",
+    "mongoose": "^9.11.2",
     "pg": "^8.23.1",
     "pg-mem": "^3.0.14",
     "playwright": "^1.63.0",
-    "prettier": "^3.9.9",
+    "prettier": "^3.9.10",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
     "sequelize": "^6.37.8",
     "sqlite3": "^6.0.1",
-    "svelte": "^5.57.1",
+    "svelte": "^5.57.2",
     "tsc-alias": "^1.9.7",
     "tsx": "^4.23.15",
     "typescript": "^6.0.3",
-    "typescript-eslint": "^8.71.0",
-    "vite": "^8.3.2",
+    "typescript-eslint": "^8.71.2",
+    "vite": "^8.3.4",
     "vitest": "^4.1.11"
   },
   "license": "Apache-2.0",
   "dependencies": {
-    "@fastify/http-proxy": "^11.6.2",
-    "@fastify/static": "^10.1.5",
-    "express": "^5.2.1",
-    "fastify": "^5.12.5",
+    "@fastify/http-proxy": "^11.6.4",
+    "@fastify/static": "^10.1.6",
+    "express": "^5.3.0",
+    "fastify": "^5.12.7",
     "fastify-type-provider-zod": "^7.0.0",
     "i18n": "0.15.4",
-    "js-yaml": "^5.4.2",
+    "js-yaml": "^5.4.3",
     "jsonc-parser": "^3.3.1",
-    "pino": "^10.3.1",
-    "pino-pretty": "^13.1.3",
+    "pino": "^10.4.0",
+    "pino-pretty": "^13.2.0",
     "reflect-metadata": "^0.2.2",
     "tsyringe": "^4.10.0",
-    "uuid": "^14.0.2",
-    "zod": "^4.6.5"
+    "uuid": "^14.0.3",
+    "zod": "^4.6.7"
   },
   "peerDependencies": {
     "http-proxy-middleware": "^4.2.0",
@@ -524,6 +524,11 @@
       "import": "./build-src-esm/service/layers/application/entry-points/rest/hook-handlers/hook-handler.js",
       "require": "./build-src-cjs/service/layers/application/entry-points/rest/hook-handlers/hook-handler.js"
     },
+    "./service/layers/application/tokens": {
+      "types": "./build-src-esm/service/layers/application/tokens.d.ts",
+      "import": "./build-src-esm/service/layers/application/tokens.js",
+      "require": "./build-src-cjs/service/layers/application/tokens.js"
+    },
     "./service/layers/application/types": {
       "types": "./build-src-esm/service/layers/application/types.d.ts",
       "import": "./build-src-esm/service/layers/application/types.js",
@@ -548,6 +553,11 @@
       "types": "./build-src-esm/service/layers/domain/ports/service.d.ts",
       "import": "./build-src-esm/service/layers/domain/ports/service.js",
       "require": "./build-src-cjs/service/layers/domain/ports/service.js"
+    },
+    "./service/layers/domain/tokens": {
+      "types": "./build-src-esm/service/layers/domain/tokens.d.ts",
+      "import": "./build-src-esm/service/layers/domain/tokens.js",
+      "require": "./build-src-cjs/service/layers/domain/tokens.js"
     },
     "./service/layers/domain/types": {
       "types": "./build-src-esm/service/layers/domain/types.d.ts",
@@ -598,6 +608,11 @@
       "types": "./build-src-esm/service/layers/infrastructure/orm/nodesqlite/types.d.ts",
       "import": "./build-src-esm/service/layers/infrastructure/orm/nodesqlite/types.js",
       "require": "./build-src-cjs/service/layers/infrastructure/orm/nodesqlite/types.js"
+    },
+    "./service/layers/infrastructure/orm/scope": {
+      "types": "./build-src-esm/service/layers/infrastructure/orm/scope.d.ts",
+      "import": "./build-src-esm/service/layers/infrastructure/orm/scope.js",
+      "require": "./build-src-cjs/service/layers/infrastructure/orm/scope.js"
     },
     "./service/layers/infrastructure/orm/sequelize/adapter": {
       "types": "./build-src-esm/service/layers/infrastructure/orm/sequelize/adapter.d.ts",
@@ -679,6 +694,11 @@
       "import": "./build-src-esm/service/layers/infrastructure/repositories/types.js",
       "require": "./build-src-cjs/service/layers/infrastructure/repositories/types.js"
     },
+    "./service/layers/infrastructure/tokens": {
+      "types": "./build-src-esm/service/layers/infrastructure/tokens.d.ts",
+      "import": "./build-src-esm/service/layers/infrastructure/tokens.js",
+      "require": "./build-src-cjs/service/layers/infrastructure/tokens.js"
+    },
     "./service/layers/infrastructure/types": {
       "types": "./build-src-esm/service/layers/infrastructure/types.d.ts",
       "import": "./build-src-esm/service/layers/infrastructure/types.js",
@@ -688,6 +708,11 @@
       "types": "./build-src-esm/service/layers/layers.d.ts",
       "import": "./build-src-esm/service/layers/layers.js",
       "require": "./build-src-cjs/service/layers/layers.js"
+    },
+    "./service/layers/tokens": {
+      "types": "./build-src-esm/service/layers/tokens.d.ts",
+      "import": "./build-src-esm/service/layers/tokens.js",
+      "require": "./build-src-cjs/service/layers/tokens.js"
     },
     "./service/layers/types": {
       "types": "./build-src-esm/service/layers/types.d.ts",
@@ -819,10 +844,20 @@
       "import": "./build-src-esm/service/platforms/server/shared/prefixes/normalize-prefix.js",
       "require": "./build-src-cjs/service/platforms/server/shared/prefixes/normalize-prefix.js"
     },
+    "./service/platforms/server/tokens": {
+      "types": "./build-src-esm/service/platforms/server/tokens.d.ts",
+      "import": "./build-src-esm/service/platforms/server/tokens.js",
+      "require": "./build-src-cjs/service/platforms/server/tokens.js"
+    },
     "./service/platforms/server/types/server-config": {
       "types": "./build-src-esm/service/platforms/server/types/server-config.d.ts",
       "import": "./build-src-esm/service/platforms/server/types/server-config.js",
       "require": "./build-src-cjs/service/platforms/server/types/server-config.js"
+    },
+    "./service/platforms/tokens": {
+      "types": "./build-src-esm/service/platforms/tokens.d.ts",
+      "import": "./build-src-esm/service/platforms/tokens.js",
+      "require": "./build-src-cjs/service/platforms/tokens.js"
     },
     "./service/platforms/types": {
       "types": "./build-src-esm/service/platforms/types.d.ts",
@@ -833,6 +868,16 @@
       "types": "./build-src-esm/service/service.d.ts",
       "import": "./build-src-esm/service/service.js",
       "require": "./build-src-cjs/service/service.js"
+    },
+    "./service/tokens": {
+      "types": "./build-src-esm/service/tokens.d.ts",
+      "import": "./build-src-esm/service/tokens.js",
+      "require": "./build-src-cjs/service/tokens.js"
+    },
+    "./service/tokens/service": {
+      "types": "./build-src-esm/service/tokens/service.d.ts",
+      "import": "./build-src-esm/service/tokens/service.js",
+      "require": "./build-src-cjs/service/tokens/service.js"
     },
     "./service/types": {
       "types": "./build-src-esm/service/types.d.ts",

@@ -16,7 +16,13 @@ export interface ApiServerPort {
   registerRoute(handler: RouteHandler): void;
   registerHook(handler: HookHandler): void;
   registerProxy(config: ProxyConfig): void;
-  listen(port: number): Promise<void>;
+  /**
+   * Start listening on the supplied host and port.
+   *
+   * Breaking adapter contract before 0.1.0: custom adapters must accept both
+   * values and bind to the requested host. Stabilize this signature at 0.1.0.
+   */
+  listen(host: string, port: number): Promise<void>;
   close(): Promise<void>;
   getRawServer(): unknown;
 }

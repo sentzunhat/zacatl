@@ -75,8 +75,8 @@ export const createApiAdapter = (
       });
     },
 
-    listen: async (port: number): Promise<void> => {
-      await server.listen({ port, host: '0.0.0.0' });
+    listen: async (host: string, port: number): Promise<void> => {
+      await server.listen({ host, port });
     },
 
     close: async (): Promise<void> => {

@@ -1,6 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 
 import { MongooseIndexManager } from '../../../../../../../src/service/layers/infrastructure/orm/mongoose/index-manager';
+import { MongooseIndexRegistry } from '../../../../../../../src/service/layers/infrastructure/orm/mongoose/index-policy';
 import type { MongooseRepositoryModel } from '../../../../../../../src/service/layers/infrastructure/repositories/mongoose/types';
 
 const makeModel = (modelName: string, collectionName: string): MongooseRepositoryModel<unknown> =>
@@ -16,6 +17,24 @@ const makeModel = (modelName: string, collectionName: string): MongooseRepositor
   }) as unknown as MongooseRepositoryModel<unknown>;
 
 describe('MongooseIndexManager', () => {
+  it('keeps same-name models and boot policies in separate Service registries', async () => {
+    const firstRegistry = new MongooseIndexRegistry();
+    const secondRegistry = new MongooseIndexRegistry();
+    const firstModel = makeModel('Session', 'first_sessions');
+    const secondModel = makeModel('Session', 'second_sessions');
+    firstRegistry.registerOptions('shared', { bootMode: 'off' });
+    secondRegistry.registerOptions('shared', { bootMode: 'create' });
+    firstRegistry.registerModel('shared', firstModel);
+    secondRegistry.registerModel('shared', secondModel);
+
+    expect(firstRegistry.getOptions('shared').bootMode).toBe('off');
+    expect(secondRegistry.getOptions('shared').bootMode).toBe('create');
+    expect((await new MongooseIndexManager({ connectionName: 'shared', registry: firstRegistry }).diff())[0]?.collectionName)
+      .toBe('first_sessions');
+    expect((await new MongooseIndexManager({ connectionName: 'shared', registry: secondRegistry }).diff())[0]?.collectionName)
+      .toBe('second_sessions');
+  });
+
   it('diff() returns read-only index changes without mutating', async () => {
     const model = makeModel('Session', 'sessions');
     const manager = new MongooseIndexManager({ models: [model] });

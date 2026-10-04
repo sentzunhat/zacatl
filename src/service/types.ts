@@ -28,6 +28,12 @@ export enum ServiceType {
   SERVER = 'SERVER',
 }
 
+/** Optional bind address and port used when starting a server Service. */
+export interface ServiceStartOptions {
+  host?: string;
+  port?: number;
+}
+
 /**
  * Localization configuration used by the service.
  *

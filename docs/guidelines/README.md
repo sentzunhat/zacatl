@@ -32,7 +32,7 @@ For fast onboarding context (What / How / Why + API/Security/Performance), see
 
 ### Core Patterns
 
-- **Architecture**: Hexagonal/Layered (Application, Domain, Infrastructure, Platforms)
+- **Architecture**: Service composes sibling Layers and Platforms modules; Layers contains Application, Domain, and Infrastructure ([current map](../service/architecture.md))
 - **DI**: Container-based with auto-registration (tsyringe)
 - **Configuration**: JSON/YAML with Zod schema validation
 - **Module System**: ES Modules (ESM)
@@ -56,7 +56,7 @@ For fast onboarding context (What / How / Why + API/Security/Performance), see
 
 ### For New Contributors
 
-1. Start with **[CONTRIBUTING.md](../../.github/CONTRIBUTING.md)** — Setup, workflow, PR process
+1. Start with **[CONTRIBUTING.md](../../CONTRIBUTING.md)** — Setup, workflow, PR process
 2. Reference **[quick-reference.md](./quick-reference.md)** during development
 3. Check specific guides for detailed rules (code-style, testing, etc.)
 4. Bookmark this folder for quick access

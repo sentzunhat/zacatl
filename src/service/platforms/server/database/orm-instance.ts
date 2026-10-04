@@ -1,6 +1,6 @@
 import { getContainer, registerValue } from '@zacatl/dependency-injection';
 import { InternalServerError } from '@zacatl/error';
-import type { InjectionToken } from '@zacatl/third-party/dependency-injection/tsyringe';
+import type { DependencyContainer, InjectionToken } from '@zacatl/third-party/dependency-injection/tsyringe';
 
 import { type DatabaseVendor, type DatabaseInstance } from './port';
 import { createDatabaseToken } from '../../../layers/infrastructure/orm/tokens/factory';
@@ -35,6 +35,7 @@ export const registerOrmInstance = (
   vendor: DatabaseVendor,
   connection: { url: string; name?: string } | undefined,
   instance: DatabaseInstance | undefined,
+  container: DependencyContainer = getContainer(),
 ): void => {
   if (instance == null) {
     return;
@@ -46,5 +47,12 @@ export const registerOrmInstance = (
   const tokenKey = connection?.name ?? vendor;
   const token = createDatabaseToken(vendor, tokenKey);
 
-  registerValue(token as InjectionToken<DatabaseInstance>, instance);
+  registerValue(token as InjectionToken<DatabaseInstance>, instance, container);
+
+  // Preserve registrations made by consumers against the pre-namespaced
+  // Symbol.for key while the package-scoped slash token remains canonical.
+  const legacyToken = Symbol.for(`db:${vendor}:${tokenKey}`);
+  if (legacyToken !== token) {
+    registerValue(legacyToken as InjectionToken<DatabaseInstance>, instance, container);
+  }
 };

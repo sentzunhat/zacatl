@@ -1,8 +1,17 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-import { clearContainer } from '../../../../src/dependency-injection';
+import {
+  clearContainer,
+  createChildContainer,
+  getContainer,
+  registerValue,
+} from '../../../../src/dependency-injection';
 import { Layers } from '../../../../src/service/layers/layers';
+import { LayersConfigToken } from '../../../../src/service/layers/tokens';
 import type { LayersConfig } from '../../../../src/service/layers/types';
+import {
+  ServiceContainerToken,
+} from '../../../../src/service/tokens';
 
 beforeEach(() => {
   clearContainer();
@@ -11,6 +20,28 @@ beforeEach(() => {
 describe('Layers', () => {
   it('constructs with an empty config without throwing', () => {
     expect(() => new Layers({})).not.toThrow();
+  });
+
+  it('keeps standalone scope registrations out of the global container', () => {
+    const layers = new Layers({});
+
+    expect('getApplicationContainer' in layers).toBe(false);
+    expect(getContainer().isRegistered(ServiceContainerToken, false)).toBe(false);
+  });
+
+  it('preserves direct construction with a Service container by deriving layer scopes', () => {
+    const serviceContainer = createChildContainer(getContainer());
+
+    expect(() => new Layers({}, serviceContainer)).not.toThrow();
+    expect(serviceContainer.resolve(ServiceContainerToken)).toBe(serviceContainer);
+  });
+
+  it('fails DI resolution when the Service-managed layer scopes are missing', () => {
+    const container = createChildContainer(getContainer());
+    registerValue(LayersConfigToken, {}, container);
+    registerValue(ServiceContainerToken, createChildContainer(container), container);
+
+    expect(() => container.resolve(Layers)).toThrow(/service\/layers\/container-scopes/);
   });
 
   it('constructs with infrastructure config', () => {

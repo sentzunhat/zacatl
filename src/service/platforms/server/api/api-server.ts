@@ -1,11 +1,28 @@
 import { resolveDependencies } from '@zacatl/dependency-injection';
+import { getContainer } from '@zacatl/dependency-injection/container';
 import { CustomError, InternalServerError } from '@zacatl/error';
+import {
+  inject,
+  injectable,
+  type DependencyContainer,
+} from '@zacatl/third-party/dependency-injection/tsyringe';
 
 import type { ApiServerPort, ProxyConfig } from './port';
 import type { RouteHandler } from '../../../layers/application/entry-points/rest/fastify/handlers/route-handler';
 import type { HookHandler } from '../../../layers/application/entry-points/rest/hook-handlers/hook-handler';
 import type { RestApplicationEntryPoints } from '../../../layers/application/types';
+import {
+  ApiServerAdapterToken,
+  ApiServerConfigToken,
+  ApiServerContainerToken,
+} from '../tokens';
 import { ServerType, type HttpServerConfig } from '../types/server-config';
+
+export {
+  ApiServerAdapterToken,
+  ApiServerConfigToken,
+  ApiServerContainerToken,
+} from '../tokens';
 
 export enum HandlersType {
   HOOK = 'hook',
@@ -24,13 +41,22 @@ interface RegisterHandlersInput {
  * Uses shared adapter provided by Server class
  * Handles route/hook registration and proxy configuration
  */
+@injectable()
 export class ApiServer {
   private readonly config: HttpServerConfig;
   private readonly adapter: ApiServerPort;
+  private readonly container: DependencyContainer;
 
-  constructor(config: HttpServerConfig, adapter: ApiServerPort) {
+  constructor(
+    @inject(ApiServerConfigToken) config: HttpServerConfig,
+    @inject(ApiServerAdapterToken) adapter: ApiServerPort,
+    @inject(ApiServerContainerToken) container?: DependencyContainer,
+  ) {
     this.config = config;
     this.adapter = adapter;
+    // Preserve the public two-argument constructor. Service-managed instances
+    // still receive the explicit Application scope through the required token.
+    this.container = container ?? getContainer();
   }
 
   /**
@@ -92,7 +118,7 @@ export class ApiServer {
       return;
     }
 
-    const hooks = resolveDependencies(restEntryPoints.hooks);
+    const hooks = resolveDependencies(restEntryPoints.hooks, this.container);
 
     await this.registerHandlers({
       handlers: hooks,
@@ -108,7 +134,7 @@ export class ApiServer {
       return;
     }
 
-    const routes = resolveDependencies(restEntryPoints.routes);
+    const routes = resolveDependencies(restEntryPoints.routes, this.container);
 
     await this.registerHandlers({
       handlers: routes,
@@ -131,11 +157,9 @@ export class ApiServer {
     this.adapter.registerProxy(config);
   }
 
-  /**
-   * Start listening on port
-   */
-  public async listen(port: number): Promise<void> {
-    await this.adapter.listen(port);
+  /** Start listening on the supplied host and port. */
+  public async listen(host: string, port: number): Promise<void> {
+    await this.adapter.listen(host, port);
   }
 
   /**

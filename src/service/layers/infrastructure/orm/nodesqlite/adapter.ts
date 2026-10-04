@@ -1,8 +1,7 @@
 import type { StatementSync } from 'node:sqlite';
 
-import type { InjectionToken } from '@zacatl/third-party/dependency-injection/tsyringe';
+import type { DependencyContainer, InjectionToken } from '@zacatl/third-party/dependency-injection/tsyringe';
 
-import { getContainer, resolveDependency } from '../../../../../dependency-injection';
 import { InternalServerError } from '../../../../../error';
 import { uuidv4 } from '../../../../../third-party/uuid';
 import type {
@@ -12,7 +11,8 @@ import type {
   QueryOptions,
 } from '../../repositories/types';
 import { DEFAULT_QUERY_LIMIT } from '../../repositories/types';
-import { createDatabaseToken } from '../tokens/factory';
+import { getOrmConstructionScope } from '../scope';
+import { createDatabaseToken, createLegacyDatabaseToken } from '../tokens/factory';
 
 /**
  * Node.js SQLite ORM Adapter (node:sqlite)
@@ -31,6 +31,7 @@ export class NodeSqliteAdapter<I extends object, O extends object>
   private _model: NodeSqliteRepositoryModel | undefined;
   private _tableReady = false;
   private readonly config: NodeSqliteRepositoryConfig;
+  private readonly container: DependencyContainer;
   // Prepared statement cache — avoids re-parsing SQL on every CRUD call.
   // Bounded LRU: findMany emits a distinct SQL string per filter-key shape,
   // so an unbounded cache would grow with dynamic per-request filters.
@@ -39,6 +40,7 @@ export class NodeSqliteAdapter<I extends object, O extends object>
 
   constructor(config: NodeSqliteRepositoryConfig) {
     this.config = config;
+    this.container = getOrmConstructionScope();
   }
 
   // Satisfies ORMPort<NodeSqliteRepositoryModel, ...> — resolves and
@@ -62,10 +64,13 @@ export class NodeSqliteAdapter<I extends object, O extends object>
 
   private resolveModel(): NodeSqliteRepositoryModel {
     const connectionName = this.config.connection?.name ?? 'SQLITE';
-    const token = createDatabaseToken('SQLITE', connectionName) as InjectionToken<NodeSqliteRepositoryModel>;
+    const canonicalToken = createDatabaseToken('SQLITE', connectionName) as InjectionToken<NodeSqliteRepositoryModel>;
+    const legacyToken = createLegacyDatabaseToken('SQLITE', connectionName) as InjectionToken<NodeSqliteRepositoryModel>;
+    const container = this.container;
+    const token = container.isRegistered(canonicalToken, false) ? canonicalToken : legacyToken;
 
-    const resolved = getContainer().isRegistered(token)
-      ? resolveDependency<NodeSqliteRepositoryModel>(token)
+    const resolved = container.isRegistered(token, false)
+      ? container.resolve<NodeSqliteRepositoryModel>(token)
       : undefined;
     const candidate = resolved as unknown as Record<string, unknown> | undefined;
 
@@ -107,7 +112,15 @@ export class NodeSqliteAdapter<I extends object, O extends object>
 
   private ensureTableExists(): void {
     // Use the backing field, not the getter, to avoid recursive resolution.
-    const database = this._model!;
+    const database = this._model;
+    if (database == null) {
+      throw new InternalServerError({
+        message: 'node:sqlite database is not available',
+        reason: 'Database instance was not resolved before table setup',
+        component: this.constructor.name,
+        operation: 'ensureTableExists',
+      });
+    }
     const name = this.getTableName();
     try {
       const checkTable = database.prepare(

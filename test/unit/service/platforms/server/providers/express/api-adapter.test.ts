@@ -383,9 +383,22 @@ describe('ExpressApiAdapter', () => {
       };
       const a = createApiAdapter(listeningServer as never);
 
-      await expect(a.listen(0)).resolves.toBeUndefined();
+      await expect(a.listen('127.0.0.1', 0)).resolves.toBeUndefined();
+      expect(listeningServer.listen).toHaveBeenLastCalledWith(
+        0,
+        '127.0.0.1',
+        expect.any(Function),
+      );
       await expect(a.close()).resolves.toBeUndefined();
-      expect(fakeHttpServer.close).toHaveBeenCalled();
+
+      await expect(a.listen('0.0.0.0', 0)).resolves.toBeUndefined();
+      expect(listeningServer.listen).toHaveBeenLastCalledWith(
+        0,
+        '0.0.0.0',
+        expect.any(Function),
+      );
+      await expect(a.close()).resolves.toBeUndefined();
+      expect(fakeHttpServer.close).toHaveBeenCalledTimes(2);
     });
 
     it('close is a no-op before listen', async () => {

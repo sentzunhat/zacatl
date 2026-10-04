@@ -29,6 +29,7 @@ describe('PageServer', () => {
       registerStaticFiles: vi.fn(),
       registerSpaFallback: vi.fn(),
       register: vi.fn().mockResolvedValue(undefined),
+      getRawServer: vi.fn().mockReturnValue({ native: true }),
     };
   });
 
@@ -99,7 +100,7 @@ describe('PageServer', () => {
 
       await pageServer.configure();
 
-      expect(customRegister).toHaveBeenCalledWith(adapter);
+      expect(customRegister).toHaveBeenCalledWith(adapter, { native: true });
     });
 
     it('should invoke customRegister even when staticDir is absent', async () => {
@@ -108,7 +109,20 @@ describe('PageServer', () => {
 
       await pageServer.configure();
 
-      expect(customRegister).toHaveBeenCalledWith(adapter);
+      expect(customRegister).toHaveBeenCalledWith(adapter, { native: true });
+    });
+
+    it('supports legacy adapters without raw-server access', async () => {
+      const legacyAdapter: PageServerPort = {
+        registerStaticFiles: vi.fn(),
+        registerSpaFallback: vi.fn(),
+        register: vi.fn().mockResolvedValue(undefined),
+      };
+      const customRegister = vi.fn();
+      pageServer = new PageServer(makeConfig({ customRegister }), legacyAdapter);
+
+      await expect(pageServer.configure()).resolves.toBeUndefined();
+      expect(customRegister).toHaveBeenCalledWith(legacyAdapter, undefined);
     });
   });
 

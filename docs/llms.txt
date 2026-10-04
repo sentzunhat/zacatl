@@ -11,16 +11,15 @@
 
 ## Architecture
 
-Zacatl enforces four layers:
+`Service` manages two sibling modules:
 
 ```
-Application  — use-cases, handlers, commands
-Domain       — ports, contracts, domain services
-Infrastructure — repository implementations (Mongoose / Sequelize / SQLite)
-Platforms    — server (Fastify / Express), CLI stub, Desktop stub
+Layers       — Application entry points, Domain providers/services, Infrastructure repositories/ORM adapters
+Platforms    — Server (Fastify / Express), CLI stub, Desktop stub
 ```
 
-Full architecture docs: [guidelines/architecture.md](guidelines/architecture.md)
+Nested modules own their local ports and adapters. Full current-versus-proposed
+map: [service/architecture.md](service/architecture.md).
 
 ## Install
 

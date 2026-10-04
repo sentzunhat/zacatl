@@ -111,7 +111,7 @@ const serviceConfig = {
 ```typescript
 const service = new Service(serviceConfig);
 const port = process.env['PORT'] ? parseInt(process.env['PORT']!, 10) : 8080;
-await service.start({ port });
+await service.start({ host: '0.0.0.0', port });
 ```
 
 ## 🏗️ Handler Pattern with AbstractRouteHandler

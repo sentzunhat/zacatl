@@ -2,22 +2,33 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 const mockResolveDependencies = vi.fn();
 
-vi.mock('@zacatl/dependency-injection', () => ({
+vi.mock('@zacatl/dependency-injection', (): { resolveDependencies: (...args: unknown[]) => unknown } => ({
   resolveDependencies: (...args: unknown[]) => mockResolveDependencies(...args),
 }));
 
 import { CustomError } from '@zacatl/error';
 
-import type { HookHandler } from '../../../../../../src/service/layers/application/entry-points/rest/hook-handlers/hook-handler';
+import {
+  createChildContainer,
+  registerValue,
+} from '../../../../../../src/dependency-injection/container';
 import type { RouteHandler } from '../../../../../../src/service/layers/application/entry-points/rest/fastify/handlers/route-handler';
+import type { HookHandler } from '../../../../../../src/service/layers/application/entry-points/rest/hook-handlers/hook-handler';
 import type { RestApplicationEntryPoints } from '../../../../../../src/service/layers/application/types';
 import type { Constructor } from '../../../../../../src/service/layers/types';
-import { ApiServer } from '../../../../../../src/service/platforms/server/api/api-server';
+import {
+  ApiServer,
+  ApiServerAdapterToken,
+  ApiServerConfigToken,
+  ApiServerContainerToken,
+} from '../../../../../../src/service/platforms/server/api/api-server';
 import type { ApiServerPort } from '../../../../../../src/service/platforms/server/api/port';
+import type { HttpServerConfig } from '../../../../../../src/service/platforms/server/types/server-config';
 import {
   ServerType,
   ServerVendor,
 } from '../../../../../../src/service/platforms/server/types/server-config';
+import type { DependencyContainer } from '../../../../../../src/third-party/dependency-injection/tsyringe';
 
 const makeAdapter = (): ApiServerPort => ({
   registerRoute: vi.fn(),
@@ -33,7 +44,7 @@ const makeConfig = (
     type: ServerType;
     gateway: { proxies: Array<{ upstream: string; prefix?: string }> };
   }> = {},
-) => ({
+): HttpServerConfig => ({
   type: ServerType.SERVER,
   vendor: ServerVendor.EXPRESS,
   instance: {},
@@ -43,11 +54,36 @@ const makeConfig = (
 describe('ApiServer', () => {
   let adapter: ApiServerPort;
   let apiServer: ApiServer;
+  let container: ReturnType<typeof createChildContainer>;
+
+  const resolveApiServer = (
+    config = makeConfig(),
+    apiAdapter = adapter,
+    handlerContainer?: DependencyContainer,
+  ): ApiServer => {
+    container = createChildContainer();
+    registerValue(ApiServerConfigToken, config, container);
+    registerValue(ApiServerAdapterToken, apiAdapter, container);
+    registerValue(ApiServerContainerToken, handlerContainer ?? container, container);
+    return container.resolve(ApiServer);
+  };
+
+  it('fails fast when its required handler container is not registered', () => {
+    const incompleteContainer = createChildContainer();
+    registerValue(ApiServerConfigToken, makeConfig(), incompleteContainer);
+    registerValue(ApiServerAdapterToken, adapter, incompleteContainer);
+
+    expect(() => incompleteContainer.resolve(ApiServer)).toThrow(/api\/container/);
+  });
+
+  it('preserves direct construction with the legacy config and adapter arguments', () => {
+    expect(() => new ApiServer(makeConfig(), adapter)).not.toThrow();
+  });
 
   beforeEach(() => {
     vi.clearAllMocks();
     adapter = makeAdapter();
-    apiServer = new ApiServer(makeConfig(), adapter);
+    apiServer = resolveApiServer();
   });
 
   describe('registerEntrypoints()', () => {
@@ -68,10 +104,10 @@ describe('ApiServer', () => {
       const routeInstance = new TestRouteHandler();
 
       mockResolveDependencies.mockImplementation((handlers: Constructor<unknown>[]) =>
-        handlers.map((Handler) => {
-          if (Handler === TestHookHandler) return hookInstance;
-          if (Handler === TestRouteHandler) return routeInstance;
-          return new Handler();
+        handlers.map((handlerClass) => {
+          if (handlerClass === TestHookHandler) return hookInstance;
+          if (handlerClass === TestRouteHandler) return routeInstance;
+          return new handlerClass();
         }),
       );
 
@@ -86,8 +122,22 @@ describe('ApiServer', () => {
       expect(adapter.registerRoute).toHaveBeenCalledWith(routeInstance);
     });
 
+    it('resolves service-managed handlers in the supplied application container', async () => {
+      const container = { resolve: vi.fn(), isRegistered: vi.fn() } as never;
+      class ScopedHandler implements RouteHandler {
+        url = '/scoped';
+        method = 'GET' as const;
+        schema = {};
+        execute = vi.fn();
+      }
+      mockResolveDependencies.mockReturnValue([]);
+      apiServer = resolveApiServer(makeConfig(), adapter, container);
+      await apiServer.registerAllRoutes({ routes: [ScopedHandler] });
+      expect(mockResolveDependencies).toHaveBeenCalledWith([ScopedHandler], container);
+    });
+
     it('registers gateway proxies when configured', async () => {
-      apiServer = new ApiServer(
+      apiServer = resolveApiServer(
         makeConfig({
           type: ServerType.GATEWAY,
           gateway: {
@@ -97,7 +147,6 @@ describe('ApiServer', () => {
             ],
           },
         }),
-        adapter,
       );
 
       await apiServer.registerEntrypoints({ routes: [], hooks: [] });
@@ -137,9 +186,9 @@ describe('ApiServer', () => {
   });
 
   describe('delegates to adapter', () => {
-    it('listen() forwards to adapter.listen', async () => {
-      await apiServer.listen(8080);
-      expect(adapter.listen).toHaveBeenCalledWith(8080);
+    it('listen(host, port) forwards both values to the adapter', async () => {
+      await apiServer.listen('127.0.0.1', 8080);
+      expect(adapter.listen).toHaveBeenCalledWith('127.0.0.1', 8080);
     });
 
     it('getRawServer() returns adapter raw server', () => {

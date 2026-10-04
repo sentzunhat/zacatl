@@ -74,7 +74,7 @@ describe('SequelizeAdapter', () => {
         instance: fakeSequelize as DatabaseConfig['instance'],
       } as DatabaseConfig);
 
-      expect(mockRegisterValue).toHaveBeenCalledOnce();
+      expect(mockRegisterValue).toHaveBeenCalledTimes(2);
     });
 
     it('calls onDatabaseConnected callback when provided', async () => {
