@@ -26,7 +26,7 @@ Each row links to its plan file when one exists.
 
 | ID | Type | Title | Status | Detail | Updated | Next Action |
 | -- | ---- | ----- | ------ | ------ | ------- | ----------- |
-| `EXPRESS-400` | bug | Express Zod validation failures return 500 instead of 400 | inbox | [plan](active/EXPRESS-400-validation-status.md) | 2026-10-15 | Reconfirm current adapter behavior, then implement as a focused fix. |
+| `EXPRESS-400` | bug | Express Zod validation failures return 500 instead of 400 | in-progress | [plan](active/EXPRESS-400-validation-status.md) | 2026-10-15 | Fix + regression tests pass locally; commit/PR, then live-check an Express example after release. |
 | `ac0c4acf` | improvement | Align work records with HAWP UUID/folder layout | plan-ready | [plan](active/ac0c4acf-c90a-4a32-a66a-b058577368f6/plan.md) | 2026-10-15 | Review dry-run findings; migrate current/open index without renaming closed history. |
 | `b4f0c8a1` | docs | README positioning and developer-experience pass | in-progress | [plan](active/b4f0c8a1-readme-and-ci-badge-polish.md) | 2026-10-15 | Finish positioning pass; badges are corrected and released. |
 | `0b959aed` | infrastructure | Audit and refresh Zacatl dependencies after 0.0.64 | plan-ready | [plan](active/0b959aed/plan.md) | 2026-10-15 | Re-resolve registry versions and advisories before implementation. |

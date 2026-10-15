@@ -1,7 +1,7 @@
 # EXPRESS-400 — Express request validation errors return 500 instead of 400
 
 **UUID:** `EXPRESS-400` · **Type:** bug · **Priority:** P2 · **Reported:** 2026-10-03
-**Status:** inbox · **Owner direction:** separate PR after #118 / #119
+**Status:** in-progress · **Owner direction:** separate PR after #118 / #119
 
 ## Problem
 
@@ -32,3 +32,22 @@ the same request with 400.
 
 Express adapter unit test plus a live run of an Express example returning 400
 for an invalid body.
+
+## Implementation (2026-10-15)
+
+- Reconfirmed: new real-Express regression test returned 500 for invalid
+  body, querystring and params before the fix.
+- `providers/express/schema-helper.ts`: Zod failures are wrapped in
+  `RequestValidationError` (extends `BadRequestError`, `code`/`statusCode`/
+  `status` = 400, `validationContext`, `validation` issues). Message follows
+  Fastify's `<context>/<path> <issue>` shape. Non-Zod errors are rethrown
+  unchanged; the error still flows through `next(err)`, so app error handlers
+  keep control and `mapErrorToStatusCode` maps it to 400.
+- Tests: `test/unit/.../express/validation-status.test.ts` (real Express app:
+  400 via app handler reading `statusCode`, 400 via Express default handler,
+  query/params 400, valid request unchanged, handler errors still 500) and two
+  `schema-helper` unit cases.
+- Verification: `npm test` 84 files / 698 tests pass; `tsc --noEmit` (src and
+  test) clean; eslint clean on touched files.
+- Not done: live run of an Express example — examples install zacatl from npm,
+  so this needs a release or a local link. Uncommitted.
