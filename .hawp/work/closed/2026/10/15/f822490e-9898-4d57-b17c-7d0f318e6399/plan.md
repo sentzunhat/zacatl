@@ -1,7 +1,7 @@
-# EXPRESS-400 — Express request validation errors return 500 instead of 400
+# f822490e — Express request validation errors return 500 instead of 400
 
-**UUID:** `EXPRESS-400` · **Type:** bug · **Priority:** P2 · **Reported:** 2026-10-03
-**Status:** in-progress · **Owner direction:** separate PR after #118 / #119
+**UUID:** `f822490e-9898-4d57-b17c-7d0f318e6399` · **Legacy ID:** `EXPRESS-400` · **Type:** bug · **Priority:** P2 · **Reported:** 2026-10-03
+**Status:** done · **Closed:** 2026-10-15 · **Owner direction:** separate PR after #118 / #119
 
 ## Problem
 
@@ -49,5 +49,31 @@ for an invalid body.
   `schema-helper` unit cases.
 - Verification: `npm test` 84 files / 698 tests pass; `tsc --noEmit` (src and
   test) clean; eslint clean on touched files.
-- Not done: live run of an Express example — examples install zacatl from npm,
-  so this needs a release or a local link. Uncommitted.
+- Committed on `dev` as `fd3c7c6c`; not yet released.
+
+## Outcome
+
+Express now answers **400 Bad Request** when a request fails its route's Zod
+schema (body, querystring or params), matching Fastify. The failure is a
+`RequestValidationError` (a `BadRequestError` with `statusCode`/`status` 400)
+passed to `next(err)`, so app error handlers still own the response body.
+Non-validation errors keep the existing 500 path. Ships with the next release.
+
+## Verification
+
+- Regression test failed first (500 on invalid body/query/params), then passed.
+- `npm test`: 84 files / 698 tests pass; `tsc --noEmit` clean (src, test);
+  eslint clean on touched files.
+- Live run (2026-10-15): `examples/express-sqlite-react` backend (links the
+  local repo via `file:../../`) after `npm run build:src`:
+  `POST /api/greetings` with `{}` → **400**
+  `{"error":{"message":"body/message Invalid input: expected string, received undefined, body/language …","statusCode":400}}`;
+  valid body → 200 with the created greeting.
+
+## Close Checklist
+
+- [x] Outcome recorded
+- [x] Verification recorded (unit, integration, live example)
+- [x] Legacy ID `EXPRESS-400` mapped to UUID per `ac0c4acf`
+- [x] Active backlog row removed and recent-close entry added
+- [x] Plan moved to the dated closed archive
