@@ -1,4 +1,4 @@
-# README overhaul + CI badge polish — quick iterations, no release cutover
+# README positioning and developer-experience pass
 
 **UUID:** `b4f0c8a1-readme-and-ci-badge-polish` · **Type:** docs/tooling · **Priority:** P2 · **Reported:** 2026-07-27
 **Status:** in-progress
@@ -20,7 +20,7 @@ until the `e7a20d15` (v0.1.0) milestone, which is the next real cutover point.
 Follow-up iterations on this same item don't need their own plan file — append
 to this one's log below.
 
-## Scope (2026-07-27 session)
+## Completed scope (2026-07-27; released through 0.0.61)
 
 - Root `README.md` restructure: fix the broken coverage-badge link (badge text
   showed 91.41% but linked to a *different* shields.io image showing 91.19% —
@@ -83,3 +83,8 @@ to this one's log below.
   secondary acknowledgment. A related v0.1.0 work item was added to audit
   server/frontend provider boundaries as replaceable peers, analogous to the
   database adapter boundary.
+- 2026-10-15: CI/download badges and release/test figures were corrected and
+  included in published releases through 0.0.61. Keep this item open for the
+  remaining positioning/developer-experience pass; do not describe badge fixes
+  as pending. Removed unneeded names of unrelated projects from this public
+  work record; the positioning question remains generic pending owner input.

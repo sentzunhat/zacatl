@@ -1,7 +1,7 @@
 # ac0c4acf — Improve work items: UUID IDs and folder-per-item layout
 
 **UUID:** `ac0c4acf-c90a-4a32-a66a-b058577368f6` · **Type:** improvement · **Priority:** P3 · **Reported:** 2026-10-03
-**Status:** inbox · **Target:** after `83cef132` (HAWP 0.0.24 update)
+**Status:** plan-ready · **Target:** after `83cef132` (Codex HAWP kit update completed 2026-10-15)
 
 ## Problem
 
@@ -27,3 +27,17 @@ IDs (`DEPS-063`, `LOG-001`, `EXPRESS-400`), 8-hex IDs, flat plan files
 
 `work:validate` (or the kit's equivalent) passes; every BACKLOG plan link
 resolves; no closed record renamed.
+
+## Current Checkpoint (2026-10-15)
+
+The prerequisite Codex-provider kit refresh is complete. HAWP 0.0.24
+validation currently reports legacy-format active/parked rows, missing detail
+links for several old items, one orphaned active audit note, and closed-record
+completeness findings. Do not bulk-apply normalization: review the dry-run and
+preserve historical closed filenames. The initial migration scope should be
+the current backlog/index and clearly orphaned active/parked records; legacy
+closed-record modernization remains a separate decision.
+
+**Next action:** reconcile active versus parked sections and plan links,
+resolve duplicate provider-boundary rows, then rerun validation and document
+remaining historical findings.

@@ -24,24 +24,22 @@ Each row links to its plan file when one exists.
 
 ## Active Work
 
-Items `2898d74c` through `dc0ae72a` descend from the 2026-07-13 security/arch/scalability audit
-(`.hawp/work/evidence/2026/07/13/AUDIT-002-security-arch-scalability-report.md`), ordered P0 → P2.
-Items `e1f4b2a0`, `a3d81c6e`, `b7c92f1d`, `c4e05a92` descend from AUDIT-004 (2026-07-15,
-`.hawp/work/evidence/2026/07/15/AUDIT-004-security-arch-scalability-report.md`).
+| ID | Type | Title | Status | Detail | Updated | Next Action |
+| -- | ---- | ----- | ------ | ------ | ------- | ----------- |
+| `EXPRESS-400` | bug | Express Zod validation failures return 500 instead of 400 | inbox | [plan](active/EXPRESS-400-validation-status.md) | 2026-10-15 | Reconfirm current adapter behavior, then implement as a focused fix. |
+| `ac0c4acf` | improvement | Align work records with HAWP UUID/folder layout | plan-ready | [plan](active/ac0c4acf-c90a-4a32-a66a-b058577368f6/plan.md) | 2026-10-15 | Review dry-run findings; migrate current/open index without renaming closed history. |
+| `b4f0c8a1` | docs | README positioning and developer-experience pass | in-progress | [plan](active/b4f0c8a1-readme-and-ci-badge-polish.md) | 2026-10-15 | Finish positioning pass; badges are corrected and released. |
+| `0b959aed` | infrastructure | Audit and refresh Zacatl dependencies after 0.0.64 | plan-ready | [plan](active/0b959aed/plan.md) | 2026-10-15 | Re-resolve registry versions and advisories before implementation. |
 
-| ID                | Type        | Title                                                                                                                                                                                                                                                                          | Status      | Plan                                                        |
-| ----------------- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------- | ----------------------------------------------------------- |
-| `EXPRESS-400` | bug | P2: Express request validation errors return 500 instead of 400 (ZodError has no statusCode) — separate PR | inbox | `.hawp/work/active/EXPRESS-400-validation-status.md` |
-| `83cef132` | tooling | P3: Update the `.hawp` folder to HAWP 0.0.24 (kit, rules, provider pointers) — after 0.0.64 | inbox | `.hawp/work/active/83cef132-c1df-402c-9504-a0df1cdf7567/plan.md` |
-| `ac0c4acf` | improvement | P3: Work items on UUID IDs and folder-per-item layout (plans, evidence, status) — after `83cef132` | inbox | `.hawp/work/active/ac0c4acf-c90a-4a32-a66a-b058577368f6/plan.md` |
-| `b4f0c8a1`        | docs        | P2: README overhaul + CI badge polish — quick iterations, batched until v0.1.0 cutover, no release needed per-iteration                                                                                                                                                        | in-progress | `.hawp/work/active/b4f0c8a1-readme-and-ci-badge-polish.md`  |
-| `NPM-OIDC-001`    | security    | P0: Replace long-lived npm publish token with npm Trusted Publishing via GitHub Actions OIDC                                                                                                                                                                                   | plan-ready  | `.hawp/work/active/NPM-OIDC-001.md`                         |
-| `e7a20d15`        | milestone   | P1: v0.1.0 — CLI/desktop/server platforms to a minimal standard; batched breaking changes                                                                                                                                                                                      | analyzing   | `.hawp/work/active/e7a20d15-v0.1.0-milestone.md`            |
-| `f2a96e04`        | improvement | P2: Dependency hygiene — remaining: HTTP-frameworks-as-peers (0.1.0). Done: exports validation 45f74849, scoped uuid override, @fastify/static 10, prod audit floors fastify/js-yaml/http-proxy (PR #115)                                                                                                                              | in-progress | see AUDIT-005 advisories                                    |
-| `PLATFORM-001`    | improvement | Audit server and frontend providers as replaceable peers, following the database adapter boundary                                                                                                                                                                              | inbox       | `.hawp/work/active/e7a20d15-v0.1.0-milestone.md`            |
-| DEVX-001          | improvement | Add devcontainer configuration for local development setup                                                                                                                                                                                                                     | parked      | `.hawp/work/parked/DEVX-001.md`                             |
-| FEAT-001          | feature     | RequestContextHook: opt-in AsyncLocalStorage per-request context                                                                                                                                                                                                               | parked      | `.hawp/work/parked/FEAT-001-REQUEST-CONTEXT-HOOK.md`        |
-| ESLINT-010        | tooling     | Upgrade ESLint from ^9.x to ^10.x                                                                                                                                                                                                                                              | parked      | `.hawp/work/parked/ESLINT-010.md`                           |
+## Blocked / Parked
+
+| ID | Type | Title | Reason | Detail | Updated |
+| -- | ---- | ----- | ------ | ------ | ------- |
+| `DEVX-001` | improvement | Devcontainer configuration for local development | Parked; non-blocking contributor experience work. | [plan](parked/DEVX-001.md) | 2026-10-15 |
+| `FEAT-001` | feature | RequestContextHook with per-request AsyncLocalStorage | Parked; optional feature, not a v0.1.0 blocker. | [plan](parked/FEAT-001-REQUEST-CONTEXT-HOOK.md) | 2026-10-15 |
+| `ESLINT-010` | tooling | Upgrade ESLint from 9 to 10 | Parked pending compatible `eslint-plugin-import` support; re-check before resuming. | [plan](parked/ESLINT-010.md) | 2026-10-15 |
+| `NPM-OIDC-001` | security | Replace npm publish token with GitHub Actions OIDC | Deferred until November–December 2026; complete before January 2027 npm policy cutoff. | [plan](parked/NPM-OIDC-001.md) | 2026-10-15 |
+| `e7a20d15` | milestone | v0.1.0 — bring CLI, desktop and server platforms to minimum support | Parked per owner direction; resume when the owner reprioritizes the v0.1.0 platform roadmap. | [plan](parked/e7a20d15-v0.1.0-milestone.md) | 2026-10-15 |
 
 ---
 
@@ -55,6 +53,7 @@ moved to [closed/BACKLOG-ARCHIVE.md](closed/BACKLOG-ARCHIVE.md#archived-2026-07-
 | ID                              | Type          | Title                                                                                                                                          | Closed     | Plan                                                                                                                               |
 | ------------------------------- | ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- | ---------- | ---------------------------------------------------------------------------------------------------------------------------------- |
 | `DEPS-063` | `maintenance` | In-major dependency updates and example lockfile audit fixes (all nine examples at 0 advisories) — released in 0.0.64 | 2026-10-04 | [evidence/2026/10/04/bacf99c4…/evidence.md](evidence/2026/10/04/bacf99c4-236e-4bd1-ae54-8d96713b383a/evidence.md) |
+| `83cef132-c1df-402c-9504-a0df1cdf7567` | `tooling` | Refresh HAWP kit and Codex provider from HAWP main | 2026-10-15 | [plan](closed/2026/10/15/83cef132-c1df-402c-9504-a0df1cdf7567/plan.md) |
 | `LOG-001` | `feature` | Shared logger for the Service, Fastify and Express (`toFastifyLogger`, `ServiceConfig.logger`, `LoggerToken`) — released in 0.0.63 | 2026-10-03 | [evidence/2026/10/03/78dba5ff…/evidence.md](evidence/2026/10/03/78dba5ff-0cd1-442e-86e3-f7faf701a4b5/evidence.md) |
 | `RUNTIME-FIX-001` | `bug` | node:sqlite without `sqlite3`, barrel polyfill fix, Fastify double-send fix, production audit fixes — released in 0.0.62 | 2026-10-01 | [evidence/2026/10/01/release-0.0.62-evidence.md](evidence/2026/10/01/release-0.0.62-evidence.md) |
 | `0.0.61` | `release` | 0.0.61 — README badge corrections released (tag, GitHub Release, npm) | 2026-08-16 | [evidence/2026/09/29/backlog-sync-release-evidence.md](evidence/2026/09/29/backlog-sync-release-evidence.md) |
@@ -63,7 +62,6 @@ moved to [closed/BACKLOG-ARCHIVE.md](closed/BACKLOG-ARCHIVE.md#archived-2026-07-
 | `GH-NOTIFY-001` | `tooling` | P3: GitHub notification noise — Discussions disabled, hardener policy enforces it | 2026-09-29 | [closed/2026/09/29/GH-NOTIFY-001.md](closed/2026/09/29/GH-NOTIFY-001.md) |
 | `871e98ef`                      | `release`     | P2: v0.0.59 — 4 Dependabot PRs merged, 2 closed superseded, 2 closed blocked on ESLint 10, 9 CVE alerts fixed across examples, released to npm | 2026-07-27 | [closed/2026/07/27/871e98ef-v0.0.59-dependency-bumps.md](closed/2026/07/27/871e98ef-v0.0.59-dependency-bumps.md)                   |
 | `refactor-collapse-duplication` | `refactoring` | P2: Collapse BaseRepository/handler duplication, normalize Sequelize adapter errors — 75 net lines removed, 0 API breaks                       | 2026-07-26 | [closed/2026/07/26/refactor-duplication-collapse.md](closed/2026/07/26/refactor-duplication-collapse.md)                           |
-| `75df2542`                      | `tooling`     | P1: CI release workflow — orchestrator redesign, no duplicate runs, all checks gate release to npm                                             | 2026-07-25 | [closed/2026/07/25/75df2542-ci-workflow-redesign.md](closed/2026/07/25/75df2542-ci-workflow-redesign.md)                           |
 
 Older closed rows: [closed/BACKLOG-ARCHIVE.md](closed/BACKLOG-ARCHIVE.md).
 
