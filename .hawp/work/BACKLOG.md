@@ -27,7 +27,6 @@ Each row links to its plan file when one exists.
 | ID | Type | Title | Status | Detail | Updated | Next Action |
 | -- | ---- | ----- | ------ | ------ | ------- | ----------- |
 | `ac0c4acf` | improvement | Align work records with HAWP UUID/folder layout | plan-ready | [plan](active/ac0c4acf-c90a-4a32-a66a-b058577368f6/plan.md) | 2026-10-15 | Review dry-run findings; migrate current/open index without renaming closed history. |
-| `b4f0c8a1` | docs | README positioning and developer-experience pass | in-progress | [plan](active/b4f0c8a1-readme-and-ci-badge-polish.md) | 2026-10-15 | Finish positioning pass; badges are corrected and released. |
 | `0b959aed` | infrastructure | Audit and refresh Zacatl dependencies after 0.0.64 | plan-ready | [plan](active/0b959aed/plan.md) | 2026-10-15 | Re-resolve registry versions and advisories before implementation. |
 
 ## Blocked / Parked
@@ -51,6 +50,7 @@ moved to [closed/BACKLOG-ARCHIVE.md](closed/BACKLOG-ARCHIVE.md#archived-2026-07-
 
 | ID                              | Type          | Title                                                                                                                                          | Closed     | Plan                                                                                                                               |
 | ------------------------------- | ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- | ---------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| `b4f0c8a1` | `docs` | README positioning pass — problem/audience first, full CRUD path in code near the top, refreshed figures | 2026-10-15 | [plan](closed/2026/10/15/b4f0c8a1/plan.md) |
 | `f822490e-9898-4d57-b17c-7d0f318e6399` | `bug` | Express answers 400 (not 500) for request schema validation failures (legacy `EXPRESS-400`) — on `dev`, unreleased | 2026-10-15 | [plan](closed/2026/10/15/f822490e-9898-4d57-b17c-7d0f318e6399/plan.md) |
 | `DEPS-063` | `maintenance` | In-major dependency updates and example lockfile audit fixes (all nine examples at 0 advisories) — released in 0.0.64 | 2026-10-04 | [evidence/2026/10/04/bacf99c4…/evidence.md](evidence/2026/10/04/bacf99c4-236e-4bd1-ae54-8d96713b383a/evidence.md) |
 | `83cef132-c1df-402c-9504-a0df1cdf7567` | `tooling` | Refresh HAWP kit and Codex provider from HAWP main | 2026-10-15 | [plan](closed/2026/10/15/83cef132-c1df-402c-9504-a0df1cdf7567/plan.md) |
