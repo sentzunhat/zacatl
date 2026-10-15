@@ -26,7 +26,6 @@ Each row links to its plan file when one exists.
 
 | ID | Type | Title | Status | Detail | Updated | Next Action |
 | -- | ---- | ----- | ------ | ------ | ------- | ----------- |
-| `ac0c4acf` | improvement | Align work records with HAWP UUID/folder layout | plan-ready | [plan](active/ac0c4acf-c90a-4a32-a66a-b058577368f6/plan.md) | 2026-10-15 | Review dry-run findings; migrate current/open index without renaming closed history. |
 | `0b959aed` | infrastructure | Audit and refresh Zacatl dependencies after 0.0.64 | plan-ready | [plan](active/0b959aed/plan.md) | 2026-10-15 | Re-resolve registry versions and advisories before implementation. |
 
 ## Blocked / Parked
@@ -46,22 +45,20 @@ Each row links to its plan file when one exists.
 Keep this section short (last 5–10 items or last 14–30 days). Compacted 2026-07-27 — 25 older rows
 moved to [closed/BACKLOG-ARCHIVE.md](closed/BACKLOG-ARCHIVE.md#archived-2026-07-27); 2 more on
 2026-09-29 ([archive](closed/BACKLOG-ARCHIVE.md#archived-2026-09-29)), 1 on 2026-10-01, 1 on
-2026-10-03, 1 on 2026-10-04.
+2026-10-03, 1 on 2026-10-04, 3 on [2026-10-15](closed/BACKLOG-ARCHIVE.md#archived-2026-10-15).
 
 | ID                              | Type          | Title                                                                                                                                          | Closed     | Plan                                                                                                                               |
 | ------------------------------- | ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- | ---------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| `ac0c4acf-c90a-4a32-a66a-b058577368f6` | `improvement` | Align work records with HAWP UUID/folder layout — backlog consistency passes; historical closed-record debt documented | 2026-10-15 | [plan](closed/2026/10/15/ac0c4acf-c90a-4a32-a66a-b058577368f6/plan.md) |
 | `b4f0c8a1` | `docs` | README positioning pass — problem/audience first, full CRUD path in code near the top, refreshed figures | 2026-10-15 | [plan](closed/2026/10/15/b4f0c8a1/plan.md) |
 | `f822490e-9898-4d57-b17c-7d0f318e6399` | `bug` | Express answers 400 (not 500) for request schema validation failures (legacy `EXPRESS-400`) — on `dev`, unreleased | 2026-10-15 | [plan](closed/2026/10/15/f822490e-9898-4d57-b17c-7d0f318e6399/plan.md) |
 | `DEPS-063` | `maintenance` | In-major dependency updates and example lockfile audit fixes (all nine examples at 0 advisories) — released in 0.0.64 | 2026-10-04 | [evidence/2026/10/04/bacf99c4…/evidence.md](evidence/2026/10/04/bacf99c4-236e-4bd1-ae54-8d96713b383a/evidence.md) |
 | `83cef132-c1df-402c-9504-a0df1cdf7567` | `tooling` | Refresh HAWP kit and Codex provider from HAWP main | 2026-10-15 | [plan](closed/2026/10/15/83cef132-c1df-402c-9504-a0df1cdf7567/plan.md) |
 | `LOG-001` | `feature` | Shared logger for the Service, Fastify and Express (`toFastifyLogger`, `ServiceConfig.logger`, `LoggerToken`) — released in 0.0.63 | 2026-10-03 | [evidence/2026/10/03/78dba5ff…/evidence.md](evidence/2026/10/03/78dba5ff-0cd1-442e-86e3-f7faf701a4b5/evidence.md) |
-| `RUNTIME-FIX-001` | `bug` | node:sqlite without `sqlite3`, barrel polyfill fix, Fastify double-send fix, production audit fixes — released in 0.0.62 | 2026-10-01 | [evidence/2026/10/01/release-0.0.62-evidence.md](evidence/2026/10/01/release-0.0.62-evidence.md) |
-| `0.0.61` | `release` | 0.0.61 — README badge corrections released (tag, GitHub Release, npm) | 2026-08-16 | [evidence/2026/09/29/backlog-sync-release-evidence.md](evidence/2026/09/29/backlog-sync-release-evidence.md) |
+| `72f2e6b9-a0fd-4abb-8151-c3b061b83281` | `bug` | node:sqlite without `sqlite3`, barrel polyfill fix, Fastify double-send fix, production audit fixes (legacy `RUNTIME-FIX-001`) — released in 0.0.62 | 2026-10-01 | [plan](closed/2026/10/01/72f2e6b9-a0fd-4abb-8151-c3b061b83281/plan.md) |
 | `0.0.60` | `release` | 0.0.60 — CI orchestrator, Docker smoke matrix, DI child containers, README; released | 2026-09-29 | [closed/2026/09/29/0.0.60-release.md](closed/2026/09/29/0.0.60-release.md) |
 | `5c2c9ef3` | `refactoring` | P2: DI layered child containers (infra→domain→app) — shipped in 0.0.60 | 2026-09-29 | [closed/2026/09/29/5c2c9ef3-1a6e-469f-9c25-f644b5e3d635.md](closed/2026/09/29/5c2c9ef3-1a6e-469f-9c25-f644b5e3d635.md) |
 | `GH-NOTIFY-001` | `tooling` | P3: GitHub notification noise — Discussions disabled, hardener policy enforces it | 2026-09-29 | [closed/2026/09/29/GH-NOTIFY-001.md](closed/2026/09/29/GH-NOTIFY-001.md) |
-| `871e98ef`                      | `release`     | P2: v0.0.59 — 4 Dependabot PRs merged, 2 closed superseded, 2 closed blocked on ESLint 10, 9 CVE alerts fixed across examples, released to npm | 2026-07-27 | [closed/2026/07/27/871e98ef-v0.0.59-dependency-bumps.md](closed/2026/07/27/871e98ef-v0.0.59-dependency-bumps.md)                   |
-| `refactor-collapse-duplication` | `refactoring` | P2: Collapse BaseRepository/handler duplication, normalize Sequelize adapter errors — 75 net lines removed, 0 API breaks                       | 2026-07-26 | [closed/2026/07/26/refactor-duplication-collapse.md](closed/2026/07/26/refactor-duplication-collapse.md)                           |
 
 Older closed rows: [closed/BACKLOG-ARCHIVE.md](closed/BACKLOG-ARCHIVE.md).
 

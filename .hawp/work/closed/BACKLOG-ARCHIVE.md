@@ -3,6 +3,14 @@
 Rows compacted out of `BACKLOG.md` → Recently Closed. Newest first.
 Plan files (when they exist) live under `.hawp/work/closed/YYYY/MM/DD/`.
 
+## Archived 2026-10-15
+
+| ID | Type | Title | Closed | Plan |
+| --- | --- | --- | --- | --- |
+| `0.0.61` | `release` | 0.0.61 — README badge corrections released (tag, GitHub Release, npm) | 2026-08-16 | [evidence/2026/09/29/backlog-sync-release-evidence.md](../evidence/2026/09/29/backlog-sync-release-evidence.md) |
+| `871e98ef`                      | `release`     | P2: v0.0.59 — 4 Dependabot PRs merged, 2 closed superseded, 2 closed blocked on ESLint 10, 9 CVE alerts fixed across examples, released to npm | 2026-07-27 | [closed/2026/07/27/871e98ef-v0.0.59-dependency-bumps.md](2026/07/27/871e98ef-v0.0.59-dependency-bumps.md)                   |
+| `refactor-collapse-duplication` | `refactoring` | P2: Collapse BaseRepository/handler duplication, normalize Sequelize adapter errors — 75 net lines removed, 0 API breaks                       | 2026-07-26 | [closed/2026/07/26/refactor-duplication-collapse.md](2026/07/26/refactor-duplication-collapse.md)                           |
+
 ## Archived 2026-10-04
 
 | ID | Type | Title | Closed | Plan |
