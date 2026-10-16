@@ -105,7 +105,7 @@ adjusted to the then-current scripts after inspecting `package.json`.
 
 ## Backlog + Plan Link
 
-**Status now:** plan-ready
+**Status now:** in-progress
 **Plan file:** .hawp/work/active/0b959aed/plan.md
 
 ## Next Step
@@ -114,3 +114,9 @@ adjusted to the then-current scripts after inspecting `package.json`.
   must be re-resolved before implementation)
 - [x] Write or update the plan file
 - [x] Move backlog status to plan-ready
+
+## Implementation checkpoint — 2026-10-16
+
+Patch/minor dependency versions in the root `package.json` and lockfile have been refreshed in the current working tree. `npm ci`, source/test/script type checking, source/test/script linting, and the Zacatl build pass. The focused service tests also pass under Node 26 x86_64.
+
+This is not full completion of the dependency audit: the install reports seven high-severity advisories, and registry/advisory review, example lockfiles, optional peers, consumer smokes, Docker matrix, and production-only audit remain to be checked. Keep this item in progress until those acceptance criteria are addressed.

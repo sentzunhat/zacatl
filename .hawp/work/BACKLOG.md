@@ -26,7 +26,9 @@ Each row links to its plan file when one exists.
 
 | ID | Type | Title | Status | Detail | Updated | Next Action |
 | -- | ---- | ----- | ------ | ------ | ------- | ----------- |
-| `0b959aed` | infrastructure | Audit and refresh Zacatl dependencies after 0.0.64 | plan-ready | [plan](active/0b959aed/plan.md) | 2026-10-15 | Re-resolve registry versions and advisories before implementation. |
+| `0b959aed` | infrastructure | Audit and refresh Zacatl dependencies after 0.0.64 | in-progress | [plan](active/0b959aed/plan.md) | 2026-10-16 | Patch/minor updates are installed and basic checks pass; resolve registry/advisory state and finish the full compatibility matrix |
+| `19965b11` | improvement | Design reusable modular ServiceConfig composition | in-progress | [plan](active/19965b11/plan.md) | 2026-10-16 | Verify new scoped DI, host, readiness, and page-adapter changes across full platform lifecycle and finalize composition contract |
+| `0ab7e9b2` | improvement | Document real-world Zacatl Service composition lessons | in-progress | [plan](active/0ab7e9b2/plan.md) | 2026-10-16 | Finish docs/examples for the revised lifecycle and extension callback, then validate links and example behavior |
 
 ## Blocked / Parked
 

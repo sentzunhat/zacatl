@@ -4,6 +4,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { logger as defaultLogger, LoggerToken } from '../../../src/logs';
 import type { Logger } from '../../../src/logs/types';
 import type { ApplicationRestRoutes } from '../../../src/service/layers/application/types';
+import type { HookHandler } from '../../../src/service/layers/application/entry-points/rest/hook-handlers/hook-handler';
 import {
   ServerType,
   ServerVendor,
@@ -16,8 +17,8 @@ vi.mock('../../../src/service/platforms/server/providers/express/api-adapter', (
     registerRoute: vi.fn(),
     registerHook: vi.fn(),
     registerProxy: vi.fn(),
-    listen: vi.fn(),
-    close: vi.fn(),
+    listen: vi.fn().mockResolvedValue(undefined),
+    close: vi.fn().mockResolvedValue(undefined),
   })),
 }));
 
@@ -41,6 +42,34 @@ class WhoLogsHandler {
 // The pattern the docs show: @singleton() registers in the global container at
 // module load; it must still receive each Service's own logger.
 const singletonInjected: Logger[] = [];
+
+const scopedRouteInjected: Logger[] = [];
+const scopedHookInjected: Logger[] = [];
+
+@injectable()
+class ScopedRoute {
+  public url = '/scoped';
+  public method = 'GET' as const;
+  public schema = {};
+
+  constructor(@inject(LoggerToken) logger: Logger) {
+    scopedRouteInjected.push(logger);
+  }
+
+  async execute(): Promise<Record<string, never>> {
+    return {};
+  }
+}
+
+@injectable()
+class ScopedHook implements HookHandler {
+  public name = 'onRequest' as const;
+  public execute = vi.fn().mockResolvedValue(undefined);
+
+  constructor(@inject(LoggerToken) logger: Logger) {
+    scopedHookInjected.push(logger);
+  }
+}
 
 @singleton()
 class SingletonLogsHandler {
@@ -118,5 +147,17 @@ describe('LoggerToken', () => {
     new Service(serviceConfig());
 
     expect(injected.at(-1)).toBe(defaultLogger);
+  });
+
+  it('resolves Service-managed routes and hooks from their Service scope during platform registration', async () => {
+    const logger = makeLogger();
+    const config = serviceConfig(logger, [ScopedRoute]);
+    config.layers!.application!.entryPoints!.rest!.hooks = [ScopedHook];
+    const scopedService = new Service(config);
+
+    await expect(scopedService.start()).resolves.toBeUndefined();
+    expect(scopedRouteInjected.at(-1)).toBe(logger);
+    expect(scopedHookInjected.at(-1)).toBe(logger);
+    await scopedService.stop();
   });
 });
