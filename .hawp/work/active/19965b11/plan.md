@@ -336,4 +336,7 @@ website-owned Sequelize UUID override requirement are explicitly disclosed in
 the PR context. The existing website work item remains the next consumer
 decision after a compatible package is published.
 
-Branch review: `dev` is ahead of `main` and no commits are missing from `dev`; no local feature branches or attached worktrees/PRs were found. Remote refs are standalone Dependabot proposals and were neither merged nor deleted.
+The release PR CI run [355](https://github.com/sentzunhat/zacatl/actions/runs/39059892471)
+passed the publish dry-run, consumer smoke and eight-example Docker matrix,
+in addition to the CVE and peer-install checks. The website remains on
+published `0.0.64` until owner review, merge and publication.

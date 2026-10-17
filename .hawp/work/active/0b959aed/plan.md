@@ -136,7 +136,9 @@ under development tooling (`braces`, `chokidar`, `fast-glob`, `globby`,
 breaking major downgrades, so they are not applied. ESLint 10 and Vitest 5
 proposals remain out of this release because their compatibility work is not
 complete. The remaining full nine-example build/Docker matrix is a release
-gate and will be reported separately from the earlier targeted validation.
+gate and has now passed as the eight-container matrix in CI run
+[355](https://github.com/sentzunhat/zacatl/actions/runs/39059892471). The
+repository's full publish dry-run and consumer smokes also passed in that run.
 
 Consumer smoke fixtures also show that consumers which explicitly install
 Sequelize continue to receive the moderate advisory through

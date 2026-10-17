@@ -38,7 +38,8 @@
 - Current `dev` implementation previously passed `npm run type:check`,
   `npm test` (84 files / 703 tests), `npm run build`, and
   `npm run smoke:consumers`; focused Docker published-port and readiness-order
-  checks passed. Release-candidate checks are being rerun on this branch.
+  checks passed. The draft PR's full publish dry-run and eight-example Docker
+  matrix passed in CI run [355](https://github.com/sentzunhat/zacatl/actions/runs/39059892471).
 - All nine example lockfiles were refreshed with
   `npm update source-map-js --package-lock-only --prefix <example>`.
 

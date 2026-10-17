@@ -166,3 +166,9 @@ uses published `0.0.64` until the release has been reviewed, merged and
 published. Continue the website migration only through its existing work item
 `2a1dc541-2cca-4c2f-b431-7a6535b77040` after that consumer can install the
 published API.
+
+The `0.0.65` release candidate's PR CI run
+[355](https://github.com/sentzunhat/zacatl/actions/runs/39059892471) passed
+the Docker matrix, package dry-run/consumer smokes, CVE scan and peer install
+check. This is package validation only; it does not establish website
+migration or production behavior.
