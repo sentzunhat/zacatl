@@ -68,6 +68,7 @@ type HttpServerConfig = {
   type: ServerType; // "SERVER" | "GATEWAY"
   vendor: ServerVendor; // "FASTIFY" | "EXPRESS"
   instance: unknown; // FastifyInstance | Express
+  host?: string; // Bind address; defaults to 0.0.0.0 for container reachability
   gateway?: GatewayService; // Required if type is GATEWAY
   prefixes?: ApiPrefixes; // Named route prefixes (e.g. { api: "/api", webhooks: "/webhooks" })
 };
@@ -78,6 +79,7 @@ type HttpServerConfig = {
 - `type` - Server type: `SERVER` (standard REST API) or `GATEWAY` (reverse proxy)
 - `vendor` - HTTP framework: `FASTIFY` or `EXPRESS`
 - `instance` - The Fastify or Express instance (create before passing to config)
+- `host` - Optional bind address; `Service.start({ host })` overrides it. Defaults to `0.0.0.0` for Docker port publishing.
 - `prefixes` - Named route prefixes used by the server and SPA fallback guards
 - `gateway` - Gateway configuration with proxy routes (required when `type` is `GATEWAY`)
 
@@ -91,7 +93,7 @@ Configuration for serving frontend applications (React, Vue, Svelte, etc.) and s
 type PageServerConfig = {
   devServerUrl?: string;
   staticDir?: string;
-  customRegister?: (server: unknown) => Promise<void> | void;
+  customRegister?: (adapter: unknown, rawServer?: unknown) => Promise<void> | void;
   prefixes?: ApiPrefixes;
 };
 ```
@@ -100,7 +102,7 @@ type PageServerConfig = {
 
 - `devServerUrl` - Development server URL for proxying (e.g., Vite dev server at `http://localhost:5173`)
 - `staticDir` - Directory containing built static files (e.g., `./dist/client`)
-- `customRegister` - Custom registration function for advanced server configuration
+- `customRegister` - Custom registration callback. Its first argument is Zacatl's page adapter; the second is the underlying Fastify or Express instance.
 - `prefixes` - API route prefixes to exclude from SPA fallback (default: `{ api: "/api" }`)
 
 ---
@@ -683,8 +685,8 @@ const service = new Service({
   platforms: {
     server: {
       page: {
-        customRegister: async (server) => {
-          const fastify = server as FastifyInstance;
+        customRegister: async (_adapter, rawServer) => {
+          const fastify = rawServer as FastifyInstance;
           // Register custom plugins, middleware, etc.
           await fastify.register(somePlugin);
         },

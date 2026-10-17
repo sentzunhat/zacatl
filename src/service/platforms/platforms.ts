@@ -52,7 +52,11 @@ export class Platforms {
     }
   }
 
-  public async start(options?: { port?: number }): Promise<void> {
+  public async prepare(): Promise<void> {
+    await this.server?.prepare();
+  }
+
+  public async start(options?: { port?: number; host?: string }): Promise<void> {
     if (this.server) {
       await this.server.start(options);
     }

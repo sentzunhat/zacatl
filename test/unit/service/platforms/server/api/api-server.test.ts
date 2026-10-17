@@ -86,6 +86,20 @@ describe('ApiServer', () => {
       expect(adapter.registerRoute).toHaveBeenCalledWith(routeInstance);
     });
 
+    it('resolves service-managed handlers in the supplied application container', async () => {
+      const container = { resolve: vi.fn(), isRegistered: vi.fn() } as never;
+      class ScopedHandler implements RouteHandler {
+        url = '/scoped';
+        method = 'GET' as const;
+        schema = {};
+        execute = vi.fn();
+      }
+      mockResolveDependencies.mockReturnValue([]);
+      apiServer = new ApiServer(makeConfig(), adapter, container);
+      await apiServer.registerAllRoutes({ routes: [ScopedHandler] });
+      expect(mockResolveDependencies).toHaveBeenCalledWith([ScopedHandler], container);
+    });
+
     it('registers gateway proxies when configured', async () => {
       apiServer = new ApiServer(
         makeConfig({
@@ -139,7 +153,7 @@ describe('ApiServer', () => {
   describe('delegates to adapter', () => {
     it('listen() forwards to adapter.listen', async () => {
       await apiServer.listen(8080);
-      expect(adapter.listen).toHaveBeenCalledWith(8080);
+      expect(adapter.listen).toHaveBeenCalledWith(8080, undefined);
     });
 
     it('getRawServer() returns adapter raw server', () => {

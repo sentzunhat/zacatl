@@ -1,7 +1,20 @@
 # NPM-OIDC-001 — replace publish token with npm Trusted Publishing
 
 **UUID:** `NPM-OIDC-001` · **Type:** security/release · **Priority:** P0 · **Reported:** 2026-08-15
-**Status:** plan-ready · **Owner:** agent (unassigned)
+**Status:** parked · **Owner:** agent (unassigned)
+
+## Schedule and deadline
+
+- **Target implementation window:** November–December 2026.
+- **External policy deadline:** January 2027. npm states that direct publishing
+  with bypass-2FA granular access tokens will be removed during January 2027;
+  npm has not published an exact day in the referenced policy documentation.
+- Complete and verify the OIDC migration before January 2027, leaving time to
+  recover the release path before the policy cutoff. Do not wait for the final
+  days of the deadline window.
+- When configuring a new npm Trusted Publisher, schedule the first successful
+  publish/verification within 48 hours because an unvalidated configuration
+  expires.
 
 ## Goal
 
@@ -52,15 +65,27 @@ release verification and provenance intact.
 
 ## Non-goals
 
-- Do not implement this migration as part of the current `0.0.60` preparation
-  without owner approval.
+- Do not implement this as an incidental part of an unrelated release. Scope
+  it as its own reviewed security change, staged against the then-current
+  release workflow.
 - Do not print, copy, rotate, or delete any credential until the exact npm and
   GitHub targets have been verified.
 - Do not weaken branch protection, tag controls, or release gates to make the
   migration pass.
 
+**Checkpoint (2026-10-15):** The 0.0.60 preparation is complete and released;
+this item remains relevant independently. The current `.github/workflows/release.yml`
+still supplies `secrets.NPM_TOKEN` as `NODE_AUTH_TOKEN` to the publish step.
+
+## Parked — 2026-10-15
+
+**Reason:** Deferred per owner direction until the November–December 2026
+implementation window. Complete and verify the migration before npm's January
+2027 policy cutoff; do not let the parked status push work past that deadline.
+
 ## References
 
 - npm Trusted Publishing: https://docs.npmjs.com/trusted-publishers/
+- npm access-token policy: https://docs.npmjs.com/about-access-tokens/
 - npm provenance: https://docs.npmjs.com/generating-provenance-statements/
 - GitHub Actions OIDC: https://docs.github.com/en/actions/reference/security/oidc
