@@ -16,7 +16,7 @@ export interface ApiServerPort {
   registerRoute(handler: RouteHandler): void;
   registerHook(handler: HookHandler): void;
   registerProxy(config: ProxyConfig): void;
-  listen(port: number): Promise<void>;
+  listen(port: number, host?: string): Promise<void>;
   close(): Promise<void>;
   getRawServer(): unknown;
 }

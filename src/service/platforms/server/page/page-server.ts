@@ -98,7 +98,7 @@ export class PageServer {
     }
 
     if (customRegister != null) {
-      await customRegister(this.adapter);
+      await customRegister(this.adapter, this.adapter.getRawServer());
     }
   }
 

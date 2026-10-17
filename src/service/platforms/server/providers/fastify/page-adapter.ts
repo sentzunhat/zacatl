@@ -8,6 +8,7 @@ import { isUnderPrefix } from '../../shared/prefixes/is-under-prefix';
  * Fastify implementation of PageServerPort.
  */
 export const createPageAdapter = (server: FastifyInstance): PageServerPort => ({
+  getRawServer: () => server,
   registerStaticFiles: (config: StaticConfig): void => {
     server.register(fastifyStatic, {
       root: config.root,

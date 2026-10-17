@@ -18,4 +18,5 @@ export interface PageServerPort {
   registerStaticFiles(config: StaticConfig): void;
   registerSpaFallback(prefixes: ApiPrefixes, staticDir: string): void;
   register(): Promise<void>;
+  getRawServer(): unknown;
 }

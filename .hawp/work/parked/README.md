@@ -1,23 +1,10 @@
 # Parked Work
 
-Flat folder for deferred or icebox items.
+Deferred items: not active and not closed — low-priority, blocked, or set
+aside until the owner reprioritizes them.
 
-Parked items are not active and not closed — they are ideas, low-priority tasks, or blocked items set aside for later.
+New parked items use the folder layout (`parked/{id}/plan.md`). Older items
+here are legacy flat files (`parked/{id}.md`), which remain valid.
 
-```
-parked/
-  IDEA-001.md
-  TASK-005.md
-```
-
-When a parked item becomes active, move it to:
-
-```
-../active/<ID>.md
-```
-
-When a parked item is cancelled or will never be done, move it to:
-
-```
-../closed/YYYY/MM/DD/<ID>.md
-```
+- To resume: move the item to `../active/` and update its backlog row.
+- To cancel: move it to `../closed/YYYY/MM/DD/` with the reason recorded.

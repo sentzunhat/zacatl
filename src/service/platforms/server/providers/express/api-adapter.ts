@@ -163,10 +163,10 @@ export const createApiAdapter = (
       });
     },
 
-    listen: async (port: number): Promise<void> => {
+    listen: async (port: number, host = '0.0.0.0'): Promise<void> => {
       return new Promise((resolve, reject) => {
         httpServer = server
-          .listen(port, '0.0.0.0', () => {
+          .listen(port, host, () => {
             resolve();
           })
           .on('error', reject);
