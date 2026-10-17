@@ -120,3 +120,32 @@ adjusted to the then-current scripts after inspecting `package.json`.
 Patch/minor dependency versions in the root `package.json` and lockfile have been refreshed in the current working tree. `npm ci`, source/test/script type checking, source/test/script linting, and the Zacatl build pass. The focused service tests also pass under Node 26 x86_64.
 
 This is not full completion of the dependency audit: the install reports seven high-severity advisories, and registry/advisory review, example lockfiles, optional peers, consumer smokes, Docker matrix, and production-only audit remain to be checked. Keep this item in progress until those acceptance criteria are addressed.
+
+### Release candidate dependency review — 2026-10-17
+
+The release candidate on `codex/release-0.0.65` includes the compatible root
+dependency refresh already on `dev` and refreshes all nine example lockfiles
+to their linked root package metadata. Each example now resolves
+`source-map-js@1.2.2`; before refresh, audits of the root and the
+`express-sqlite-react` example showed respectively seven high development-only
+findings and one high `source-map-js` finding. The example lockfile refresh
+removes the latter. Root `npm audit --omit=dev --audit-level=moderate` reports
+zero vulnerabilities. Root `npm audit` still reports seven high findings
+under development tooling (`braces`, `chokidar`, `fast-glob`, `globby`,
+`http-proxy-middleware`, `micromatch`, `tsc-alias`); npm's offered fixes are
+breaking major downgrades, so they are not applied. ESLint 10 and Vitest 5
+proposals remain out of this release because their compatibility work is not
+complete. The remaining full nine-example build/Docker matrix is a release
+gate and will be reported separately from the earlier targeted validation.
+
+Consumer smoke fixtures also show that consumers which explicitly install
+Sequelize continue to receive the moderate advisory through
+`sequelize/node_modules/uuid`; Zacatl's scoped override cannot enforce a
+consumer repository's dependency tree. Keep that separately tracked under the
+existing website Sequelize/UUID work item.
+
+The lockfile change that came from the open `source-map-js` proposal is being
+absorbed into this release candidate. Older compatible Dependabot proposals
+are superseded by the already-refreshed `dev` dependency graph. Breaking-major
+proposals remain separate. Do not close or delete those proposals as if their
+work were included.

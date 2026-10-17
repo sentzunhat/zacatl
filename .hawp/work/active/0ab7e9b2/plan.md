@@ -156,3 +156,13 @@ The existing website migration plan remains documentation/consumer guidance; no 
 `docs/service/README.md` now documents this callback contract and host option. Build, type checks, full Zacatl tests (84 files/703 tests), and all five consumer smoke fixtures passed. The Fastify SQLite Docker image reported a wildcard bind and accepted a published-port request (HTTP 200). A live Fastify Docker port check and a delayed-repository listener test both passed. The website's actual route lifecycle is still its current manual implementation, and its deployed or migrated behavior has not been claimed or changed.
 
 Next: after Zacatl implementation review/release, use the existing website-owned work item `2a1dc541` to decide whether to adopt Service lifecycle and the website-local Sequelize UUID override; do not treat the checkout override as consumer protection.
+
+### Release candidate update — 2026-10-17
+
+`dev` has been assembled as a `0.0.65` draft release candidate for owner
+review. The source changes and verified integration behavior above are in the
+proposed `dev` → `main` PR. No website code was changed, and the website still
+uses published `0.0.64` until the release has been reviewed, merged and
+published. Continue the website migration only through its existing work item
+`2a1dc541-2cca-4c2f-b431-7a6535b77040` after that consumer can install the
+published API.

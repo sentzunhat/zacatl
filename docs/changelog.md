@@ -2,6 +2,55 @@
 
 ---
 
+## [0.0.65] - 2026-10-17
+
+**Status**: Draft release candidate for owner review; not published
+
+### ✨ Features and fixes
+
+- `Service.start({ port, host })` and `HttpServerConfig.host` provide an
+  additive host override while keeping `0.0.0.0` as the default.
+- Service-managed REST handlers resolve from their Application child DI
+  container. Startup prepares database and page platforms, awaits repository
+  readiness, then opens the HTTP listener; startup failure triggers platform
+  cleanup.
+- Page `customRegister` keeps its adapter argument and adds the raw native
+  Fastify/Express instance as a second argument for plugin and hook setup.
+- Express request-schema validation failures return HTTP 400.
+
+### 📦 Dependencies
+
+- Root compatible dependency refresh from `dev` is included. All nine example
+  lockfiles now match the linked root package metadata and resolve
+  `source-map-js` 1.2.2; this fixes the example-only audit finding present at
+  1.2.1. No forced downgrade or major toolchain proposal is included.
+- Consumer smoke audits confirm the SQL examples that directly install
+  Sequelize still report the advisory on Sequelize's nested `uuid` copy;
+  Zacatl's own scoped override does not control that dependency tree. This
+  consumer-owned finding remains for the existing website/advisory work item.
+- `npm audit --omit=dev` is clean. The root development audit still reports
+  seven high advisories through `braces`/`micromatch` under development tools;
+  npm only proposes breaking major downgrades, which are excluded pending a
+  compatible remediation.
+
+### 🧪 Verification
+
+- Current `dev` implementation previously passed `npm run type:check`,
+  `npm test` (84 files / 703 tests), `npm run build`, and
+  `npm run smoke:consumers`; focused Docker published-port and readiness-order
+  checks passed. Release-candidate checks are being rerun on this branch.
+- All nine example lockfiles were refreshed with
+  `npm update source-map-js --package-lock-only --prefix <example>`.
+
+### 🚦 Release boundary
+
+- This version bump and changelog prepare the `dev` → `main` draft PR. The
+  repository's automated tag, npm publish, and GitHub Release happen only
+  after an owner-approved merge to `main` and successful release gates.
+- The website still consumes published Zacatl 0.0.64. This release candidate
+  does not migrate the website; website adoption remains tracked by its
+  existing work item `2a1dc541-2cca-4c2f-b431-7a6535b77040`.
+
 ## [0.0.64] - 2026-10-03
 
 **Status**: Release candidate for the automated `main` release path

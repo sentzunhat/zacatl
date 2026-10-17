@@ -325,4 +325,15 @@ Direct checks: `npm run type:check:src`, `npm run type:check:test`, `npm test` (
 
 Final verification on current source: `npm run type:check`, `npm test` (84 files/703 tests), `npm run build`, and `npm run smoke:consumers` passed. Generated ESM declarations include `Service.start({ port?, host? })` and `HttpServerConfig.host`; `git diff --check` passes. Review the Fastify consumer plugin/hook-order case before any website migration. Website consumers must use their own Sequelize override while upstream Sequelize retains vulnerable UUID. No version bump or release was prepared.
 
+### Release candidate update — 2026-10-17
+
+The previously verified implementation is now being prepared for owner review
+as Zacatl `0.0.65` on `codex/release-0.0.65`, targeting `main` from `dev`.
+This is a release candidate only; no tag, publish, merge, or website migration
+has occurred. The version/changelog and dependency findings are summarized in
+`docs/changelog.md`. The remaining development-only audit findings and the
+website-owned Sequelize UUID override requirement are explicitly disclosed in
+the PR context. The existing website work item remains the next consumer
+decision after a compatible package is published.
+
 Branch review: `dev` is ahead of `main` and no commits are missing from `dev`; no local feature branches or attached worktrees/PRs were found. Remote refs are standalone Dependabot proposals and were neither merged nor deleted.
