@@ -29,6 +29,7 @@ describe('PageServer', () => {
       registerStaticFiles: vi.fn(),
       registerSpaFallback: vi.fn(),
       register: vi.fn().mockResolvedValue(undefined),
+      getRawServer: vi.fn().mockReturnValue({ native: true }),
     };
   });
 
@@ -99,7 +100,7 @@ describe('PageServer', () => {
 
       await pageServer.configure();
 
-      expect(customRegister).toHaveBeenCalledWith(adapter);
+      expect(customRegister).toHaveBeenCalledWith(adapter, { native: true });
     });
 
     it('should invoke customRegister even when staticDir is absent', async () => {
@@ -108,7 +109,7 @@ describe('PageServer', () => {
 
       await pageServer.configure();
 
-      expect(customRegister).toHaveBeenCalledWith(adapter);
+      expect(customRegister).toHaveBeenCalledWith(adapter, { native: true });
     });
   });
 

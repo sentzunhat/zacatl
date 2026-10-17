@@ -12,6 +12,7 @@ type MockFastifyServer = {
   route: ReturnType<typeof vi.fn>;
   addHook: ReturnType<typeof vi.fn>;
   register: ReturnType<typeof vi.fn<() => Promise<void>>>;
+  listen: ReturnType<typeof vi.fn>;
 };
 
 describe('FastifyApiAdapter', () => {
@@ -25,8 +26,17 @@ describe('FastifyApiAdapter', () => {
       route: vi.fn(),
       addHook: vi.fn(),
       register: vi.fn().mockResolvedValue(undefined),
+      listen: vi.fn().mockResolvedValue(undefined),
     };
     adapter = createApiAdapter(mockServer as unknown as FastifyInstance);
+  });
+
+  it('uses the container-safe default host and accepts an explicit host', async () => {
+    await adapter.listen(3000);
+    expect(mockServer.listen).toHaveBeenCalledWith({ port: 3000, host: '0.0.0.0' });
+
+    await adapter.listen(3001, '127.0.0.1');
+    expect(mockServer.listen).toHaveBeenLastCalledWith({ port: 3001, host: '127.0.0.1' });
   });
 
   describe('registerRoute', () => {

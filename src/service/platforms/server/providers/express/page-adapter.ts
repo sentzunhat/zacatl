@@ -8,6 +8,7 @@ import { isUnderPrefix } from '../../shared/prefixes/is-under-prefix';
  * Express implementation of PageServerPort.
  */
 export const createPageAdapter = (server: Express): PageServerPort => ({
+  getRawServer: () => server,
   registerStaticFiles: (config: StaticConfig): void => {
     server.use(
       config.prefix ?? '/',

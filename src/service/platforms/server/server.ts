@@ -47,7 +47,11 @@ export class Server {
 
   private readonly logger: Logger;
 
-  constructor(config: ServerConfig, container?: DependencyContainer) {
+  constructor(
+    config: ServerConfig,
+    container?: DependencyContainer,
+    applicationContainer?: DependencyContainer,
+  ) {
     this.config = config;
     // The Service registers its logger in the container it shares with the
     // layers; standalone servers fall back to the Zacatl logger.
@@ -61,7 +65,7 @@ export class Server {
     this.apiAdapter = adapters.api;
     this.pageAdapter = adapters.page;
 
-    this.initializeServers();
+    this.initializeServers(applicationContainer ?? container);
   }
 
   /**
@@ -100,8 +104,8 @@ export class Server {
   /**
    * Initialize ApiServer, PageServer, and DatabaseServer
    */
-  private initializeServers(): void {
-    this.apiServer = new ApiServer(this.config.server, this.apiAdapter);
+  private initializeServers(container?: DependencyContainer): void {
+    this.apiServer = new ApiServer(this.config.server, this.apiAdapter, container);
     this.pageServer = new PageServer(this.config, this.pageAdapter);
 
     if (this.config.databases.length > 0) {
@@ -138,15 +142,24 @@ export class Server {
   /**
    * Start the server
    */
-  public async start(options?: { port?: number }): Promise<void> {
+  public async prepare(): Promise<void> {
     try {
-      // 1. Configure databases
       await this.configureDatabases();
-
-      // 2. Configure page server (static files, SPA)
       if (this.pageServer) {
         await this.pageServer.configure();
       }
+    } catch (error: unknown) {
+      throw new CustomError({
+        message: `failed to prepare service "${this.config.name}"`,
+        code: 500,
+        reason: 'service preparation failed',
+        error: error as Error,
+      });
+    }
+  }
+
+  public async start(options?: { port?: number; host?: string }): Promise<void> {
+    try {
 
       // 3. Start API server listening
       if (!this.apiServer) {
@@ -159,7 +172,8 @@ export class Server {
       }
 
       const port = options?.port ?? this.config.port;
-      await this.apiServer.listen(port);
+      const host = options?.host ?? this.config.server.host ?? '0.0.0.0';
+      await this.apiServer.listen(port, host);
     } catch (error: unknown) {
       throw new CustomError({
         message: `failed to start service "${this.config.name}"`,

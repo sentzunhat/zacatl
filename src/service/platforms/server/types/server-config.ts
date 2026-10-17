@@ -14,6 +14,8 @@ export interface HttpServerConfig {
   vendor: ServerVendor;
   instance: unknown;
   prefixes?: ApiPrefixes;
+  /** Bind address used by Service.start(). Defaults to 0.0.0.0 for container reachability. */
+  host?: string;
   gateway?: GatewayService;
 }
 
@@ -35,7 +37,8 @@ export interface PageServerConfig {
    * @example { maxAge: '1y', immutable: true }
    */
   cache?: { maxAge?: number | string; immutable?: boolean } | undefined;
-  customRegister?: ((server: unknown) => Promise<void> | void) | undefined;
+  /** Configure the page server adapter; second argument exposes the raw Fastify/Express instance. */
+  customRegister?: ((server: unknown, rawServer?: unknown) => Promise<void> | void) | undefined;
 }
 
 export enum ServerType {
