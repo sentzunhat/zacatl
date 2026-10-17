@@ -146,8 +146,8 @@ Sequelize continue to receive the moderate advisory through
 consumer repository's dependency tree. Keep that separately tracked under the
 existing website Sequelize/UUID work item.
 
-The lockfile change that came from the open `source-map-js` proposal is being
-absorbed into this release candidate. Older compatible Dependabot proposals
-are superseded by the already-refreshed `dev` dependency graph. Breaking-major
-proposals remain separate. Do not close or delete those proposals as if their
-work were included.
+The lockfile change from Dependabot PR #137 is absorbed across the affected
+example locks. PR #137 and compatible older proposals whose versions are
+superseded by `dev` were closed, and their stale branch refs were removed.
+Breaking-major proposals remain open for separate compatibility decisions:
+ESLint 10 (#131, #86), Vitest 5 (#127), and coverage-istanbul 5 (#125).
