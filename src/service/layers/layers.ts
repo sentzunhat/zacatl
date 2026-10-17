@@ -8,12 +8,14 @@ import type { LayersConfig } from './types';
 
 export class Layers {
   private readonly infrastructure: Infrastructure | undefined;
+  private readonly applicationContainer: DependencyContainer;
 
   constructor(config: LayersConfig, parentContainer?: DependencyContainer) {
     // CRITICAL: Register dependencies in order so each layer can resolve previous layers
     const infraContainer = createChildContainer(parentContainer);
     const domainContainer = createChildContainer(infraContainer);
     const appContainer = createChildContainer(domainContainer);
+    this.applicationContainer = appContainer;
 
     // 1. Infrastructure (repositories) - no dependencies
     if (config.infrastructure) {
@@ -33,5 +35,9 @@ export class Layers {
 
   public async start(): Promise<void> {
     await this.infrastructure?.start();
+  }
+
+  public getApplicationContainer(): DependencyContainer {
+    return this.applicationContainer;
   }
 }

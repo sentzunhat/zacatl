@@ -3,7 +3,7 @@
 **Type:** feature
 **Complexity:** medium
 **Impact:** additive, no breaking changes
-**Status:** plan-ready
+**Status:** parked
 
 ---
 

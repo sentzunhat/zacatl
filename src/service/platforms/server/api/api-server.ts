@@ -1,5 +1,6 @@
 import { resolveDependencies } from '@zacatl/dependency-injection';
 import { CustomError, InternalServerError } from '@zacatl/error';
+import type { DependencyContainer } from '@zacatl/third-party/dependency-injection/tsyringe';
 
 import type { ApiServerPort, ProxyConfig } from './port';
 import type { RouteHandler } from '../../../layers/application/entry-points/rest/fastify/handlers/route-handler';
@@ -27,10 +28,12 @@ interface RegisterHandlersInput {
 export class ApiServer {
   private readonly config: HttpServerConfig;
   private readonly adapter: ApiServerPort;
+  private readonly container: DependencyContainer | undefined;
 
-  constructor(config: HttpServerConfig, adapter: ApiServerPort) {
+  constructor(config: HttpServerConfig, adapter: ApiServerPort, container?: DependencyContainer) {
     this.config = config;
     this.adapter = adapter;
+    this.container = container;
   }
 
   /**
@@ -92,7 +95,7 @@ export class ApiServer {
       return;
     }
 
-    const hooks = resolveDependencies(restEntryPoints.hooks);
+    const hooks = resolveDependencies(restEntryPoints.hooks, this.container);
 
     await this.registerHandlers({
       handlers: hooks,
@@ -108,7 +111,7 @@ export class ApiServer {
       return;
     }
 
-    const routes = resolveDependencies(restEntryPoints.routes);
+    const routes = resolveDependencies(restEntryPoints.routes, this.container);
 
     await this.registerHandlers({
       handlers: routes,
@@ -134,8 +137,8 @@ export class ApiServer {
   /**
    * Start listening on port
    */
-  public async listen(port: number): Promise<void> {
-    await this.adapter.listen(port);
+  public async listen(port: number, host?: string): Promise<void> {
+    await this.adapter.listen(port, host);
   }
 
   /**

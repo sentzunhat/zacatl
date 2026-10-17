@@ -1,9 +1,13 @@
 import type { Request } from 'express';
 import { describe, it, expect } from 'vitest';
 
+import { BadRequestError } from '@zacatl/error';
 import { z } from '@zacatl/third-party/zod';
 
-import { applyZodSchema } from '../../../../../../../src/service/platforms/server/providers/express/schema-helper';
+import {
+  applyZodSchema,
+  RequestValidationError,
+} from '../../../../../../../src/service/platforms/server/providers/express/schema-helper';
 import { createMockExpressRequest } from '../../../../../helpers/rest/schema-fixtures';
 
 describe('applyZodSchema()', () => {
@@ -136,6 +140,33 @@ describe('applyZodSchema()', () => {
         req,
       ),
     ).rejects.toThrow();
+  });
+
+  it('wraps Zod failures in a 400 RequestValidationError with Fastify-style context', async () => {
+    const req = createMockExpressRequest({ body: {} });
+
+    const error = await applyZodSchema({ body: z.object({ language: z.string() }) }, req).catch(
+      (e: unknown) => e,
+    );
+
+    expect(error).toBeInstanceOf(RequestValidationError);
+    expect(error).toBeInstanceOf(BadRequestError);
+    const validationError = error as RequestValidationError;
+    expect(validationError.statusCode).toBe(400);
+    expect(validationError.status).toBe(400);
+    expect(validationError.code).toBe(400);
+    expect(validationError.validationContext).toBe('body');
+    expect(validationError.validation[0]?.path).toEqual(['language']);
+    expect(validationError.message).toMatch(/^body\/language /);
+  });
+
+  it('rethrows non-Zod schema errors unchanged', async () => {
+    const req = createMockExpressRequest({ body: {} });
+    const boom = new Error('boom');
+
+    await expect(
+      applyZodSchema({ body: { parseAsync: () => Promise.reject(boom) } }, req),
+    ).rejects.toBe(boom);
   });
 
   it('replaces querystring when req.query is a getter-only accessor (Express 5)', async () => {

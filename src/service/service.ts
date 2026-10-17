@@ -67,7 +67,10 @@ export class Service {
     }
 
     if (platforms != null) {
-      this.platforms = new Platforms(platforms, serviceContainer);
+      this.platforms = new Platforms(
+        platforms,
+        this.layers?.getApplicationContainer() ?? serviceContainer,
+      );
     }
 
     if (run?.auto === true) {
@@ -168,7 +171,7 @@ export class Service {
   /**
    * Start the service platforms and register entrypoints when present.
    *
-   * @param options - Optional start options. For example `{ port?: number }`.
+   * @param options - Optional start options. For example `{ port?: number, host?: string }`.
    * @returns A promise that resolves when platform startup completes.
    */
   /**
@@ -180,19 +183,32 @@ export class Service {
     await this.platforms?.stop();
   }
 
-  public async start(options?: { port?: number }): Promise<void> {
-    if (this.config.layers?.application?.entryPoints) {
-      await this.platforms?.registerEntrypoints(this.config.layers?.application?.entryPoints);
+  public async start(options?: { port?: number; host?: string }): Promise<void> {
+    try {
+      if (this.config.layers?.application?.entryPoints) {
+        await this.platforms?.registerEntrypoints(this.config.layers?.application?.entryPoints);
+      }
 
-      await this.platforms?.start(options);
+      if (this.config.type === ServiceType.SERVER) {
+        // Connect databases and run callbacks before repository readiness;
+        // only then open HTTP so requests cannot race repository.ready().
+        await this.platforms?.prepare();
+        await this.layers?.start();
+        await this.platforms?.start(options);
+      } else {
+        // Preserve the existing CLI/desktop platform start contract.
+        await this.platforms?.start(options);
+        await this.layers?.start();
+      }
+    } catch (error) {
+      try {
+        await this.platforms?.stop();
+      } catch {
+        // Preserve the startup failure while making a best effort to release
+        // database connections and any partially initialized server.
+      }
+      throw error;
     }
-
-    // Await repository/adapter readiness AFTER platforms start: database
-    // connections are opened (and their DI tokens registered) inside
-    // platform start, so awaiting earlier would crash the documented
-    // connection-only flows. Failures still surface at startup, not on
-    // the first query.
-    await this.layers?.start();
   }
 }
 
