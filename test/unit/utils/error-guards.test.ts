@@ -106,6 +106,17 @@ describe('Error Guard Utilities', () => {
     it('should reject objects with name field but not ZodError', () => {
       expect(isZodError({ name: 'CustomError' })).toBe(false);
     });
+
+    it('should reject a ZodError name without usable issues', () => {
+      expect(isZodError(Object.assign(new Error('schema failed'), { name: 'ZodError' })))
+        .toBe(false);
+      expect(isZodError({ name: 'ZodError', issues: [{ message: 'invalid' }] }))
+        .toBe(false);
+      expect(isZodError(Object.assign(new Error('invalid'), {
+        name: 'ZodError',
+        issues: [{ path: ['name'], message: 'required' }],
+      }))).toBe(true);
+    });
   });
 
   describe('isCustomError()', () => {

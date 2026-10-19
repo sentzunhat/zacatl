@@ -169,6 +169,15 @@ describe('applyZodSchema()', () => {
     ).rejects.toBe(boom);
   });
 
+  it('rethrows malformed ZodError-like schema failures unchanged', async () => {
+    const req = createMockExpressRequest({ body: {} });
+    const failure = Object.assign(new Error('schema failed'), { name: 'ZodError' });
+
+    await expect(
+      applyZodSchema({ body: { parseAsync: () => Promise.reject(failure) } }, req),
+    ).rejects.toBe(failure);
+  });
+
   it('replaces querystring when req.query is a getter-only accessor (Express 5)', async () => {
     // Express 5's IncomingMessage defines `query` as a prototype getter with
     // no setter — plain `req.query = value` throws
