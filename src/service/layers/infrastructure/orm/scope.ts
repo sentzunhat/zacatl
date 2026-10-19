@@ -15,5 +15,9 @@ export const withOrmConstructionScope = <T>(
   construct: () => T,
 ): T => constructionScope.run(container, construct);
 
+/** Scope explicitly chosen by an enclosing composition boundary, if any. */
+export const getActiveOrmConstructionScope = (): DependencyContainer | undefined =>
+  constructionScope.getStore();
+
 export const getOrmConstructionScope = (): DependencyContainer =>
   constructionScope.getStore() ?? getContainer();

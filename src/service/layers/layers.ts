@@ -5,14 +5,15 @@ import {
   type DependencyContainer,
 } from '@zacatl/third-party/dependency-injection/tsyringe';
 
+import { Application } from './application/application';
 import { ApplicationConfigToken, ApplicationContainerToken } from './application/tokens';
 import { DomainConfigToken, DomainContainerToken } from './domain/tokens';
-import { InfrastructureConfigToken, InfrastructureContainerToken } from './infrastructure/tokens';
+import { withOrmConstructionScope } from './infrastructure/orm/scope';
 import { LayerContainerScopesToken, LayersConfigToken, type LayerContainerScopes } from './tokens';
 import { ServiceContainerToken } from '../tokens/service';
-import { Application } from './application/application';
 import { Domain } from './domain/domain';
 import { Infrastructure } from './infrastructure/infrastructure';
+import { InfrastructureConfigToken, InfrastructureContainerToken } from './infrastructure/tokens';
 import type { LayersConfig } from './types';
 import {
   createChildContainer,
@@ -68,7 +69,16 @@ export class Layers {
     // 1. Infrastructure (repositories) - no dependencies
     if (config.infrastructure) {
       registerValue(InfrastructureConfigToken, config.infrastructure, infraContainer);
-      this.infrastructure = infraContainer.resolve(Infrastructure);
+      // Direct Layers consumers historically register ORM instances in the
+      // global container, including when they supply a parent for layer DI.
+      // Service-managed Layers keep ORM resolution strictly inside their
+      // owning Infrastructure container.
+      this.infrastructure = registeredContainers == null
+        ? withOrmConstructionScope(
+          getContainer(),
+          () => infraContainer.resolve(Infrastructure),
+        )
+        : infraContainer.resolve(Infrastructure);
     }
 
     // 2. Domain (services) - depends on repositories

@@ -6,7 +6,7 @@ import {
   type DependencyContainer,
 } from '@zacatl/third-party/dependency-injection/tsyringe';
 
-import { withOrmConstructionScope } from './orm/scope';
+import { getActiveOrmConstructionScope, withOrmConstructionScope } from './orm/scope';
 import { InfrastructureConfigToken, InfrastructureContainerToken } from './tokens';
 import type { InfrastructureConfig, InfrastructureUnknownRepository } from './types';
 import { ensureRegisteredSingleton, getContainer } from '../../../dependency-injection/container';
@@ -51,7 +51,7 @@ export class Infrastructure {
     }
 
     const resolvedRepositories = withOrmConstructionScope(
-      this.container ?? getContainer(),
+      getActiveOrmConstructionScope() ?? this.container ?? getContainer(),
       () => resolveDependencies<InfrastructureUnknownRepository>(
         this.config.repositories ?? [],
         this.container,
