@@ -87,3 +87,15 @@ The full local suite passed (85 files / 732 tests), as did type checks and
 build. Consumer smoke and PR-head CI remain to be verified.
 
 **Status:** in-progress until consumer and pushed-head verification finish.
+
+## Follow-up review — 2026-10-19
+
+Copilot found that direct `new Layers(config)` had lost visibility into ORM
+instances registered through the legacy global helper. Focused tests first
+reproduced failed `ready()` for both direct Layers forms. The composition
+boundary now explicitly chooses the legacy global ORM source whenever Layers
+is built without Service-provided scopes, even if a parent container is used
+for other layer DI. Service-managed Layers continue to capture only their
+Infrastructure container; ORM adapters do not recursively resolve globals.
+Focused direct tests and the two-Service isolation tests passed. Final PR-head
+CI remains the gate.

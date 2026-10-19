@@ -148,3 +148,21 @@ Verify the pushed PR head and CI before development integration. Keep the
 accepted `ApiServerPort.listen(host, port)` compatibility thread explicitly
 unresolved. The database source/config migration and release PR to `main`
 remain separate work; no merge or publication occurred at this checkpoint.
+
+## Later Copilot review follow-up — 2026-10-19
+
+The review on squashed head `5a3e594a` identified a direct `Layers` ORM fallback
+regression and a malformed ZodError guard. Both were reproduced with focused
+tests before source changes. Direct Layers now explicitly captures the legacy
+global ORM source, including when a parent is supplied for layer DI;
+Service-owned Layers continue to capture their Infrastructure scope. The
+shared `isZodError` guard now checks the issue shape before request or
+configuration error wrapping. Final local verification passed 736 tests across
+85 files, type checks, lint, build and consumer smoke. The final-head CI result
+remains unproven at this checkpoint.
+
+The review overview mentioned restart and partial connection cleanup without
+separate inline findings. Source inspection found plausible lifecycle gaps;
+`f1080c66` owns reproduction and contract design in a separate change. The
+database ownership move remains `bfea146e`. The host-first adapter break stays
+an accepted, intentionally unresolved review thread.

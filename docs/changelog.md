@@ -32,6 +32,11 @@
   Mongoose index options and models also belong to each Service. Use
   `service.getMongooseIndexManager()` to inspect Service-owned models; direct
   manual adapters retain their global registry path.
+- Direct `Layers` composition reads ORM registrations from the global
+  container, including when supplied a parent for layer DI. Service-managed
+  repositories still read only their own Infrastructure scope.
+- Zod error detection checks the issue shape before wrapping validation
+  failures, so malformed lookalikes are rethrown unchanged.
 - Page `customRegister` keeps its adapter argument and adds the raw native
   Fastify/Express instance as a second argument for plugin and hook setup.
 - Express request-schema validation failures return HTTP 400.
@@ -54,7 +59,7 @@
 
 ### 🧪 Verification
 
-- The current local development candidate passed `npm test` (85 files / 732 tests),
+- The current local development candidate passed `npm test` (85 files / 736 tests),
   including direct-start preparation and prepare-then-start idempotence
   regressions. The earlier implementation also passed `npm run type:check`,
   `npm run build`, and
