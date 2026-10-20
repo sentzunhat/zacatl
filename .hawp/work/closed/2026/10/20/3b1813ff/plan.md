@@ -29,10 +29,18 @@ arrays and other malformed failures are rethrown unchanged.
 
 ## Verification and gate
 
-Focused guard and Express tests pass: 2 files / 57 tests, including malformed
-and empty issue-array cases. Full local suite passed on the prior source head:
-85 files / 736 tests; source/test/script type checks, build and lint passed
-(existing lint warnings only). Verify type checks and CI on the updated PR
-head before closure.
+Focused guard and Express tests pass on `caeef07c`: 2 files / 57 tests,
+including malformed and empty issue-array cases. `npm run type:check` passes.
+The preceding full local suite passed at 85 files / 736 tests, and the full
+PR CI run [39436096400](https://github.com/sentzunhat/zacatl/actions/runs/39436096400)
+passes all 12 checks on `caeef07c`, including publish dry-run and eight Docker
+smoke jobs.
 
-**Status:** in-progress until the pushed head is verified.
+## Closure
+
+The malformed and empty issue-array paths now return false from the shared
+structural guard, while nonempty valid issue arrays remain recognized. The
+review finding is fixed and verified. The separate accepted adapter-contract
+thread does not block closure of this validation item.
+
+**Status:** closed 2026-10-20.
