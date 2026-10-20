@@ -112,6 +112,10 @@ describe('Error Guard Utilities', () => {
         .toBe(false);
       expect(isZodError({ name: 'ZodError', issues: [{ message: 'invalid' }] }))
         .toBe(false);
+      expect(isZodError(Object.assign(new Error('schema failed'), {
+        name: 'ZodError',
+        issues: [],
+      }))).toBe(false);
       expect(isZodError(Object.assign(new Error('invalid'), {
         name: 'ZodError',
         issues: [{ path: ['name'], message: 'required' }],

@@ -23,13 +23,16 @@ only `name`. Real Zod validation errors passed existing tests.
 
 **Decision:** Strengthen the shared guard to accept an `Error` named
 `ZodError` only when `issues` is an array whose members provide a path array
-and message string. This keeps cross-copy structural recognition and makes all
-callers use the same boundary. Other failures are rethrown unchanged.
+and message string, and contains at least one issue. This keeps cross-copy
+structural recognition and makes all callers use the same boundary. Empty
+arrays and other malformed failures are rethrown unchanged.
 
 ## Verification and gate
 
-Focused guard and Express tests pass. Full local suite passed: 85 files / 736
-tests; source/test/script type checks, build and lint passed (existing lint
-warnings only). Final PR-head CI and review thread status remain to verify.
+Focused guard and Express tests pass: 2 files / 57 tests, including malformed
+and empty issue-array cases. Full local suite passed on the prior source head:
+85 files / 736 tests; source/test/script type checks, build and lint passed
+(existing lint warnings only). Verify type checks and CI on the updated PR
+head before closure.
 
 **Status:** in-progress until the pushed head is verified.

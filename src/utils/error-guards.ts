@@ -24,7 +24,7 @@ export const isZodError = (error: unknown): error is ZodError => {
   // The name alone is not enough: a custom schema can reject an unrelated
   // Error named ZodError. Consumers render issue.path and issue.message.
   const issues: unknown = (error as Error & { issues?: unknown }).issues;
-  return Array.isArray(issues) && issues.every((issue: unknown) => {
+  return Array.isArray(issues) && issues.length > 0 && issues.every((issue: unknown) => {
     if (issue == null || typeof issue !== 'object') return false;
     const candidate = issue as Record<string, unknown>;
     return Array.isArray(candidate['path']) && typeof candidate['message'] === 'string';
