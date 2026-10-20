@@ -35,6 +35,8 @@ Each row links to its plan file when one exists.
 | `f1080c66` | bug | Define restart behavior and clean up partial database connections | analyzing | [plan](active/f1080c66/plan.md) | 2026-10-19 | Reproduce lifecycle failures and choose one-shot contract or full restart support in a separate change |
 | `bfea146e` | improvement | Move database connection ownership into Infrastructure | plan-ready | [plan](active/bfea146e/plan.md) | 2026-10-19 | After PR #138 integration, design config and source migration in small compatibility-aware slices |
 | `4c4365a1` | improvement | Define Domain client boundaries for entry points | plan-ready | [plan](active/4c4365a1/plan.md) | 2026-10-19 | Compare consumer shapes and choose a pattern or small API after the current release lane |
+| `533c3a53` | refactoring | Replace obsolete public API compatibility shims with canonical contracts | plan-ready | [plan](active/533c3a53/plan.md) | 2026-10-20 | Inventory public exports and legacy ORM/API paths; review canonical contract before implementation |
+| `b0649873` | refactoring | Organize the `src/` root around the agreed architecture | plan-ready | [plan](active/b0649873/plan.md) | 2026-10-20 | Map current ownership and package exports, then review a target tree before moving files |
 
 ## Blocked / Parked
 

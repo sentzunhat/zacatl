@@ -16,7 +16,12 @@ development series. The public API is not yet stable, and a `0.0.x` patch
 release may include breaking changes, new features, bug fixes, documentation,
 or other improvements. Increment the patch number for each published
 development release; do not treat a `0.0.x` increment as a compatibility
-promise.
+promise. Zacatl does not promise backward compatibility between `0.0.x`
+releases. When an API is replaced during this phase, prefer the new canonical
+contract and remove shims kept only for earlier Zacatl `0.0.x` contracts;
+document the change and any required consumer migration in the changelog or
+migration guide. Keep compatibility only when it is an intentional part of
+the canonical contract, such as support for a dependency/runtime boundary.
 
 Starting with `0.1.0`, use these rules for later pre-1.0 releases:
 
