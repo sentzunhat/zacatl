@@ -61,7 +61,8 @@ container.registerSingleton(CreateHandler, CreateHandler);
 
 ```typescript
 import { Service } from '@sentzunhat/zacatl/service';
-import { ServiceType, ServerType, ServerVendor, DatabaseVendor } from '@sentzunhat/zacatl/service';
+import { ServiceType, DatabaseVendor } from '@sentzunhat/zacatl/service';
+import { ServerType, ServerVendor } from '@sentzunhat/zacatl/service/platforms/server/types/server-config';
 
 const serviceConfig = {
   type: ServiceType.SERVER,
@@ -120,8 +121,8 @@ All handlers **MUST** extend `AbstractRouteHandler`:
 
 ```typescript
 import { injectable, inject } from 'tsyringe';
-import { AbstractRouteHandler } from '@sentzunhat/zacatl/service';
-import { HttpMethod } from '@sentzunhat/zacatl/service';
+import { AbstractRouteHandler } from '@sentzunhat/zacatl/service/layers/application/entry-points/rest/fastify/handlers/abstract';
+import type { Request } from '@sentzunhat/zacatl/service/layers/application/entry-points/rest/fastify/handlers/abstract';
 import { GreetingService } from '../domain/services/greeting.service';
 
 interface CreateBody {
@@ -139,14 +140,11 @@ export class CreateGreetingHandler extends AbstractRouteHandler<
     @inject(GreetingService)
     private readonly greetingService: GreetingService,
   ) {
-    super();
+    super({ url: '/greetings', method: 'POST', schema: {} });
   }
 
-  method = HttpMethod.POST;
-  path = '/greetings';
-
-  async execute(body: CreateBody): Promise<{ id: string; message: string }> {
-    const greeting = await this.greetingService.createGreeting(body);
+  async handler(request: Request<CreateBody>): Promise<{ id: string; message: string }> {
+    const greeting = await this.greetingService.createGreeting(request.body);
     return { id: greeting.id, message: greeting.message };
   }
 }
@@ -211,9 +209,11 @@ export class MyHandler {
 
 // ✅ CORRECT
 export class MyHandler extends AbstractRouteHandler<Body, Query, Reply> {
-  method = HttpMethod.GET;
-  path = "/my-path";
-  async execute(body: Body, query: Query): Promise<Reply> { ... }
+  constructor() {
+    super({ url: '/my-path', method: 'GET', schema: {} });
+  }
+
+  async handler(request: Request<Body, Query>): Promise<Reply> { ... }
 }
 ```
 

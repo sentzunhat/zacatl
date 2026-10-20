@@ -64,8 +64,8 @@ makes repositories ready, then starts listening. Direct `Server.start()` also
 prepares before listening. Service-owned ORM registrations and Mongoose index
 policy are isolated in each Service's Infrastructure scope; direct/manual ORM
 use retains the global fallback. Direct `new Layers(config)` uses globally
-registered ORM instances; `new Layers(config, parentContainer)` preserves that
-legacy ORM source while using the parent for layer DI. Neither path changes
+registered ORM instances; `new Layers(config, parentContainer)` uses that same
+canonical ORM source while using the parent for layer DI. Neither path changes
 Service-owned lookup.
 The physical database connection files and
 `platforms.server.databases` config remain transitional until the separately

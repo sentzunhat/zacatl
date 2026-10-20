@@ -76,7 +76,7 @@ describe('ApiServer', () => {
     expect(() => incompleteContainer.resolve(ApiServer)).toThrow(/api\/container/);
   });
 
-  it('preserves direct construction with the legacy config and adapter arguments', () => {
+  it('supports direct construction with config and adapter arguments', () => {
     expect(() => new ApiServer(makeConfig(), adapter)).not.toThrow();
   });
 

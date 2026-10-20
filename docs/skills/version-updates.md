@@ -23,9 +23,10 @@ document the change and any required consumer migration in the changelog or
 migration guide. Keep compatibility only when it is an intentional part of
 the canonical contract, such as support for a dependency/runtime boundary.
 
-Starting with `0.1.0`, use these rules for later pre-1.0 releases:
+Starting with `0.1.0`, use these rules for later pre-1.0 releases (`0.1.x`
+and beyond):
 
-- **PATCH** (`0.x.y`) - Bug fixes, documentation updates, minor improvements
+- **PATCH** (`0.x.y`) - Bug fixes, documentation updates, and backward-compatible improvements
 - **MINOR** (`0.(x+1).0`) - New features and breaking changes
 - **MAJOR** (`x.0.0`) - Reserved for 1.0.0 stable release
 
@@ -62,14 +63,14 @@ From `0.1.0` onward, increment for:
 - Optimizing internal algorithms
 - Adding missing JSDoc comments
 
-### Minor Version (from 0.1.0: 0.x.0 → 0.(x+1).0)
+### Minor Version (from 0.1.0 onward: 0.x.0 → 0.(x+1).0)
 
 From `0.1.0` onward, increment for:
 
 - ✅ New features or modules
 - ✅ New public APIs
 - ✅ New framework adapters (Express, Fastify, etc.)
-- ✅ Breaking changes (allowed in 0.x)
+- ✅ Breaking changes (required bump for `0.1.x` and later)
 - ✅ New platform support (CLI, Desktop)
 - ✅ Significant architectural changes
 
@@ -78,7 +79,7 @@ From `0.1.0` onward, increment for:
 - Adding Express adapter support
 - Introducing new Service configuration options
 - Adding new error classes
-- Changing repository API (in 0.x this is minor, not major)
+- Changing repository API (in `0.1.x` and later this is a minor bump; during `0.0.x`, use the next patch)
 
 ### Major Version (1.0.0+)
 
@@ -109,7 +110,7 @@ git log v0.0.39..HEAD --oneline
 
 Ask (for releases from `0.1.0` onward):
 
-- Are there breaking changes? → **Minor** (in 0.x) / **Major** (in 1.x+)
+- Are there breaking changes? → **Minor** (in `0.1.x` and later) / **Major** (in `1.x+`)
 - Are there new features? → **Minor**
 - Only fixes/docs? → **Patch**
 

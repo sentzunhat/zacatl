@@ -1,4 +1,5 @@
 /* eslint-disable import/order */
+import { createDatabaseToken } from '../../../../../../../src/service/layers/infrastructure/orm/tokens/factory';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 // Mock Sequelize before partial import
@@ -21,7 +22,6 @@ import { container } from '@zacatl/third-party/dependency-injection/tsyringe';
 
 import { clearContainer } from '../../../../../../../src/dependency-injection';
 import { SequelizeAdapter } from '../../../../../../../src/service/layers/infrastructure/orm/sequelize/adapter';
-import { SequelizeToken } from '../../../../../../../src/service/layers/infrastructure/orm/tokens/sequelize';
 
 import { ORMType } from '../../../../../../../src/service/layers/infrastructure/repositories/types';
 
@@ -62,7 +62,7 @@ describe('SequelizeAdapter', () => {
     vi.clearAllMocks();
     clearContainer();
     // Register a mock Sequelize instance in DI that returns MockModel by name
-    container.register(SequelizeToken, {
+    container.register(createDatabaseToken('SEQUELIZE', 'SEQUELIZE'), {
       useValue: { model: (_name: string) => MockModel },
     });
     adapter = new SequelizeAdapter(mockConfig);
@@ -82,13 +82,13 @@ describe('SequelizeAdapter', () => {
       expect(() => new SequelizeAdapter(mockConfig)).not.toThrow();
     });
 
-    it('resolves instances registered manually with the previous global symbol', () => {
+    it('does not resolve instances registered with the removed legacy symbol', () => {
       clearContainer();
       const instance = { model: (_name: string) => MockModel };
       container.register(Symbol.for('db:SEQUELIZE:SEQUELIZE'), { useValue: instance });
       const localAdapter = new SequelizeAdapter(mockConfig);
 
-      expect(localAdapter.model).toBe(MockModel);
+      expect(() => localAdapter.model).toThrow('Sequelize instance not registered in DI container');
     });
 
     it('throws InternalServerError on first model access when DI token is not registered', () => {
@@ -101,7 +101,7 @@ describe('SequelizeAdapter', () => {
 
     it('throws InternalServerError on first model access when Sequelize resolves to null', () => {
       clearContainer();
-      container.register(SequelizeToken, { useFactory: () => null as never });
+      container.register(createDatabaseToken('SEQUELIZE', 'SEQUELIZE'), { useFactory: () => null as never });
       const localAdapter = new SequelizeAdapter(mockConfig);
       expect(() => localAdapter.model).toThrow(
         'Sequelize instance resolved to null from DI container',

@@ -17,7 +17,9 @@ import { container } from '@sentzunhat/zacatl/third-party/tsyringe';
 
 ```typescript
 // ✅ Explicit module subpaths
-import { Service, BaseRepository, ORMType } from '@sentzunhat/zacatl/service';
+import { Service } from '@sentzunhat/zacatl/service';
+import { BaseRepository } from '@sentzunhat/zacatl/service/layers/infrastructure/repositories/mongoose/repository';
+import type { LeanDocument } from '@sentzunhat/zacatl/service/layers/infrastructure/repositories/types';
 import { NotFoundError } from '@sentzunhat/zacatl/error';
 import { resolveDependency } from '@sentzunhat/zacatl/dependency-injection';
 import { container, inject, singleton } from '@sentzunhat/zacatl/third-party/dependency-injection/tsyringe';
@@ -32,7 +34,12 @@ import { z } from '@sentzunhat/zacatl/third-party/zod';
 
 | What you need | Import path |
 | ------------- | ----------- |
-| `Service`, `BaseRepository`, `ORMType`, route handlers | `@sentzunhat/zacatl/service` |
+| `Service`, service configuration | `@sentzunhat/zacatl/service` |
+| Mongoose repository | `@sentzunhat/zacatl/service/layers/infrastructure/repositories/mongoose/repository` |
+| Sequelize repository | `@sentzunhat/zacatl/service/layers/infrastructure/repositories/sequelize/repository` |
+| node:sqlite repository | `@sentzunhat/zacatl/service/layers/infrastructure/repositories/nodesqlite/repository` |
+| `ORMType` | `@sentzunhat/zacatl/service/layers/infrastructure/orm/types` |
+| Shared repository types | `@sentzunhat/zacatl/service/layers/infrastructure/repositories/types` |
 | Error classes | `@sentzunhat/zacatl/error` |
 | `registerDependency`, `resolveDependency`, … | `@sentzunhat/zacatl/dependency-injection` |
 | `loadJSON`, `loadYML` | `@sentzunhat/zacatl/configuration` |
@@ -64,17 +71,22 @@ Database and DI re-exports use **nested subpaths only** — flat paths such as `
 ## Complete example
 
 ```typescript
-import { Service, ServiceType, ServerType, ServerVendor, BaseRepository, ORMType } from '@sentzunhat/zacatl/service';
+import { Service, ServiceType } from '@sentzunhat/zacatl/service';
+import { ServerType, ServerVendor } from '@sentzunhat/zacatl/service/platforms/server/types/server-config';
+import { BaseRepository } from '@sentzunhat/zacatl/service/layers/infrastructure/repositories/mongoose/repository';
+import type { LeanDocument } from '@sentzunhat/zacatl/service/layers/infrastructure/repositories/types';
 import { NotFoundError } from '@sentzunhat/zacatl/error';
 import { resolveDependency } from '@sentzunhat/zacatl/dependency-injection';
 import { inject, singleton } from '@sentzunhat/zacatl/third-party/dependency-injection/tsyringe';
 import { mongoose, Schema } from '@sentzunhat/zacatl/third-party/databases/mongoose';
 import { z } from '@sentzunhat/zacatl/third-party/zod';
 
+type Greeting = LeanDocument<{ message: string }>;
+
 @singleton()
-class GreetingRepository extends BaseRepository<{ message: string }, { message: string }> {
+class GreetingRepository extends BaseRepository<{ message: string }, { message: string }, Greeting> {
   constructor() {
-    super({ type: ORMType.Mongoose, schema: new Schema({ message: String }) });
+    super({ name: 'Greeting', schema: new Schema({ message: String }) });
   }
 }
 

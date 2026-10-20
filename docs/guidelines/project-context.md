@@ -121,9 +121,7 @@ Comprehensive reference for the zacatl repository structure, conventions, tech s
 - src/service/layers/infrastructure/orm/sequelize/adapter.ts
 - src/service/layers/infrastructure/orm/sequelize/adapter-loader.ts
 - src/service/layers/infrastructure/orm/sequelize/types.ts
-- src/service/layers/infrastructure/orm/tokens/mongoose.ts
-- src/service/layers/infrastructure/orm/tokens/nodesqlite.ts
-- src/service/layers/infrastructure/orm/tokens/sequelize.ts
+- src/service/layers/infrastructure/orm/tokens/factory.ts
 - src/service/layers/infrastructure/repositories/types.ts
 - src/service/layers/infrastructure/repositories/mongoose/repository.ts
 - src/service/layers/infrastructure/repositories/mongoose/types.ts

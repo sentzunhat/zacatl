@@ -200,7 +200,8 @@ export interface Repository<D, I, O> {
 
 export class BaseRepository<D, I, O> extends Repository<D, I, O> { ... }
 
-export interface ORMAdapter<D, I, O> {
+// Example naming pattern only; this is not a Zacatl public API type.
+export interface PersistenceAdapter<D, I, O> {
   create(entity: I): Promise<O>;
   toLean(input: unknown): O | null;
 }

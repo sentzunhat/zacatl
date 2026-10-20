@@ -33,7 +33,7 @@ src/
 ├── service/                    # Service orchestration
 │   ├── types.ts                # Service types (ServiceType, etc.)
 │   ├── platforms/              # Platform implementations
-│   │   ├── server/             # HTTP server, database adapters
+│   │   ├── server/             # HTTP server; database connection code is transitional
 │   │   │   ├── api/
 │   │   │   │   └── adapters/   # Express & Fastify API adapters
 │   │   │   ├── page/
@@ -260,16 +260,18 @@ export class PinoLoggerAdapter implements LoggerPort {
 
 ### Platforms module (sibling of Layers)
 
-**Purpose:** Runtime initialization, HTTP server setup, DI wiring
+**Purpose:** Runtime-specific hosts and adapters, coordinated by Service
 
 **Contains:**
 
 - Server startup (Express, Fastify)
-- Database connections
-- DI container initialization
 - CLI platform setup
 
-**Pattern:** Orchestrate layers and initialize external systems
+**Pattern:** Platforms/Server owns HTTP, API routes, and pages. Layers/Infrastructure
+owns database connections, ORM adapters, and repositories. The current database
+connection configuration and lifecycle code still sit under Server as a
+tracked transition; this implementation detail does not change the ownership
+boundary.
 
 ```typescript
 // ✅ Platforms Setup
@@ -294,6 +296,7 @@ const service = new Service({
         {
           vendor: DatabaseVendor.SEQUELIZE,
           instance: sequelize,
+          connection: { url: databaseUrl },
         },
       ],
     },
@@ -307,7 +310,8 @@ const service = new Service({
 Service → (coordinates) → Layers + Platforms
 Application → (uses) → Domain contracts
 Infrastructure → (implements) → Domain ports
-Platforms → (hosts) → HTTP and database runtime adapters
+Platforms → (hosts) → HTTP and page runtime adapters
+Infrastructure → (owns) → database connections, ORM adapters and repositories
 ```
 
 **Golden Rule:**

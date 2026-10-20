@@ -29,14 +29,15 @@ Complete Zacatl API documentation.
 // Core exports
 import { Service } from '@sentzunhat/zacatl/service';
 
-// Subpath imports
-import { BaseRepository, ORMType } from '@sentzunhat/zacatl/service';
 import { NotFoundError, BadRequestError } from '@sentzunhat/zacatl/error';
 import { loadJSON, loadYML } from '@sentzunhat/zacatl/configuration';
 
 // Full paths (still supported)
 import { createLogger } from '@sentzunhat/zacatl/logs';
 ```
+
+Repository and ORM APIs use their explicit infrastructure subpaths. See the
+[repository guide](repository.md) for vendor-specific imports and shared types.
 
 ---
 

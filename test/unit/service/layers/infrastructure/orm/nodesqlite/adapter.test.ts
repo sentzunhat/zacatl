@@ -1,8 +1,8 @@
+import { createDatabaseToken } from '@zacatl/service/layers/infrastructure/orm/tokens/factory';
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 
 import { clearContainer } from '@zacatl/dependency-injection';
 import { NodeSqliteAdapter } from '@zacatl/service/layers/infrastructure/orm/nodesqlite/adapter';
-import { NodeSqliteToken } from '@zacatl/service/layers/infrastructure/orm/tokens/nodesqlite';
 import { ORMType } from '@zacatl/service/layers/infrastructure/repositories/types';
 import { container } from '@zacatl/third-party/dependency-injection/tsyringe';
 
@@ -42,7 +42,7 @@ describe('NodeSqliteAdapter', () => {
       all: vi.fn().mockReturnValue([]),
     });
 
-    container.register(NodeSqliteToken, {
+    container.register(createDatabaseToken('SQLITE', 'SQLITE'), {
       useValue: mockDatabase,
     });
 
@@ -95,6 +95,17 @@ describe('NodeSqliteAdapter', () => {
         type: ORMType.NodeSqlite as const,
         name: 'test_items',
       });
+      expect(() => localAdapter.model).toThrow('node:sqlite database instance is not valid');
+    });
+
+    it('does not resolve instances registered with the removed legacy symbol', () => {
+      clearContainer();
+      container.register(Symbol.for('db:SQLITE:SQLITE'), { useValue: mockDatabase });
+      const localAdapter = new NodeSqliteAdapter<TestInput, TestOutput>({
+        type: ORMType.NodeSqlite,
+        name: 'test_items',
+      });
+
       expect(() => localAdapter.model).toThrow('node:sqlite database instance is not valid');
     });
 

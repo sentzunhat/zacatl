@@ -88,7 +88,7 @@ export const MongooseIndexRegistryToken: InjectionToken<MongooseIndexRegistry> =
   '@sentzunhat/zacatl/service/layers/infrastructure/orm/mongoose/index-registry',
 );
 
-/** Standalone/manual adapter compatibility; Service creates its own registry. */
+/** Default registry for standalone/manual adapters; Service creates its own registry. */
 export const globalMongooseIndexRegistry = new MongooseIndexRegistry();
 
 export const registerMongooseIndexOptions = (

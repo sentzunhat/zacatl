@@ -1,30 +1,35 @@
-# Database Integration
+# Working with Databases
 
-Connect to PostgreSQL, MongoDB, or any database.
+Zacatl's Service coordinates database setup and repository readiness. Choose
+the ORM-specific repository wrapper for each repository. Database instances
+are configured on the Server platform; repository wrappers use the matching
+ORM adapter from the Layers infrastructure.
 
-## Sequelize (SQL Databases)
+## Sequelize
 
-### Setup
+Install Sequelize and the dialect driver used by the application:
 
 ```bash
-# Sequelize is an optional peer in Zacatl 0.0.57+.
-# Install Sequelize plus the dialect driver your service uses:
-npm install sequelize pg pg-hstore  # PostgreSQL
+npm install sequelize pg pg-hstore
 ```
 
-### Configuration
+Register the instance through the Server database configuration:
 
 ```typescript
 import { Sequelize } from 'sequelize';
-import { Service, ServiceType, DatabaseVendor } from '@sentzunhat/zacatl/service';
+import { DatabaseVendor, Service, ServiceType } from '@sentzunhat/zacatl/service';
 
-const sequelize = new Sequelize('postgresql://user:pass@localhost:5432/mydb');
+const sequelize = new Sequelize(process.env.DATABASE_URL!);
 
 const service = new Service({
   type: ServiceType.SERVER,
   platforms: {
     server: {
-      databases: [{ vendor: DatabaseVendor.SEQUELIZE, instance: sequelize }],
+      databases: [{
+        vendor: DatabaseVendor.SEQUELIZE,
+        instance: sequelize,
+        connection: { url: process.env.DATABASE_URL! },
+      }],
     },
   },
 });
@@ -32,100 +37,74 @@ const service = new Service({
 await service.start();
 ```
 
-### Repository Example
+Define the model through Sequelize, then use the Sequelize wrapper for
+repository behavior:
 
 ```typescript
-import { IRepository } from '@sentzunhat/zacatl/service';
-import { DataTypes, Sequelize, Model } from 'sequelize';
+import { DataTypes, Model, Sequelize } from 'sequelize';
+import { BaseRepository } from '@sentzunhat/zacatl/service/layers/infrastructure/repositories/sequelize/repository';
+import { ORMType } from '@sentzunhat/zacatl/service/layers/infrastructure/orm/types';
 
-interface Product {
+interface ProductRecord {
   id: string;
   name: string;
   price: number;
 }
 
-class ProductModel extends Model {}
+interface ProductInput extends Omit<ProductRecord, 'id'> {}
+interface ProductOutput extends ProductRecord {
+  createdAt: Date;
+  updatedAt: Date;
+}
 
-export class ProductRepository implements IRepository<Product> {
-  private model: typeof ProductModel;
+class ProductModel extends Model<ProductRecord, ProductInput> implements ProductRecord {
+  declare id: string;
+  declare name: string;
+  declare price: number;
+}
 
-  constructor(sequelize: Sequelize) {
-    ProductModel.init(
-      {
-        id: {
-          type: DataTypes.UUID,
-          primaryKey: true,
-          defaultValue: DataTypes.UUIDV4,
-        },
-        name: { type: DataTypes.STRING, allowNull: false },
-        price: { type: DataTypes.FLOAT, allowNull: false },
-      },
-      { sequelize, modelName: 'Product' },
-    );
-    this.model = ProductModel;
+export function configureProductModel(sequelize: Sequelize): void {
+  ProductModel.init(
+    {
+      id: { type: DataTypes.UUID, primaryKey: true, defaultValue: DataTypes.UUIDV4 },
+      name: { type: DataTypes.STRING, allowNull: false },
+      price: { type: DataTypes.FLOAT, allowNull: false },
+    },
+    { sequelize, modelName: 'Product', timestamps: true },
+  );
+}
+
+export class ProductRepository extends BaseRepository<ProductRecord, ProductInput, ProductOutput> {
+  constructor() {
+    super({ type: ORMType.Sequelize, name: 'Product' });
   }
-
-  findById = async (id: string) => {
-    return this.model.findByPk(id) as Promise<Product | null>;
-  };
-
-  findMany = async (filter: Record<string, unknown>) => {
-    return this.model.findAll({ where: filter }) as Promise<Product[]>;
-  };
-
-  create = async (data: Product) => {
-    return this.model.create(data) as Promise<Product>;
-  };
-
-  update = async (id: string, data: Partial<Product>) => {
-    await this.model.update(data, { where: { id } });
-  };
-
-  delete = async (id: string) => {
-    await this.model.destroy({ where: { id } });
-  };
-
-  exists = async (id: string) => {
-    const count = await this.model.count({ where: { id } });
-    return count > 0;
-  };
 }
 ```
 
-## Mongoose (MongoDB)
+The Sequelize instance and model must be configured before the Service prepares
+repositories. For full model wiring, see [database setup](./database-setup.md).
 
-### Setup
+## Mongoose
+
+Install Mongoose and register its instance with a connection URL:
 
 ```bash
-# Mongoose is an optional peer in Zacatl 0.0.57+.
-npm install mongoose mongodb
+npm install mongoose
 ```
-
-### Configuration
 
 ```typescript
 import mongoose from 'mongoose';
-import { Service, ServiceType, DatabaseVendor } from '@sentzunhat/zacatl/service';
+import { DatabaseVendor, Service, ServiceType } from '@sentzunhat/zacatl/service';
 
 const service = new Service({
   type: ServiceType.SERVER,
   platforms: {
     server: {
-      databases: [
-        {
-          vendor: DatabaseVendor.MONGOOSE,
-          instance: mongoose,
-          connection: { url: 'mongodb://localhost:27017/mydb' },
-          indexes: {
-            bootMode:
-              process.env.APP_ENV === 'local' ||
-              process.env.APP_ENV === 'development' ||
-              process.env.NODE_ENV === 'test'
-                ? 'create'
-                : 'off',
-          },
-        },
-      ],
+      databases: [{
+        vendor: DatabaseVendor.MONGOOSE,
+        instance: mongoose,
+        connection: { url: process.env.MONGODB_URL! },
+      }],
     },
   },
 });
@@ -133,126 +112,50 @@ const service = new Service({
 await service.start();
 ```
 
-For large staging/production collections, keep app boot index-safe with
-`bootMode: 'off'` and run explicit diff/create scripts. See
-[Mongoose Index Lifecycle Controls](./mongoose-index-lifecycle.md).
-
-### Repository Example
+Use the Mongoose wrapper and schema for repository operations:
 
 ```typescript
-import { IRepository } from '@sentzunhat/zacatl/service';
-import mongoose, { Schema, Document } from 'mongoose';
+import { BaseRepository } from '@sentzunhat/zacatl/service/layers/infrastructure/repositories/mongoose/repository';
+import { ORMType } from '@sentzunhat/zacatl/service/layers/infrastructure/orm/types';
+import { Schema } from '@sentzunhat/zacatl/third-party/databases/mongoose';
 
-interface Article {
-  id: string;
+interface ArticleRecord {
   title: string;
   content: string;
 }
 
-const ArticleSchema = new Schema({
+interface ArticleInput extends ArticleRecord {}
+interface ArticleOutput extends ArticleRecord {
+  id: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+const articleSchema = new Schema<ArticleRecord>({
   title: { type: String, required: true },
   content: { type: String, required: true },
 });
 
-const ArticleModel = mongoose.model<Article & Document>('Article', ArticleSchema);
-
-export class ArticleRepository implements IRepository<Article> {
-  findById = async (id: string) => {
-    const doc = await ArticleModel.findById(id).lean();
-    return doc as Article | null;
-  };
-
-  findMany = async (filter: Record<string, unknown>) => {
-    return ArticleModel.find(filter).lean() as Promise<Article[]>;
-  };
-
-  create = async (data: Omit<Article, 'id'>) => {
-    const doc = await ArticleModel.create(data);
-    return doc.toObject() as Article;
-  };
-
-  update = async (id: string, data: Partial<Article>) => {
-    await ArticleModel.findByIdAndUpdate(id, data);
-  };
-
-  delete = async (id: string) => {
-    await ArticleModel.findByIdAndDelete(id);
-  };
-
-  exists = async (id: string) => {
-    const count = await ArticleModel.countDocuments({ _id: id });
-    return count > 0;
-  };
+export class ArticleRepository extends BaseRepository<ArticleRecord, ArticleInput, ArticleOutput> {
+  constructor() {
+    super({ type: ORMType.Mongoose, name: 'Article', schema: articleSchema });
+  }
 }
 ```
 
-## Custom Database
+For production index policies, see
+[Mongoose Index Lifecycle Controls](./mongoose-index-lifecycle.md).
 
-Implement `IRepository<T>` for any database:
+## Application-owned repository contracts
 
-```typescript
-import { IRepository } from '@sentzunhat/zacatl/service';
-import { DatabaseSync } from 'node:sqlite';
+For a database or storage system without a built-in Zacatl wrapper, define an
+application-owned port and implement it with that storage system. `RepositoryPort`
+is the common CRUD contract when its methods fit the application's needs; it is
+not a database-independent `IRepository` API exported from the Service barrel.
+Import it as a type from
+`service/layers/infrastructure/repositories/types` and keep the concrete
+adapter in your infrastructure layer.
 
-export class SQLiteRepository<T> implements IRepository<T> {
-  constructor(
-    private db: DatabaseSync,
-    private tableName: string,
-  ) {}
-
-  findById = async (id: string): Promise<T | null> => {
-    const stmt = this.db.prepare(`SELECT * FROM ${this.tableName} WHERE id = ?`);
-    return stmt.get(id) as T | null;
-  };
-
-  findMany = async (filter: Record<string, unknown>): Promise<T[]> => {
-    const keys = Object.keys(filter);
-    const values = Object.values(filter);
-    const where = keys.map((k) => `${k} = ?`).join(' AND ');
-    const stmt = this.db.prepare(`SELECT * FROM ${this.tableName} WHERE ${where}`);
-    return stmt.all(...values) as T[];
-  };
-
-  create = async (data: T): Promise<T> => {
-    const keys = Object.keys(data as any);
-    const values = Object.values(data as any);
-    const placeholders = keys.map(() => '?').join(',');
-    const stmt = this.db.prepare(
-      `INSERT INTO ${this.tableName} (${keys.join(',')}) VALUES (${placeholders})`,
-    );
-    stmt.run(...values);
-    return data;
-  };
-
-  update = async (id: string, data: Partial<T>): Promise<void> => {
-    const keys = Object.keys(data as any);
-    const values = Object.values(data as any);
-    const set = keys.map((k) => `${k} = ?`).join(',');
-    const stmt = this.db.prepare(`UPDATE ${this.tableName} SET ${set} WHERE id = ?`);
-    stmt.run(...values, id);
-  };
-
-  delete = async (id: string): Promise<void> => {
-    const stmt = this.db.prepare(`DELETE FROM ${this.tableName} WHERE id = ?`);
-    stmt.run(id);
-  };
-
-  exists = async (id: string): Promise<boolean> => {
-    const stmt = this.db.prepare(`SELECT COUNT(*) as count FROM ${this.tableName} WHERE id = ?`);
-    const result = stmt.get(id) as { count: number };
-    return result.count > 0;
-  };
-}
-```
-
-## Supported Databases
-
-| Database   | Adapter   | Status               |
-| ---------- | --------- | -------------------- |
-| PostgreSQL | Sequelize | ✅ Built-in          |
-| MySQL      | Sequelize | ✅ Built-in          |
-| SQLite     | Sequelize | ✅ Built-in          |
-| MongoDB    | Mongoose  | ✅ Built-in          |
-| Others     | Custom    | ✅ Easy to implement |
-
-**Next**: [Error Handling →](../../error/README.md)
+See [the repository guide](../../service/repository.md) for the shared methods
+and [the infrastructure usage guide](../../service/infrastructure-usage.md)
+for the Layers/Platforms ownership boundary.

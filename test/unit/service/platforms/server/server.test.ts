@@ -10,10 +10,8 @@ import {
   ServerVendor,
   ServerType as ServerType,
 } from '../../../../../src/service/platforms/server/types/server-config';
-import {
-  ApplicationContainerToken,
-  ServiceContainerToken,
-} from '../../../../../src/service/tokens';
+import { ApplicationContainerToken } from '../../../../../src/service/layers/application/tokens';
+import { ServiceContainerToken } from '../../../../../src/service/tokens/service';
 
 const createServer = (config: ServerConfig): Server => {
   const serviceContainer = createChildContainer(getContainer());
@@ -78,7 +76,7 @@ describe('Server', () => {
       expect(() => new Server({ ...config, databases: [] })).not.toThrow();
     });
 
-    it('preserves direct construction with the legacy Service container argument', () => {
+    it('supports direct construction with a Service scope', () => {
       const serviceContainer = createChildContainer(getContainer());
 
       expect(() => new Server({ ...config, databases: [] }, serviceContainer)).not.toThrow();

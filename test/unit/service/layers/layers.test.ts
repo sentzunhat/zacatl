@@ -14,9 +14,7 @@ import { LayersConfigToken } from '../../../../src/service/layers/tokens';
 import type { LayersConfig } from '../../../../src/service/layers/types';
 import { registerOrmInstance } from '../../../../src/service/platforms/server/database/orm-instance';
 import { DatabaseVendor } from '../../../../src/service/platforms/server/database/port';
-import {
-  ServiceContainerToken,
-} from '../../../../src/service/tokens';
+import { ServiceContainerToken } from '../../../../src/service/tokens/service';
 import { injectable } from '../../../../src/third-party/dependency-injection/tsyringe';
 
 beforeEach(() => {

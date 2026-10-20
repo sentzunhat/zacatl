@@ -648,7 +648,7 @@ registerSingleton(Database, Database);
 Use explicit subpaths (no root barrel since 0.0.56):
 
 ```typescript
-import { Service, BaseRepository } from '@sentzunhat/zacatl/service';
+import { Service } from '@sentzunhat/zacatl/service';
 import { BadRequestError, ValidationError, NotFoundError } from '@sentzunhat/zacatl/error';
 import { resolveDependency } from '@sentzunhat/zacatl/dependency-injection';
 import { inject, singleton, container } from '@sentzunhat/zacatl/third-party/dependency-injection/tsyringe';

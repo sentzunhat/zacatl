@@ -5,8 +5,9 @@ This guide shows how to configure MongoDB (Mongoose) and PostgreSQL/MySQL/SQLite
 ## Quick Example: Multi-Database Service
 
 ```typescript
-import { Service, DatabaseVendor, ServerVendor, ServerType } from '@sentzunhat/zacatl/service';
-import { ORMType } from '@sentzunhat/zacatl/service/layers/infrastructure';
+import { Service, DatabaseVendor } from '@sentzunhat/zacatl/service';
+import { ServerVendor, ServerType } from '@sentzunhat/zacatl/service/platforms/server/types/server-config';
+import { ORMType } from '@sentzunhat/zacatl/service/layers/infrastructure/orm/types';
 import mongoose from 'mongoose';
 import { Sequelize } from 'sequelize';
 import fastify from 'fastify';
@@ -90,7 +91,9 @@ npm install sequelize sqlite3      # SQLite via Sequelize
 
 ```typescript
 // repositories/user.repository.ts
-import { BaseRepository, ORMType } from '@sentzunhat/zacatl/service/layers/infrastructure';
+import { BaseRepository as MongooseRepository } from '@sentzunhat/zacatl/service/layers/infrastructure/repositories/mongoose/repository';
+import { ORMType } from '@sentzunhat/zacatl/service/layers/infrastructure/orm/types';
+import type { MongooseModel } from '@sentzunhat/zacatl/third-party/databases/mongoose';
 import { Schema } from 'mongoose';
 
 interface UserDb {
@@ -122,7 +125,7 @@ const UserSchema = new Schema<UserDb>(
   { timestamps: true },
 );
 
-export class UserRepository extends BaseRepository<UserDb, UserInput, UserOutput> {
+export class UserRepository extends MongooseRepository<UserDb, UserInput, UserOutput> {
   constructor() {
     super({
       type: ORMType.Mongoose, // ✅ Use enum
@@ -133,7 +136,7 @@ export class UserRepository extends BaseRepository<UserDb, UserInput, UserOutput
 
   // Custom method using Mongoose
   async findByEmail(email: string): Promise<UserOutput | null> {
-    const user = await (this.model as MongooseModel<User>)
+    const user = await (this.model as MongooseModel<UserDb>)
       .findOne({ email })
       .lean({ virtuals: true });
     return this.toLean(user);
@@ -145,8 +148,10 @@ export class UserRepository extends BaseRepository<UserDb, UserInput, UserOutput
 
 ```typescript
 // repositories/product.repository.ts
-import { BaseRepository, ORMType } from '@sentzunhat/zacatl/service/layers/infrastructure';
-import { DataTypes, Model, Sequelize } from 'sequelize';
+import { BaseRepository as SequelizeRepository } from '@sentzunhat/zacatl/service/layers/infrastructure/repositories/sequelize/repository';
+import { ORMType } from '@sentzunhat/zacatl/service/layers/infrastructure/orm/types';
+import { DataTypes, Model, Op, Sequelize } from 'sequelize';
+import type { ModelStatic } from 'sequelize';
 
 interface ProductDb {
   id: number;
@@ -186,7 +191,7 @@ export function initProductModel(sequelize: Sequelize) {
   );
 }
 
-export class ProductRepository extends BaseRepository<ProductModel, ProductInput, ProductOutput> {
+export class ProductRepository extends SequelizeRepository<ProductModel, ProductInput, ProductOutput> {
   constructor() {
     super({
       type: ORMType.Sequelize, // ✅ Use enum
@@ -208,7 +213,8 @@ export class ProductRepository extends BaseRepository<ProductModel, ProductInput
 
 ```typescript
 // index.ts
-import { Service, DatabaseVendor, ServerVendor, ServerType } from '@sentzunhat/zacatl/service';
+import { Service, DatabaseVendor } from '@sentzunhat/zacatl/service';
+import { ServerVendor, ServerType } from '@sentzunhat/zacatl/service/platforms/server/types/server-config';
 import mongoose from 'mongoose';
 import { Sequelize } from 'sequelize';
 import fastify from 'fastify';
@@ -339,12 +345,12 @@ const service = new Service({
         {
           vendor: DatabaseVendor.SEQUELIZE,
           instance: userDb,
-          connection: { url: '' },
+          connection: { url: 'user.sqlite' },
         },
         {
           vendor: DatabaseVendor.SEQUELIZE,
           instance: productDb,
-          connection: { url: '' },
+          connection: { url: 'product.sqlite' },
         },
       ],
     },
@@ -433,7 +439,7 @@ export const getDatabaseConfig = () => {
       {
         vendor: DatabaseVendor.SEQUELIZE,
         instance: new Sequelize({ dialect: 'sqlite', storage: ':memory:' }),
-        connection: { url: '' },
+        connection: { url: ':memory:' },
       },
     ],
   };
@@ -443,7 +449,7 @@ export const getDatabaseConfig = () => {
 ## Available ORM Types (Enum)
 
 ```typescript
-import { ORMType } from '@sentzunhat/zacatl/service/layers/infrastructure';
+import { ORMType } from '@sentzunhat/zacatl/service/layers/infrastructure/orm/types';
 
 // Use enum for type safety
 ORMType.Mongoose; // For MongoDB

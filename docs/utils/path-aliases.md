@@ -23,10 +23,11 @@ import { encode, generateHmac } from '@zacatl/utils';
 ### Architecture Layers
 
 ```typescript
-import { BaseRepository } from '@zacatl/infrastructure';
-import { Domain } from '@zacatl/domain';
-import { Application } from '@zacatl/application';
-import { Platforms } from '@zacatl/platform';
+import { Infrastructure } from '@zacatl/service/layers/infrastructure/infrastructure';
+import { Domain } from '@zacatl/service/layers/domain/domain';
+import { Application } from '@zacatl/service/layers/application/application';
+import { Platforms } from '@zacatl/service/platforms/platforms';
+import { BaseRepository } from '@zacatl/service/layers/infrastructure/repositories/sequelize/repository';
 ```
 
 ### Third-Party Re-Exports
@@ -51,7 +52,9 @@ If you're using Zacatl in your project, import from the published package:
 ```typescript
 // ✅ Correct - Public API imports
 import { NotFoundError } from '@sentzunhat/zacatl/error';
-import { Service, ServiceType, ServerVendor, BaseRepository } from '@sentzunhat/zacatl/service';
+import { Service, ServiceType } from '@sentzunhat/zacatl/service';
+import { ServerVendor } from '@sentzunhat/zacatl/service/platforms/server/types/server-config';
+import { BaseRepository } from '@sentzunhat/zacatl/service/layers/infrastructure/repositories/sequelize/repository';
 import { mongoose } from '@sentzunhat/zacatl/third-party/databases/mongoose';
 
 // ❌ Wrong - Internal aliases don't work in user projects
@@ -66,7 +69,7 @@ See the [main README](../../README.md) for complete import examples.
 
 ```typescript
 import { Service } from '../../../service/service';
-import { BaseRepository } from '../../service/layers/infrastructure/repositories/base-repository';
+import { BaseRepository } from '../../service/layers/infrastructure/repositories/sequelize/repository';
 import { BadRequestError } from '../../../error/bad-request';
 import { logger } from '../../../logs';
 ```
@@ -75,7 +78,7 @@ import { logger } from '../../../logs';
 
 ```typescript
 import { Service } from '@zacatl/service';
-import { BaseRepository } from '@zacatl/infrastructure';
+import { BaseRepository } from '@zacatl/service/layers/infrastructure/repositories/sequelize/repository';
 import { BadRequestError } from '@zacatl/error';
 import { logger } from '@zacatl/logs';
 ```
@@ -93,10 +96,10 @@ import { logger } from '@zacatl/logs';
 | `@zacatl/utils`                | `src/utils/`                         | Utility functions          |
 | `@zacatl/third-party`          | `src/third-party/`                   | tsyringe, zod re-exports   |
 | `@zacatl/optionals`            | `src/utils/optionals.ts`             | Optional type helpers      |
-| `@zacatl/infrastructure`       | `src/service/layers/infrastructure/` | Infrastructure layer       |
-| `@zacatl/domain`               | `src/service/layers/domain/`         | Domain layer               |
-| `@zacatl/application`          | `src/service/layers/application/`    | Application layer          |
-| `@zacatl/platform`             | `src/service/platforms/`             | Platform layer             |
+| `@zacatl/service/layers/infrastructure/infrastructure` | `src/service/layers/infrastructure/infrastructure.ts` | Infrastructure layer bootstrapper |
+| `@zacatl/service/layers/domain/domain` | `src/service/layers/domain/domain.ts` | Domain layer bootstrapper |
+| `@zacatl/service/layers/application/application` | `src/service/layers/application/application.ts` | Application layer bootstrapper |
+| `@zacatl/service/platforms/platforms` | `src/service/platforms/platforms.ts` | Platforms coordinator |
 
 ## Native Subpath Imports (`#/*`)
 

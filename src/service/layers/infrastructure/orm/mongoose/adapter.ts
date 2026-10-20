@@ -1,5 +1,5 @@
 import { type QueryFilter, type Mongoose } from '@zacatl/third-party/databases/mongoose';
-import type { DependencyContainer, InjectionToken } from '@zacatl/third-party/dependency-injection/tsyringe';
+import type { DependencyContainer } from '@zacatl/third-party/dependency-injection/tsyringe';
 
 import {
   globalMongooseIndexRegistry,
@@ -16,7 +16,7 @@ import type {
 } from '../../repositories/types';
 import { DEFAULT_QUERY_LIMIT } from '../../repositories/types';
 import { getOrmConstructionScope } from '../scope';
-import { createDatabaseToken, createLegacyDatabaseToken } from '../tokens/factory';
+import { createDatabaseToken } from '../tokens/factory';
 
 /**
  * Mongoose ORM adapter - handles Mongoose-specific database operations
@@ -72,10 +72,8 @@ export class MongooseAdapter<D, I extends object, O extends object> implements O
 
   private resolveModel(): MongooseRepositoryModel<D> {
     const connectionName = this.config.connection?.name ?? 'MONGOOSE';
-    const canonicalToken = createDatabaseToken('MONGOOSE', connectionName) as InjectionToken<Mongoose>;
-    const legacyToken = createLegacyDatabaseToken('MONGOOSE', connectionName) as InjectionToken<Mongoose>;
+    const token = createDatabaseToken('MONGOOSE', connectionName);
     const container = this.container;
-    const token = container.isRegistered(canonicalToken, false) ? canonicalToken : legacyToken;
 
     if (!container.isRegistered(token, false)) {
       throw new InternalServerError({

@@ -2,10 +2,8 @@ import { afterEach, describe, expect, it } from 'vitest';
 
 import { InternalServerError } from '@zacatl/error';
 
-import { clearContainer, resolveDependency } from '../../../../../../src/dependency-injection';
-import { MongooseToken } from '../../../../../../src/service/layers/infrastructure/orm/tokens/mongoose';
-import { NodeSqliteToken } from '../../../../../../src/service/layers/infrastructure/orm/tokens/nodesqlite';
-import { SequelizeToken } from '../../../../../../src/service/layers/infrastructure/orm/tokens/sequelize';
+import { clearContainer, getContainer, resolveDependency } from '../../../../../../src/dependency-injection';
+import { createDatabaseToken } from '../../../../../../src/service/layers/infrastructure/orm/tokens/factory';
 import {
   getOrmInstance,
   registerOrmInstance,
@@ -19,8 +17,8 @@ describe('orm-instance helpers', () => {
 
   describe('getOrmInstance()', () => {
     it('throws InternalServerError when the ORM token is not registered', () => {
-      expect(() => getOrmInstance(MongooseToken)).toThrow(InternalServerError);
-      expect(() => getOrmInstance(MongooseToken)).toThrow(/ORM instance not registered/);
+      expect(() => getOrmInstance(createDatabaseToken('MONGOOSE', 'MONGOOSE'))).toThrow(InternalServerError);
+      expect(() => getOrmInstance(createDatabaseToken('MONGOOSE', 'MONGOOSE'))).toThrow(/ORM instance not registered/);
     });
 
     it('returns the instance previously registered for the token', () => {
@@ -29,15 +27,15 @@ describe('orm-instance helpers', () => {
 
       registerOrmInstance(DatabaseVendor.MONGOOSE, connection, mongooseInstance);
 
-      expect(getOrmInstance(MongooseToken)).toBe(mongooseInstance);
+      expect(getOrmInstance(createDatabaseToken('MONGOOSE', 'MONGOOSE'))).toBe(mongooseInstance);
     });
   });
 
   describe('registerOrmInstance()', () => {
     it.each([
-      [DatabaseVendor.MONGOOSE, MongooseToken, { kind: 'mongoose' } as unknown as DatabaseInstance],
-      [DatabaseVendor.SEQUELIZE, SequelizeToken, { kind: 'sequelize' } as unknown as DatabaseInstance],
-      [DatabaseVendor.SQLITE, NodeSqliteToken, { kind: 'sqlite' } as unknown as DatabaseInstance],
+      [DatabaseVendor.MONGOOSE, createDatabaseToken('MONGOOSE', 'MONGOOSE'), { kind: 'mongoose' } as unknown as DatabaseInstance],
+      [DatabaseVendor.SEQUELIZE, createDatabaseToken('SEQUELIZE', 'SEQUELIZE'), { kind: 'sequelize' } as unknown as DatabaseInstance],
+      [DatabaseVendor.SQLITE, createDatabaseToken('SQLITE', 'SQLITE'), { kind: 'sqlite' } as unknown as DatabaseInstance],
     ])('binds %s instances to the DI container', (vendor, token, instance) => {
       // Use vendor string as the name to match the default token (createDatabaseToken('VENDOR', 'VENDOR'))
       const connection: DatabaseConnection = { url: `${vendor.toLowerCase()}://test`, name: vendor };
@@ -46,7 +44,7 @@ describe('orm-instance helpers', () => {
       expect(resolveDependency(token)).toBe(instance);
     });
 
-    it('keeps the legacy global symbol registered for existing consumers', () => {
+    it('registers only the canonical package-scoped symbol', () => {
       const instance = { kind: 'sequelize' } as unknown as DatabaseInstance;
       registerOrmInstance(
         DatabaseVendor.SEQUELIZE,
@@ -54,15 +52,15 @@ describe('orm-instance helpers', () => {
         instance,
       );
 
-      expect(resolveDependency(Symbol.for('db:SEQUELIZE:SEQUELIZE'))).toBe(instance);
-      expect(resolveDependency(SequelizeToken)).toBe(instance);
+      expect(getContainer().isRegistered(Symbol.for('db:SEQUELIZE:SEQUELIZE'), false)).toBe(false);
+      expect(resolveDependency(createDatabaseToken('SEQUELIZE', 'SEQUELIZE'))).toBe(instance);
     });
 
     it.each([undefined, null])('is a no-op when instance is %s', (instance) => {
       const connection: DatabaseConnection = { url: 'mongodb://localhost/test', name: DatabaseVendor.MONGOOSE };
       registerOrmInstance(DatabaseVendor.MONGOOSE, connection, instance as never);
 
-      expect(() => getOrmInstance(MongooseToken)).toThrow(/ORM instance not registered/);
+      expect(() => getOrmInstance(createDatabaseToken('MONGOOSE', 'MONGOOSE'))).toThrow(/ORM instance not registered/);
     });
   });
 });

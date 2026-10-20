@@ -13,7 +13,7 @@
 [![CI](https://img.shields.io/github/actions/workflow/status/sentzunhat/zacatl/ci.yml?branch=main&style=flat-square&label=CI)](https://github.com/sentzunhat/zacatl/actions/workflows/ci.yml)
 [![CVE scan](https://img.shields.io/github/actions/workflow/status/sentzunhat/zacatl/cve-scan.yml?branch=main&style=flat-square&label=CVE%20scan)](https://github.com/sentzunhat/zacatl/actions/workflows/cve-scan.yml)
 [![Release](https://img.shields.io/github/actions/workflow/status/sentzunhat/zacatl/release.yml?style=flat-square&label=release)](https://github.com/sentzunhat/zacatl/actions/workflows/release.yml)
-[![Tests: 736](https://img.shields.io/badge/tests-736%20passing-brightgreen.svg?style=flat-square)](#-testing)
+[![Tests: 738](https://img.shields.io/badge/tests-738%20passing-brightgreen.svg?style=flat-square)](#-testing)
 [![Coverage: 92.16%](https://img.shields.io/badge/coverage-92.16%25-brightgreen.svg?style=flat-square)](#-testing)
 
 **Stack**
@@ -25,7 +25,14 @@
 
 **Build consistent TypeScript services without giving up the frameworks you already use.**
 
-Zacatl gives TypeScript teams a repeatable application → domain → infrastructure → platform structure, built-in dependency injection, type-safe validation, and structured errors. You keep using [Fastify](https://fastify.dev), [Express](https://expressjs.com), [Mongoose](https://mongoosejs.com), or [Sequelize](https://sequelize.org); Zacatl supplies the boundaries that keep those choices from leaking through the whole application.
+Zacatl gives TypeScript teams a repeatable `Service` composition model:
+`Service` coordinates sibling `Layers` (Application, Domain, Infrastructure)
+and `Platforms` (Server, CLI, Desktop). The Infrastructure layer owns
+database connections, ORM adapters, and repositories; Server owns HTTP, API
+routes, and pages. You keep using [Fastify](https://fastify.dev),
+[Express](https://expressjs.com), [Mongoose](https://mongoosejs.com), or
+[Sequelize](https://sequelize.org); Zacatl supplies the boundaries that keep
+those choices from leaking through the whole application.
 
 It is aimed first at teams building modular APIs and backend services that want consistent project structure, replaceable adapters, and earlier feedback from tests and CI/CD.
 
@@ -115,7 +122,7 @@ export class GreetingServiceAdapter implements GreetingServicePort {
 }
 ```
 
-**3. Repository** — `BaseRepository` supplies create/read/update/delete; you add only the queries your domain needs.
+**3. Repository** — Zacatl's ORM-specific `BaseRepository` supplies create/read/update/delete; you add only the queries your domain needs. Import it from the matching Mongoose, Sequelize, or node:sqlite subpath.
 
 ```typescript
 @singleton()
@@ -159,7 +166,8 @@ Database drivers are optional peers — install only the one you use (see [ORM A
 
 ```typescript
 import Fastify from 'fastify';
-import { Service, ServiceType, ServerType, ServerVendor } from '@sentzunhat/zacatl/service';
+import { Service, ServiceType } from '@sentzunhat/zacatl/service';
+import { ServerType, ServerVendor } from '@sentzunhat/zacatl/service/platforms/server/types/server-config';
 
 const fastify = Fastify();
 
@@ -313,7 +321,7 @@ npm test                 # Run all tests
 npm run test:coverage    # Coverage report
 ```
 
-736 tests across 85 files passed locally for this development candidate. CI runs the full suite plus type-check, lint, and an 8-example Docker smoke matrix before any release — see [docs/guidelines/ci-cd-workflow.md](./docs/guidelines/ci-cd-workflow.md) for exactly what gates what.
+738 tests across 85 files passed locally for this development candidate. CI runs the full suite plus type-check, lint, and an 8-example Docker smoke matrix before any release — see [docs/guidelines/ci-cd-workflow.md](./docs/guidelines/ci-cd-workflow.md) for exactly what gates what.
 
 > `CI` is the orchestrator — CVE scanning, peer-dependency install checks, the full test suite, and an 8-example Docker smoke matrix, gating every merge to `main`. `CVE scan` runs that same audit again on its own weekly schedule so its badge stays live independent of `CI`. `Release` reflects the actual tag → npm publish → GitHub Release pipeline, only fired by real releases. There's no separate "Publish dry-run" badge: that check only runs as part of `CI` (gated on a pending version bump), and giving it its own trigger would mean it either fails on ordinary non-release pushes or needs to duplicate that gate — not worth it for one more badge.
 

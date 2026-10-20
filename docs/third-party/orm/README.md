@@ -10,13 +10,17 @@
 - [multi-orm-setup.md](multi-orm-setup.md) - Use multiple databases in one service
 - [working-with-databases.md](working-with-databases.md) - Step-by-step tutorial
 
-## Common Patterns
+## Common Pattern
+
+Import the wrapper for the repository's ORM. `/service` exports the Service
+orchestrator; repository wrappers and ORM types are available through explicit
+subpaths.
 
 ```typescript
-import { BaseRepository, ORMType } from '@sentzunhat/zacatl/service';
+import { BaseRepository as MongooseRepository } from '@sentzunhat/zacatl/service/layers/infrastructure/repositories/mongoose/repository';
+import { ORMType } from '@sentzunhat/zacatl/service/layers/infrastructure/orm/types';
 
-// Basic repository usage
-class UserRepository extends BaseRepository<User, CreateUser, UserDTO> {
+class UserRepository extends MongooseRepository<UserDb, CreateUser, UserDTO> {
   constructor() {
     super({
       type: ORMType.Mongoose,
@@ -25,19 +29,12 @@ class UserRepository extends BaseRepository<User, CreateUser, UserDTO> {
     });
   }
 }
-
-// Use in routes
-@injectable()
-class GetUsersHandler extends GetRouteHandler {
-  constructor(private userRepo: UserRepository) {
-    super({ url: '/users' });
-  }
-
-  async handle() {
-    return this.userRepo.find({});
-  }
-}
 ```
+
+Use `sequelize/repository` or `nodesqlite/repository` for those databases. The
+wrappers share CRUD methods but each repository uses one ORM. For an
+application-owned persistence contract, use `RepositoryPort` from
+`service/layers/infrastructure/repositories/types`.
 
 ## Related Documentation
 

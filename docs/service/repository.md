@@ -1,34 +1,39 @@
 # Repository Pattern API
 
-Repository primitives for Mongoose, Sequelize, and Node.js SQLite.
+Zacatl provides a separate abstract `BaseRepository` for each ORM. Import the
+matching wrapper from its ORM subpath. The wrappers share CRUD behavior but do
+not switch between ORMs at runtime.
 
 ## BaseRepository
 
-Base repository implementations provide ORM-agnostic data access for **Mongoose**, **Sequelize**, and **node:sqlite**. The node:sqlite model resolves lazily, after its database connection is registered.
+Repository wrappers provide the common CRUD contract for **Mongoose**,
+**Sequelize**, and **node:sqlite**. The node:sqlite model resolves lazily,
+after its database connection is registered.
 
 ### Features
 
 - **Lazy SQLite initialization** - construct repositories before the node:sqlite connection is registered; access the model only after service startup
-- **Multi-ORM support** - unified interface for Mongoose, Sequelize, and node:sqlite
+- **Shared CRUD contract** - consistent methods across Mongoose, Sequelize, and node:sqlite
 - **Direct model access** - use `this.model` for ORM-specific queries
 - **Type-safe** - full TypeScript support with model type assertions
 - **Mongoose-safe by default** - repository filters are treated as data, and updates are wrapped in `$set` unless you opt into `raw: true`
 
 ## Which class should I use?
 
-- **Default for fixed ORM repositories**:
-  - `AbstractMongooseRepository` for Mongoose-only repositories
-  - `AbstractSequelizeRepository` for Sequelize-only repositories
-  - `AbstractNodeSqliteRepository` for `node:sqlite` repositories
-- **Use `BaseRepository`** when the same repository shape may switch between Mongoose, Sequelize, and node:sqlite via config.
-- **Use adapters directly (`MongooseAdapter`, `SequelizeAdapter`, `NodeSqliteAdapter`)** only for framework extension or very advanced low-level use. For application repositories, prefer abstract repository classes.
+- **Use the matching `BaseRepository`** for a repository with a fixed ORM:
+  - `service/layers/infrastructure/repositories/mongoose/repository`
+  - `service/layers/infrastructure/repositories/sequelize/repository`
+  - `service/layers/infrastructure/repositories/nodesqlite/repository`
+- A repository does not switch ORM based on config. Define a separate repository
+  adapter for each ORM the application uses.
+- **Use adapters directly** only for framework extension or low-level integrations.
 
 ## API Reference
 
 ```typescript
-export abstract class BaseRepository<D, I, O> {
-  // ORM model instance - immediate access
-  readonly model: RepositoryModel<D>;
+// Each ORM-specific abstract BaseRepository exposes its model and CRUD methods.
+abstract class BaseRepository {
+  readonly model: unknown;
 
   // CRUD operations
   findById(id: string): Promise<O | null>;
@@ -40,17 +45,15 @@ export abstract class BaseRepository<D, I, O> {
 
   // Utilities
   toLean(input: unknown): O | null;
-  isMongoose(): boolean;
-  isSequelize(): boolean;
-  isNodeSqlite(): boolean;
 }
 ```
 
 ## Sequelize Example
 
 ```typescript
-import { BaseRepository, ORMType, LeanDocument } from '@sentzunhat/zacatl/service';
-import { ModelStatic } from '@sentzunhat/zacatl/third-party/databases/sequelize';
+import { BaseRepository as BaseSequelizeRepository } from '@sentzunhat/zacatl/service/layers/infrastructure/repositories/sequelize/repository';
+import type { LeanDocument } from '@sentzunhat/zacatl/service/layers/infrastructure/repositories/types';
+import type { ModelStatic } from '@sentzunhat/zacatl/third-party/databases/sequelize';
 import { UserModel } from './models/user.model';
 
 interface User
@@ -62,12 +65,9 @@ interface CreateUser {
   email: string;
 }
 
-class UserRepository extends BaseRepository<UserModel, CreateUser, User> {
+class UserRepository extends BaseSequelizeRepository<UserModel, CreateUser, User> {
   constructor() {
-    super({
-      type: ORMType.Sequelize,
-      name: 'User',
-    });
+    super({ name: 'User' });
   }
 
   async findByEmail(email: string): Promise<User | null> {
@@ -82,12 +82,13 @@ class UserRepository extends BaseRepository<UserModel, CreateUser, User> {
 ## Mongoose Example
 
 ```typescript
-import { BaseRepository, ORMType, LeanWithMeta } from '@sentzunhat/zacatl/service';
-import { MongooseModel } from '@sentzunhat/zacatl/third-party/databases/mongoose';
+import { BaseRepository as BaseMongooseRepository } from '@sentzunhat/zacatl/service/layers/infrastructure/repositories/mongoose/repository';
+import type { LeanDocument } from '@sentzunhat/zacatl/service/layers/infrastructure/repositories/types';
+import type { MongooseModel } from '@sentzunhat/zacatl/third-party/databases/mongoose';
 import { Schema } from 'mongoose';
 
 interface User
-  extends LeanWithMeta<{
+  extends LeanDocument<{
     email: string;
   }> {}
 
@@ -99,13 +100,9 @@ const userSchema = new Schema<User>({
   email: { type: String, required: true, unique: true },
 });
 
-class UserRepository extends BaseRepository<User, CreateUser, User> {
+class UserRepository extends BaseMongooseRepository<User, CreateUser, User> {
   constructor() {
-    super({
-      type: ORMType.Mongoose,
-      name: 'User',
-      schema: userSchema,
-    });
+    super({ name: 'User', schema: userSchema });
   }
 
   async findByEmail(email: string): Promise<User | null> {
@@ -143,7 +140,7 @@ Use the library's base types to enforce this contract:
 **All ORMs:**
 
 ```typescript
-import { LeanDocument } from '@sentzunhat/zacatl/service';
+import type { LeanDocument } from '@sentzunhat/zacatl/service/layers/infrastructure/repositories/types';
 
 type User = LeanDocument<{
   email: string;
@@ -151,12 +148,12 @@ type User = LeanDocument<{
 }>;
 ```
 
-> **Note:** `LeanDocument<T>` is the shared output shape for repository results.
-> Mongoose also exposes `LeanWithMeta<T>` as a backward-compatible alias.
+> **Note:** `LeanDocument<T>` is the canonical shared output shape for repository results.
 
 These base types automatically include `id`, `createdAt`, and `updatedAt` with correct types.
 
-> **Note**: These types are re-exported from `@sentzunhat/zacatl` for convenience. They're defined in the repository layer but available at the top level of the library.
+> **Note:** These types are exported from the repository types subpath shown
+> above; Zacatl does not publish a package-root barrel.
 
 ## Configuration
 
@@ -164,8 +161,8 @@ These base types automatically include `id`, `createdAt`, and `updatedAt` with c
 
 ```typescript
 type MongooseRepositoryConfig<D> = {
-  readonly type: ORMType.Mongoose;
-  readonly name?: string; // model name, auto-generated if omitted
+  readonly type?: ORMType.Mongoose;
+  readonly name: string; // registered model name
   readonly schema: Schema<D>;
 };
 ```
@@ -174,7 +171,7 @@ type MongooseRepositoryConfig<D> = {
 
 ```typescript
 type SequelizeRepositoryConfig<D extends object> = {
-  readonly type: ORMType.Sequelize;
+  readonly type?: ORMType.Sequelize;
   readonly name: string; // registered Sequelize model name
 };
 ```

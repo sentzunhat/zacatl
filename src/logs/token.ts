@@ -21,5 +21,5 @@ import type { Logger } from './types';
  * }
  * ```
  */
-// eslint-disable-next-line @typescript-eslint/naming-convention -- PascalCase matches the other DI tokens (e.g. NodeSqliteToken)
+// eslint-disable-next-line @typescript-eslint/naming-convention -- PascalCase is the established name for DI tokens.
 export const LoggerToken: InjectionToken<Logger> = Symbol.for('@sentzunhat/zacatl/logger');

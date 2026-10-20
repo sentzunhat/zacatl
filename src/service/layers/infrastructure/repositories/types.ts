@@ -72,7 +72,6 @@ export type {
   MongooseBaseRepositoryConfig,
   MongooseRepositoryConfig,
   MongooseRepositoryModel,
-  LeanWithMeta,
 } from './mongoose/types';
 export type {
   SequelizeBaseRepositoryConfig,

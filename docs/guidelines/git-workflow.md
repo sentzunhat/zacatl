@@ -119,7 +119,9 @@ Relates to #88
 
 **Footer Keywords:**
 
-- `BREAKING CHANGE:` — Signals breaking change (requires major version)
+- `BREAKING CHANGE:` — Signals an API break; choose the version increment under
+  the current policy (`0.0.x` patch before `0.1.0`, minor from `0.1.0` to
+  `1.0.0`, and major after `1.0.0`)
 - `Fixes #<number>` — Closes issue
 - `Relates to #<number>` — References related issue
 - `Reviewed-by:` — Code reviewer(s)
@@ -225,22 +227,24 @@ MAJOR.MINOR.PATCH[-prerelease][+build]
 
 #### Patch (`0.0.x` → `0.0.x+1`)
 
+Before the first `0.1.0` release, Zacatl uses the `0.0.x` series for
+development publications. A patch increment may include breaking API changes,
+new features, fixes, documentation, and other improvements. There is no
+backward-compatibility promise between `0.0.x` releases; document consumer
+migrations and remove shims kept only for earlier Zacatl `0.0.x` contracts.
+This policy ends at `0.1.0`.
+
 **Increment for:**
 
-- Bug fixes (no API changes)
-- Documentation improvements
-- Internal refactoring (no public API impact)
-- Performance improvements
-- Type definition fixes
-- Test additions
+- Any changes included in a pre-`0.1.0` development publication, including
+  breaking changes and improvements
 
-**DOES NOT trigger major/minor increment:**
+Starting with `0.1.0`, use the normal pre-1.0 rules below: patches are for
+backward-compatible fixes and improvements; new features or breaking changes
+require a minor increment (`0.x.0`). After `1.0.0`, breaking changes require
+a major increment.
 
-- No new features
-- No API changes
-- No breaking changes
-
-**Example commits triggering patch:**
+**Example pre-`0.1.0` patch commits:**
 
 ```
 fix(service): handle null database connections  # Fix
@@ -249,15 +253,15 @@ perf(handler): optimize request parsing         # Perf
 refactor(di): simplify auto-registration        # Internal
 ```
 
-#### Minor (`0.x.0` → `0.x+1.0`)
+#### Minor (from `0.1.0`: `0.x.0` → `0.x+1.0`)
 
-**Increment for (0.x phase only):**
+**Starting with `0.1.0`, increment for:**
 
 - New features (backward compatible)
 - New public APIs
 - New framework adapters
 - New platform support
-- **Breaking changes** (allowed in 0.x; becomes major in 1.0+)
+- **Breaking changes** (minor in 0.x; major in 1.0+)
 
 **MUST reset patch to 0:**
 
@@ -280,7 +284,7 @@ feat(error): add ForbiddenError class           # New API
 - Removal of deprecated features
 - Major architectural shifts
 
-**In 0.x phase:**
+**From `0.1.0` until `1.0.0`:**
 
 - Breaking changes are **minor** bumps (allowed)
 - Migration from 0.x to 1.0.0 is major (stability marker)
@@ -304,7 +308,12 @@ Review commits since last release:
 git log v0.0.39..HEAD --oneline
 ```
 
-Ask:
+For a release before `0.1.0`, use the next `0.0.x` patch version, even when
+the development changes include breaking API changes, new features, or other
+improvements. Record breaking changes and consumer migration guidance in the
+changelog. Starting with `0.1.0`, apply the patch/minor rules below.
+
+Ask (from `0.1.0` onward):
 
 - **Breaking changes?** → Major (post-1.0 only) or Minor (0.x)
 - **New features?** → Minor
@@ -541,8 +550,8 @@ npx husky add .husky/pre-commit "npm run type:check && npm run lint:silent && np
 | Types      | feat, fix, refactor, docs, test, chore, ci, style, perf |
 | Branches   | `<type>/<scope>/<description>`                          |
 | Versioning | Semantic Versioning 2.0.0                               |
-| Patch      | Bug fixes, docs, internal refactoring                   |
-| Minor      | New features (breaking in 0.x)                          |
-| Major      | Breaking changes (post-1.0) or v1.0.0 release           |
+| Patch      | Before `0.1.0`, any development change; afterward fixes and improvements |
+| Minor      | From `0.1.0`, new features and breaking changes in 0.x                  |
+| Major      | Breaking changes after `1.0.0` or the `1.0.0` stability release         |
 | Changelog  | Keep a Changelog format with emojis                     |
 | PRs        | Clear title, description, checklist                     |

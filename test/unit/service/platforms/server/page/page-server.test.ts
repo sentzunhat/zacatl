@@ -112,17 +112,17 @@ describe('PageServer', () => {
       expect(customRegister).toHaveBeenCalledWith(adapter, { native: true });
     });
 
-    it('supports legacy adapters without raw-server access', async () => {
-      const legacyAdapter: PageServerPort = {
+    it('supports adapters without optional raw-server access', async () => {
+      const adapterWithoutRawServer: PageServerPort = {
         registerStaticFiles: vi.fn(),
         registerSpaFallback: vi.fn(),
         register: vi.fn().mockResolvedValue(undefined),
       };
       const customRegister = vi.fn();
-      pageServer = new PageServer(makeConfig({ customRegister }), legacyAdapter);
+      pageServer = new PageServer(makeConfig({ customRegister }), adapterWithoutRawServer);
 
       await expect(pageServer.configure()).resolves.toBeUndefined();
-      expect(customRegister).toHaveBeenCalledWith(legacyAdapter, undefined);
+      expect(customRegister).toHaveBeenCalledWith(adapterWithoutRawServer, undefined);
     });
   });
 

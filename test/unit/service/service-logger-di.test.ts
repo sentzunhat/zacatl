@@ -11,12 +11,10 @@ import {
   ServerVendor,
 } from '../../../src/service/platforms/server/types/server-config';
 import { Service, ServiceType, type ServiceConfig } from '../../../src/service/service';
-import {
-  ApplicationContainerToken,
-  DomainContainerToken,
-  InfrastructureContainerToken,
-  ServiceContainerToken,
-} from '../../../src/service/tokens';
+import { ApplicationContainerToken } from '../../../src/service/layers/application/tokens';
+import { DomainContainerToken } from '../../../src/service/layers/domain/tokens';
+import { InfrastructureContainerToken } from '../../../src/service/layers/infrastructure/tokens';
+import { ServiceContainerToken } from '../../../src/service/tokens/service';
 import type { DependencyContainer } from '../../../src/third-party/dependency-injection/tsyringe';
 import { singleton } from '../../../src/third-party/dependency-injection/tsyringe';
 

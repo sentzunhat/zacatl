@@ -1,7 +1,7 @@
+import { createDatabaseToken } from '@zacatl/service/layers/infrastructure/orm/tokens/factory';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 import { clearContainer } from '@zacatl/dependency-injection';
-import { NodeSqliteToken } from '@zacatl/service/layers/infrastructure/orm/tokens/nodesqlite';
 import { BaseRepository } from '@zacatl/service/layers/infrastructure/repositories/nodesqlite/repository';
 import { ORMType } from '@zacatl/service/layers/infrastructure/repositories/types';
 import { container } from '@zacatl/third-party/dependency-injection/tsyringe';
@@ -42,7 +42,7 @@ describe('BaseRepository', () => {
     });
     mockDatabase.exec.mockResolvedValue(undefined);
 
-    container.register(NodeSqliteToken, {
+    container.register(createDatabaseToken('SQLITE', 'SQLITE'), {
       useValue: mockDatabase,
     });
 

@@ -634,21 +634,6 @@
       "import": "./build-src-esm/service/layers/infrastructure/orm/tokens/factory.js",
       "require": "./build-src-cjs/service/layers/infrastructure/orm/tokens/factory.js"
     },
-    "./service/layers/infrastructure/orm/tokens/mongoose": {
-      "types": "./build-src-esm/service/layers/infrastructure/orm/tokens/mongoose.d.ts",
-      "import": "./build-src-esm/service/layers/infrastructure/orm/tokens/mongoose.js",
-      "require": "./build-src-cjs/service/layers/infrastructure/orm/tokens/mongoose.js"
-    },
-    "./service/layers/infrastructure/orm/tokens/nodesqlite": {
-      "types": "./build-src-esm/service/layers/infrastructure/orm/tokens/nodesqlite.d.ts",
-      "import": "./build-src-esm/service/layers/infrastructure/orm/tokens/nodesqlite.js",
-      "require": "./build-src-cjs/service/layers/infrastructure/orm/tokens/nodesqlite.js"
-    },
-    "./service/layers/infrastructure/orm/tokens/sequelize": {
-      "types": "./build-src-esm/service/layers/infrastructure/orm/tokens/sequelize.d.ts",
-      "import": "./build-src-esm/service/layers/infrastructure/orm/tokens/sequelize.js",
-      "require": "./build-src-cjs/service/layers/infrastructure/orm/tokens/sequelize.js"
-    },
     "./service/layers/infrastructure/orm/types": {
       "types": "./build-src-esm/service/layers/infrastructure/orm/types.d.ts",
       "import": "./build-src-esm/service/layers/infrastructure/orm/types.js",
@@ -868,11 +853,6 @@
       "types": "./build-src-esm/service/service.d.ts",
       "import": "./build-src-esm/service/service.js",
       "require": "./build-src-cjs/service/service.js"
-    },
-    "./service/tokens": {
-      "types": "./build-src-esm/service/tokens.d.ts",
-      "import": "./build-src-esm/service/tokens.js",
-      "require": "./build-src-cjs/service/tokens.js"
     },
     "./service/tokens/service": {
       "types": "./build-src-esm/service/tokens/service.d.ts",

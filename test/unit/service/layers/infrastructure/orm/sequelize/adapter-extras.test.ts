@@ -1,3 +1,4 @@
+import { createDatabaseToken } from '../../../../../../../src/service/layers/infrastructure/orm/tokens/factory';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 import { container } from '@zacatl/third-party/dependency-injection/tsyringe';
@@ -5,7 +6,6 @@ import { container } from '@zacatl/third-party/dependency-injection/tsyringe';
 import { clearContainer } from '../../../../../../../src/dependency-injection';
 import { InternalServerError } from '../../../../../../../src/error';
 import { SequelizeAdapter } from '../../../../../../../src/service/layers/infrastructure/orm/sequelize/adapter';
-import { SequelizeToken } from '../../../../../../../src/service/layers/infrastructure/orm/tokens/sequelize';
 import { ORMType } from '../../../../../../../src/service/layers/infrastructure/repositories/types';
 
 interface Plain {
@@ -19,7 +19,7 @@ describe('SequelizeAdapter Extras', () => {
   beforeEach(() => {
     clearContainer();
     // Register a mock Sequelize instance in DI for each test
-    container.register(SequelizeToken, {
+    container.register(createDatabaseToken('SEQUELIZE', 'SEQUELIZE'), {
       useValue: { model: (_name: string) => mockModel },
     });
   });
@@ -30,7 +30,7 @@ describe('SequelizeAdapter Extras', () => {
       count: vi.fn().mockResolvedValueOnce([1, 2, 3]),
     };
 
-    container.register(SequelizeToken, {
+    container.register(createDatabaseToken('SEQUELIZE', 'SEQUELIZE'), {
       useValue: { model: (_name: string) => mockModel },
     });
 
@@ -52,7 +52,7 @@ describe('SequelizeAdapter Extras', () => {
     // Provide a model that is not used; adapter.toLean only checks instanceof Model at runtime,
     // but we can pass the instance directly and assert transformation occurs for plain objects too.
     const dummyModel = {};
-    container.register(SequelizeToken, {
+    container.register(createDatabaseToken('SEQUELIZE', 'SEQUELIZE'), {
       useValue: { model: (_name: string) => dummyModel },
     });
 
@@ -71,7 +71,7 @@ describe('SequelizeAdapter Extras', () => {
         findByPk: vi.fn().mockRejectedValue(dbError),
       };
 
-      container.register(SequelizeToken, {
+      container.register(createDatabaseToken('SEQUELIZE', 'SEQUELIZE'), {
         useValue: { model: (_name: string) => mockModel },
       });
 
@@ -92,7 +92,7 @@ describe('SequelizeAdapter Extras', () => {
         findAll: vi.fn().mockRejectedValue(dbError),
       };
 
-      container.register(SequelizeToken, {
+      container.register(createDatabaseToken('SEQUELIZE', 'SEQUELIZE'), {
         useValue: { model: (_name: string) => mockModel },
       });
 
@@ -113,7 +113,7 @@ describe('SequelizeAdapter Extras', () => {
         create: vi.fn().mockRejectedValue(dbError),
       };
 
-      container.register(SequelizeToken, {
+      container.register(createDatabaseToken('SEQUELIZE', 'SEQUELIZE'), {
         useValue: { model: (_name: string) => mockModel },
       });
 
@@ -138,7 +138,7 @@ describe('SequelizeAdapter Extras', () => {
         sequelize: { getDialect: () => 'mysql' },
       };
 
-      container.register(SequelizeToken, {
+      container.register(createDatabaseToken('SEQUELIZE', 'SEQUELIZE'), {
         useValue: { model: (_name: string) => mockModel },
       });
 
@@ -164,7 +164,7 @@ describe('SequelizeAdapter Extras', () => {
         destroy: vi.fn().mockRejectedValue(dbError),
       };
 
-      container.register(SequelizeToken, {
+      container.register(createDatabaseToken('SEQUELIZE', 'SEQUELIZE'), {
         useValue: { model: (_name: string) => mockModel },
       });
 
@@ -185,7 +185,7 @@ describe('SequelizeAdapter Extras', () => {
         count: vi.fn().mockRejectedValue(dbError),
       };
 
-      container.register(SequelizeToken, {
+      container.register(createDatabaseToken('SEQUELIZE', 'SEQUELIZE'), {
         useValue: { model: (_name: string) => mockModel },
       });
 
@@ -205,7 +205,7 @@ describe('SequelizeAdapter Extras', () => {
         create: vi.fn().mockResolvedValue(null),
       };
 
-      container.register(SequelizeToken, {
+      container.register(createDatabaseToken('SEQUELIZE', 'SEQUELIZE'), {
         useValue: { model: (_name: string) => mockModel },
       });
 
@@ -226,7 +226,7 @@ describe('SequelizeAdapter Extras', () => {
         findByPk: vi.fn().mockRejectedValue('string error'),
       };
 
-      container.register(SequelizeToken, {
+      container.register(createDatabaseToken('SEQUELIZE', 'SEQUELIZE'), {
         useValue: { model: (_name: string) => mockModel },
       });
 

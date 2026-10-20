@@ -6,8 +6,8 @@ import { getContainer } from '../../../../dependency-injection/container';
 
 // Consumer repositories usually call super(config) with no container argument.
 // Capture their owning Infrastructure scope only while DI constructs them; ORM
-// adapters retain that scope for later model/connection resolution. Direct
-// construction outside a Service keeps the legacy global-container behavior.
+// adapters retain that scope for later model/connection resolution. Standalone
+// layer composition uses the global container as its explicit registration source.
 const constructionScope = new AsyncLocalStorage<DependencyContainer>();
 
 export const withOrmConstructionScope = <T>(

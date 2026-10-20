@@ -1,6 +1,6 @@
 import type { StatementSync } from 'node:sqlite';
 
-import type { DependencyContainer, InjectionToken } from '@zacatl/third-party/dependency-injection/tsyringe';
+import type { DependencyContainer } from '@zacatl/third-party/dependency-injection/tsyringe';
 
 import { InternalServerError } from '../../../../../error';
 import { uuidv4 } from '../../../../../third-party/uuid';
@@ -12,7 +12,7 @@ import type {
 } from '../../repositories/types';
 import { DEFAULT_QUERY_LIMIT } from '../../repositories/types';
 import { getOrmConstructionScope } from '../scope';
-import { createDatabaseToken, createLegacyDatabaseToken } from '../tokens/factory';
+import { createDatabaseToken } from '../tokens/factory';
 
 /**
  * Node.js SQLite ORM Adapter (node:sqlite)
@@ -64,10 +64,8 @@ export class NodeSqliteAdapter<I extends object, O extends object>
 
   private resolveModel(): NodeSqliteRepositoryModel {
     const connectionName = this.config.connection?.name ?? 'SQLITE';
-    const canonicalToken = createDatabaseToken('SQLITE', connectionName) as InjectionToken<NodeSqliteRepositoryModel>;
-    const legacyToken = createLegacyDatabaseToken('SQLITE', connectionName) as InjectionToken<NodeSqliteRepositoryModel>;
+    const token = createDatabaseToken('SQLITE', connectionName);
     const container = this.container;
-    const token = container.isRegistered(canonicalToken, false) ? canonicalToken : legacyToken;
 
     const resolved = container.isRegistered(token, false)
       ? container.resolve<NodeSqliteRepositoryModel>(token)

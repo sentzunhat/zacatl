@@ -4,7 +4,7 @@
 
 ## [0.0.65] - 2026-10-17
 
-**Status**: Draft release candidate for owner review; not published
+**Status**: Release candidate in PR #138 targeting `main`; not published
 
 ### ✨ Features and fixes
 
@@ -15,9 +15,18 @@
   `ApiServerPort.listen` require `(host, port)`. Custom adapters must accept
   and use both values; built-in Fastify and Express adapters do so. Stabilize
   this contract at 0.1.0.
-- Namespaced ORM symbols are canonical. ORM adapters also resolve instances
-  registered directly with the previous `db:<vendor>:<key>` symbol, and
-  Zacatl's registration helper continues to create that alias.
+- **Canonical ORM tokens:** ORM adapters and registration helpers use only
+  `createDatabaseToken(vendor, connectionName)`. The previous
+  `db:<vendor>:<key>` symbols and `MongooseToken`, `SequelizeToken`, and
+  `NodeSqliteToken` aliases are removed. Consumers should import
+  `createDatabaseToken` from `@sentzunhat/zacatl/service/layers/infrastructure/orm/tokens/factory`
+  and register instances under the resulting token.
+- **Canonical service token imports:** the compatibility barrel
+  `@sentzunhat/zacatl/service/tokens` is removed. Import each token from its
+  owning module, such as `service/tokens/service`, `service/layers/application/tokens`,
+  or `service/platforms/tokens`.
+- **Canonical repository output type:** the `LeanWithMeta` alias is removed;
+  use the shared `LeanDocument` type.
 - Service-managed REST handlers resolve from their Application child DI
   container. Startup prepares database and page platforms, awaits repository
   readiness, then opens the HTTP listener; direct `Server.start()` also
@@ -59,21 +68,24 @@
 
 ### 🧪 Verification
 
-- The current local development candidate passed `npm test` (85 files / 736 tests),
+- Local development verification passed `npm test` (85 files / 738 tests),
   including direct-start preparation and prepare-then-start idempotence
-  regressions. The earlier implementation also passed `npm run type:check`,
-  `npm run build`, and
-  `npm run smoke:consumers`; focused Docker published-port and readiness-order
-  checks passed. The draft PR's full publish dry-run and eight-example Docker
-  matrix passed in CI run [355](https://github.com/sentzunhat/zacatl/actions/runs/39059892471).
+  regressions. `npm run type:check`, `npm run build`, `npm run lint:silent`,
+  and `npm run smoke:consumers` passed. The prior PR head
+  `d3a37e429881ebdc90d6222052340cfaf816d7da` passed all 12 CI checks,
+  including the publish dry-run and eight-example Docker matrix, in
+  [CI run 39445072711](https://github.com/sentzunhat/zacatl/actions/runs/39445072711).
+  A later documentation-only sequencing update is included in PR #138; see
+  the PR for the latest CI result.
 - All nine example lockfiles were refreshed with
   `npm update source-map-js --package-lock-only --prefix <example>`.
 
-### 🚦 Release boundary
+### 🚦 Integration and release boundary
 
-- This version bump and changelog prepare the `dev` → `main` draft PR. The
-  repository's automated tag, npm publish, and GitHub Release happen only
-  after an owner-approved merge to `main` and successful release gates.
+- PR #138 now targets `main` as the `0.0.65` release candidate. Its pull
+  request checks passed; merging it will start the main-branch release gates,
+  followed by the automated tag, npm publish, and GitHub Release if those gates
+  pass. The PR remains open and has not been merged.
 - The website still consumes published Zacatl 0.0.64. This release candidate
   does not migrate the website; website adoption remains tracked by its
   existing work item `2a1dc541-2cca-4c2f-b431-7a6535b77040`.

@@ -28,8 +28,6 @@ export type MongooseDocument<Db> = Document<
 > &
   WithMongooseMeta<Db>;
 
-export type LeanWithMeta<T extends object = Record<string, unknown>> = LeanDocument<T>;
-
 export type MongooseDoc<Db> = IfAny<
   MongooseDocument<Db>,
   MongooseDocument<Db>,

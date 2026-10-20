@@ -23,14 +23,19 @@ modules, and their nested ports and adapters, see the
 ## Import
 
 ```typescript
-import { ServerConfig, ServerVendor, ServerType, DatabaseVendor } from '@sentzunhat/zacatl/service';
+import { DatabaseVendor } from '@sentzunhat/zacatl/service';
+import type { ServerConfig } from '@sentzunhat/zacatl/service/platforms/server/server';
+import { ServerVendor, ServerType } from '@sentzunhat/zacatl/service/platforms/server/types/server-config';
 ```
 
 ---
 
 ## Third-Party Dependencies
 
-All HTTP frameworks, databases, and utilities used by the server platform are **exported via the library** for consistent versioning across your application. See [Unified Dependency Export Strategy](./dependency-exports.md) for detailed import patterns and package management.
+Zacatl exposes selected framework and database integrations through explicit
+subpaths. Database drivers remain optional peer dependencies; install the
+packages your application uses. See [Unified Dependency Export Strategy](./dependency-exports.md)
+for the current import paths and dependency guidance.
 
 **Key Exports:**
 
@@ -41,6 +46,12 @@ All HTTP frameworks, databases, and utilities used by the server platform are **
 ---
 
 ## Configuration Types
+
+Service coordinates startup and shutdown. Layers/Infrastructure owns
+connections, ORM adapters, and repositories; Platforms/Server owns HTTP, API
+routes, and pages. The current configuration still places database connection
+entries under `platforms.server.databases`; Service prepares the infrastructure
+connections before Server begins listening.
 
 ### `ServerConfig`
 
@@ -352,7 +363,8 @@ Simple REST API server with Fastify.
 
 ```typescript
 import Fastify from 'fastify';
-import { Service, ServiceType, ServerVendor, ServerType } from '@sentzunhat/zacatl/service';
+import { Service, ServiceType } from '@sentzunhat/zacatl/service';
+import { ServerVendor, ServerType } from '@sentzunhat/zacatl/service/platforms/server/types/server-config';
 
 const fastify = Fastify();
 
@@ -448,7 +460,8 @@ Simple Express REST API server.
 
 ```typescript
 import express from 'express';
-import { Service, ServerVendor, ServerType } from '@sentzunhat/zacatl/service';
+import { Service } from '@sentzunhat/zacatl/service';
+import { ServerVendor, ServerType } from '@sentzunhat/zacatl/service/platforms/server/types/server-config';
 
 const app = express();
 
@@ -490,7 +503,8 @@ Fastify server with React SPA + API + Sequelize using SQLite dialect.
 ```typescript
 import Fastify from 'fastify';
 import { Sequelize } from 'sequelize';
-import { Service, ServerVendor, ServerType, DatabaseVendor } from '@sentzunhat/zacatl/service';
+import { Service, DatabaseVendor } from '@sentzunhat/zacatl/service';
+import { ServerVendor, ServerType } from '@sentzunhat/zacatl/service/platforms/server/types/server-config';
 
 const fastify = Fastify();
 const sequelize = new Sequelize('sqlite:database.sqlite');
@@ -552,7 +566,8 @@ Fastify gateway server that proxies requests to multiple backend services.
 
 ```typescript
 import Fastify from 'fastify';
-import { Service, ServerVendor, ServerType } from '@sentzunhat/zacatl/service';
+import { Service } from '@sentzunhat/zacatl/service';
+import { ServerVendor, ServerType } from '@sentzunhat/zacatl/service/platforms/server/types/server-config';
 
 const fastify = Fastify();
 
@@ -605,7 +620,8 @@ Server with both MongoDB (Mongoose) and PostgreSQL (Sequelize).
 import Fastify from 'fastify';
 import mongoose from 'mongoose';
 import { Sequelize } from 'sequelize';
-import { Service, ServerVendor, ServerType, DatabaseVendor } from '@sentzunhat/zacatl/service';
+import { Service, DatabaseVendor } from '@sentzunhat/zacatl/service';
+import { ServerVendor, ServerType } from '@sentzunhat/zacatl/service/platforms/server/types/server-config';
 
 const fastify = Fastify();
 const sequelize = new Sequelize('postgres://localhost:5432/mydb');

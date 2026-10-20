@@ -1,49 +1,44 @@
 # ORM Support
 
-## Architecture
+Zacatl provides ORM-specific repository wrappers over a shared CRUD
+implementation. Each repository targets one ORM; use separate repository
+classes when an application uses multiple databases.
 
 ```mermaid
 graph TD
-    A[Your Repository] -->|extends| B[BaseRepository]
-    B -->|uses| C[ORMAdapter]
-    C -->|implements| D[MongooseAdapter]
-    C -->|implements| E[SequelizeAdapter]
-    C -->|implements| F[NodeSqliteAdapter]
-    C -->|implements| G[YourAdapter]
-    D --> H[(MongoDB)]
-    E --> I[(PostgreSQL/MySQL)]
-    F --> J[(SQLite)]
-    G --> K[(Your DB)]
+    R[Your repository] --> W[ORM-specific BaseRepository]
+    W --> P[ORMPort]
+    P --> M[Mongoose adapter]
+    P --> S[Sequelize adapter]
+    P --> N[Node.js SQLite adapter]
 ```
 
 ## Built-in ORMs
 
 - Mongoose (MongoDB)
-- Sequelize (PostgreSQL, MySQL, SQLite via `sequelize` package)
-- Node.js SQLite (`node:sqlite` module on Zacatl's Node 26 runtime, no external
-  package required)
+- Sequelize (PostgreSQL, MySQL, SQLite, and other Sequelize dialects)
+- Node.js SQLite (`node:sqlite`, no external package required)
 
 ## Mongoose Example
 
 ```typescript
-import { BaseRepository, ORMType } from '@sentzunhat/zacatl/service';
-import { Schema } from 'mongoose';
+import { BaseRepository as MongooseRepository } from '@sentzunhat/zacatl/service/layers/infrastructure/repositories/mongoose/repository';
+import { ORMType } from '@sentzunhat/zacatl/service/layers/infrastructure/orm/types';
+import type { MongooseModel } from '@sentzunhat/zacatl/third-party/databases/mongoose';
+import { Schema } from '@sentzunhat/zacatl/third-party/databases/mongoose';
 
-const userSchema = new Schema(
-  {
-    name: String,
-    email: String,
-  },
-  { timestamps: true },
-);
+const userSchema = new Schema<UserDb>({
+  name: String,
+  email: String,
+});
 
-class UserRepository extends BaseRepository<User, CreateUser, UserDTO> {
+class UserRepository extends MongooseRepository<UserDb, CreateUser, UserDTO> {
   constructor() {
     super({ type: ORMType.Mongoose, name: 'User', schema: userSchema });
   }
 
-  async findByEmail(email: string) {
-    const model = this.model as MongooseModel<User>;
+  async findByEmail(email: string): Promise<UserDTO | null> {
+    const model = this.model as MongooseModel<UserDb>;
     return this.toLean(await model.findOne({ email }).lean());
   }
 }
@@ -52,20 +47,18 @@ class UserRepository extends BaseRepository<User, CreateUser, UserDTO> {
 ## Sequelize Example
 
 ```typescript
-import { BaseRepository, ORMType } from '@sentzunhat/zacatl/service';
-import { Model } from 'sequelize';
+import { BaseRepository as SequelizeRepository } from '@sentzunhat/zacatl/service/layers/infrastructure/repositories/sequelize/repository';
+import { ORMType } from '@sentzunhat/zacatl/service/layers/infrastructure/orm/types';
+import { Model } from '@sentzunhat/zacatl/third-party/databases/sequelize';
 
 class ProductModel extends Model {
   declare id: string;
   declare name: string;
 }
 
-class ProductRepository extends BaseRepository<ProductModel, CreateProduct, ProductDTO> {
+class ProductRepository extends SequelizeRepository<ProductModel, CreateProduct, ProductDTO> {
   constructor() {
-    super({
-      type: ORMType.Sequelize,
-      name: 'Product',
-    });
+    super({ type: ORMType.Sequelize, name: 'Product' });
   }
 }
 ```
@@ -73,67 +66,47 @@ class ProductRepository extends BaseRepository<ProductModel, CreateProduct, Prod
 ## Node.js SQLite Example
 
 ```typescript
-import { BaseRepository, ORMType } from '@sentzunhat/zacatl/service';
+import { BaseRepository as NodeSqliteRepository } from '@sentzunhat/zacatl/service/layers/infrastructure/repositories/nodesqlite/repository';
+import type { LeanDocument } from '@sentzunhat/zacatl/service/layers/infrastructure/repositories/types';
 
-interface User {
-  id: string;
-  name: string;
-  email: string;
-}
+type UserDTO = LeanDocument<{ name: string; email: string }>;
 
-class UserRepository extends BaseRepository<User, CreateUser, UserDTO> {
+class UserRepository extends NodeSqliteRepository<CreateUser, UserDTO> {
   constructor() {
-    super({
-      type: ORMType.NodeSqlite,
-      name: 'users',
-    });
+    super({ name: 'users' });
   }
 }
 ```
 
-````
+## Custom Adapter Contract
 
-## Custom Adapter
+`ORMPort` is the adapter contract used by the shared repository implementation.
+Import its type from the repository types subpath. Custom adapters also need a
+model, readiness lifecycle, CRUD operations, and output normalization:
 
 ```typescript
-import { ORMAdapter } from '@sentzunhat/zacatl/service';
+import type { ORMPort, QueryOptions } from '@sentzunhat/zacatl/service/layers/infrastructure/repositories/types';
 
-class MyAdapter<D, I, O> implements ORMAdapter<D, I, O> {
-  readonly model: any;
+class MyAdapter<D, I extends object, O extends object>
+  implements ORMPort<D, I, O>
+{
+  declare readonly model: D;
 
-  toLean(input: unknown): O | null {
-    /* ... */
-  }
-  async findById(id: string): Promise<O | null> {
-    /* ... */
-  }
-  async create(entity: I): Promise<O> {
-    /* ... */
-  }
-  async update(id: string, update: Partial<I>): Promise<O | null> {
-    /* ... */
-  }
-  async delete(id: string): Promise<O | null> {
-    /* ... */
-  }
+  async ready(): Promise<void> { throw new Error('Implement resource setup'); }
+  async findById(id: string): Promise<O | null> { throw new Error('Implement lookup'); }
+  async findMany(
+    filter?: Record<string, unknown>,
+    options?: QueryOptions,
+  ): Promise<O[]> { throw new Error('Implement listing'); }
+  async create(entity: I): Promise<O> { throw new Error('Implement creation'); }
+  async update(id: string, update: Partial<I>): Promise<O | null> { throw new Error('Implement update'); }
+  async delete(id: string): Promise<O | null> { throw new Error('Implement deletion'); }
+  async exists(id: string): Promise<boolean> { throw new Error('Implement existence check'); }
+  toLean(input: unknown): O | null { throw new Error('Implement output normalization'); }
 }
-````
+```
 
-## BaseRepository API
-
-````typescript
-// CRUD
-await repo.findById(id);
-await repo.create(data);
-await repo.update(id, data);
-await repo.delete(id);
-
-// Utilities
-repo.toLean(document);
-repo.isMongoose();
-repo.isSequelize();
-// Use model directly with type assertion:
-// (repo.model as MongooseModel<T>) for Mongoose
-// (repo.model as ModelStatic<T>) for Sequelize
-// (repo.model as DatabaseSync) for Node.js SQLite```
-````
+The public `BaseRepository` implementation at
+`service/layers/infrastructure/repositories/base-repository` accepts an
+`ORMPort` adapter. Application repositories should normally extend the
+ORM-specific wrappers shown above.

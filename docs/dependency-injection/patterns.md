@@ -144,6 +144,8 @@ registerSingleton(CreateHandler, CreateHandler);
 
 ```typescript
 import { injectable, inject } from 'tsyringe';
+import { AbstractRouteHandler } from '@sentzunhat/zacatl/service/layers/application/entry-points/rest/fastify/handlers/abstract';
+import type { Request } from '@sentzunhat/zacatl/service/layers/application/entry-points/rest/fastify/handlers/abstract';
 
 @injectable()
 export class MyService {
@@ -153,7 +155,11 @@ export class MyService {
 @injectable()
 export class MyHandler extends AbstractRouteHandler<Body, Query, Reply> {
   constructor(@inject(MyService) private readonly myService: MyService) {
-    super();
+    super({ url: '/items', method: 'GET', schema: {} });
+  }
+
+  async handler(request: Request<Body, Query>): Promise<Reply> {
+    return this.myService.execute(request.body, request.query);
   }
 }
 ```

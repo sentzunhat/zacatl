@@ -11,7 +11,7 @@ import type {
  * Creates a Mongoose adapter.
  *
  * The adapter resolves the shared Mongoose instance from the DI container
- * via {@link MongooseToken}, so no lazy import wrapper is needed here.
+ * via the canonical `createDatabaseToken('MONGOOSE', connectionName)` token.
  *
  * @param config Mongoose repository configuration
  * @returns ORMPort implementation for Mongoose

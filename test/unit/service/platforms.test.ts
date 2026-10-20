@@ -6,13 +6,11 @@ import {
   registerValue,
 } from '../../../src/dependency-injection/container';
 import type { ApplicationEntryPoints } from '../../../src/service/layers/application/types';
+import { ApplicationContainerToken } from '../../../src/service/layers/application/tokens';
 import { Platforms } from '../../../src/service/platforms/platforms';
+import { PlatformsConfigToken } from '../../../src/service/platforms/tokens';
 import type { PlatformsConfig } from '../../../src/service/platforms/types';
-import {
-  ApplicationContainerToken,
-  PlatformsConfigToken,
-  ServiceContainerToken,
-} from '../../../src/service/tokens';
+import { ServiceContainerToken } from '../../../src/service/tokens/service';
 
 // Mock the platform implementations to keep the test isolated and simple
 const serverStart = vi.fn(async () => {});
@@ -26,9 +24,11 @@ vi.mock('../../../src/service/platforms/server/server', async () => {
     '../../../src/service/platforms/server/tokens'
   );
   const {
-    ApplicationContainerToken: applicationContainerToken,
     ServiceContainerToken: serviceContainerToken,
-  } = await import('../../../src/service/tokens');
+  } = await import('../../../src/service/tokens/service');
+  const {
+    ApplicationContainerToken: applicationContainerToken,
+  } = await import('../../../src/service/layers/application/tokens');
   const exportsObj: Record<string, unknown> = {};
   class MockServer {
     public cfg: unknown;

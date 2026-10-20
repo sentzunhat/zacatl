@@ -1116,3 +1116,15 @@ threads. The two bug plans contain reproduction and focused fix paths.
 Current remote PR head `6f9aa0e3` passed all 12 CI checks; local
 documentation-only commit `04f3a090` has no CI result. Local unit, type,
 build and lint checks passed but do not negate the focused reproductions.
+
+### PR #138 retargeted to `main` — 2026-10-20
+
+At the owner's request, PR #138 was retargeted from `dev` to `main` after
+confirming `.github/workflows/ci.yml` runs pull-request checks for both bases.
+At retarget time the head was `d3a37e429881ebdc90d6222052340cfaf816d7da`,
+with all 12 checks passing in CI run `39445072711`. The candidate package
+version is `0.0.65`; no `v0.0.65` tag was found and npm returned 404 for that
+version. Merging to `main` will run the main-branch release gates and, if they
+pass, create the tag, publish the package, and create a GitHub Release. The PR
+remains open and unmerged. The PR description and `docs/changelog.md` now
+describe this release path; pre-`0.1.0` `0.0.x` version policy is unchanged.

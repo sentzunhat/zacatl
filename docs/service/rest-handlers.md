@@ -50,7 +50,7 @@ Located in `src/service/layers/application/entry-points/rest/express/handlers/`
 **Example:**
 
 ```typescript
-import { GetRouteHandler } from '@sentzunhat/zacatl/service/layers/application/entry-points/rest/express/handlers';
+import { GetRouteHandler } from '@sentzunhat/zacatl/service/layers/application/entry-points/rest/express/handlers/get-route-handler';
 
 export class FetchGreetingsHandler extends GetRouteHandler {
   constructor() {

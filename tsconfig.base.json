@@ -129,6 +129,9 @@
       "@zacatl/logs/console/types": [
         "./src/logs/console/types.ts"
       ],
+      "@zacatl/logs/fastify": [
+        "./src/logs/fastify.ts"
+      ],
       "@zacatl/logs/pino": [
         "./src/logs/pino.ts"
       ],
@@ -144,17 +147,20 @@
       "@zacatl/logs/pino/types": [
         "./src/logs/pino/types.ts"
       ],
+      "@zacatl/logs/token": [
+        "./src/logs/token.ts"
+      ],
       "@zacatl/logs/types": [
         "./src/logs/types.ts"
       ],
       "@zacatl/service": [
-        "./src/service/service.ts"
+        "./src/service/index.ts"
       ],
       "@zacatl/service/layers/application/application": [
         "./src/service/layers/application/application.ts"
       ],
-      "@zacatl/service/layers/application/entry-points/rest": [
-        "./src/service/layers/application/entry-points/rest/index.ts"
+      "@zacatl/service/layers/application/entry-points/rest/common/error-mapper": [
+        "./src/service/layers/application/entry-points/rest/common/error-mapper.ts"
       ],
       "@zacatl/service/layers/application/entry-points/rest/common/handler": [
         "./src/service/layers/application/entry-points/rest/common/handler.ts"
@@ -186,6 +192,9 @@
       "@zacatl/service/layers/application/entry-points/rest/express/handlers/put-route-handler": [
         "./src/service/layers/application/entry-points/rest/express/handlers/put-route-handler.ts"
       ],
+      "@zacatl/service/layers/application/entry-points/rest/express/hook-handlers/hook-handler": [
+        "./src/service/layers/application/entry-points/rest/express/hook-handlers/hook-handler.ts"
+      ],
       "@zacatl/service/layers/application/entry-points/rest/fastify/handlers/abstract": [
         "./src/service/layers/application/entry-points/rest/fastify/handlers/abstract.ts"
       ],
@@ -213,6 +222,9 @@
       "@zacatl/service/layers/application/entry-points/rest/hook-handlers/hook-handler": [
         "./src/service/layers/application/entry-points/rest/hook-handlers/hook-handler.ts"
       ],
+      "@zacatl/service/layers/application/tokens": [
+        "./src/service/layers/application/tokens.ts"
+      ],
       "@zacatl/service/layers/application/types": [
         "./src/service/layers/application/types.ts"
       ],
@@ -228,6 +240,9 @@
       "@zacatl/service/layers/domain/ports/service": [
         "./src/service/layers/domain/ports/service.ts"
       ],
+      "@zacatl/service/layers/domain/tokens": [
+        "./src/service/layers/domain/tokens.ts"
+      ],
       "@zacatl/service/layers/domain/types": [
         "./src/service/layers/domain/types.ts"
       ],
@@ -239,6 +254,12 @@
       ],
       "@zacatl/service/layers/infrastructure/orm/mongoose/adapter-loader": [
         "./src/service/layers/infrastructure/orm/mongoose/adapter-loader.ts"
+      ],
+      "@zacatl/service/layers/infrastructure/orm/mongoose/index-manager": [
+        "./src/service/layers/infrastructure/orm/mongoose/index-manager.ts"
+      ],
+      "@zacatl/service/layers/infrastructure/orm/mongoose/index-policy": [
+        "./src/service/layers/infrastructure/orm/mongoose/index-policy.ts"
       ],
       "@zacatl/service/layers/infrastructure/orm/mongoose/types": [
         "./src/service/layers/infrastructure/orm/mongoose/types.ts"
@@ -252,6 +273,9 @@
       "@zacatl/service/layers/infrastructure/orm/nodesqlite/types": [
         "./src/service/layers/infrastructure/orm/nodesqlite/types.ts"
       ],
+      "@zacatl/service/layers/infrastructure/orm/scope": [
+        "./src/service/layers/infrastructure/orm/scope.ts"
+      ],
       "@zacatl/service/layers/infrastructure/orm/sequelize/adapter": [
         "./src/service/layers/infrastructure/orm/sequelize/adapter.ts"
       ],
@@ -261,17 +285,14 @@
       "@zacatl/service/layers/infrastructure/orm/sequelize/types": [
         "./src/service/layers/infrastructure/orm/sequelize/types.ts"
       ],
-      "@zacatl/service/layers/infrastructure/orm/tokens/mongoose": [
-        "./src/service/layers/infrastructure/orm/tokens/mongoose.ts"
-      ],
-      "@zacatl/service/layers/infrastructure/orm/tokens/nodesqlite": [
-        "./src/service/layers/infrastructure/orm/tokens/nodesqlite.ts"
-      ],
-      "@zacatl/service/layers/infrastructure/orm/tokens/sequelize": [
-        "./src/service/layers/infrastructure/orm/tokens/sequelize.ts"
+      "@zacatl/service/layers/infrastructure/orm/tokens/factory": [
+        "./src/service/layers/infrastructure/orm/tokens/factory.ts"
       ],
       "@zacatl/service/layers/infrastructure/orm/types": [
         "./src/service/layers/infrastructure/orm/types.ts"
+      ],
+      "@zacatl/service/layers/infrastructure/repositories/base-repository": [
+        "./src/service/layers/infrastructure/repositories/base-repository.ts"
       ],
       "@zacatl/service/layers/infrastructure/repositories/mongoose/repository": [
         "./src/service/layers/infrastructure/repositories/mongoose/repository.ts"
@@ -294,11 +315,17 @@
       "@zacatl/service/layers/infrastructure/repositories/types": [
         "./src/service/layers/infrastructure/repositories/types.ts"
       ],
+      "@zacatl/service/layers/infrastructure/tokens": [
+        "./src/service/layers/infrastructure/tokens.ts"
+      ],
       "@zacatl/service/layers/infrastructure/types": [
         "./src/service/layers/infrastructure/types.ts"
       ],
       "@zacatl/service/layers/layers": [
         "./src/service/layers/layers.ts"
+      ],
+      "@zacatl/service/layers/tokens": [
+        "./src/service/layers/tokens.ts"
       ],
       "@zacatl/service/layers/types": [
         "./src/service/layers/types.ts"
@@ -378,14 +405,23 @@
       "@zacatl/service/platforms/server/shared/prefixes/normalize-prefix": [
         "./src/service/platforms/server/shared/prefixes/normalize-prefix.ts"
       ],
+      "@zacatl/service/platforms/server/tokens": [
+        "./src/service/platforms/server/tokens.ts"
+      ],
       "@zacatl/service/platforms/server/types/server-config": [
         "./src/service/platforms/server/types/server-config.ts"
+      ],
+      "@zacatl/service/platforms/tokens": [
+        "./src/service/platforms/tokens.ts"
       ],
       "@zacatl/service/platforms/types": [
         "./src/service/platforms/types.ts"
       ],
       "@zacatl/service/service": [
         "./src/service/service.ts"
+      ],
+      "@zacatl/service/tokens/service": [
+        "./src/service/tokens/service.ts"
       ],
       "@zacatl/service/types": [
         "./src/service/types.ts"

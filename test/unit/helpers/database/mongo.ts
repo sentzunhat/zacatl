@@ -3,8 +3,8 @@ import type { Connection } from 'mongoose';
 
 import { connect } from '@zacatl/third-party/databases/mongoose';
 import { container } from '@zacatl/third-party/dependency-injection/tsyringe';
+import { createDatabaseToken } from '../../../../src/service/layers/infrastructure/orm/tokens/factory';
 
-import { MongooseToken } from '../../../../src/service/layers/infrastructure/orm/tokens/mongoose';
 
 const dbName = 'sentzunhat-zacatl';
 const dbVersion = '8.0.0';
@@ -50,7 +50,7 @@ export const connectToMongoServerAndRegisterDependency = async (): Promise<void>
 
   dbConnection = conn.connection;
 
-  container.register(MongooseToken, {
+  container.register(createDatabaseToken('MONGOOSE', 'MONGOOSE'), {
     useValue: conn,
   });
 

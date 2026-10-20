@@ -1,5 +1,5 @@
 import type { Sequelize, WhereOptions } from '@zacatl/third-party/databases/sequelize';
-import type { DependencyContainer, InjectionToken } from '@zacatl/third-party/dependency-injection/tsyringe';
+import type { DependencyContainer } from '@zacatl/third-party/dependency-injection/tsyringe';
 
 import { InternalServerError } from '../../../../../error';
 import type {
@@ -10,7 +10,7 @@ import type {
 } from '../../repositories/types';
 import { DEFAULT_QUERY_LIMIT } from '../../repositories/types';
 import { getOrmConstructionScope } from '../scope';
-import { createDatabaseToken, createLegacyDatabaseToken } from '../tokens/factory';
+import { createDatabaseToken } from '../tokens/factory';
 
 /**
  * Sequelize ORM adapter - handles Sequelize-specific database operations
@@ -59,10 +59,8 @@ export class SequelizeAdapter<D extends object, I extends object, O extends obje
 
   private resolveModel(): SequelizeRepositoryModel<D> {
     const connectionName = this.config.connection?.name ?? 'SEQUELIZE';
-    const canonicalToken = createDatabaseToken('SEQUELIZE', connectionName) as InjectionToken<Sequelize>;
-    const legacyToken = createLegacyDatabaseToken('SEQUELIZE', connectionName) as InjectionToken<Sequelize>;
+    const token = createDatabaseToken('SEQUELIZE', connectionName);
     const container = this.container;
-    const token = container.isRegistered(canonicalToken, false) ? canonicalToken : legacyToken;
 
     if (!container.isRegistered(token, false)) {
       throw new InternalServerError({
