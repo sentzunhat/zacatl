@@ -47,7 +47,11 @@ src/
 - Files/folders use kebab-case (`not-found.ts`, `dependency-injection/`)
 - Common suffixes are responsibility-based: `*-adapter.ts`, `*-server.ts`, `*-handler.ts`, `types.ts`
 - Public exports are surfaced from module barrels first; deep imports are available but should be used intentionally
-- Platform folders group API/page/database concerns under `src/service/platforms/server/`
+- Platform folders currently include Server database connection code as a
+  transitional implementation detail. The agreed ownership is
+  `Layers/Infrastructure` for database connections, ORM adapters, and
+  repositories, and `Platforms/Server` for HTTP, API routes, and pages; see
+  the [Service architecture map](../service/architecture.md).
 
 ## Data and Service Flow (Server)
 

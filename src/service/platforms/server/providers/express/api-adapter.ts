@@ -50,6 +50,15 @@ export const createApiAdapter = (
     return `${prefix}${normalizedUrl}`;
   };
 
+  const listen = async (host: string, port: number): Promise<void> =>
+    new Promise((resolve, reject) => {
+      httpServer = server
+        .listen(port, host, () => {
+          resolve();
+        })
+        .on('error', reject);
+    });
+
   return {
     registerRoute: (handler: RouteHandler): void => {
       const method = handler.method.toLowerCase();
@@ -163,15 +172,7 @@ export const createApiAdapter = (
       });
     },
 
-    listen: async (port: number): Promise<void> => {
-      return new Promise((resolve, reject) => {
-        httpServer = server
-          .listen(port, '0.0.0.0', () => {
-            resolve();
-          })
-          .on('error', reject);
-      });
-    },
+    listen,
 
     close: async (): Promise<void> => {
       if (httpServer == null) {

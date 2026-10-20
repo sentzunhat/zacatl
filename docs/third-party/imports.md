@@ -60,12 +60,11 @@ import { mongoose, Schema, type Mongoose } from '@sentzunhat/zacatl/third-party/
 
 ```typescript
 import { mongoose, Schema, type Mongoose } from '@sentzunhat/zacatl/third-party/databases/mongoose';
-import { BaseRepository, ORMType } from '@sentzunhat/zacatl/service';
+import { BaseRepository } from '@sentzunhat/zacatl/service/layers/infrastructure/repositories/mongoose/repository';
 
 class UserRepository extends BaseRepository<User, CreateUser, User> {
   constructor(schema: Schema<User>) {
     super({
-      type: ORMType.Mongoose,
       name: 'User',
       schema,
     });
@@ -95,12 +94,11 @@ import {
   SequelizeModel as Model,
   type Sequelize,
 } from '@sentzunhat/zacatl/third-party/databases/sequelize';
-import { BaseRepository, ORMType } from '@sentzunhat/zacatl/service';
+import { BaseRepository } from '@sentzunhat/zacatl/service/layers/infrastructure/repositories/sequelize/repository';
 
 class UserRepository extends BaseRepository<UserModel, CreateUser, User> {
   constructor() {
     super({
-      type: ORMType.Sequelize,
       name: 'User',
     });
   }
@@ -189,7 +187,8 @@ import type { Mongoose } from 'mongoose';
 
 ```typescript
 // ✅ CORRECT - Core functionality
-import { BaseRepository, Service } from '@sentzunhat/zacatl/service';
+import { Service } from '@sentzunhat/zacatl/service';
+import { BaseRepository } from '@sentzunhat/zacatl/service/layers/infrastructure/repositories/mongoose/repository';
 
 // ✅ CORRECT - Actual mongoose usage (in code path that needs it)
 import mongoose from 'mongoose';
@@ -198,66 +197,27 @@ await mongoose.connect(url);
 
 ---
 
-## Real-World Example: Multi-Adapter Repository
+## Real-World Example: Separate Repositories for Multiple ORMs
+
+Choose one ORM wrapper for each repository. The public API does not switch a
+single `BaseRepository` between ORM vendors at runtime; a service may register
+separate Sequelize and Mongoose repositories together.
 
 ```typescript
-import type { Mongoose } from '@sentzunhat/zacatl/third-party/databases/mongoose';
-import type { ModelStatic } from '@sentzunhat/zacatl/third-party/databases/sequelize';
-import { BaseRepository, ORMType } from '@sentzunhat/zacatl/service';
+import { BaseRepository as MongooseRepository } from '@sentzunhat/zacatl/service/layers/infrastructure/repositories/mongoose/repository';
+import { BaseRepository as SequelizeRepository } from '@sentzunhat/zacatl/service/layers/infrastructure/repositories/sequelize/repository';
 
-interface UserModel {
-  id: string;
-  email: string;
+class UserMongoRepository extends MongooseRepository<User, CreateUser, UserOutput> {
+  constructor() { super({ name: 'User', schema: userSchema }); }
 }
 
-interface User {
-  id: string;
-  email: string;
-}
-
-interface CreateUser {
-  email: string;
-}
-
-declare const userSchema: object;
-
-type Runtime = 'mongoose' | 'sequelize';
-
-export class UserRepository extends BaseRepository<UserModel, CreateUser, User> {
-  constructor(runtime: Runtime) {
-    const config =
-      runtime === 'mongoose'
-        ? {
-          type: ORMType.Mongoose,
-          schema: userSchema,
-          name: 'User',
-        }
-        : {
-          type: ORMType.Sequelize,
-          name: 'User',
-        };
-
-    super(config);
-  }
-
-  async findByEmail(email: string): Promise<User | null> {
-    if (this.isMongoose()) {
-      const user = await (this.model as Mongoose['models'][string]).findOne({ email }).lean().exec();
-      return this.toLean(user);
-    }
-
-    const user = await (this.model as ModelStatic<UserModel>).findOne({ where: { email } });
-    return this.toLean(user);
-  }
+class AuditSqlRepository extends SequelizeRepository<AuditRecord, CreateAudit, AuditRecord> {
+  constructor() { super({ name: 'AuditRecord' }); }
 }
 ```
 
-This approach:
-
-- ✅ Keeps repository config aligned with the current DI-token based ORM resolution
-- ✅ Uses valid `BaseRepository` config for either supported ORM
-- ✅ Preserves clean type-only imports for optional dependencies
-- ✅ Keeps custom queries available through `this.model`
+List both classes in `layers.infrastructure.repositories`. Each repository
+keeps its model and queries specific to its selected ORM.
 
 ---
 
@@ -268,7 +228,8 @@ This approach:
 ```typescript
 // ✅ Always available
 import { logger } from '@sentzunhat/zacatl/logs';
-import { Service, BaseRepository } from '@sentzunhat/zacatl/service';
+import { Service } from '@sentzunhat/zacatl/service';
+import { BaseRepository } from '@sentzunhat/zacatl/service/layers/infrastructure/repositories/mongoose/repository';
 import { singleton } from '@sentzunhat/zacatl/third-party/dependency-injection/tsyringe';
 ```
 
@@ -319,8 +280,8 @@ import type { Mongoose } from '@sentzunhat/zacatl/third-party/databases/mongoose
 vs.
 
 ```typescript
-// ❌ This import...
-import { BaseRepository, mongooseSupport } from '@sentzunhat/zacatl/service';
+// A repository wrapper lives in the subpath for the chosen ORM.
+import { BaseRepository } from '@sentzunhat/zacatl/service/layers/infrastructure/repositories/mongoose/repository';
 
 // ...pulls in database adapter surfaces you may not use
 // Final bundle = mongoose + sequelize + sqlite3 + types

@@ -234,7 +234,8 @@ class MyLayer {
 Domain and Infrastructure layers use these functions internally:
 
 ```typescript
-import { Domain, Infrastructure } from '@sentzunhat/zacatl/service';
+import { Domain } from '@sentzunhat/zacatl/service/layers/domain/domain';
+import { Infrastructure } from '@sentzunhat/zacatl/service/layers/infrastructure/infrastructure';
 
 // Infrastructure auto-uses registerDependencies
 const infra = new Infrastructure({

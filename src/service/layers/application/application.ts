@@ -1,15 +1,24 @@
 import { resolveDependencies } from '@zacatl/dependency-injection';
 import { InternalServerError } from '@zacatl/error';
-import type { DependencyContainer } from '@zacatl/third-party/dependency-injection/tsyringe';
+import {
+  inject,
+  injectable,
+  type DependencyContainer,
+} from '@zacatl/third-party/dependency-injection/tsyringe';
 
+import { ApplicationConfigToken, ApplicationContainerToken } from './tokens';
 import type { ApplicationConfig } from './types';
 import { ensureRegisteredSingleton } from '../../../dependency-injection/container';
 
+@injectable()
 export class Application {
   protected config: ApplicationConfig;
   private readonly container: DependencyContainer | undefined;
 
-  constructor(config: ApplicationConfig, container?: DependencyContainer) {
+  constructor(
+    @inject(ApplicationConfigToken) config: ApplicationConfig,
+    @inject(ApplicationContainerToken) container?: DependencyContainer,
+  ) {
     this.config = config;
     this.container = container;
 

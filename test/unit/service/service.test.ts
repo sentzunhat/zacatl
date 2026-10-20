@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import fastify from 'fastify';
 
 import { InternalServerError } from '../../../src/error';
 import {
@@ -51,11 +52,13 @@ describe('Service (unit)', () => {
     const svcWithInternals = svc as unknown as {
       platforms: {
         registerEntrypoints: (entryPoints: unknown) => Promise<void>;
+        prepare: () => Promise<void>;
         start: () => Promise<void>;
       };
     };
     svcWithInternals.platforms = {
       registerEntrypoints: async (): Promise<void> => {},
+      prepare: async (): Promise<void> => {},
       start: async (): Promise<void> => {
         throw new Error('start-failure');
       },
@@ -64,7 +67,7 @@ describe('Service (unit)', () => {
     await expect(svc.start()).rejects.toThrow('start-failure');
   });
 
-  it('start() awaits layer readiness after platform startup (databases connect during platform start)', async () => {
+  it('start() prepares platforms, awaits layer readiness, then starts listening', async () => {
     const cfg: ServiceConfig = {
       type: ServiceType.SERVER,
       layers: { application: { entryPoints: { rest: { routes: [] } } } },
@@ -95,11 +98,15 @@ describe('Service (unit)', () => {
     (svc as unknown as {
       platforms: {
         registerEntrypoints: (entryPoints: unknown) => Promise<void>;
+        prepare: () => Promise<void>;
         start: () => Promise<void>;
       };
     }).platforms = {
       registerEntrypoints: async (): Promise<void> => {
         calls.push('entrypoints');
+      },
+      prepare: async (): Promise<void> => {
+        calls.push('prepare');
       },
       start: async (): Promise<void> => {
         calls.push('platforms');
@@ -108,7 +115,65 @@ describe('Service (unit)', () => {
 
     await svc.start();
 
-    expect(calls).toEqual(['entrypoints', 'platforms', 'layers']);
+    expect(calls).toEqual(['entrypoints', 'prepare', 'layers', 'platforms']);
+  });
+
+  it('Service.start({ host }) binds the Fastify listener to the requested host', async () => {
+    const instance = fastify();
+    const svc = new Service({
+      type: ServiceType.SERVER,
+      layers: { application: { entryPoints: { rest: { routes: [] } } } },
+      platforms: {
+        server: {
+          name: 'host-test',
+          server: { type: ServerType.SERVER, vendor: ServerVendor.FASTIFY, instance },
+          databases: [],
+          port: 0,
+        },
+      },
+      run: { auto: false },
+    });
+
+    await svc.start({ host: '127.0.0.1' });
+    expect(instance.server.address()).toMatchObject({ address: '127.0.0.1' });
+    await svc.stop();
+  });
+
+  it('does not accept HTTP requests until repository readiness completes', async () => {
+    let releaseReady: () => void = () => {};
+    const readyGate = new Promise<void>((resolve) => {
+      releaseReady = resolve;
+    });
+    class DelayedRepository {
+      async ready(): Promise<void> {
+        await readyGate;
+      }
+    }
+    const instance = fastify();
+    const svc = new Service({
+      type: ServiceType.SERVER,
+      layers: {
+        infrastructure: { repositories: [DelayedRepository as never] },
+        application: { entryPoints: { rest: { routes: [] } } },
+      },
+      platforms: {
+        server: {
+          name: 'readiness-test',
+          server: { type: ServerType.SERVER, vendor: ServerVendor.FASTIFY, instance },
+          databases: [],
+          port: 0,
+        },
+      },
+      run: { auto: false },
+    });
+
+    const start = svc.start();
+    await new Promise((resolve) => setTimeout(resolve, 20));
+    expect(instance.server.listening).toBe(false);
+    releaseReady();
+    await start;
+    expect(instance.server.listening).toBe(true);
+    await svc.stop();
   });
 
   it('stop() resolves cleanly without platforms', async () => {

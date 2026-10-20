@@ -52,7 +52,9 @@ import { loadJSON, loadYML } from '@sentzunhat/zacatl/configuration';
 ### Infrastructure
 
 ```typescript
-import { BaseRepository, ORMType } from '@sentzunhat/zacatl/service';
+import { BaseRepository as MongooseRepository } from '@sentzunhat/zacatl/service/layers/infrastructure/repositories/mongoose/repository';
+import { ORMType } from '@sentzunhat/zacatl/service/layers/infrastructure/orm/types';
+import type { LeanDocument } from '@sentzunhat/zacatl/service/layers/infrastructure/repositories/types';
 ```
 
 ---
@@ -98,16 +100,21 @@ databases: [
 ];
 ```
 
-**SQLite ORM Support:** Full ORM integration via `createNodeSqliteAdapter()` factory with `BaseRepository` for type-safe CRUD operations.
+**SQLite repository support:** Extend the Node.js SQLite repository wrapper for the usual application path. The adapter factory is available for lower-level integrations.
 
 ```typescript
-import { createNodeSqliteAdapter } from '@sentzunhat/zacatl/service';
-import type { DatabaseSync } from 'node:sqlite';
+import { BaseRepository as NodeSqliteRepository } from '@sentzunhat/zacatl/service/layers/infrastructure/repositories/nodesqlite/repository';
+import { createNodeSqliteAdapter } from '@sentzunhat/zacatl/service/layers/infrastructure/orm/nodesqlite/adapter-loader';
 
-const adapter = createNodeSqliteAdapter<InputModel, OutputModel>({
-  database: dbInstance as DatabaseSync,
-  tableName: 'users',
-});
+class UserRepository extends NodeSqliteRepository<CreateUser, UserDTO> {
+  constructor() {
+    super({ name: 'users' });
+  }
+}
+
+// Low-level integrations provide repository configuration; the adapter
+// resolves the registered DatabaseSync instance from Zacatl's DI scope.
+const adapter = createNodeSqliteAdapter<CreateUser, UserDTO>({ name: 'users' });
 ```
 
 **Performance Optimization:** The `node:sqlite` module is dynamically imported only when a connection is first initiated, avoiding startup overhead for projects that don't use SQLite.
@@ -131,6 +138,8 @@ npm install @sentzunhat/zacatl
 ```typescript
 import { resolveDependency } from '@sentzunhat/zacatl/dependency-injection';
 import { Service } from '@sentzunhat/zacatl/service';
+import { ServerType, ServerVendor } from '@sentzunhat/zacatl/service/platforms/server/types/server-config';
+import { Fastify } from '@sentzunhat/zacatl/third-party/fastify';
 import { singleton } from '@sentzunhat/zacatl/third-party/dependency-injection/tsyringe';
 
 @singleton()
@@ -143,6 +152,13 @@ class MyService {
 const service = new Service({
   type: ServiceType.SERVER,
   layers: { domain: { services: [MyService] } },
+  platforms: {
+    server: {
+      name: 'worker',
+      server: { type: ServerType.SERVER, vendor: ServerVendor.FASTIFY, instance: Fastify() },
+      databases: [],
+    },
+  },
 });
 
 await service.start();
@@ -163,14 +179,18 @@ npm install @sentzunhat/zacatl mongoose
 **Use:**
 
 ```typescript
-import { Service, BaseRepository, ORMType } from '@sentzunhat/zacatl/service';
+import { Service, DatabaseVendor, ServiceType } from '@sentzunhat/zacatl/service';
+import { ServerType, ServerVendor } from '@sentzunhat/zacatl/service/platforms/server/types/server-config';
+import { BaseRepository as MongooseRepository } from '@sentzunhat/zacatl/service/layers/infrastructure/repositories/mongoose/repository';
+import { ORMType } from '@sentzunhat/zacatl/service/layers/infrastructure/orm/types';
+import { Fastify } from '@sentzunhat/zacatl/third-party/fastify';
 import { singleton } from '@sentzunhat/zacatl/third-party/dependency-injection/tsyringe';
 import { mongoose, Schema } from '@sentzunhat/zacatl/third-party/databases/mongoose';
 
 const UserSchema = new Schema({ name: String });
 
 @singleton()
-class UserRepository extends BaseRepository<any, any, any> {
+class UserRepository extends MongooseRepository<User, CreateUser, UserDTO> {
   constructor() {
     super({ type: ORMType.Mongoose, name: 'User', schema: UserSchema });
   }
@@ -184,10 +204,12 @@ const service = new Service({
   platforms: {
     server: {
       name: 'app',
+      server: { type: ServerType.SERVER, vendor: ServerVendor.FASTIFY, instance: Fastify() },
       databases: [
         {
           vendor: DatabaseVendor.MONGOOSE,
-          instance: mongoose.connect('mongodb://localhost/db'),
+          instance: mongoose,
+          connection: { url: 'mongodb://localhost/db' },
         },
       ],
     },
@@ -208,18 +230,22 @@ npm install @sentzunhat/zacatl pg pg-hstore
 **Use:**
 
 ```typescript
-import { Service, BaseRepository, ORMType } from '@sentzunhat/zacatl/service';
+import { Service, DatabaseVendor, ServiceType } from '@sentzunhat/zacatl/service';
+import { ServerType, ServerVendor } from '@sentzunhat/zacatl/service/platforms/server/types/server-config';
+import { BaseRepository as SequelizeRepository } from '@sentzunhat/zacatl/service/layers/infrastructure/repositories/sequelize/repository';
+import { ORMType } from '@sentzunhat/zacatl/service/layers/infrastructure/orm/types';
+import { Fastify } from '@sentzunhat/zacatl/third-party/fastify';
 import { singleton } from '@sentzunhat/zacatl/third-party/dependency-injection/tsyringe';
-import { Sequelize, DataTypes } from '@sentzunhat/zacatl/third-party/databases/sequelize';
+import { Sequelize, DataTypes, Model } from '@sentzunhat/zacatl/third-party/databases/sequelize';
 
 const sequelize = new Sequelize('postgresql://localhost/db');
 
-const UserModel = sequelize.define('User', {
-  name: DataTypes.STRING,
-});
+class UserModel extends Model {}
+
+UserModel.init({ name: DataTypes.STRING }, { sequelize, modelName: 'User' });
 
 @singleton()
-class UserRepository extends BaseRepository<any, any, any> {
+class UserRepository extends SequelizeRepository<UserModel, CreateUser, UserDTO> {
   constructor() {
     super({
       type: ORMType.Sequelize,
@@ -236,10 +262,12 @@ const service = new Service({
   platforms: {
     server: {
       name: 'app',
+      server: { type: ServerType.SERVER, vendor: ServerVendor.FASTIFY, instance: Fastify() },
       databases: [
         {
           vendor: DatabaseVendor.SEQUELIZE,
           instance: sequelize,
+          connection: { url: 'postgresql://localhost/db' },
         },
       ],
     },
@@ -254,9 +282,9 @@ const service = new Service({
 | Feature               | Import From                                                    | Install Required?           |
 | --------------------- | -------------------------------------------------------------- | --------------------------- |
 | `singleton` decorator | `@sentzunhat/zacatl/third-party/dependency-injection/tsyringe` | ❌ No (included)            |
-| `Service`             | `@sentzunhat/zacatl`                                           | ❌ No (included)            |
-| `BaseRepository`      | `@sentzunhat/zacatl`                                           | ❌ No (included)            |
-| `logger`              | `@sentzunhat/zacatl`                                           | ❌ No (included)            |
+| `Service`             | `@sentzunhat/zacatl/service`                                   | ❌ No (included)            |
+| ORM repository wrapper | `@sentzunhat/zacatl/service/layers/infrastructure/repositories/{mongoose,sequelize,nodesqlite}/repository` | ❌ No (included) |
+| `logger`              | `@sentzunhat/zacatl/logs`                                      | ❌ No (included)            |
 | `z` (Zod)             | `@sentzunhat/zacatl/third-party/zod`                           | ❌ No (included)            |
 | `mongoose`            | `@sentzunhat/zacatl/third-party/databases/mongoose`            | ✅ Yes (optional peer)      |
 | `Schema`              | `@sentzunhat/zacatl/third-party/databases/mongoose`            | ✅ Yes (optional peer)      |
@@ -270,7 +298,7 @@ const service = new Service({
 All TypeScript types are included automatically:
 
 ```typescript
-import { ServerConfig } from '@sentzunhat/zacatl/service';
+import type { ServerConfig } from '@sentzunhat/zacatl/service/platforms/server/server';
 import { DependencyContainer } from '@sentzunhat/zacatl/third-party/dependency-injection/tsyringe';
 import { ZodType, ZodError } from '@sentzunhat/zacatl/third-party/zod';
 ```

@@ -1,7 +1,9 @@
 import { InternalServerError } from '@zacatl/error';
+import { inject, injectable } from '@zacatl/third-party/dependency-injection/tsyringe';
 
 import type { DesktopConfig } from './types';
 import type { IpcApplicationEntryPoints } from '../../layers/application/types';
+import { DesktopConfigToken } from '../tokens';
 
 /**
  * Desktop platform stub for ServiceType.DESKTOP execution.
@@ -12,11 +14,12 @@ import type { IpcApplicationEntryPoints } from '../../layers/application/types';
  * @example
  * const desktop = new Desktop({ window: { title: "App" }, platform: "neutralino" });
  */
+@injectable()
 export class Desktop {
   private readonly window: DesktopConfig['window'];
   private readonly platform: DesktopConfig['platform'];
 
-  constructor(config: DesktopConfig) {
+  constructor(@inject(DesktopConfigToken) config: DesktopConfig) {
     this.window = config.window;
     this.platform = config.platform;
   }

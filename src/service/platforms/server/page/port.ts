@@ -18,4 +18,6 @@ export interface PageServerPort {
   registerStaticFiles(config: StaticConfig): void;
   registerSpaFallback(prefixes: ApiPrefixes, staticDir: string): void;
   register(): Promise<void>;
+  /** Optional access to the underlying Fastify or Express instance. */
+  getRawServer?(): unknown;
 }

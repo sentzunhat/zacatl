@@ -1,9 +1,10 @@
 # Infrastructure Usage Guide
 
-> Import from the infrastructure subpath:
+> Repository wrappers and ORM types use explicit infrastructure subpaths:
 >
 > ```typescript
-> import { BaseRepository, ORMType } from '@sentzunhat/zacatl/service';
+> import { BaseRepository as MongooseRepository } from '@sentzunhat/zacatl/service/layers/infrastructure/repositories/mongoose/repository';
+> import { ORMType } from '@sentzunhat/zacatl/service/layers/infrastructure/orm/types';
 > ```
 
 ## Modular ORM System
@@ -12,12 +13,9 @@ Your service supports **multiple ORMs simultaneously**. You can mix Mongoose (Mo
 
 ## Which repository class should I use?
 
-- **Use `BaseRepository`** for repositories that may target Mongoose, Sequelize, or node:sqlite with the shared CRUD interface.
-- **Use ORM-specific abstract repositories** when your repository is tied to one ORM:
-  - `AbstractMongooseRepository`
-  - `AbstractSequelizeRepository`
-  - `AbstractNodeSqliteRepository`
-- **Use adapters directly** only for framework extension or low-level advanced integrations. For normal app repositories, prefer `BaseRepository` or ORM-specific abstract repositories.
+- **Use the ORM-specific `BaseRepository` wrapper** for the database each repository targets. The wrappers share CRUD methods; they do not switch ORM at runtime.
+- **Use `RepositoryPort`** when defining an application-owned repository contract independent of its persistence implementation.
+- **Use ORM adapters or `ORMPort`** only for framework extensions and low-level integrations.
 
 ## Architecture
 
@@ -30,7 +28,7 @@ Your service supports **multiple ORMs simultaneously**. You can mix Mongoose (Mo
                       │
                       ▼
 ┌─────────────────────────────────────────────────────┐
-│  Your Repositories (Pick Your ORM)                  │
+│  Your Repositories (one wrapper per ORM)            │
 │  ┌──────────────────┐  ┌───────────────────┐        │
 │  │ UserRepository   │  │ ProductRepository │        │
 │  │ extends Base     │  │ extends Base      │        │
@@ -40,8 +38,8 @@ Your service supports **multiple ORMs simultaneously**. You can mix Mongoose (Mo
              │                     │
              ▼                     ▼
 ┌────────────────────────────────────────────────────┐
-│  BaseRepository (Factory Pattern)                  │
-│  • Automatically selects correct ORM adapter       │
+│  ORM-specific BaseRepository wrapper               │
+│  • Creates the corresponding ORM adapter            │
 │  • Provides unified CRUD interface                 │
 │  • Type-safe repository methods                    │
 └────────────┬───────────────────────────────────────┘
@@ -109,7 +107,9 @@ interface ProductOutput {
 #### Option A: Using Mongoose (MongoDB)
 
 ```typescript
-import { BaseRepository, ORMType } from '@sentzunhat/zacatl/service';
+import { BaseRepository as MongooseRepository } from '@sentzunhat/zacatl/service/layers/infrastructure/repositories/mongoose/repository';
+import { ORMType } from '@sentzunhat/zacatl/service/layers/infrastructure/orm/types';
+import type { MongooseModel } from '@sentzunhat/zacatl/third-party/databases/mongoose';
 import { Schema } from '@sentzunhat/zacatl/third-party/databases/mongoose';
 
 const UserSchema = new Schema<UserDb>(
@@ -121,7 +121,7 @@ const UserSchema = new Schema<UserDb>(
   { timestamps: true },
 );
 
-export class UserRepository extends BaseRepository<UserDb, UserInput, UserOutput> {
+export class UserRepository extends MongooseRepository<UserDb, UserInput, UserOutput> {
   constructor() {
     super({
       type: ORMType.Mongoose,
@@ -132,7 +132,7 @@ export class UserRepository extends BaseRepository<UserDb, UserInput, UserOutput
 
   // Optional: Add custom methods
   async findByEmail(email: string): Promise<UserOutput | null> {
-    const user = await (this.model as MongooseModel<User>).findOne({ email }).lean();
+    const user = await (this.model as MongooseModel<UserDb>).findOne({ email }).lean();
     return this.toLean(user);
   }
 }
@@ -143,7 +143,7 @@ export class UserRepository extends BaseRepository<UserDb, UserInput, UserOutput
 Uses the built-in `node:sqlite` module on Zacatl's Node 26 runtime. No external
 package needed.
 
-For repository-style CRUD with normalized output, use `AbstractNodeSqliteRepository`.
+For repository-style CRUD with normalized output, extend the Node.js SQLite `BaseRepository` wrapper.
 For an app-local store with explicit tables and typed row mappers, see
 [`examples/node-sqlite-store`](../../examples/node-sqlite-store/).
 If you are replacing simple Sequelize SQLite model usage, use
@@ -159,10 +159,23 @@ databases: [{ vendor: DatabaseVendor.SQLITE, connection: { url: 'app.db' } }];
 // ':memory:' is also valid for in-memory databases
 ```
 
+For CRUD through Zacatl's repository API, use its SQLite-specific wrapper:
+
+```typescript
+import { BaseRepository as NodeSqliteRepository } from '@sentzunhat/zacatl/service/layers/infrastructure/repositories/nodesqlite/repository';
+
+export class ItemRepository extends NodeSqliteRepository<ItemInput, ItemOutput> {
+  constructor() {
+    super({ name: 'items' });
+  }
+}
+```
+
 **Raw SQL access (inject `DatabaseServer`):**
 
 ```typescript
-import { DatabaseServer, DatabaseVendor } from '@sentzunhat/zacatl/service';
+import { DatabaseVendor } from '@sentzunhat/zacatl/service';
+import { DatabaseServer } from '@sentzunhat/zacatl/service/platforms/server/database/database-server';
 import { singleton, inject } from '@sentzunhat/zacatl/third-party/dependency-injection/tsyringe';
 import type { DatabaseSync } from 'node:sqlite';
 
@@ -187,8 +200,10 @@ export class ItemRepository {
 #### Option C: Using Sequelize (PostgreSQL/MySQL/SQLite via ORM)
 
 ```typescript
-import { BaseRepository, ORMType } from '@sentzunhat/zacatl/service';
-import { DataTypes, Model, Sequelize } from '@sentzunhat/zacatl/third-party/databases/sequelize';
+import { BaseRepository as SequelizeRepository } from '@sentzunhat/zacatl/service/layers/infrastructure/repositories/sequelize/repository';
+import { ORMType } from '@sentzunhat/zacatl/service/layers/infrastructure/orm/types';
+import { DataTypes, Model, Op, Sequelize } from '@sentzunhat/zacatl/third-party/databases/sequelize';
+import type { ModelStatic } from '@sentzunhat/zacatl/third-party/databases/sequelize';
 
 // Sequelize model definition
 class ProductModel extends Model {}
@@ -205,7 +220,7 @@ ProductModel.init(
   { sequelize, modelName: 'Product', timestamps: true },
 );
 
-export class ProductRepository extends BaseRepository<ProductModel, ProductInput, ProductOutput> {
+export class ProductRepository extends SequelizeRepository<ProductModel, ProductInput, ProductOutput> {
   constructor() {
     super({
       type: ORMType.Sequelize,
@@ -324,9 +339,9 @@ const service = new Service({
 
 To add support for a new ORM:
 
-1. Create adapter in `src/service/layers/infrastructure/orm/adapters/`
-2. Implement `ORMAdapter<D, I, O>` interface
-3. Add type to `BaseRepositoryConfig`
-4. Update BaseRepository constructor factory
+1. Create the adapter in the matching vendor area under `src/service/layers/infrastructure/orm/`.
+2. Implement the `ORMPort` contract from `service/layers/infrastructure/repositories/types`.
+3. Add a repository wrapper/configuration path for the new adapter.
+4. Register the adapter in the infrastructure composition flow.
 
 That's it! The modular system handles the rest.

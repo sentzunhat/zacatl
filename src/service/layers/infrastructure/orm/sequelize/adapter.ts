@@ -1,7 +1,6 @@
 import type { Sequelize, WhereOptions } from '@zacatl/third-party/databases/sequelize';
-import type { InjectionToken } from '@zacatl/third-party/dependency-injection/tsyringe';
+import type { DependencyContainer } from '@zacatl/third-party/dependency-injection/tsyringe';
 
-import { getContainer, resolveDependency } from '../../../../../dependency-injection';
 import { InternalServerError } from '../../../../../error';
 import type {
   SequelizeRepositoryConfig,
@@ -10,6 +9,7 @@ import type {
   QueryOptions,
 } from '../../repositories/types';
 import { DEFAULT_QUERY_LIMIT } from '../../repositories/types';
+import { getOrmConstructionScope } from '../scope';
 import { createDatabaseToken } from '../tokens/factory';
 
 /**
@@ -23,9 +23,11 @@ export class SequelizeAdapter<D extends object, I extends object, O extends obje
   private _model: SequelizeRepositoryModel<D> | undefined;
   private _readyPromise: Promise<void> | undefined;
   private readonly config: SequelizeRepositoryConfig;
+  private readonly container: DependencyContainer;
 
   constructor(config: SequelizeRepositoryConfig) {
     this.config = config;
+    this.container = getOrmConstructionScope();
   }
 
   // Satisfies ORMPort<SequelizeRepositoryModel<D>, ...>
@@ -57,9 +59,10 @@ export class SequelizeAdapter<D extends object, I extends object, O extends obje
 
   private resolveModel(): SequelizeRepositoryModel<D> {
     const connectionName = this.config.connection?.name ?? 'SEQUELIZE';
-    const token = createDatabaseToken('SEQUELIZE', connectionName) as InjectionToken<Sequelize>;
+    const token = createDatabaseToken('SEQUELIZE', connectionName);
+    const container = this.container;
 
-    if (!getContainer().isRegistered(token)) {
+    if (!container.isRegistered(token, false)) {
       throw new InternalServerError({
         message: 'Sequelize instance not registered in DI container',
         reason:
@@ -71,7 +74,7 @@ export class SequelizeAdapter<D extends object, I extends object, O extends obje
       });
     }
 
-    const sequelize = resolveDependency<Sequelize>(token);
+    const sequelize = container.resolve<Sequelize>(token);
 
     if (sequelize == null) {
       throw new InternalServerError({

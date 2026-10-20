@@ -12,6 +12,7 @@ import { registerValue as mockRegisterValue } from '@zacatl/dependency-injection
 import { CustomError } from '@zacatl/error';
 
 import { SequelizeAdapter } from '../../../../../../src/service/platforms/server/database/adapters/sequelize';
+import { createDatabaseToken } from '../../../../../../src/service/layers/infrastructure/orm/tokens/factory';
 import {
   DatabaseVendor,
   type DatabaseConfig,
@@ -75,6 +76,11 @@ describe('SequelizeAdapter', () => {
       } as DatabaseConfig);
 
       expect(mockRegisterValue).toHaveBeenCalledOnce();
+      expect(mockRegisterValue).toHaveBeenCalledWith(
+        createDatabaseToken('SEQUELIZE', 'SEQUELIZE'),
+        fakeSequelize,
+        expect.anything(),
+      );
     });
 
     it('calls onDatabaseConnected callback when provided', async () => {

@@ -20,7 +20,7 @@ export interface LayersConfig {
  * Constructor type that accepts classes with arbitrary parameter signatures
  * Uses contravariant any[] to allow flexibility in DI container
  * Supports both manual instantiation and automatic DI resolution
- * Note: any[] is intentional here for constructor signature compatibility
+ * Note: any[] lets the DI container resolve constructors with different parameter lists.
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type Constructor<T = object> = new (...args: any[]) => T;

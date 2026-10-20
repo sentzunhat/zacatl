@@ -1,3 +1,4 @@
+import { createDatabaseToken } from '../../../../../../src/service/layers/infrastructure/orm/tokens/factory';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 // Mock Sequelize before partial import
@@ -19,7 +20,6 @@ import { SequelizeModel as Model } from '@zacatl/third-party/databases/sequelize
 import { container } from '@zacatl/third-party/dependency-injection/tsyringe';
 
 import { clearContainer } from '../../../../../../src/dependency-injection';
-import { SequelizeToken } from '../../../../../../src/service/layers/infrastructure/orm/tokens/sequelize';
 import { BaseRepository } from '../../../../../../src/service/layers/infrastructure/repositories/sequelize/repository';
 import { ORMType } from '../../../../../../src/service/layers/infrastructure/repositories/types';
 
@@ -62,7 +62,7 @@ describe('BaseRepository (Sequelize)', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     clearContainer();
-    container.register(SequelizeToken, {
+    container.register(createDatabaseToken('SEQUELIZE', 'SEQUELIZE'), {
       useValue: { model: (_name: string) => MockModel },
     });
     repository = new UserRepository();

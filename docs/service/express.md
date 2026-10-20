@@ -1,6 +1,7 @@
 # Express.js Integration
 
-Zacatl provides Express.js support through the **same `Service` pipeline and `AbstractRouteHandler` base class used by Fastify**. There is one handler abstraction; the `ExpressApiAdapter` inside the platform layer translates it to Express at runtime.
+Zacatl provides Express.js support through the same `Service` lifecycle as
+Fastify, with framework-specific handler classes and adapters.
 
 ## Quick Start
 
@@ -14,7 +15,8 @@ npm install express @sentzunhat/zacatl
 
 ```typescript
 import express from 'express';
-import { Service, ServiceType, ServerVendor, ServerType } from '@sentzunhat/zacatl/service';
+import { Service, ServiceType } from '@sentzunhat/zacatl/service';
+import { ServerVendor, ServerType } from '@sentzunhat/zacatl/service/platforms/server/types/server-config';
 import { singleton, inject } from 'tsyringe';
 import { GetGreetingsHandler } from './application/handlers/get-greetings';
 
@@ -49,15 +51,17 @@ const service = new Service({
   },
 });
 
-await service.start({ port: 3000 });
+await service.start({ host: '0.0.0.0', port: 3000 });
 ```
 
 ## Handler Structure
 
-Express and Fastify handlers use **the same base class**: `AbstractRouteHandler` (from `@sentzunhat/zacatl`). The `ExpressApiAdapter` wraps the Express response in a `FastifyReply`-compatible interface so handlers are portable.
+Express and Fastify handlers have parallel, framework-specific base classes.
+Import the Express handler from the Express path when using Express; do not
+share a Fastify handler class across both adapters.
 
 ```typescript
-import { AbstractRouteHandler } from '@sentzunhat/zacatl/service';
+import { AbstractRouteHandler } from '@sentzunhat/zacatl/service/layers/application/entry-points/rest/express/handlers/abstract';
 import { singleton, inject } from 'tsyringe';
 
 @singleton()
@@ -74,9 +78,8 @@ export class CreateGreetingHandler extends AbstractRouteHandler<
     });
   }
 
-  async handler(request, reply): Promise<GreetingResponse> {
+  async handler(request): Promise<GreetingResponse> {
     const greeting = await this.service.createGreeting(request.body);
-    await reply.code(201).send({ ok: true, data: greeting });
     return greeting;
   }
 }
@@ -84,12 +87,12 @@ export class CreateGreetingHandler extends AbstractRouteHandler<
 
 ## Key Differences at Runtime
 
-| Aspect             | Fastify                | Express (via adapter)              |
-| ------------------ | ---------------------- | ---------------------------------- |
-| Handler base class | `AbstractRouteHandler` | `AbstractRouteHandler` (same)      |
-| Schema validation  | `fastify-zod`          | `applyZodSchema` in adapter        |
-| Response           | `reply.code().send()`  | Adapter translates to `res.json()` |
-| Hook support       | All Fastify hooks      | `onRequest`, `preHandler` only     |
+| Aspect             | Fastify                         | Express                       |
+| ------------------ | ------------------------------- | ----------------------------- |
+| Handler base class | Fastify `AbstractRouteHandler`  | Express `AbstractRouteHandler`|
+| Schema validation  | Fastify schema handling         | Express adapter validation    |
+| Response           | Handler return value is sent    | Handler return value is sent  |
+| Hook support       | Fastify lifecycle hooks         | `onRequest`, `preHandler`     |
 
 ## Middleware Integration
 
@@ -109,7 +112,7 @@ app.use((err, req, res, _next) => {
 });
 
 const service = new Service({ ..., platforms: { server: { ..., server: { vendor: ServerVendor.EXPRESS, instance: app } } } });
-await service.start({ port: 3000 });
+await service.start({ host: '0.0.0.0', port: 3000 });
 ```
 
 ## Full Example

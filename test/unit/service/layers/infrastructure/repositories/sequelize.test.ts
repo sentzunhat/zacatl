@@ -1,3 +1,4 @@
+import { createDatabaseToken } from '../../../../../../src/service/layers/infrastructure/orm/tokens/factory';
 import { newDb } from 'pg-mem';
 import { describe, it, expect, vi, beforeAll, afterAll } from 'vitest';
 
@@ -10,7 +11,6 @@ import {
 import { singleton } from '@zacatl/third-party/dependency-injection/tsyringe';
 
 import { clearContainer, getContainer } from '../../../../../../src/dependency-injection/container';
-import { SequelizeToken } from '../../../../../../src/service/layers/infrastructure/orm/tokens/sequelize';
 import { BaseRepository } from '../../../../../../src/service/layers/infrastructure/repositories/sequelize/repository';
 import { ORMType } from '../../../../../../src/service/layers/infrastructure/repositories/types';
 
@@ -82,7 +82,7 @@ describe('BaseRepository', () => {
     sequelize = await initializeSequelizeModel();
     await sequelize.sync({ force: true });
     // Register the Sequelize instance in DI so the adapter can resolve it
-    getContainer().register(SequelizeToken, { useValue: sequelize });
+    getContainer().register(createDatabaseToken('SEQUELIZE', 'SEQUELIZE'), { useValue: sequelize });
     repository = new UserTestRepository();
     userModel = sequelize.model(MODEL_NAME) as ModelStatic<UserTestDb>;
   });

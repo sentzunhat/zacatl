@@ -126,7 +126,7 @@ export interface TaskOutput extends Task {
 
 ```typescript
 import { singleton } from 'tsyringe';
-import { BaseRepository, ORMType } from '@sentzunhat/zacatl/service';
+import { BaseRepository } from '@sentzunhat/zacatl/service/layers/infrastructure/repositories/mongoose/repository';
 import { Schema } from 'mongoose';
 import type { Task, TaskOutput } from '../../domain/entities/task.entity.js';
 
@@ -140,7 +140,6 @@ const TaskSchema = new Schema<Task>({
 export class TaskRepository extends BaseRepository<Task, Task, TaskOutput> {
   constructor() {
     super({
-      type: ORMType.Mongoose,
       name: 'Task',
       schema: TaskSchema,
     });
@@ -542,7 +541,6 @@ domain: {
 export class UserRepository extends BaseRepository<User, User, UserOutput> {
   constructor() {
     super({
-      type: ORMType.Mongoose, // or ORMType.Sequelize
       name: 'User',
       schema: UserSchema,
     });

@@ -2,6 +2,94 @@
 
 ---
 
+## [0.0.65] - 2026-10-17
+
+**Status**: Release candidate in PR #138 targeting `main`; not published
+
+### ✨ Features and fixes
+
+- `Service.start({ host, port })` and `HttpServerConfig.host` configure the
+  listener while keeping `0.0.0.0` as the default. The default server port is
+  `9669` when no port is configured.
+- **Intentional pre-0.1.0 breaking API change:** `ApiServer.listen` and
+  `ApiServerPort.listen` require `(host, port)`. Custom adapters must accept
+  and use both values; built-in Fastify and Express adapters do so. Stabilize
+  this contract at 0.1.0.
+- **Canonical ORM tokens:** ORM adapters and registration helpers use only
+  `createDatabaseToken(vendor, connectionName)`. The previous
+  `db:<vendor>:<key>` symbols and `MongooseToken`, `SequelizeToken`, and
+  `NodeSqliteToken` aliases are removed. Consumers should import
+  `createDatabaseToken` from `@sentzunhat/zacatl/service/layers/infrastructure/orm/tokens/factory`
+  and register instances under the resulting token.
+- **Canonical service token imports:** the compatibility barrel
+  `@sentzunhat/zacatl/service/tokens` is removed. Import each token from its
+  owning module, such as `service/tokens/service`, `service/layers/application/tokens`,
+  or `service/platforms/tokens`.
+- **Canonical repository output type:** the `LeanWithMeta` alias is removed;
+  use the shared `LeanDocument` type.
+- Service-managed REST handlers resolve from their Application child DI
+  container. Startup prepares database and page platforms, awaits repository
+  readiness, then opens the HTTP listener; direct `Server.start()` also
+  prepares databases and pages, with an idempotent guard preventing duplicate
+  preparation in the Service-managed path. Startup failure triggers platform
+  cleanup.
+- Direct `Server` and `Platforms` consumers resolve configured routes and
+  hooks through their expected DI scope. Service-managed routes stay within
+  their Application scope.
+- ORM registrations for SQLite, Sequelize and Mongoose are held in each
+  Service's Infrastructure scope, including instances opened during prepare.
+  Mongoose index options and models also belong to each Service. Use
+  `service.getMongooseIndexManager()` to inspect Service-owned models; direct
+  manual adapters retain their global registry path.
+- Direct `Layers` composition reads ORM registrations from the global
+  container, including when supplied a parent for layer DI. Service-managed
+  repositories still read only their own Infrastructure scope.
+- Zod error detection checks the issue shape before wrapping validation
+  failures, so malformed lookalikes are rethrown unchanged.
+- Page `customRegister` keeps its adapter argument and adds the raw native
+  Fastify/Express instance as a second argument for plugin and hook setup.
+- Express request-schema validation failures return HTTP 400.
+
+### 📦 Dependencies
+
+- Root compatible dependency refresh from `dev` is included. The eight example
+  lockfiles that include `source-map-js` now match the linked root package
+  metadata and resolve `source-map-js` 1.2.2; `node-sqlite-store` has no
+  `source-map-js` entry. This fixes the example-only audit finding present at
+  1.2.1. No forced downgrade or major toolchain proposal is included.
+- Consumer smoke audits confirm the SQL examples that directly install
+  Sequelize still report the advisory on Sequelize's nested `uuid` copy;
+  Zacatl's own scoped override does not control that dependency tree. This
+  consumer-owned finding remains for the existing website/advisory work item.
+- `npm audit --omit=dev` is clean. The root development audit still reports
+  seven high advisories through `braces`/`micromatch` under development tools;
+  npm only proposes breaking major downgrades, which are excluded pending a
+  compatible remediation.
+
+### 🧪 Verification
+
+- Local development verification passed `npm test` (85 files / 738 tests),
+  including direct-start preparation and prepare-then-start idempotence
+  regressions. `npm run type:check`, `npm run build`, `npm run lint:silent`,
+  and `npm run smoke:consumers` passed. The prior PR head
+  `d3a37e429881ebdc90d6222052340cfaf816d7da` passed all 12 CI checks,
+  including the publish dry-run and eight-example Docker matrix, in
+  [CI run 39445072711](https://github.com/sentzunhat/zacatl/actions/runs/39445072711).
+  A later documentation-only sequencing update is included in PR #138; see
+  the PR for the latest CI result.
+- All nine example lockfiles were refreshed with
+  `npm update source-map-js --package-lock-only --prefix <example>`.
+
+### 🚦 Integration and release boundary
+
+- PR #138 now targets `main` as the `0.0.65` release candidate. Its pull
+  request checks passed; merging it will start the main-branch release gates,
+  followed by the automated tag, npm publish, and GitHub Release if those gates
+  pass. The PR remains open and has not been merged.
+- The website still consumes published Zacatl 0.0.64. This release candidate
+  does not migrate the website; website adoption remains tracked by its
+  existing work item `2a1dc541-2cca-4c2f-b431-7a6535b77040`.
+
 ## [0.0.64] - 2026-10-03
 
 **Status**: Release candidate for the automated `main` release path

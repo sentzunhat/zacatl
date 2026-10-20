@@ -50,8 +50,11 @@ export * from './orm-exports'; // ❌ Eagerly loads mongoose + sequelize
 **Usage:**
 
 ```typescript
-// No ORM loading
-import { Service, BaseRepository } from '@sentzunhat/zacatl/service';
+// Service composition does not load an ORM adapter by itself
+import { Service } from '@sentzunhat/zacatl/service';
+
+// A repository uses the subpath for its selected ORM
+import { BaseRepository } from '@sentzunhat/zacatl/service/layers/infrastructure/repositories/mongoose/repository';
 
 // Explicit opt-in
 import { mongoose, Schema } from '@sentzunhat/zacatl/third-party/databases/mongoose';
@@ -331,8 +334,9 @@ import { Schema, mongoose } from '@sentzunhat/zacatl/third-party/databases/mongo
 ### v0.0.23+ (NEW)
 
 ```typescript
-// Main package - NO ORMs
-import { Service, BaseRepository } from '@sentzunhat/zacatl/service';
+// Service is available independently from ORM-specific repository wrappers
+import { Service } from '@sentzunhat/zacatl/service';
+import { BaseRepository } from '@sentzunhat/zacatl/service/layers/infrastructure/repositories/mongoose/repository';
 
 // ORM imports - opt-in from dedicated paths
 import { mongoose, Schema } from '@sentzunhat/zacatl/third-party/databases/mongoose';

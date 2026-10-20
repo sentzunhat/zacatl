@@ -12,7 +12,8 @@ import { Service } from '@sentzunhat/zacatl/service';
 
 ```typescript
 import Fastify from 'fastify';
-import { Service, ServiceType, ServerType, ServerVendor } from '@sentzunhat/zacatl/service';
+import { Service, ServiceType } from '@sentzunhat/zacatl/service';
+import { ServerType, ServerVendor } from '@sentzunhat/zacatl/service/platforms/server/types/server-config';
 
 const fastify = Fastify();
 

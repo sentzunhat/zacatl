@@ -45,32 +45,15 @@ await sequelize.sync();
 ### Create Repository
 
 ```typescript
-import { IRepository } from '@sentzunhat/zacatl/service';
+import { BaseRepository } from '@sentzunhat/zacatl/service/layers/infrastructure/repositories/sequelize/repository';
+import type { LeanDocument } from '@sentzunhat/zacatl/service/layers/infrastructure/repositories/types';
 
-class UserRepository implements IRepository<User> {
-  async findById(id: string) {
-    return await User.findByPk(id);
-  }
+interface UserFields { name: string; email: string }
+interface CreateUser { name: string; email: string }
+type UserOutput = LeanDocument<UserFields>;
 
-  async findMany() {
-    return await User.findAll();
-  }
-
-  async create(data: any) {
-    return await User.create(data);
-  }
-
-  async update(id: string, data: any) {
-    await User.update(data, { where: { id } });
-  }
-
-  async delete(id: string) {
-    await User.destroy({ where: { id } });
-  }
-
-  async exists(id: string) {
-    return (await User.count({ where: { id } })) > 0;
-  }
+class UserRepository extends BaseRepository<UserFields, CreateUser, UserOutput> {
+  constructor() { super({ name: 'User' }); }
 }
 ```
 
@@ -105,6 +88,7 @@ const service = new Service({
         {
           vendor: DatabaseVendor.SEQUELIZE,
           instance: sequelize,
+          connection: { url: process.env.DATABASE_URL! },
         },
       ],
     },
@@ -121,7 +105,7 @@ const service = new Service({
 npm install mongoose mongodb
 
 # Then use via subpath import:
-# import mongoose from '@sentzunhat/zacatl/third-party/databases/mongoose';
+# import { mongoose } from '@sentzunhat/zacatl/third-party/databases/mongoose';
 ```
 
 ### Setup
@@ -135,41 +119,27 @@ await mongoose.connect('mongodb://localhost:27017/mydb');
 ### Define Schema
 
 ```typescript
-const userSchema = new mongoose.Schema({
+import { Schema } from '@sentzunhat/zacatl/third-party/databases/mongoose';
+
+const userSchema = new Schema({
   name: String,
   email: String,
 });
 
-const User = mongoose.model('User', userSchema);
 ```
 
 ### Create Repository
 
 ```typescript
-class UserRepository implements IRepository<User> {
-  async findById(id: string) {
-    return await User.findById(id);
-  }
+import { BaseRepository } from '@sentzunhat/zacatl/service/layers/infrastructure/repositories/mongoose/repository';
+import type { LeanDocument } from '@sentzunhat/zacatl/service/layers/infrastructure/repositories/types';
 
-  async findMany() {
-    return await User.find();
-  }
+interface UserFields { name: string; email: string }
+interface CreateUser { name: string; email: string }
+type UserOutput = LeanDocument<UserFields>;
 
-  async create(data: any) {
-    return await User.create(data);
-  }
-
-  async update(id: string, data: any) {
-    await User.findByIdAndUpdate(id, data);
-  }
-
-  async delete(id: string) {
-    await User.findByIdAndDelete(id);
-  }
-
-  async exists(id: string) {
-    return await User.exists({ _id: id });
-  }
+class UserRepository extends BaseRepository<UserFields, CreateUser, UserOutput> {
+  constructor() { super({ name: 'User', schema: userSchema }); }
 }
 ```
 

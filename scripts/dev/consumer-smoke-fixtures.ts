@@ -54,7 +54,7 @@ const fixtures: Fixture[] = [
 
       import { registerValue } from '@sentzunhat/zacatl/dependency-injection';
       import { DatabaseVendor } from '@sentzunhat/zacatl/service';
-      import { NodeSqliteToken } from '@sentzunhat/zacatl/service/layers/infrastructure/orm/tokens/nodesqlite';
+      import { createDatabaseToken } from '@sentzunhat/zacatl/service/layers/infrastructure/orm/tokens/factory';
       import { BaseRepository } from '@sentzunhat/zacatl/service/layers/infrastructure/repositories/nodesqlite/repository';
       import { ORMType } from '@sentzunhat/zacatl/service/layers/infrastructure/repositories/types';
       import { z } from '@sentzunhat/zacatl/third-party';
@@ -75,7 +75,7 @@ const fixtures: Fixture[] = [
         }
       }
 
-      registerValue(NodeSqliteToken, db);
+      registerValue(createDatabaseToken('SQLITE', 'SQLITE'), db);
       const notes = new NoteRepository();
       const created = await notes.create({ title: z.string().parse('hello') });
       const found = await notes.findById(created.id);

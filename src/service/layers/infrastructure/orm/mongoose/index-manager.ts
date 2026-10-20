@@ -1,4 +1,4 @@
-import { getMongooseIndexModels } from './index-policy';
+import { globalMongooseIndexRegistry, type MongooseIndexRegistry } from './index-policy';
 import { InternalServerError } from '../../../../../error';
 import type { MongooseRepositoryModel } from '../../repositories/mongoose/types';
 
@@ -32,13 +32,16 @@ export interface MongooseIndexSyncOptions extends MongooseIndexModelSelector {
 export class MongooseIndexManager {
   private readonly connectionName: string | undefined;
   private readonly models: readonly MongooseRepositoryModel<unknown>[] | undefined;
+  private readonly registry: MongooseIndexRegistry;
 
   constructor(options?: {
     readonly connectionName?: string;
     readonly models?: readonly MongooseRepositoryModel<unknown>[];
+    readonly registry?: MongooseIndexRegistry;
   }) {
     this.connectionName = options?.connectionName;
     this.models = options?.models;
+    this.registry = options?.registry ?? globalMongooseIndexRegistry;
   }
 
   async diff(selector?: MongooseIndexModelSelector): Promise<MongooseIndexDiff[]> {
@@ -112,7 +115,7 @@ export class MongooseIndexManager {
 
   private selectModels(selector?: MongooseIndexModelSelector): MongooseRepositoryModel<unknown>[] {
     const models =
-      this.models != null ? [...this.models] : getMongooseIndexModels(this.connectionName);
+      this.models != null ? [...this.models] : this.registry.getModels(this.connectionName);
     const modelAllowlist = new Set(selector?.models ?? []);
     const collectionAllowlist = new Set(selector?.collections ?? []);
     const filterByModel = modelAllowlist.size > 0;

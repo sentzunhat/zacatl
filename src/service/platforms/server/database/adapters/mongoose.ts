@@ -1,10 +1,11 @@
 import type { Mongoose } from 'mongoose';
 
 import { CustomError } from '@zacatl/error';
+import type { DependencyContainer } from '@zacatl/third-party/dependency-injection/tsyringe';
 
 import {
-  getMongooseIndexOptions,
-  registerMongooseIndexOptions,
+  globalMongooseIndexRegistry,
+  MongooseIndexRegistryToken,
 } from '../../../../layers/infrastructure/orm/mongoose/index-policy';
 import { registerOrmInstance } from '../orm-instance';
 import { DatabaseVendor, type DatabaseServerPort, type DatabaseConfig } from '../port';
@@ -12,7 +13,11 @@ import { DatabaseVendor, type DatabaseServerPort, type DatabaseConfig } from '..
 export class MongooseAdapter implements DatabaseServerPort {
   private mongooseInstance: Mongoose | null = null;
 
-  async connect(serviceName: string, config: DatabaseConfig): Promise<void> {
+  async connect(
+    serviceName: string,
+    config: DatabaseConfig,
+    container?: DependencyContainer,
+  ): Promise<void> {
     const { instance, connection, onDatabaseConnected } = config;
 
     const getMongoDbName = (uri: string): string | undefined => {
@@ -31,9 +36,12 @@ export class MongooseAdapter implements DatabaseServerPort {
     }
 
     const dbName = getMongoDbName(connection.url) ?? serviceName;
-    registerMongooseIndexOptions(connection.name, config.indexes);
+    const indexRegistry = container?.isRegistered(MongooseIndexRegistryToken, false) === true
+      ? container.resolve(MongooseIndexRegistryToken)
+      : globalMongooseIndexRegistry;
+    indexRegistry.registerOptions(connection.name, config.indexes);
 
-    const { bootMode } = getMongooseIndexOptions(connection.name);
+    const { bootMode } = indexRegistry.getOptions(connection.name);
     const shouldAutoManageIndexes = bootMode === 'create' || bootMode === 'sync';
 
     await mongoose.connect(connection.url, {
@@ -47,7 +55,7 @@ export class MongooseAdapter implements DatabaseServerPort {
     }
 
     this.mongooseInstance = mongoose;
-    registerOrmInstance(DatabaseVendor.MONGOOSE, connection, mongoose);
+    registerOrmInstance(DatabaseVendor.MONGOOSE, connection, mongoose, container);
   }
 
   async disconnect(): Promise<void> {

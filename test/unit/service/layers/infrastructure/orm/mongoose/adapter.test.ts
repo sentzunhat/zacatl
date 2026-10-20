@@ -7,7 +7,6 @@ import {
   registerMongooseIndexOptions,
 } from '../../../../../../../src/service/layers/infrastructure/orm/mongoose/index-policy';
 import { createDatabaseToken } from '../../../../../../../src/service/layers/infrastructure/orm/tokens/factory';
-import { MongooseToken } from '../../../../../../../src/service/layers/infrastructure/orm/tokens/mongoose';
 import { ORMType } from '../../../../../../../src/service/layers/infrastructure/repositories/types';
 import { container } from '../../../../../../../src/third-party';
 
@@ -89,7 +88,7 @@ describe('MongooseAdapter', () => {
     clearMongooseIndexRegistry();
     vi.clearAllMocks();
     mockModel = makeModel();
-    container.register(MongooseToken, { useValue: makeMockMongoose(mockModel) });
+    container.register(createDatabaseToken('MONGOOSE', 'MONGOOSE'), { useValue: makeMockMongoose(mockModel) });
   });
 
   afterEach(() => {
@@ -122,7 +121,7 @@ describe('MongooseAdapter', () => {
     it('reuses a model already registered on the Mongoose instance', () => {
       const registeredModel = makeModel();
       const mongoose = makeMockMongoose(mockModel, { TestUserExisting: registeredModel });
-      container.register(MongooseToken, { useValue: mongoose });
+      container.register(createDatabaseToken('MONGOOSE', 'MONGOOSE'), { useValue: mongoose });
       const adapter = new MongooseAdapter<TestInput, TestInput, TestOutput>({
         type: ORMType.Mongoose,
         name: 'TestUserExisting',
@@ -158,9 +157,23 @@ describe('MongooseAdapter', () => {
       expect(() => adapter.model).toThrow('Mongoose instance not registered in DI container');
     });
 
+    it('does not resolve instances registered with the removed legacy symbol', () => {
+      clearContainer();
+      container.register(Symbol.for('db:MONGOOSE:MONGOOSE'), {
+        useValue: makeMockMongoose(mockModel),
+      });
+      const adapter = new MongooseAdapter<TestInput, TestInput, TestOutput>({
+        type: ORMType.Mongoose,
+        name: 'TestUserLegacyToken',
+        schema: mockSchema as never,
+      });
+
+      expect(() => adapter.model).toThrow('Mongoose instance not registered in DI container');
+    });
+
     it('throws InternalServerError on first model access when DI resolves to null', () => {
       clearContainer();
-      container.register(MongooseToken, { useFactory: () => null as never });
+      container.register(createDatabaseToken('MONGOOSE', 'MONGOOSE'), { useFactory: () => null as never });
 
       const adapter = new MongooseAdapter<TestInput, TestInput, TestOutput>({
         type: ORMType.Mongoose,

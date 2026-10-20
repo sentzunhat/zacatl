@@ -9,7 +9,8 @@ import type {
  * Creates a Node.js SQLite adapter.
  *
  * The adapter resolves the shared DatabaseSync instance from the DI container
- * via {@link NodeSqliteToken}, mirroring the other ORM adapters.
+ * via the canonical `createDatabaseToken('SQLITE', connectionName)` token,
+ * mirroring the other ORM adapters.
  *
  * @param config Node.js SQLite repository configuration
  * @returns ORMPort implementation for node:sqlite

@@ -18,7 +18,8 @@ Declare handlers in the `Service` configuration. The framework handles the rest:
 
 ```typescript
 import Fastify from 'fastify';
-import { Service, ServiceType, ServerType, ServerVendor } from '@sentzunhat/zacatl/service';
+import { Service, ServiceType } from '@sentzunhat/zacatl/service';
+import { ServerType, ServerVendor } from '@sentzunhat/zacatl/service/platforms/server/types/server-config';
 import { container } from '@sentzunhat/zacatl/third-party';
 
 // Register repositories and services before constructing Service
@@ -75,16 +76,9 @@ container.registerInstance(MyService, myService);
 container.registerSingleton(MyHandler, MyHandler);
 ```
 
-## `HandlersType` Enum
-
-The `HandlersType` enum is exported for internal use by adapters:
-
-```typescript
-import { HandlersType } from '@sentzunhat/zacatl/service';
-
-HandlersType.HOOK; // "HOOK"
-HandlersType.ROUTE; // "ROUTE"
-```
+`HandlersType` is an adapter implementation detail. Application code should
+declare route and hook handler classes in Service configuration rather than
+importing adapter internals.
 
 ## Best Practices
 

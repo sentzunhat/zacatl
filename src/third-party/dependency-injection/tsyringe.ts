@@ -5,7 +5,7 @@
  */
 import './reflect-metadata';
 
-export { container, singleton, inject } from 'tsyringe';
+export { container, singleton, inject, injectable } from 'tsyringe';
 
 // Type-only exports
 export type { DependencyContainer, InjectionToken } from 'tsyringe';

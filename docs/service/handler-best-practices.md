@@ -131,10 +131,8 @@ export class CreateUserHandler extends PostRouteHandler<
 For **Express**, import from the express-specific handlers:
 
 ```typescript
-import {
-  GetRouteHandler,
-  PostRouteHandler,
-} from '@sentzunhat/zacatl/service/layers/application/entry-points/rest/express/handlers';
+import { GetRouteHandler } from '@sentzunhat/zacatl/service/layers/application/entry-points/rest/express/handlers/get-route-handler';
+import { PostRouteHandler } from '@sentzunhat/zacatl/service/layers/application/entry-points/rest/express/handlers/post-route-handler';
 ```
 
 Both Fastify and Express handlers use the same type parameters and schema structure.

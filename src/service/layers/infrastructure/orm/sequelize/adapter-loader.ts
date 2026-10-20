@@ -11,7 +11,7 @@ import type {
  * Creates a Sequelize adapter.
  *
  * The adapter resolves the shared Sequelize instance from the DI container
- * via {@link SequelizeToken}, so a lazy import wrapper is unnecessary.
+ * via the canonical `createDatabaseToken('SEQUELIZE', connectionName)` token.
  *
  * @param config Sequelize repository configuration
  * @returns ORMPort implementation for Sequelize

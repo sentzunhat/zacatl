@@ -11,13 +11,14 @@ vi.mock('../../../../../../src/service/platforms/server/database/adapters/factor
   createDatabaseAdapter: vi.fn(() => mockAdapter),
 }));
 
+import { CustomError } from '@zacatl/error';
+
 import { createDatabaseAdapter } from '../../../../../../src/service/platforms/server/database/adapters/factory';
 import { DatabaseServer } from '../../../../../../src/service/platforms/server/database/database-server';
 import {
   DatabaseVendor,
   type DatabaseConfig,
 } from '../../../../../../src/service/platforms/server/database/port';
-import { CustomError } from '@zacatl/error';
 
 describe('DatabaseServer', () => {
   beforeEach(() => {
@@ -63,8 +64,8 @@ describe('DatabaseServer', () => {
       expect(createDatabaseAdapter).toHaveBeenCalledWith(DatabaseVendor.SEQUELIZE);
       expect(createDatabaseAdapter).toHaveBeenCalledWith(DatabaseVendor.MONGOOSE);
       expect(mockConnect).toHaveBeenCalledTimes(2);
-      expect(mockConnect).toHaveBeenCalledWith('svc', databases[0]);
-      expect(mockConnect).toHaveBeenCalledWith('svc', databases[1]);
+      expect(mockConnect).toHaveBeenCalledWith('svc', databases[0], expect.any(Object));
+      expect(mockConnect).toHaveBeenCalledWith('svc', databases[1], expect.any(Object));
     });
 
     it('wraps adapter connect failures in CustomError', async () => {

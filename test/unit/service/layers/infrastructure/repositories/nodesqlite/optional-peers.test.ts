@@ -1,3 +1,4 @@
+import { createDatabaseToken } from '@zacatl/service/layers/infrastructure/orm/tokens/factory';
 import { readdirSync, readFileSync } from 'node:fs';
 import { join, relative } from 'node:path';
 import { DatabaseSync } from 'node:sqlite';
@@ -5,7 +6,6 @@ import { DatabaseSync } from 'node:sqlite';
 import { describe, expect, it, vi } from 'vitest';
 
 import { clearContainer, registerValue } from '@zacatl/dependency-injection';
-import { NodeSqliteToken } from '@zacatl/service/layers/infrastructure/orm/tokens/nodesqlite';
 import { BaseRepository } from '@zacatl/service/layers/infrastructure/repositories/nodesqlite/repository';
 import { ORMType } from '@zacatl/service/layers/infrastructure/repositories/types';
 
@@ -39,7 +39,7 @@ describe('node:sqlite BaseRepository without optional database peers', () => {
 
     clearContainer();
     const db = new DatabaseSync(':memory:');
-    registerValue(NodeSqliteToken, db);
+    registerValue(createDatabaseToken('SQLITE', 'SQLITE'), db);
 
     try {
       const notes = new NoteRepository();

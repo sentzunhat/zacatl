@@ -13,8 +13,8 @@
 [![CI](https://img.shields.io/github/actions/workflow/status/sentzunhat/zacatl/ci.yml?branch=main&style=flat-square&label=CI)](https://github.com/sentzunhat/zacatl/actions/workflows/ci.yml)
 [![CVE scan](https://img.shields.io/github/actions/workflow/status/sentzunhat/zacatl/cve-scan.yml?branch=main&style=flat-square&label=CVE%20scan)](https://github.com/sentzunhat/zacatl/actions/workflows/cve-scan.yml)
 [![Release](https://img.shields.io/github/actions/workflow/status/sentzunhat/zacatl/release.yml?style=flat-square&label=release)](https://github.com/sentzunhat/zacatl/actions/workflows/release.yml)
-[![Tests: 691](https://img.shields.io/badge/tests-691%20passing-brightgreen.svg?style=flat-square)](#-testing)
-[![Coverage: 92.10%](https://img.shields.io/badge/coverage-92.10%25-brightgreen.svg?style=flat-square)](#-testing)
+[![Tests: 738](https://img.shields.io/badge/tests-738%20passing-brightgreen.svg?style=flat-square)](#-testing)
+[![Coverage: 92.16%](https://img.shields.io/badge/coverage-92.16%25-brightgreen.svg?style=flat-square)](#-testing)
 
 **Stack**
 
@@ -23,11 +23,16 @@
 
 </div>
 
-> `CI` is the orchestrator — CVE scanning, peer-dependency install checks, the full test suite, and an 8-example Docker smoke matrix, gating every merge to `main`. `CVE scan` runs that same audit again on its own weekly schedule so its badge stays live independent of `CI`. `Release` reflects the actual tag → npm publish → GitHub Release pipeline, only fired by real releases. There's no separate "Publish dry-run" badge: that check only runs as part of `CI` (gated on a pending version bump), and giving it its own trigger would mean it either fails on ordinary non-release pushes or needs to duplicate that gate — not worth it for one more badge. See [docs/guidelines/ci-cd-workflow.md](./docs/guidelines/ci-cd-workflow.md) for exactly what runs where and why.
-
 **Build consistent TypeScript services without giving up the frameworks you already use.**
 
-Zacatl gives TypeScript teams a repeatable application → domain → infrastructure → platform structure, built-in dependency injection, type-safe validation, and structured errors. You keep using [Fastify](https://fastify.dev), [Express](https://expressjs.com), [Mongoose](https://mongoosejs.com), or [Sequelize](https://sequelize.org); Zacatl supplies the boundaries that keep those choices from leaking through the whole application.
+Zacatl gives TypeScript teams a repeatable `Service` composition model:
+`Service` coordinates sibling `Layers` (Application, Domain, Infrastructure)
+and `Platforms` (Server, CLI, Desktop). The Infrastructure layer owns
+database connections, ORM adapters, and repositories; Server owns HTTP, API
+routes, and pages. You keep using [Fastify](https://fastify.dev),
+[Express](https://expressjs.com), [Mongoose](https://mongoosejs.com), or
+[Sequelize](https://sequelize.org); Zacatl supplies the boundaries that keep
+those choices from leaking through the whole application.
 
 It is aimed first at teams building modular APIs and backend services that want consistent project structure, replaceable adapters, and earlier feedback from tests and CI/CD.
 
@@ -58,7 +63,7 @@ Zacatl is useful when a service needs to stay understandable as it grows, or whe
 
 | Capability                  | Detail                                                             |
 | ---------------------------- | ------------------------------------------------------------------ |
-| 🏗️ Layered Architecture     | Strict Application → Domain → Infrastructure → Platform layers     |
+| 🏗️ Service Architecture     | Service coordinates sibling Layers and Platforms modules           |
 | 💉 Dependency Injection     | Built-in DI container via `tsyringe`                                |
 | ✅ Type-Safe Validation     | Zod schema support; Yup and optional validation planned            |
 | 🛡️ Structured Errors        | 8 custom error types with correlation IDs                          |
@@ -70,18 +75,78 @@ Zacatl is useful when a service needs to stay understandable as it grows, or whe
 
 ## 🧭 See It in a Real Service
 
-The [`fastify-sqlite-react`](./examples/fastify-sqlite-react) example is a complete greeting CRUD service, not just a bootstrap snippet:
+The [`fastify-sqlite-react`](./examples/fastify-sqlite-react) example is a complete greeting CRUD service. One request travels through four files, each with a single job:
 
 ```text
-HTTP request
-  → validated route handler
-  → GreetingService
-  → GreetingRepository port
-  → SQLite adapter
-  → typed response
+POST /api/greetings
+  → CreateGreetingHandler   (application: validate + map HTTP)
+  → GreetingServiceAdapter  (domain: business rules)
+  → GreetingRepositoryAdapter (infrastructure: persistence)
+  → Sequelize / SQLite
 ```
 
-It includes create, list, update, and delete flows with validation, domain logic, repository wiring, persistence, and a React frontend. Run it locally with:
+**1. Route handler** — the Zod schema validates the request before your code runs; invalid input gets a 400 on both Fastify and Express.
+
+```typescript
+export const CreateGreetingBodySchema = z.object({
+  message: z.string().min(1, 'Message is required'),
+  language: z.string().min(2, 'Language code must be at least 2 characters'),
+});
+
+@singleton()
+export class CreateGreetingHandler extends PostRouteHandler<CreateGreetingBody, void, GreetingResponse> {
+  constructor(@inject(GreetingServiceAdapter) private readonly greetingService: GreetingServiceAdapter) {
+    super({ url: '/greetings', schema: { body: CreateGreetingBodySchema } });
+  }
+
+  async handler(request: Request<CreateGreetingBody>): Promise<GreetingResponse> {
+    const greeting = await this.greetingService.createGreeting(request.body);
+    return toGreetingResponse(greeting);
+  }
+}
+```
+
+**2. Domain service** — business rules, no HTTP or database types. Throwing a Zacatl error maps to the right status code.
+
+```typescript
+@singleton()
+export class GreetingServiceAdapter implements GreetingServicePort {
+  constructor(@inject(GreetingRepositoryAdapter) private readonly greetingRepository: GreetingRepositoryAdapter) {}
+
+  async createGreeting(input: CreateGreetingInput): Promise<Greeting> {
+    if (input.message.trim().length === 0) {
+      throw new BadRequestError({ message: 'Greeting message cannot be empty' });
+    }
+    return this.greetingRepository.create({ ...input, language: input.language.toLowerCase() });
+  }
+}
+```
+
+**3. Repository** — Zacatl's ORM-specific `BaseRepository` supplies create/read/update/delete; you add only the queries your domain needs. Import it from the matching Mongoose, Sequelize, or node:sqlite subpath.
+
+```typescript
+@singleton()
+export class GreetingRepositoryAdapter
+  extends BaseRepository<GreetingModel, CreateGreetingInput, Greeting>
+  implements GreetingRepositoryPort
+{
+  constructor() {
+    super({ name: GreetingModel.name });
+  }
+}
+```
+
+**4. Wiring** — list each layer's classes once; Zacatl registers them in the DI container and mounts the routes.
+
+```typescript
+layers: {
+  infrastructure: { repositories: [GreetingRepositoryAdapter] },
+  domain: { services: [GreetingServiceAdapter] },
+  application: { entryPoints: { rest: { hooks: [], routes: [CreateGreetingHandler /* , … */] } } },
+},
+```
+
+Run it:
 
 ```bash
 cd examples/fastify-sqlite-react
@@ -89,7 +154,7 @@ docker compose up -d
 curl http://localhost:8081/api/greetings
 ```
 
-The same greeting flow is implemented across Fastify/Express, SQLite/PostgreSQL/MongoDB, and React/Svelte in the [examples matrix](./examples/README.md), making the adapter boundaries visible instead of theoretical.
+The same flow is implemented across Fastify/Express, SQLite/PostgreSQL/MongoDB, and React/Svelte in the [examples matrix](./examples/README.md). Swapping Fastify for Express or SQLite for MongoDB changes the adapter and wiring, not the domain service.
 
 ## 🚀 Quick Start
 
@@ -97,13 +162,12 @@ The same greeting flow is implemented across Fastify/Express, SQLite/PostgreSQL/
 npm install @sentzunhat/zacatl
 ```
 
-> Core server dependencies are installed with Zacatl. ORM/database adapters use optional peer dependencies (`mongoose`, `mongodb`, `sequelize`, `sqlite3`, `pg`) that you install based on what your service uses. SQL projects that use Zacatl's Sequelize adapter should install `sequelize` plus the dialect driver, for example `pg` or `sqlite3`.
->
-> Audit note for 0.0.57+: non-SQL consumers should not install `sequelize`, and should not inherit Sequelize's nested audit surface through Zacatl core. SQL consumers that explicitly install `sequelize` own that SQL dependency tree. Apps that only need local SQLite can use Zacatl's `node:sqlite` path on Node 26 without external `sqlite3` or Sequelize.
+Database drivers are optional peers — install only the one you use (see [ORM Adapters](#️-orm-adapters)). A minimal service:
 
 ```typescript
 import Fastify from 'fastify';
-import { Service, ServiceType, ServerType, ServerVendor } from '@sentzunhat/zacatl/service';
+import { Service, ServiceType } from '@sentzunhat/zacatl/service';
+import { ServerType, ServerVendor } from '@sentzunhat/zacatl/service/platforms/server/types/server-config';
 
 const fastify = Fastify();
 
@@ -125,11 +189,13 @@ const service = new Service({
 await service.start({ port: 3000 });
 ```
 
-See [examples/](./examples/) for eight production-ready starters spanning Express/Fastify × SQLite/PostgreSQL/MongoDB × React/Svelte.
+Add routes, services and repositories to `layers` as shown [above](#-see-it-in-a-real-service). See [examples/](./examples/) for eight runnable starters spanning Express/Fastify × SQLite/PostgreSQL/MongoDB × React/Svelte.
 
 ## 🗄️ ORM Adapters
 
 Zacatl doesn't reimplement your database driver — it registers the real thing (Mongoose, Sequelize, or Node's built-in `node:sqlite`) on the service's `platforms.server.databases` list, and gives repositories a consistent shape regardless of which one you picked.
+
+**Dependencies:** Zacatl installs its core server dependencies. Database libraries (`mongoose`, `mongodb`, `sequelize`, `sqlite3`, `pg`) are optional peers: install the ones your service uses. Non-SQL services never pull in Sequelize's dependency tree, and local-SQLite apps on Node 26 can use `node:sqlite` with no extra packages.
 
 **Mongoose** (excerpt from [`examples/fastify-mongodb-react`](./examples/fastify-mongodb-react)):
 
@@ -167,36 +233,16 @@ const databases = [{ vendor: DatabaseVendor.NODE_SQLITE, connection: { url: './d
 
 ## 🏗️ Architecture
 
-```mermaid
-flowchart TB
-    subgraph App["Application Layer"]
-        direction LR
-        A1[HTTP Handlers]
-        A2[Validation]
-        A3[Routes / Hooks]
-    end
-    subgraph Domain["Domain Layer"]
-        direction LR
-        D1[Business Logic]
-        D2[Services]
-        D3[Ports]
-    end
-    subgraph Infra["Infrastructure Layer"]
-        direction LR
-        I1[Repositories]
-        I2[Database Adapters]
-    end
-    subgraph Platform["Platform Layer"]
-        direction LR
-        P1[DI Container]
-        P2[Service Startup]
-        P3[Server Vendor: Fastify / Express]
-    end
-
-    App --> Domain --> Infra --> Platform
-```
-
-Dependencies flow strictly inward — Application depends on Domain, Domain depends on Infrastructure ports (not concrete adapters), and Platform wires the concrete Fastify/Express/Mongoose/Sequelize instances in at startup. The public API surface is stable; internal modules may change between minor versions.
+`Service` composes two sibling modules: `Layers` (Application, Domain and
+Infrastructure) and `Platforms` (Server, CLI and Desktop). Infrastructure owns
+database connections, ORM adapters and repositories; Server owns HTTP, API
+routes and pages. Connection setup and its public config still live under
+`platforms.server` pending a separately tracked move into Infrastructure.
+Each nested module owns the ports and adapters for its contract.
+See the [Service architecture map](./docs/service/architecture.md) for the
+diagram, call flow, and implemented versus planned modules. Before `0.1.0`,
+published `0.0.x` APIs may still change incompatibly; migration notes identify
+known breaks.
 
 ## 🎯 Platform Support
 
@@ -275,7 +321,9 @@ npm test                 # Run all tests
 npm run test:coverage    # Coverage report
 ```
 
-691 tests across 83 files, 92.10% line coverage. CI runs the full suite plus type-check, lint, and an 8-example Docker smoke matrix before any release — see [docs/guidelines/ci-cd-workflow.md](./docs/guidelines/ci-cd-workflow.md) for exactly what gates what.
+738 tests across 85 files passed locally for this development candidate. CI runs the full suite plus type-check, lint, and an 8-example Docker smoke matrix before any release — see [docs/guidelines/ci-cd-workflow.md](./docs/guidelines/ci-cd-workflow.md) for exactly what gates what.
+
+> `CI` is the orchestrator — CVE scanning, peer-dependency install checks, the full test suite, and an 8-example Docker smoke matrix, gating every merge to `main`. `CVE scan` runs that same audit again on its own weekly schedule so its badge stays live independent of `CI`. `Release` reflects the actual tag → npm publish → GitHub Release pipeline, only fired by real releases. There's no separate "Publish dry-run" badge: that check only runs as part of `CI` (gated on a pending version bump), and giving it its own trigger would mean it either fails on ordinary non-release pushes or needs to duplicate that gate — not worth it for one more badge.
 
 ## 📋 Requirements
 

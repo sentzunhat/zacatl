@@ -177,7 +177,7 @@ const service = new Service({
 });
 
 // Start service
-await service.start({ port: 4000 });
+await service.start({ host: '0.0.0.0', port: 4000 });
 ```
 
 ---

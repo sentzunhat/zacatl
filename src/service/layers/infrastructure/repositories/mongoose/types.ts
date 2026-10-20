@@ -6,7 +6,6 @@ import type { ORMType } from '../../orm/types';
 export type {
   WithMongooseMeta,
   LeanDocument,
-  LeanWithMeta,
   MongooseDoc,
   ToLeanInput,
 } from '../../orm/mongoose/types';

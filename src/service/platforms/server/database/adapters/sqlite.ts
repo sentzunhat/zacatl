@@ -1,6 +1,8 @@
 import type { DatabaseSync } from 'node:sqlite';
 
 import { CustomError } from '@zacatl/error';
+import type { DependencyContainer } from '@zacatl/third-party/dependency-injection/tsyringe';
+
 
 import { registerOrmInstance } from '../orm-instance';
 import { DatabaseVendor } from '../port';
@@ -50,7 +52,11 @@ export class SqliteAdapter implements DatabaseServerPort {
     return this._moduleCached;
   }
 
-  async connect(_serviceName: string, config: DatabaseConfig): Promise<void> {
+  async connect(
+    _serviceName: string,
+    config: DatabaseConfig,
+    container?: DependencyContainer,
+  ): Promise<void> {
     const { connection, instance, onDatabaseConnected } = config;
 
     if (connection?.url == null || connection.url.length === 0) {
@@ -72,7 +78,7 @@ export class SqliteAdapter implements DatabaseServerPort {
         this.db = new mod.DatabaseSync(connection.url, { defensive: true });
       }
 
-      registerOrmInstance(DatabaseVendor.SQLITE, connection, this.db);
+      registerOrmInstance(DatabaseVendor.SQLITE, connection, this.db, container);
 
       if (onDatabaseConnected != null) {
         await onDatabaseConnected(this.db);

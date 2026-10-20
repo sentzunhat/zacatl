@@ -57,13 +57,11 @@ differently.
 
 ## Read-Only Diff
 
-Use `MongooseIndexManager` to inspect what Mongoose would create or drop without
-mutating the database:
+Use the manager owned by the `Service` to inspect its models without mixing
+models from another Service with the same connection name:
 
 ```typescript
-import { MongooseIndexManager } from '@sentzunhat/zacatl/service';
-
-const indexManager = new MongooseIndexManager();
+const indexManager = service.getMongooseIndexManager();
 const diff = await indexManager.diff();
 
 console.log(JSON.stringify(diff, null, 2));
@@ -85,7 +83,9 @@ Example output:
 ```
 
 `diff()` uses Mongoose `Model.diffIndexes()` and does not create or drop
-indexes.
+indexes. Pass a connection name to `service.getMongooseIndexManager(name)`
+when selecting one of several Mongoose connections. Direct/manual adapters can
+still use `new MongooseIndexManager()` with the standalone global registry.
 
 ## Create Missing Indexes
 

@@ -65,10 +65,10 @@ HAWP is a **shaping protocol**, not a runtime. Better results come from stronger
 
 ## Optional Resources
 
-- Templates: [templates/micro-hawp.md](templates/micro-hawp.md), [templates/standard-hawp.md](templates/standard-hawp.md), [templates/status-report.md](templates/status-report.md), [templates/audit-report.md](templates/audit-report.md)
-- Patterns: [patterns/evidence-discipline.md](patterns/evidence-discipline.md), [patterns/non-findings.md](patterns/non-findings.md)
-- Review checklist: [reviews/project-review-checklist.md](reviews/project-review-checklist.md)
-- Guardrail ADR: [usage/GUARDRAIL_ADR.md](usage/GUARDRAIL_ADR.md)
+- Templates: [micro-hawp](kit/templates/micro-hawp.md), [standard-hawp](kit/templates/standard-hawp.md), [status report](kit/templates/status-report.md), [audit report](kit/templates/audit-report.md)
+- Patterns: [evidence discipline](kit/patterns/evidence-discipline.md), [non-findings](kit/patterns/non-findings.md)
+- Review checklist: [project review checklist](kit/reviews/project-review-checklist.md)
+- Guardrail ADR: [GUARDRAIL_ADR](work/decisions/2026/06/06/GUARDRAIL_ADR.md)
 
 Templates and patterns are optional usage aids. They do not expand the HAWP core protocol.
 

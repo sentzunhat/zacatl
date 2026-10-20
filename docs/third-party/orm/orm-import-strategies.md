@@ -1,228 +1,95 @@
-# ORM Import Guide - Choose Your Style
+# ORM Imports
 
-> **Version:** 0.0.23+  
-> **Two import options:** Convenience vs. Minimal bundle size
+Zacatl exposes its service API and optional database dependencies through
+explicit package subpaths. There is no package-root barrel, and the service
+barrel does not export ORM repository classes.
 
----
-
-## Quick Decision
-
-**Starting a new project or prototyping?** → Use **Main Package** imports  
-**Building for production or optimizing bundle size?** → Use **Subpath** imports
-
----
-
-## Option 1: Main Package (Convenience)
-
-Import everything from one place:
+## Common imports
 
 ```typescript
-import { Service, BaseRepository } from '@sentzunhat/zacatl/service';
+import { Service, ServiceType, DatabaseVendor } from '@sentzunhat/zacatl/service';
+import { ORMType } from '@sentzunhat/zacatl/service/layers/infrastructure/orm/types';
+import { BaseRepository as MongooseRepository } from '@sentzunhat/zacatl/service/layers/infrastructure/repositories/mongoose/repository';
 import { mongoose, Schema } from '@sentzunhat/zacatl/third-party/databases/mongoose';
-import { Sequelize, DataTypes } from '@sentzunhat/zacatl/third-party/databases/sequelize';
 ```
 
-**When to use:**
+Import only the database wrapper and dependency your application uses:
 
-- Quick projects and prototypes
-- Learning zacatl
-- Bundle size isn't critical (< 100kb difference)
-- Prefer simplicity over optimization
+| Database | Repository wrapper | Optional dependency |
+| --- | --- | --- |
+| Mongoose | `service/layers/infrastructure/repositories/mongoose/repository` | `third-party/databases/mongoose` |
+| Sequelize | `service/layers/infrastructure/repositories/sequelize/repository` | `third-party/databases/sequelize` |
+| Node.js SQLite | `service/layers/infrastructure/repositories/nodesqlite/repository` | Built-in `node:sqlite` |
 
----
+The shared repository contracts, including `RepositoryPort`, `ORMPort`, and
+`QueryOptions`, are types exported from
+`service/layers/infrastructure/repositories/types`. `ORMType` is exported
+from `service/layers/infrastructure/orm/types`.
 
-## Option 2: Subpath Imports (Minimal)
-
-Import ORMs separately:
-
-```typescript
-import { Service, BaseRepository } from '@sentzunhat/zacatl/service';
-import { mongoose, Schema } from '@sentzunhat/zacatl/third-party/databases/mongoose';
-// OR
-import { Sequelize, DataTypes } from '@sentzunhat/zacatl/third-party/databases/sequelize';
-```
-
-**When to use:**
-
-- Production applications
-- Only using ONE ORM (eliminates unused one from bundle)
-- Optimizing bundle size
-- Clear separation of concerns
-
----
-
-## Complete Examples
-
-### Mongoose Repository (Both Styles)
-
-**Style 1 - Main Package:**
+## Mongoose example
 
 ```typescript
-import { Service, BaseRepository, ORMType } from '@sentzunhat/zacatl/service';
-import { mongoose, Schema } from '@sentzunhat/zacatl/third-party/databases/mongoose';
+import { BaseRepository as MongooseRepository } from '@sentzunhat/zacatl/service/layers/infrastructure/repositories/mongoose/repository';
+import { ORMType } from '@sentzunhat/zacatl/service/layers/infrastructure/orm/types';
+import { Schema } from '@sentzunhat/zacatl/third-party/databases/mongoose';
 
-const UserSchema = new Schema({
-  name: String,
-  email: String,
+interface UserRecord {
+  email: string;
+  name: string;
+}
+
+interface UserInput extends UserRecord {}
+interface UserOutput extends UserRecord {
+  id: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+const userSchema = new Schema<UserRecord>({
+  email: { type: String, required: true },
+  name: { type: String, required: true },
 });
 
-class UserRepository extends BaseRepository {
+class UserRepository extends MongooseRepository<UserRecord, UserInput, UserOutput> {
   constructor() {
-    super({
-      type: ORMType.Mongoose,
-      name: 'User',
-      schema: UserSchema,
-    });
+    super({ type: ORMType.Mongoose, name: 'User', schema: userSchema });
   }
 }
 ```
 
-**Style 2 - Subpath (Minimal):**
+## Sequelize example
 
 ```typescript
-import { Service, BaseRepository, ORMType } from '@sentzunhat/zacatl/service';
-import { mongoose, Schema } from '@sentzunhat/zacatl/third-party/databases/mongoose';
+import { BaseRepository as SequelizeRepository } from '@sentzunhat/zacatl/service/layers/infrastructure/repositories/sequelize/repository';
+import { ORMType } from '@sentzunhat/zacatl/service/layers/infrastructure/orm/types';
 
-const UserSchema = new Schema({
-  name: String,
-  email: String,
-});
+interface UserRecord {
+  email: string;
+  name: string;
+}
 
-class UserRepository extends BaseRepository {
+interface UserInput extends UserRecord {}
+interface UserOutput extends UserRecord {
+  id: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+class UserRepository extends SequelizeRepository<UserRecord, UserInput, UserOutput> {
   constructor() {
-    super({
-      type: ORMType.Mongoose,
-      name: 'User',
-      schema: UserSchema,
-    });
+    super({ type: ORMType.Sequelize, name: 'User' });
   }
 }
 ```
 
----
+The configured Sequelize instance and model are registered with the Service
+infrastructure. See [database setup](./database-setup.md) for complete
+connection and model configuration.
 
-### Sequelize Repository (Both Styles)
+## Historical import note
 
-**Style 1 - Main Package:**
-
-```typescript
-import { Service, BaseRepository, ORMType } from '@sentzunhat/zacatl/service';
-import { Sequelize, DataTypes } from '@sentzunhat/zacatl/third-party/databases/sequelize';
-
-const sequelize = new Sequelize('sqlite::memory:');
-
-const User = sequelize.define('User', {
-  name: DataTypes.STRING,
-  email: DataTypes.STRING,
-});
-
-class UserRepository extends BaseRepository {
-  constructor() {
-    super({
-      type: ORMType.Sequelize,
-      model: User,
-    });
-  }
-}
-```
-
-**Style 2 - Subpath (Minimal):**
-
-```typescript
-import { Service, BaseRepository, ORMType } from '@sentzunhat/zacatl/service';
-import { Sequelize, DataTypes } from '@sentzunhat/zacatl/third-party/databases/sequelize';
-
-const sequelize = new Sequelize('sqlite::memory:');
-
-const User = sequelize.define('User', {
-  name: DataTypes.STRING,
-  email: DataTypes.STRING,
-});
-
-class UserRepository extends BaseRepository {
-  constructor() {
-    super({
-      type: ORMType.Sequelize,
-      model: User,
-    });
-  }
-}
-```
-
----
-
-## Migration from v0.0.22
-
-If you were importing ORMs from zacatl, **no changes needed** - both styles work:
-
-```typescript
-// v0.0.22 and v0.0.23+ - Still works ✅
-import { Service } from '@sentzunhat/zacatl/service';
-import { mongoose, Schema } from '@sentzunhat/zacatl/third-party/databases/mongoose';
-
-// v0.0.23+ New option - Minimal bundle
-import { Service } from '@sentzunhat/zacatl/service';
-import { mongoose, Schema } from '@sentzunhat/zacatl/third-party/databases/mongoose';
-```
-
----
-
-## Available Subpath Exports
-
-### Mongoose
-
-```typescript
-import {
-  mongoose,
-  Mongoose,
-  Schema,
-  Model,
-  Document,
-  connect,
-  connection,
-  MongooseModel, // Type only
-} from '@sentzunhat/zacatl/third-party/databases/mongoose';
-```
-
-### Sequelize
-
-```typescript
-import {
-  Sequelize,
-  SequelizeModel,
-  DataTypes,
-  Op,
-  ModelStatic, // Type only
-  SequelizeOptions, // Type only
-} from '@sentzunhat/zacatl/third-party/databases/sequelize';
-```
-
----
-
-## Bundle Size Impact
-
-**Scenario:** Using only Mongoose in your app
-
-| Import Style | Bundle Includes            | Approx. Size     |
-| ------------ | -------------------------- | ---------------- |
-| Main package | Mongoose + Sequelize types | ~100%            |
-| Subpath      | Mongoose only              | ~92% (saves ~8%) |
-
-**Note:** Actual savings depend on your bundler's tree-shaking capabilities. Modern bundlers (Vite, Rollup, esbuild) work best with subpath imports.
-
----
-
-## Recommendation
-
-**Start with main package imports** for simplicity. **Switch to subpath imports** when:
-
-- You're ready to optimize
-- Bundle size matters for your use case
-- You're only using one ORM
-
-Both options are fully supported and will remain stable across versions.
-
----
-
-**Generated for:** Zacatl v0.0.23+  
-**Last Updated:** January 31, 2026
+Older releases and examples used a shared `BaseRepository` export and runtime
+ORM switching. That API was removed in favor of one ORM-specific wrapper per
+repository. Do not use the old `@sentzunhat/zacatl/service` imports or copy
+those historical snippets into new code. The
+[single-import guide](../single-import.md) lists current public import paths.

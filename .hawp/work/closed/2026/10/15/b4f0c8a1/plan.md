@@ -1,7 +1,7 @@
-# README overhaul + CI badge polish — quick iterations, no release cutover
+# README positioning and developer-experience pass
 
-**UUID:** `b4f0c8a1-readme-and-ci-badge-polish` · **Type:** docs/tooling · **Priority:** P2 · **Reported:** 2026-07-27
-**Status:** in-progress
+**UUID:** `b4f0c8a1` · **Legacy ID:** `b4f0c8a1-readme-and-ci-badge-polish` · **Type:** docs/tooling · **Priority:** P2 · **Reported:** 2026-07-27
+**Status:** done · **Closed:** 2026-10-15
 **Owner:** agent (unassigned)
 
 ---
@@ -20,7 +20,7 @@ until the `e7a20d15` (v0.1.0) milestone, which is the next real cutover point.
 Follow-up iterations on this same item don't need their own plan file — append
 to this one's log below.
 
-## Scope (2026-07-27 session)
+## Completed scope (2026-07-27; released through 0.0.61)
 
 - Root `README.md` restructure: fix the broken coverage-badge link (badge text
   showed 91.41% but linked to a *different* shields.io image showing 91.19% —
@@ -83,3 +83,50 @@ to this one's log below.
   secondary acknowledgment. A related v0.1.0 work item was added to audit
   server/frontend provider boundaries as replaceable peers, analogous to the
   database adapter boundary.
+- 2026-10-15: CI/download badges and release/test figures were corrected and
+  included in published releases through 0.0.61. Keep this item open for the
+  remaining positioning/developer-experience pass; do not describe badge fixes
+  as pending. Removed unneeded names of unrelated projects from this public
+  work record; the positioning question remains generic pending owner input.
+- 2026-10-15: Positioning/developer-experience pass done on `dev`:
+  - Moved the long CI-badge explanation out of the hero into **Testing**, so
+    the README opens with the problem statement and audience.
+  - **See It in a Real Service** now shows the full create path in code —
+    Zod schema + route handler, domain service, `BaseRepository` adapter, and
+    `layers` wiring — trimmed from `examples/fastify-sqlite-react` (types
+    checked against the example), plus the request → handler → service →
+    repository flow.
+  - **Quick Start** is install + minimal service; the 0.0.57 dependency/audit
+    note became a short "Dependencies" paragraph under **ORM Adapters**.
+  - Refreshed test/coverage figures via `npm run test:coverage`
+    (698 tests / 84 files, 92.16% lines).
+  - AI-collaboration note stays as the final Acknowledgments section.
+
+## Outcome
+
+The README leads with the developer problem and audience, shows the complete
+CRUD path near the top in real code, and keeps AI collaboration as a secondary
+acknowledgment. Badge corrections had already shipped through 0.0.61. Lands
+on `dev` with no release, per this item's non-goals.
+
+Not carried forward: the July question about naming other projects the
+framework benefits from was never answered; it is not needed for this pass and
+can be raised as a new item if the owner wants it.
+
+## Verification
+
+- `hawp links check`: 204 Markdown files, local links valid (TOC anchors
+  unchanged).
+- Excerpt types checked against the example (`CreateGreetingBody` ≡
+  `CreateGreetingInput`; `BadRequestError` `reason` is optional).
+- `npm run test:coverage`: 84 files / 698 tests pass; README figures updated by
+  `scripts/dev/update-coverage-readme.ts`.
+- Not run: Prettier on `README.md` (the file was already not Prettier-clean
+  before this pass; left to avoid unrelated table reflow).
+
+## Close Checklist
+
+- [x] Outcome recorded
+- [x] Verification recorded
+- [x] Active backlog row removed and recent-close entry added
+- [x] Plan moved to the dated closed archive
