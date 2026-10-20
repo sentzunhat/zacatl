@@ -2,16 +2,21 @@
 
 ## Intent
 
-Capture the owner's module model and make a small release work sequence for
-the new Copilot findings on draft PR #138.
+Historical record of the owner's module model and release work sequence, created
+while PR #138 was a draft and targeted `dev`.
 
 ## Current State
 
-`Service` composes sibling `Layers` and `Platforms` modules. The three
-hexagonal layers are nested under `Layers`; Server is nested under `Platforms`.
-The map is in `docs/service/architecture.md`. PR #138 is the development
-integration path to `dev`; a later release PR decides publication from `dev`
-to `main`.
+Historical architecture checkpoint created on 2026-10-19: `Service` composes
+sibling `Layers` and `Platforms` modules. The three hexagonal layers are nested
+under `Layers`; Server is nested under `Platforms`. The map is in
+`docs/service/architecture.md`.
+
+Updated 2026-10-20: PR #138 now targets `main` as the proposed release PR and
+remains open. No merge, prerelease publication, version tag, or npm publication
+has occurred. The repository package version remains `0.0.65`; the PR's CI
+publish job is a dry run. The title and description summarize the work without
+a release number.
 
 ## What Was Inspected
 
@@ -38,10 +43,9 @@ guide already had a pre-`0.1.0` exception before this documentation pass.
 
 ## What Remains Unproven
 
-Both review issues need runtime reproductions and targeted checks. CI status
-for the present PR head, merge readiness, and a release version have not been
-verified by this architecture pass. A proposed Domain clients module has not
-been designed as a public API.
+The current package version and PR target were checked on 2026-10-20. A real
+prerelease/publication has not occurred; the CI publish job is only a dry run.
+A proposed Domain clients module has not been designed as a public API.
 
 ## Constraints
 
@@ -57,6 +61,7 @@ providers.
 
 ## Suggested Next Step
 
-Reproduce and address `6ec737fa` in PR #138. Reproduce `fa61f33c`, then make
-the smallest scoped fix on `dev` before publication or explicitly approve a
-narrower single-Service release contract. Verify the final PR head and CI.
+Continue review on PR #138 targeting `main`. Reproduce and address any remaining
+review findings on the PR branch, then verify the resulting head and CI before
+owner-approved merge and automated publication. Keep the separate physical
+infrastructure-layout work tracked outside this release PR.
