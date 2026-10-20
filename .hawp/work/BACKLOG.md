@@ -31,7 +31,6 @@ Each row links to its plan file when one exists.
 | `0ab7e9b2` | improvement | Document real-world Zacatl Service composition lessons | in-progress | [plan](active/0ab7e9b2/plan.md) | 2026-10-19 | Align remaining guides and examples to the Service architecture map after runtime contracts settle |
 | `6ec737fa` | bug | Preserve direct Server entry-point resolution | in-progress | [plan](active/6ec737fa/plan.md) | 2026-10-19 | Local fix and focused coverage pass; verify pushed PR head and CI before closure |
 | `fa61f33c` | bug | Scope ORM registrations and index policy to each Service | in-progress | [plan](active/fa61f33c/plan.md) | 2026-10-19 | Direct Layers global fallback restored without weakening Service scope; verify final PR head and CI |
-| `3b1813ff` | bug | Reject malformed ZodError lookalikes before wrapping | closed | [plan](closed/2026/10/20/3b1813ff/plan.md) | 2026-10-19 | Fixed nonempty structural guard; focused tests, type checks, and all 12 CI checks pass on `caeef07c` |
 | `f1080c66` | bug | Define restart behavior and clean up partial database connections | analyzing | [plan](active/f1080c66/plan.md) | 2026-10-19 | Reproduce lifecycle failures and choose one-shot contract or full restart support in a separate change |
 | `bfea146e` | improvement | Move database connection ownership into Infrastructure | plan-ready | [plan](active/bfea146e/plan.md) | 2026-10-19 | After PR #138 integration, design config and source migration in small compatibility-aware slices |
 | `4c4365a1` | improvement | Define Domain client boundaries for entry points | plan-ready | [plan](active/4c4365a1/plan.md) | 2026-10-19 | Compare consumer shapes and choose a pattern or small API after the current release lane |
@@ -59,6 +58,7 @@ moved to [closed/BACKLOG-ARCHIVE.md](closed/BACKLOG-ARCHIVE.md#archived-2026-07-
 
 | ID                              | Type          | Title                                                                                                                                          | Closed     | Plan                                                                                                                               |
 | ------------------------------- | ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- | ---------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| `3b1813ff` | `bug` | Reject malformed ZodError lookalikes before wrapping — nonempty issue validation prevents malformed errors from becoming request validation errors | 2026-10-20 | [plan](closed/2026/10/20/3b1813ff/plan.md) |
 | `ac0c4acf-c90a-4a32-a66a-b058577368f6` | `improvement` | Align work records with HAWP UUID/folder layout — backlog consistency passes; historical closed-record debt documented | 2026-10-15 | [plan](closed/2026/10/15/ac0c4acf-c90a-4a32-a66a-b058577368f6/plan.md) |
 | `b4f0c8a1` | `docs` | README positioning pass — problem/audience first, full CRUD path in code near the top, refreshed figures | 2026-10-15 | [plan](closed/2026/10/15/b4f0c8a1/plan.md) |
 | `f822490e-9898-4d57-b17c-7d0f318e6399` | `bug` | Express answers 400 (not 500) for request schema validation failures (legacy `EXPRESS-400`) — on `dev`, unreleased | 2026-10-15 | [plan](closed/2026/10/15/f822490e-9898-4d57-b17c-7d0f318e6399/plan.md) |
@@ -68,7 +68,6 @@ moved to [closed/BACKLOG-ARCHIVE.md](closed/BACKLOG-ARCHIVE.md#archived-2026-07-
 | `72f2e6b9-a0fd-4abb-8151-c3b061b83281` | `bug` | node:sqlite without `sqlite3`, barrel polyfill fix, Fastify double-send fix, production audit fixes (legacy `RUNTIME-FIX-001`) — released in 0.0.62 | 2026-10-01 | [plan](closed/2026/10/01/72f2e6b9-a0fd-4abb-8151-c3b061b83281/plan.md) |
 | `0.0.60` | `release` | 0.0.60 — CI orchestrator, Docker smoke matrix, DI child containers, README; released | 2026-09-29 | [closed/2026/09/29/0.0.60-release.md](closed/2026/09/29/0.0.60-release.md) |
 | `5c2c9ef3` | `refactoring` | P2: DI layered child containers (infra→domain→app) — shipped in 0.0.60 | 2026-09-29 | [closed/2026/09/29/5c2c9ef3-1a6e-469f-9c25-f644b5e3d635.md](closed/2026/09/29/5c2c9ef3-1a6e-469f-9c25-f644b5e3d635.md) |
-| `GH-NOTIFY-001` | `tooling` | P3: GitHub notification noise — Discussions disabled, hardener policy enforces it | 2026-09-29 | [closed/2026/09/29/GH-NOTIFY-001.md](closed/2026/09/29/GH-NOTIFY-001.md) |
 
 Older closed rows: [closed/BACKLOG-ARCHIVE.md](closed/BACKLOG-ARCHIVE.md).
 

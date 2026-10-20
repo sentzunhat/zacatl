@@ -36,7 +36,7 @@ PR CI run [39436096400](https://github.com/sentzunhat/zacatl/actions/runs/394360
 passes all 12 checks on `caeef07c`, including publish dry-run and eight Docker
 smoke jobs.
 
-## Closure
+## Outcome
 
 The malformed and empty issue-array paths now return false from the shared
 structural guard, while nonempty valid issue arrays remain recognized. The
@@ -44,3 +44,19 @@ review finding is fixed and verified. The separate accepted adapter-contract
 thread does not block closure of this validation item.
 
 **Status:** closed 2026-10-20.
+
+## Verification
+
+- Focused guard and Express suite: 2 files / 57 tests pass.
+- `npm run type:check` passes.
+- CI run [39436096400](https://github.com/sentzunhat/zacatl/actions/runs/39436096400):
+  all 12 checks pass on code head `caeef07c`.
+- The later commits contain only HAWP and version-policy documentation; HAWP
+  links and kit validation pass.
+
+## Close Checklist
+
+- [x] Outcome recorded
+- [x] Verification recorded
+- [x] Active backlog row removed and recent-close entry added
+- [x] Plan moved to the dated closed archive

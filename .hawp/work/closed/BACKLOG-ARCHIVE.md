@@ -3,6 +3,12 @@
 Rows compacted out of `BACKLOG.md` → Recently Closed. Newest first.
 Plan files (when they exist) live under `.hawp/work/closed/YYYY/MM/DD/`.
 
+## Archived 2026-10-20
+
+| ID | Type | Title | Closed | Plan |
+| --- | --- | --- | --- | --- |
+| `GH-NOTIFY-001` | `tooling` | P3: GitHub notification noise — Discussions disabled, hardener policy enforces it | 2026-09-29 | [closed/2026/09/29/GH-NOTIFY-001.md](2026/09/29/GH-NOTIFY-001.md) |
+
 ## Archived 2026-10-15
 
 | ID | Type | Title | Closed | Plan |
