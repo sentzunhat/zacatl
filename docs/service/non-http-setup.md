@@ -5,7 +5,7 @@ This guide is the recommended setup for non-HTTP processes in Zacatl today.
 ## What Is Supported Today
 
 - Supported now: standalone dependency injection helpers from
-  `@sentzunhat/zacatl/dependency-injection`.
+  `@sentzunhat/zacatl/third-party/dependency-injection`.
 - Declared but not runnable yet: `ServiceType.CLI` and `ServiceType.DESKTOP`.
 - Not part of the current API: `ServiceType.WORKER`.
 - `ServiceType.SERVER` startup currently requires:
@@ -21,7 +21,7 @@ import {
   clearContainer,
   registerDependency,
   resolveDependency,
-} from '@sentzunhat/zacatl/dependency-injection';
+} from '@sentzunhat/zacatl/third-party/dependency-injection';
 import { singleton } from '@sentzunhat/zacatl/third-party/dependency-injection/tsyringe';
 
 @singleton()
@@ -39,7 +39,7 @@ console.log(greetingService.greet('Zacatl'));
 ## Constructor Injection Example
 
 ```typescript
-import { registerDependencies, resolveDependency } from '@sentzunhat/zacatl/dependency-injection';
+import { registerDependencies, resolveDependency } from '@sentzunhat/zacatl/third-party/dependency-injection';
 import { singleton } from '@sentzunhat/zacatl/third-party/dependency-injection/tsyringe';
 
 @singleton()
@@ -72,8 +72,8 @@ import {
   registerDependency,
   registerValue,
   resolveDependency,
-} from '@sentzunhat/zacatl/dependency-injection';
-import { loadYML } from '@sentzunhat/zacatl/configuration';
+} from '@sentzunhat/zacatl/third-party/dependency-injection';
+import { loadYML } from '@sentzunhat/zacatl/utils/configuration';
 import { inject, singleton } from '@sentzunhat/zacatl/third-party/dependency-injection/tsyringe';
 
 const ENV_TOKEN = Symbol('ENV_TOKEN');
@@ -105,7 +105,7 @@ import {
   registerDependency,
   registerValue,
   resolveDependency,
-} from '@sentzunhat/zacatl/dependency-injection';
+} from '@sentzunhat/zacatl/third-party/dependency-injection';
 import { InternalServerError } from '@sentzunhat/zacatl/error';
 import { logger } from '@sentzunhat/zacatl/logs';
 import { inject, singleton } from '@sentzunhat/zacatl/third-party/dependency-injection/tsyringe';
@@ -148,7 +148,7 @@ import {
   clearContainer,
   registerDependencies,
   resolveDependency,
-} from '@sentzunhat/zacatl/dependency-injection';
+} from '@sentzunhat/zacatl/third-party/dependency-injection';
 import { logger } from '@sentzunhat/zacatl/logs';
 import { singleton } from '@sentzunhat/zacatl/third-party/dependency-injection/tsyringe';
 
@@ -200,8 +200,8 @@ await main();
   - Prefer class tokens in `resolveDependency(MyClass)` for type safety.
 - Import path errors:
   - Use published paths for this workflow:
-    - `@sentzunhat/zacatl/dependency-injection`
-    - `@sentzunhat/zacatl/configuration`
+    - `@sentzunhat/zacatl/third-party/dependency-injection`
+    - `@sentzunhat/zacatl/utils/configuration`
     - `@sentzunhat/zacatl/error`
     - `@sentzunhat/zacatl/logs`
 - Confusion about Service runtimes:

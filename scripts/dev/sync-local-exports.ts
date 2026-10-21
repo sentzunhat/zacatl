@@ -4,6 +4,7 @@
  * After `npm run build`, reads `build-src-esm/` and writes a matching
  * `exports` map into the root `package.json`.
  *
+ * It also marks the local CJS output as CommonJS, matching the publish tree.
  * This lets the symlinked local package resolve every subpath import
  * (e.g. `@sentzunhat/zacatl/third-party/fastify`) without manual `paths`
  * hacks in consuming tsconfigs.
@@ -87,6 +88,12 @@ const main = async (): Promise<void> => {
     name: 'sync-exports',
     fn: async () => {
       walk(buildEsmDir);
+      if (fs.existsSync(buildCjsDir)) {
+        fs.writeFileSync(
+          path.join(buildCjsDir, 'package.json'),
+          `${JSON.stringify({ type: 'commonjs' }, null, 2)}\n`,
+        );
+      }
       exportsMap['./package.json'] = './package.json';
 
       // Sort: "." first, then alphabetically

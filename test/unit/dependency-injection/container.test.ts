@@ -1,12 +1,13 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
 import {
+  createChildContainer,
   clearContainer,
   registerDependency,
   registerSingleton,
   registerValue,
   resolveDependency,
-} from '../../../src/dependency-injection/container';
+} from '../../../src/third-party/dependency-injection/container';
 
 class TestService {
   public id = Math.random();
@@ -72,6 +73,14 @@ describe('Dependency Injection Container', () => {
     expect(resolved).toBe(repoInstance);
     expect(resolved.name).toBe('TestRepository');
     expect(resolved.findAll()).toEqual(['item1', 'item2']);
+  });
+
+  it('resolves from the explicitly supplied container', () => {
+    const child = createChildContainer();
+    registerValue('TestRepository', new TestRepository(), child);
+
+    expect(resolveDependency<TestRepository>('TestRepository', child)).toBeInstanceOf(TestRepository);
+    expect(() => resolveDependency<TestRepository>('TestRepository')).toThrow();
   });
 
   it('should support multiple different registrations', () => {

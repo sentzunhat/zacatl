@@ -1,7 +1,7 @@
 import { inject, injectable } from 'tsyringe';
 import { describe, expect, it, vi } from 'vitest';
 
-import { getContainer } from '../../../src/dependency-injection/container';
+import { getContainer } from '../../../src/third-party/dependency-injection/container';
 import { logger as defaultLogger, LoggerToken } from '../../../src/logs';
 import type { Logger } from '../../../src/logs/types';
 import type { HookHandler } from '../../../src/service/layers/application/entry-points/rest/hook-handlers/hook-handler';

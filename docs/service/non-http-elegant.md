@@ -12,7 +12,7 @@ Use Zacatl dependency injection helpers directly for scripts, workers, and migra
   - `layers.application.entryPoints.rest`
 
 For non-HTTP execution today, prefer standalone DI helpers from
-`@sentzunhat/zacatl/dependency-injection`.
+`@sentzunhat/zacatl/third-party/dependency-injection`.
 
 ## Recommended Pattern Today: Standalone DI
 
@@ -22,7 +22,7 @@ import {
   registerDependency,
   registerValue,
   resolveDependency,
-} from '@sentzunhat/zacatl/dependency-injection';
+} from '@sentzunhat/zacatl/third-party/dependency-injection';
 import { inject, singleton } from '@sentzunhat/zacatl/third-party/dependency-injection/tsyringe';
 import { logger } from '@sentzunhat/zacatl/logs';
 
@@ -62,7 +62,7 @@ await worker.runOnce();
 ## Minimal Setup
 
 ```typescript
-import { registerDependency, resolveDependency } from '@sentzunhat/zacatl/dependency-injection';
+import { registerDependency, resolveDependency } from '@sentzunhat/zacatl/third-party/dependency-injection';
 import { singleton } from '@sentzunhat/zacatl/third-party/dependency-injection/tsyringe';
 
 @singleton()
@@ -79,7 +79,7 @@ console.log(calculator.add(2, 3));
 ## Registering Classes
 
 ```typescript
-import { registerDependencies, resolveDependencies } from '@sentzunhat/zacatl/dependency-injection';
+import { registerDependencies, resolveDependencies } from '@sentzunhat/zacatl/third-party/dependency-injection';
 import { singleton } from '@sentzunhat/zacatl/third-party/dependency-injection/tsyringe';
 
 @singleton()
@@ -110,12 +110,12 @@ await notifier.notify('42');
 ## Registering Values and Config Objects
 
 ```typescript
-import { loadYML } from '@sentzunhat/zacatl/configuration';
+import { loadYML } from '@sentzunhat/zacatl/utils/configuration';
 import {
   registerDependency,
   registerValue,
   resolveDependency,
-} from '@sentzunhat/zacatl/dependency-injection';
+} from '@sentzunhat/zacatl/third-party/dependency-injection';
 import { inject, singleton } from '@sentzunhat/zacatl/third-party/dependency-injection/tsyringe';
 
 const APP_CONFIG = Symbol('APP_CONFIG');
@@ -148,7 +148,7 @@ import {
   registerDependency,
   registerValue,
   resolveDependency,
-} from '@sentzunhat/zacatl/dependency-injection';
+} from '@sentzunhat/zacatl/third-party/dependency-injection';
 import { InternalServerError } from '@sentzunhat/zacatl/error';
 import { logger } from '@sentzunhat/zacatl/logs';
 import { inject, singleton } from '@sentzunhat/zacatl/third-party/dependency-injection/tsyringe';
@@ -195,7 +195,7 @@ import {
   clearContainer,
   registerDependency,
   resolveDependency,
-} from '@sentzunhat/zacatl/dependency-injection';
+} from '@sentzunhat/zacatl/third-party/dependency-injection';
 import { logger } from '@sentzunhat/zacatl/logs';
 import { singleton } from '@sentzunhat/zacatl/third-party/dependency-injection/tsyringe';
 

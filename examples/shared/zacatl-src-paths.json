@@ -4,7 +4,7 @@
   "compilerOptions": {
     "paths": {
       "@sentzunhat/zacatl/*": ["REL/src/*"],
-      "@sentzunhat/zacatl/third-party": ["REL/src/third-party/index.ts"],
+      "@sentzunhat/zacatl/third-party": ["REL/src/third-party.ts"],
       "@sentzunhat/zacatl/third-party/*": ["REL/src/third-party/*"]
     }
   }

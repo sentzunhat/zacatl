@@ -7,7 +7,7 @@ import {
   resolveDependencies,
   registerAndResolve,
   registerDependency,
-} from '../../../src/dependency-injection';
+} from '../../../src/third-party/dependency-injection/container';
 
 describe('Layer Registration Pattern', () => {
   beforeEach(() => {

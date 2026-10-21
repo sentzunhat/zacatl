@@ -20,7 +20,7 @@ vi.mock('sequelize', () => {
 import { SequelizeModel as Model } from '@zacatl/third-party/databases/sequelize';
 import { container } from '@zacatl/third-party/dependency-injection/tsyringe';
 
-import { clearContainer } from '../../../../../../../src/dependency-injection';
+import { clearContainer } from '../../../../../../../src/third-party/dependency-injection/container';
 import { SequelizeAdapter } from '../../../../../../../src/service/layers/infrastructure/orm/sequelize/adapter';
 
 import { ORMType } from '../../../../../../../src/service/layers/infrastructure/repositories/types';

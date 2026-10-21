@@ -5,7 +5,7 @@ import { DatabaseSync } from 'node:sqlite';
 
 import { describe, expect, it, vi } from 'vitest';
 
-import { clearContainer, registerValue } from '@zacatl/dependency-injection';
+import { clearContainer, registerValue } from '@zacatl/third-party/dependency-injection';
 import { BaseRepository } from '@zacatl/service/layers/infrastructure/repositories/nodesqlite/repository';
 import { ORMType } from '@zacatl/service/layers/infrastructure/repositories/types';
 

@@ -25,11 +25,27 @@ its relocation is a separate work item.
 
 ```
 src/
-├── configuration/              # Config loading & validation
-├── dependency-injection/       # DI container wrappers
+├── utils/                      # Shared utilities
+│   ├── configuration.ts        # Config loading package entry
+│   ├── configuration/          # JSON and YAML loaders
+│   └── command-runner/         # Shell-free command execution module
+├── third-party/                # Framework & library wrappers
+│   ├── eslint-plugins.ts       # Vendor ESLint package exports
+│   ├── eslint/                 # Shareable ESLint configurations
+│   ├── localization.ts         # Localization package entry
+│   ├── localization/           # i18n integration and bundled locales
+│   ├── dependency-injection.ts # Public DI helper exports
+│   ├── dependency-injection/   # DI implementation
+│   ├── express.ts              # Express export
+│   ├── fastify.ts              # Fastify export
+│   ├── mongoose.ts             # Mongoose export
+│   ├── sequelize.ts            # Sequelize export
+│   ├── sqlite3.ts              # sqlite3 export
+│   ├── zod.ts                  # Zod export
+│   └── ...other libs
+├── third-party.ts              # Aggregate third-party package entry
 ├── error/                      # Error classes & types
 ├── logs/                       # Logging abstractions
-├── localization/               # i18n/translation adapters
 ├── service/                    # Service orchestration
 │   ├── types.ts                # Service types (ServiceType, etc.)
 │   ├── platforms/              # Platform implementations
@@ -52,16 +68,6 @@ src/
 │   │           ├── nodesqlite/ # Node sqlite adapter
 │   │           └── sequelize/  # Sequelize adapter & lazy loader
 │   └── service.ts              # Main Service class
-├── third-party/                # Framework & library wrappers
-│   ├── express.ts              # Express export
-│   ├── fastify.ts              # Fastify export
-│   ├── mongoose.ts             # Mongoose export
-│   ├── sequelize.ts            # Sequelize export
-│   ├── sqlite3.ts              # sqlite3 export
-│   ├── zod.ts                  # Zod export
-│   └── ...other libs
-└── utils/                      # Utility functions
-    └── command-runner/         # Shell-free command execution module
 
 test/
 ├── unit/                       # Unit tests
@@ -93,7 +99,9 @@ build-src-esm/, build-src-cjs/, build-scripts-*/  # Compiled output (generated)
 // ✅ Good structure
 src/
   error-guards/      # Utilities for error handling
-  dependency-injection/
+  third-party/
+    dependency-injection.ts # Public DI helper exports
+    dependency-injection/ # tsyringe-backed implementation
   service/
   routes/
   handlers/
@@ -404,8 +412,9 @@ Each major module should have a `README.md`:
 
 ```
 src/
-  dependency-injection/
-    README.md         # Explains DI pattern, how to use
+  third-party/
+    dependency-injection.ts # Public DI helper exports
+    dependency-injection/ # DI helper implementation
   service/
     README.md         # Service architecture overview
   error/
@@ -588,7 +597,7 @@ port like `GreetingRepositoryPort`), never on which ORM adapter is wired up.
 
 ### Naming Rule: How an Exported Abstract Class Signals "Extend Me"
 
-`src/eslint/naming-conventions.mjs` enforces this with **one rule, one
+`src/third-party/eslint/naming-conventions.mjs` enforces this with **one rule, one
 allowlist** — not a base rule plus scattered independent exemptions. An
 exported abstract class must do one of:
 
@@ -715,7 +724,7 @@ Configure short import paths for better readability:
   "compilerOptions": {
     "baseUrl": "./",
     "paths": {
-      "@zacatl/configuration": ["src/configuration.ts"],
+      "@zacatl/utils/configuration": ["src/utils/configuration.ts"],
       "@zacatl/error": ["src/error.ts"],
       "@zacatl/service": ["src/service/service.ts"],
       "@zacatl/*": ["src/*"]
@@ -1090,7 +1099,7 @@ export class CustomError extends Error {
 ### Example 2: Dependency Injection Container
 
 ```typescript
-// src/dependency-injection/container.ts
+// src/third-party/dependency-injection/container.ts
 export const registerDependencies = <T extends object>(
   dependencies: Constructor<T>[],
   lifecycle: Lifecycle = Lifecycle.SINGLETON,
@@ -1112,7 +1121,7 @@ export const resolveDependencies = <T extends object>(dependencies: Constructor<
 ### Example 3: Configuration Loading with Validation
 
 ```typescript
-// src/configuration/json.ts
+// src/utils/configuration/json.ts
 export const loadJSON = <T>(filePath: string, schema: ZodSchema<T>): T => {
   try {
     if (!existsSync(filePath)) {

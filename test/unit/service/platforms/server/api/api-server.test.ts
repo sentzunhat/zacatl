@@ -2,16 +2,20 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 const mockResolveDependencies = vi.fn();
 
-vi.mock('@zacatl/dependency-injection', (): { resolveDependencies: (...args: unknown[]) => unknown } => ({
-  resolveDependencies: (...args: unknown[]) => mockResolveDependencies(...args),
-}));
+vi.mock('@zacatl/third-party/dependency-injection', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@zacatl/third-party/dependency-injection')>();
+  return {
+    ...actual,
+    resolveDependencies: (...args: unknown[]) => mockResolveDependencies(...args),
+  };
+});
 
 import { CustomError } from '@zacatl/error';
 
 import {
   createChildContainer,
   registerValue,
-} from '../../../../../../src/dependency-injection/container';
+} from '../../../../../../src/third-party/dependency-injection/container';
 import type { RouteHandler } from '../../../../../../src/service/layers/application/entry-points/rest/fastify/handlers/route-handler';
 import type { HookHandler } from '../../../../../../src/service/layers/application/entry-points/rest/hook-handlers/hook-handler';
 import type { RestApplicationEntryPoints } from '../../../../../../src/service/layers/application/types';

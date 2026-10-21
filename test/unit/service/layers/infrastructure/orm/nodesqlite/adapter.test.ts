@@ -1,7 +1,7 @@
 import { createDatabaseToken } from '@zacatl/service/layers/infrastructure/orm/tokens/factory';
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 
-import { clearContainer } from '@zacatl/dependency-injection';
+import { clearContainer } from '@zacatl/third-party/dependency-injection';
 import { NodeSqliteAdapter } from '@zacatl/service/layers/infrastructure/orm/nodesqlite/adapter';
 import { ORMType } from '@zacatl/service/layers/infrastructure/repositories/types';
 import { container } from '@zacatl/third-party/dependency-injection/tsyringe';

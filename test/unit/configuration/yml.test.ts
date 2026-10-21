@@ -4,7 +4,7 @@ import { join } from 'path';
 
 import { describe, it, expect, afterEach } from 'vitest';
 
-import { loadYML, loadYAML } from '@zacatl/configuration';
+import { loadYML, loadYAML } from '@zacatl/utils/configuration';
 import { BadRequestError, NotFoundError, ValidationError } from '@zacatl/error';
 import { z } from '@zacatl/third-party/zod';
 

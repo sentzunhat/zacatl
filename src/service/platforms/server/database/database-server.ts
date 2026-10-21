@@ -1,11 +1,17 @@
 import { CustomError } from '@zacatl/error';
+import { getContainer } from '@zacatl/third-party/dependency-injection';
 import { inject, injectable } from '@zacatl/third-party/dependency-injection/tsyringe';
 import type { DependencyContainer } from '@zacatl/third-party/dependency-injection/tsyringe';
 
 import { createDatabaseAdapter } from './adapters/factory';
+import { normalizeConnectionName } from './connection-name';
 import type { DatabaseConfig, DatabaseServerPort } from './port';
-import { getContainer } from '../../../../dependency-injection/container';
 import { DatabaseConfigsToken, DatabaseContainerToken, DatabaseServiceNameToken } from '../tokens';
+
+const getAdapterKey = (vendor: string, connectionName?: string): string => {
+  const normalizedName = normalizeConnectionName(vendor, connectionName);
+  return normalizedName === vendor ? vendor : `${vendor}:${normalizedName}`;
+};
 
 /**
  * DatabaseServer - Encapsulates database connection logic
@@ -37,46 +43,63 @@ export class DatabaseServer {
       return;
     }
 
-    for (const database of this.databases) {
-      if (database.connection?.url == null || database.connection.url.length === 0) {
-        throw new CustomError({
-          message: 'database connection URL is not provided',
-          code: 500,
-          reason: 'database connection URL not provided',
-        });
-      }
+    let currentDatabase: DatabaseConfig | undefined;
+    try {
+      for (const database of this.databases) {
+        currentDatabase = database;
+        if (database.connection?.url == null || database.connection.url.length === 0) {
+          throw new CustomError({
+            message: 'database connection URL is not provided',
+            code: 500,
+            reason: 'database connection URL not provided',
+          });
+        }
 
-      try {
+        const adapterKey = getAdapterKey(database.vendor, database.connection.name);
+        if (this.adapters.has(adapterKey)) {
+          throw new CustomError({
+            message: `duplicate database connection key "${adapterKey}"`,
+            code: 500,
+            reason: 'duplicate database connection key',
+          });
+        }
+
         const adapter = createDatabaseAdapter(database.vendor);
-        await adapter.connect(this.serviceName, database, this.container);
-
-        // Store adapter keyed by connection name (or vendor for single-database setups).
-        // This allows multiple same-vendor databases to be tracked independently.
-        const adapterKey = database.connection.name ?? database.vendor;
+        // Track ownership before connect: adapters may have opened a resource
+        // before a post-connect callback or later setup step rejects.
         this.adapters.set(adapterKey, adapter);
-      } catch (error: unknown) {
-        throw new CustomError({
-          message: `failed to configure database for service "${this.serviceName}"`,
-          code: 500,
-          reason: 'database configuration failed',
-          error: error as Error,
-          metadata: {
-            database: {
-              vendor: database.vendor,
-              connectionUrl: database.connection.url,
-              connectionName: database.connection.name,
-            },
-          },
-        });
+        await adapter.connect(this.serviceName, database, this.container);
       }
+    } catch (error: unknown) {
+      try {
+        await this.disconnect();
+      } catch {
+        // Preserve the setup failure; cleanup is best effort for all adapters.
+      }
+      throw new CustomError({
+        message: `failed to configure database for service "${this.serviceName}"`,
+        code: 500,
+        reason: 'database configuration failed',
+        error: error as Error,
+        metadata: currentDatabase != null
+          ? {
+            database: {
+              vendor: currentDatabase.vendor,
+              connectionUrl: currentDatabase.connection?.url,
+              connectionName: currentDatabase.connection?.name,
+            },
+          }
+          : undefined,
+      });
     }
   }
 
   /**
-   * Get database adapter for specific vendor
+   * Get a database adapter by vendor and optional connection name.
+   * Omit the name to retrieve the vendor's default connection.
    */
-  public getAdapter(vendor: string): DatabaseServerPort | undefined {
-    return this.adapters.get(vendor);
+  public getAdapter(vendor: string, connectionName?: string): DatabaseServerPort | undefined {
+    return this.adapters.get(getAdapterKey(vendor, connectionName));
   }
 
   /**
@@ -90,9 +113,16 @@ export class DatabaseServer {
    * Disconnect all databases
    */
   public async disconnect(): Promise<void> {
-    const disconnectPromises = Array.from(this.adapters.values()).map((adapter) =>
-      adapter.disconnect?.(),
-    );
-    await Promise.all(disconnectPromises);
+    const adapters = Array.from(this.adapters.entries());
+    const results = await Promise.allSettled(adapters.map(async ([key, adapter]) => {
+      await adapter.disconnect?.();
+      if (this.adapters.get(key) === adapter) {
+        this.adapters.delete(key);
+      }
+    }));
+    const failed = results.find((result) => result.status === 'rejected');
+    if (failed?.status === 'rejected') {
+      throw failed.reason;
+    }
   }
 }

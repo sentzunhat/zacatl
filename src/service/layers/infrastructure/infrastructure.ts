@@ -1,5 +1,5 @@
-import { resolveDependencies } from '@zacatl/dependency-injection';
 import { InternalServerError } from '@zacatl/error';
+import { getContainer, resolveDependencies } from '@zacatl/third-party/dependency-injection';
 import {
   inject,
   injectable,
@@ -9,7 +9,7 @@ import {
 import { getActiveOrmConstructionScope, withOrmConstructionScope } from './orm/scope';
 import { InfrastructureConfigToken, InfrastructureContainerToken } from './tokens';
 import type { InfrastructureConfig, InfrastructureUnknownRepository } from './types';
-import { ensureRegisteredSingleton, getContainer } from '../../../dependency-injection/container';
+import { ensureRegisteredSingleton } from '../../../third-party/dependency-injection/container';
 
 export type { InfrastructureConfig };
 

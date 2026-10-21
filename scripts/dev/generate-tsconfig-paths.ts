@@ -9,11 +9,6 @@
  * - All directories with index.ts: @zacatl/path/to/dir → ./src/path/to/dir/index.ts
  * - All .ts files (except index.ts): @zacatl/path/to/file → ./src/path/to/file.ts
  *
- * ## Header ownership
- *
- * The generated paths section starts with `// @generated-by:generate-tsconfig-paths`
- * to indicate automation. Manual edits are not lost (they exist outside this section).
- *
  * ## Usage
  *
  *   npm run paths:generate   # update tsconfig.base.json with all paths
@@ -52,8 +47,8 @@ interface PathEntry {
  * Recursively collect all .ts files and directories (with index.ts) from srcDir.
  * Returns a sorted list of path entries ready for JSON.
  *
- * For files like `src/configuration/json.ts`, generates:
- *   @zacatl/configuration/json → ./src/configuration/json.ts
+ * For files like `src/utils/configuration/json.ts`, generates:
+ *   @zacatl/utils/configuration/json → ./src/utils/configuration/json.ts
  *
  * For directories like `src/service/layers` with index.ts, generates:
  *   @zacatl/service/layers → ./src/service/layers/index.ts
@@ -65,43 +60,36 @@ interface PathEntry {
 const collectPaths = (dir: string, relativePath: string = ''): PathEntry[] => {
   const entries: PathEntry[] = [];
 
-  try {
-    const items = fs.readdirSync(dir, { withFileTypes: true });
+  const items = fs.readdirSync(dir, { withFileTypes: true });
 
-    for (const item of items) {
-      const itemPath = path.join(dir, item.name);
+  for (const item of items) {
+    const itemPath = path.join(dir, item.name);
 
-      // ── Directories with index.ts ──────────────────────────────────────
-      if (item.isDirectory()) {
-        const indexPath = path.join(itemPath, 'index.ts');
-        if (fs.existsSync(indexPath)) {
-          const relDir = relativePath ? `${relativePath}/${item.name}` : item.name;
-          const key = `@zacatl${relDir ? '/' + relDir : ''}`;
-          const value = `./src${relDir ? '/' + relDir : ''}/index.ts`;
-          entries.push({ key, value });
-        }
-
-        // Recursively process subdirectories
-        const nextRelPath = relativePath ? `${relativePath}/${item.name}` : item.name;
-        entries.push(...collectPaths(itemPath, nextRelPath));
-        continue;
-      }
-
-      // ── Individual .ts files (except index.ts) ──────────────────────────
-      if (item.isFile() && item.name.endsWith('.ts') && item.name !== 'index.ts') {
-        const stem = item.name.slice(0, -3); // remove .ts extension
-        const relFile = relativePath ? `${relativePath}/${stem}` : stem;
-        const key = `@zacatl/${relFile}`;
-        const value = `./src${relativePath ? '/' + relativePath : ''}/${item.name}`;
+    // ── Directories with index.ts ──────────────────────────────────────
+    if (item.isDirectory()) {
+      const indexPath = path.join(itemPath, 'index.ts');
+      if (fs.existsSync(indexPath)) {
+        const relDir = relativePath ? `${relativePath}/${item.name}` : item.name;
+        const key = `@zacatl${relDir ? '/' + relDir : ''}`;
+        const value = `./src${relDir ? '/' + relDir : ''}/index.ts`;
         entries.push({ key, value });
       }
+
+      // Recursively process subdirectories. Read failures intentionally abort
+      // generation so a partial alias map is never written.
+      const nextRelPath = relativePath ? `${relativePath}/${item.name}` : item.name;
+      entries.push(...collectPaths(itemPath, nextRelPath));
+      continue;
     }
-  } catch (err: unknown) {
-    // eslint-disable-next-line no-console
-    console.warn(
-      `Could not read directory ${dir}:`,
-      err instanceof Error ? err.message : String(err),
-    );
+
+    // ── Individual .ts files (except index.ts) ──────────────────────────
+    if (item.isFile() && item.name.endsWith('.ts') && item.name !== 'index.ts') {
+      const stem = item.name.slice(0, -3); // remove .ts extension
+      const relFile = relativePath ? `${relativePath}/${stem}` : stem;
+      const key = `@zacatl/${relFile}`;
+      const value = `./src${relativePath ? '/' + relativePath : ''}/${item.name}`;
+      entries.push({ key, value });
+    }
   }
 
   return entries;
@@ -126,8 +114,8 @@ const generatePathsObject = (paths: PathEntry[]): Record<string, string[]> => {
 };
 
 /**
- * Update tsconfig.base.json with generated paths.
- * Preserves the rest of the tsconfig structure and any non-generated paths.
+ * Update tsconfig.base.json with the complete generated paths map.
+ * Other tsconfig settings remain unchanged.
  */
 const updateTsconfig = (newPaths: Record<string, string[]>): void => {
   const rawContent = fs.readFileSync(TSCONFIG_BASE_PATH, 'utf8');
@@ -144,10 +132,9 @@ const updateTsconfig = (newPaths: Record<string, string[]>): void => {
 
   const compilerOptions = config.compilerOptions as Record<string, unknown>;
 
-  // Merge generated paths (no flat third-party compatibility aliases)
-  const finalPaths = {
-    ...newPaths,
-  };
+  const finalPaths = Object.fromEntries(
+    Object.entries(newPaths).sort(([left], [right]) => left.localeCompare(right)),
+  );
 
   // Replace the paths section entirely with generated + manual paths
   compilerOptions.paths = finalPaths;
@@ -162,35 +149,41 @@ const updateTsconfig = (newPaths: Record<string, string[]>): void => {
 // ---------------------------------------------------------------------------
 
 const main = async (): Promise<void> => {
-  await measureTime({
-    name: 'paths:generate',
-    fn: async () => {
-      if (!fs.existsSync(SRC_DIR)) {
+  try {
+    await measureTime({
+      name: 'paths:generate',
+      fn: async () => {
+        if (!fs.existsSync(SRC_DIR)) {
+          // eslint-disable-next-line no-console
+          console.error(`Error: src/ directory not found at ${SRC_DIR}`);
+          process.exit(1);
+        }
+
+        if (!fs.existsSync(TSCONFIG_BASE_PATH)) {
+          // eslint-disable-next-line no-console
+          console.error(`Error: tsconfig.base.json not found at ${TSCONFIG_BASE_PATH}`);
+          process.exit(1);
+        }
+
+        // Collect all paths recursively
+        const rawPaths = collectPaths(SRC_DIR);
+        const sortedPaths = sortPaths(rawPaths);
+        const pathsObject = generatePathsObject(sortedPaths);
+
+        // Update tsconfig.base.json
+        updateTsconfig(pathsObject);
+
         // eslint-disable-next-line no-console
-        console.error(`Error: src/ directory not found at ${SRC_DIR}`);
-        process.exit(1);
-      }
-
-      if (!fs.existsSync(TSCONFIG_BASE_PATH)) {
+        console.log(`Generated ${sortedPaths.length} path mapping(s)`);
         // eslint-disable-next-line no-console
-        console.error(`Error: tsconfig.base.json not found at ${TSCONFIG_BASE_PATH}`);
-        process.exit(1);
-      }
-
-      // Collect all paths recursively
-      const rawPaths = collectPaths(SRC_DIR);
-      const sortedPaths = sortPaths(rawPaths);
-      const pathsObject = generatePathsObject(sortedPaths);
-
-      // Update tsconfig.base.json
-      updateTsconfig(pathsObject);
-
-      // eslint-disable-next-line no-console
-      console.log(`Generated ${sortedPaths.length} path mapping(s)`);
-      // eslint-disable-next-line no-console
-      console.log(`Updated ${TSCONFIG_BASE_PATH}`);
-    },
-  });
+        console.log(`Updated ${TSCONFIG_BASE_PATH}`);
+      },
+    });
+  } catch (err: unknown) {
+    // eslint-disable-next-line no-console
+    console.error('Could not generate a complete TypeScript path map:', err);
+    process.exitCode = 1;
+  }
 };
 
 void main();

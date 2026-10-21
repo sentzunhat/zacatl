@@ -252,7 +252,7 @@ known breaks.
 | CLI           | Planned (stub only)   |
 | Desktop       | Planned (stub only)   |
 
-> For non-HTTP scripts and workers today, use the standalone DI helpers from `@sentzunhat/zacatl/dependency-injection` directly.
+> For non-HTTP scripts and workers today, use the standalone DI helpers from `@sentzunhat/zacatl/third-party/dependency-injection` directly.
 
 ## 📸 Examples & Screenshots
 
@@ -286,11 +286,13 @@ Each example builds **one** Docker image containing both the compiled backend an
 | Module                 | Import path                                |
 | ----------------------- | -------------------------------------------- |
 | Service                | `@sentzunhat/zacatl/service`                |
-| Configuration          | `@sentzunhat/zacatl/configuration`          |
-| Dependency Injection   | `@sentzunhat/zacatl/dependency-injection`   |
+| Configuration          | `@sentzunhat/zacatl/utils/configuration`    |
+| Dependency Injection   | `@sentzunhat/zacatl/third-party/dependency-injection` |
 | Errors                 | `@sentzunhat/zacatl/error`                  |
 | Logs                   | `@sentzunhat/zacatl/logs`                   |
-| Localization           | `@sentzunhat/zacatl/localization`           |
+| Localization           | `@sentzunhat/zacatl/third-party/localization` |
+| ESLint configurations  | `@sentzunhat/zacatl/third-party/eslint`      |
+| ESLint plugin exports  | `@sentzunhat/zacatl/third-party/eslint-plugins` |
 | Utils                  | `@sentzunhat/zacatl/utils`                  |
 | Third-party re-exports | `@sentzunhat/zacatl/third-party/*`          |
 

@@ -2,15 +2,11 @@
   "compilerOptions": {
     "incremental": false,
     "target": "ESNext",
-    "lib": [
-      "ESNext"
-    ],
+    "lib": ["ESNext"],
     "module": "ESNext",
     "moduleResolution": "bundler",
     "rootDir": "./src",
-    "types": [
-      "node"
-    ],
+    "types": ["node"],
     "resolveJsonModule": true,
     "allowImportingTsExtensions": false,
     "experimentalDecorators": true,
@@ -54,108 +50,30 @@
     "allowUnreachableCode": false,
     "skipLibCheck": true,
     "paths": {
-      "@zacatl/configuration": [
-        "./src/configuration.ts"
-      ],
-      "@zacatl/configuration/json": [
-        "./src/configuration/json.ts"
-      ],
-      "@zacatl/configuration/yml": [
-        "./src/configuration/yml.ts"
-      ],
-      "@zacatl/dependency-injection": [
-        "./src/dependency-injection.ts"
-      ],
-      "@zacatl/dependency-injection/container": [
-        "./src/dependency-injection/container.ts"
-      ],
-      "@zacatl/error": [
-        "./src/error.ts"
-      ],
-      "@zacatl/error/bad-request": [
-        "./src/error/bad-request.ts"
-      ],
-      "@zacatl/error/bad-resource": [
-        "./src/error/bad-resource.ts"
-      ],
-      "@zacatl/error/custom": [
-        "./src/error/custom.ts"
-      ],
-      "@zacatl/error/forbidden": [
-        "./src/error/forbidden.ts"
-      ],
-      "@zacatl/error/internal-server": [
-        "./src/error/internal-server.ts"
-      ],
-      "@zacatl/error/not-found": [
-        "./src/error/not-found.ts"
-      ],
-      "@zacatl/error/unauthorized": [
-        "./src/error/unauthorized.ts"
-      ],
-      "@zacatl/error/validation": [
-        "./src/error/validation.ts"
-      ],
-      "@zacatl/localization": [
-        "./src/localization.ts"
-      ],
-      "@zacatl/localization/i18n-node": [
-        "./src/localization/i18n-node.ts"
-      ],
-      "@zacatl/localization/node/core": [
-        "./src/localization/node/core.ts"
-      ],
-      "@zacatl/localization/node/helpers": [
-        "./src/localization/node/helpers.ts"
-      ],
-      "@zacatl/localization/node/types": [
-        "./src/localization/node/types.ts"
-      ],
-      "@zacatl/logs": [
-        "./src/logs.ts"
-      ],
-      "@zacatl/logs/console": [
-        "./src/logs/console.ts"
-      ],
-      "@zacatl/logs/console/adapter": [
-        "./src/logs/console/adapter.ts"
-      ],
-      "@zacatl/logs/console/config": [
-        "./src/logs/console/config.ts"
-      ],
-      "@zacatl/logs/console/default": [
-        "./src/logs/console/default.ts"
-      ],
-      "@zacatl/logs/console/types": [
-        "./src/logs/console/types.ts"
-      ],
-      "@zacatl/logs/fastify": [
-        "./src/logs/fastify.ts"
-      ],
-      "@zacatl/logs/pino": [
-        "./src/logs/pino.ts"
-      ],
-      "@zacatl/logs/pino/adapter": [
-        "./src/logs/pino/adapter.ts"
-      ],
-      "@zacatl/logs/pino/config": [
-        "./src/logs/pino/config.ts"
-      ],
-      "@zacatl/logs/pino/default": [
-        "./src/logs/pino/default.ts"
-      ],
-      "@zacatl/logs/pino/types": [
-        "./src/logs/pino/types.ts"
-      ],
-      "@zacatl/logs/token": [
-        "./src/logs/token.ts"
-      ],
-      "@zacatl/logs/types": [
-        "./src/logs/types.ts"
-      ],
-      "@zacatl/service": [
-        "./src/service/index.ts"
-      ],
+      "@zacatl/error": ["./src/error.ts"],
+      "@zacatl/error/bad-request": ["./src/error/bad-request.ts"],
+      "@zacatl/error/bad-resource": ["./src/error/bad-resource.ts"],
+      "@zacatl/error/custom": ["./src/error/custom.ts"],
+      "@zacatl/error/forbidden": ["./src/error/forbidden.ts"],
+      "@zacatl/error/internal-server": ["./src/error/internal-server.ts"],
+      "@zacatl/error/not-found": ["./src/error/not-found.ts"],
+      "@zacatl/error/unauthorized": ["./src/error/unauthorized.ts"],
+      "@zacatl/error/validation": ["./src/error/validation.ts"],
+      "@zacatl/logs": ["./src/logs.ts"],
+      "@zacatl/logs/console": ["./src/logs/console.ts"],
+      "@zacatl/logs/console/adapter": ["./src/logs/console/adapter.ts"],
+      "@zacatl/logs/console/config": ["./src/logs/console/config.ts"],
+      "@zacatl/logs/console/default": ["./src/logs/console/default.ts"],
+      "@zacatl/logs/console/types": ["./src/logs/console/types.ts"],
+      "@zacatl/logs/fastify": ["./src/logs/fastify.ts"],
+      "@zacatl/logs/pino": ["./src/logs/pino.ts"],
+      "@zacatl/logs/pino/adapter": ["./src/logs/pino/adapter.ts"],
+      "@zacatl/logs/pino/config": ["./src/logs/pino/config.ts"],
+      "@zacatl/logs/pino/default": ["./src/logs/pino/default.ts"],
+      "@zacatl/logs/pino/types": ["./src/logs/pino/types.ts"],
+      "@zacatl/logs/token": ["./src/logs/token.ts"],
+      "@zacatl/logs/types": ["./src/logs/types.ts"],
+      "@zacatl/service": ["./src/service/index.ts"],
       "@zacatl/service/layers/application/application": [
         "./src/service/layers/application/application.ts"
       ],
@@ -222,30 +140,18 @@
       "@zacatl/service/layers/application/entry-points/rest/hook-handlers/hook-handler": [
         "./src/service/layers/application/entry-points/rest/hook-handlers/hook-handler.ts"
       ],
-      "@zacatl/service/layers/application/tokens": [
-        "./src/service/layers/application/tokens.ts"
-      ],
-      "@zacatl/service/layers/application/types": [
-        "./src/service/layers/application/types.ts"
-      ],
-      "@zacatl/service/layers/domain/domain": [
-        "./src/service/layers/domain/domain.ts"
-      ],
-      "@zacatl/service/layers/domain/ports/domain": [
-        "./src/service/layers/domain/ports/domain.ts"
-      ],
+      "@zacatl/service/layers/application/tokens": ["./src/service/layers/application/tokens.ts"],
+      "@zacatl/service/layers/application/types": ["./src/service/layers/application/types.ts"],
+      "@zacatl/service/layers/domain/domain": ["./src/service/layers/domain/domain.ts"],
+      "@zacatl/service/layers/domain/ports/domain": ["./src/service/layers/domain/ports/domain.ts"],
       "@zacatl/service/layers/domain/ports/provider": [
         "./src/service/layers/domain/ports/provider.ts"
       ],
       "@zacatl/service/layers/domain/ports/service": [
         "./src/service/layers/domain/ports/service.ts"
       ],
-      "@zacatl/service/layers/domain/tokens": [
-        "./src/service/layers/domain/tokens.ts"
-      ],
-      "@zacatl/service/layers/domain/types": [
-        "./src/service/layers/domain/types.ts"
-      ],
+      "@zacatl/service/layers/domain/tokens": ["./src/service/layers/domain/tokens.ts"],
+      "@zacatl/service/layers/domain/types": ["./src/service/layers/domain/types.ts"],
       "@zacatl/service/layers/infrastructure/infrastructure": [
         "./src/service/layers/infrastructure/infrastructure.ts"
       ],
@@ -321,39 +227,21 @@
       "@zacatl/service/layers/infrastructure/types": [
         "./src/service/layers/infrastructure/types.ts"
       ],
-      "@zacatl/service/layers/layers": [
-        "./src/service/layers/layers.ts"
-      ],
-      "@zacatl/service/layers/tokens": [
-        "./src/service/layers/tokens.ts"
-      ],
-      "@zacatl/service/layers/types": [
-        "./src/service/layers/types.ts"
-      ],
-      "@zacatl/service/platforms/cli/cli": [
-        "./src/service/platforms/cli/cli.ts"
-      ],
-      "@zacatl/service/platforms/cli/types": [
-        "./src/service/platforms/cli/types.ts"
-      ],
+      "@zacatl/service/layers/layers": ["./src/service/layers/layers.ts"],
+      "@zacatl/service/layers/tokens": ["./src/service/layers/tokens.ts"],
+      "@zacatl/service/layers/types": ["./src/service/layers/types.ts"],
+      "@zacatl/service/platforms/cli/cli": ["./src/service/platforms/cli/cli.ts"],
+      "@zacatl/service/platforms/cli/types": ["./src/service/platforms/cli/types.ts"],
       "@zacatl/service/platforms/context/request-context": [
         "./src/service/platforms/context/request-context.ts"
       ],
-      "@zacatl/service/platforms/desktop/desktop": [
-        "./src/service/platforms/desktop/desktop.ts"
-      ],
-      "@zacatl/service/platforms/desktop/types": [
-        "./src/service/platforms/desktop/types.ts"
-      ],
-      "@zacatl/service/platforms/platforms": [
-        "./src/service/platforms/platforms.ts"
-      ],
+      "@zacatl/service/platforms/desktop/desktop": ["./src/service/platforms/desktop/desktop.ts"],
+      "@zacatl/service/platforms/desktop/types": ["./src/service/platforms/desktop/types.ts"],
+      "@zacatl/service/platforms/platforms": ["./src/service/platforms/platforms.ts"],
       "@zacatl/service/platforms/server/api/api-server": [
         "./src/service/platforms/server/api/api-server.ts"
       ],
-      "@zacatl/service/platforms/server/api/port": [
-        "./src/service/platforms/server/api/port.ts"
-      ],
+      "@zacatl/service/platforms/server/api/port": ["./src/service/platforms/server/api/port.ts"],
       "@zacatl/service/platforms/server/database/adapters/factory": [
         "./src/service/platforms/server/database/adapters/factory.ts"
       ],
@@ -378,9 +266,7 @@
       "@zacatl/service/platforms/server/page/page-server": [
         "./src/service/platforms/server/page/page-server.ts"
       ],
-      "@zacatl/service/platforms/server/page/port": [
-        "./src/service/platforms/server/page/port.ts"
-      ],
+      "@zacatl/service/platforms/server/page/port": ["./src/service/platforms/server/page/port.ts"],
       "@zacatl/service/platforms/server/providers/express/api-adapter": [
         "./src/service/platforms/server/providers/express/api-adapter.ts"
       ],
@@ -396,50 +282,30 @@
       "@zacatl/service/platforms/server/providers/fastify/page-adapter": [
         "./src/service/platforms/server/providers/fastify/page-adapter.ts"
       ],
-      "@zacatl/service/platforms/server/server": [
-        "./src/service/platforms/server/server.ts"
-      ],
+      "@zacatl/service/platforms/server/server": ["./src/service/platforms/server/server.ts"],
       "@zacatl/service/platforms/server/shared/prefixes/is-under-prefix": [
         "./src/service/platforms/server/shared/prefixes/is-under-prefix.ts"
       ],
       "@zacatl/service/platforms/server/shared/prefixes/normalize-prefix": [
         "./src/service/platforms/server/shared/prefixes/normalize-prefix.ts"
       ],
-      "@zacatl/service/platforms/server/tokens": [
-        "./src/service/platforms/server/tokens.ts"
-      ],
+      "@zacatl/service/platforms/server/tokens": ["./src/service/platforms/server/tokens.ts"],
       "@zacatl/service/platforms/server/types/server-config": [
         "./src/service/platforms/server/types/server-config.ts"
       ],
-      "@zacatl/service/platforms/tokens": [
-        "./src/service/platforms/tokens.ts"
-      ],
-      "@zacatl/service/platforms/types": [
-        "./src/service/platforms/types.ts"
-      ],
-      "@zacatl/service/service": [
-        "./src/service/service.ts"
-      ],
-      "@zacatl/service/tokens/service": [
-        "./src/service/tokens/service.ts"
-      ],
-      "@zacatl/service/types": [
-        "./src/service/types.ts"
-      ],
-      "@zacatl/third-party": [
-        "./src/third-party.ts"
-      ],
-      "@zacatl/third-party/databases/mongoose": [
-        "./src/third-party/databases/mongoose.ts"
-      ],
-      "@zacatl/third-party/databases/nodesqlite": [
-        "./src/third-party/databases/nodesqlite.ts"
-      ],
-      "@zacatl/third-party/databases/sequelize": [
-        "./src/third-party/databases/sequelize.ts"
-      ],
-      "@zacatl/third-party/databases/sqlite3": [
-        "./src/third-party/databases/sqlite3.ts"
+      "@zacatl/service/platforms/tokens": ["./src/service/platforms/tokens.ts"],
+      "@zacatl/service/platforms/types": ["./src/service/platforms/types.ts"],
+      "@zacatl/service/service": ["./src/service/service.ts"],
+      "@zacatl/service/tokens/service": ["./src/service/tokens/service.ts"],
+      "@zacatl/service/types": ["./src/service/types.ts"],
+      "@zacatl/third-party": ["./src/third-party.ts"],
+      "@zacatl/third-party/databases/mongoose": ["./src/third-party/databases/mongoose.ts"],
+      "@zacatl/third-party/databases/nodesqlite": ["./src/third-party/databases/nodesqlite.ts"],
+      "@zacatl/third-party/databases/sequelize": ["./src/third-party/databases/sequelize.ts"],
+      "@zacatl/third-party/databases/sqlite3": ["./src/third-party/databases/sqlite3.ts"],
+      "@zacatl/third-party/dependency-injection": ["./src/third-party/dependency-injection.ts"],
+      "@zacatl/third-party/dependency-injection/container": [
+        "./src/third-party/dependency-injection/container.ts"
       ],
       "@zacatl/third-party/dependency-injection/reflect-metadata": [
         "./src/third-party/dependency-injection/reflect-metadata.ts"
@@ -447,63 +313,39 @@
       "@zacatl/third-party/dependency-injection/tsyringe": [
         "./src/third-party/dependency-injection/tsyringe.ts"
       ],
-      "@zacatl/third-party/eslint": [
-        "./src/third-party/eslint.ts"
+      "@zacatl/third-party/eslint-plugins": ["./src/third-party/eslint-plugins.ts"],
+      "@zacatl/third-party/express": ["./src/third-party/express.ts"],
+      "@zacatl/third-party/fastify": ["./src/third-party/fastify.ts"],
+      "@zacatl/third-party/http-proxy-middleware": ["./src/third-party/http-proxy-middleware.ts"],
+      "@zacatl/third-party/i18n": ["./src/third-party/i18n.ts"],
+      "@zacatl/third-party/js-yaml": ["./src/third-party/js-yaml.ts"],
+      "@zacatl/third-party/localization": ["./src/third-party/localization.ts"],
+      "@zacatl/third-party/localization/i18n-node": ["./src/third-party/localization/i18n-node.ts"],
+      "@zacatl/third-party/localization/node/core": ["./src/third-party/localization/node/core.ts"],
+      "@zacatl/third-party/localization/node/helpers": [
+        "./src/third-party/localization/node/helpers.ts"
       ],
-      "@zacatl/third-party/express": [
-        "./src/third-party/express.ts"
+      "@zacatl/third-party/localization/node/types": [
+        "./src/third-party/localization/node/types.ts"
       ],
-      "@zacatl/third-party/fastify": [
-        "./src/third-party/fastify.ts"
-      ],
-      "@zacatl/third-party/http-proxy-middleware": [
-        "./src/third-party/http-proxy-middleware.ts"
-      ],
-      "@zacatl/third-party/i18n": [
-        "./src/third-party/i18n.ts"
-      ],
-      "@zacatl/third-party/js-yaml": [
-        "./src/third-party/js-yaml.ts"
-      ],
-      "@zacatl/third-party/pino": [
-        "./src/third-party/pino.ts"
-      ],
-      "@zacatl/third-party/uuid": [
-        "./src/third-party/uuid.ts"
-      ],
-      "@zacatl/third-party/zod": [
-        "./src/third-party/zod.ts"
-      ],
-      "@zacatl/utils": [
-        "./src/utils.ts"
-      ],
+      "@zacatl/third-party/pino": ["./src/third-party/pino.ts"],
+      "@zacatl/third-party/uuid": ["./src/third-party/uuid.ts"],
+      "@zacatl/third-party/zod": ["./src/third-party/zod.ts"],
+      "@zacatl/utils": ["./src/utils.ts"],
       "@zacatl/utils/command-runner/execute-commands": [
         "./src/utils/command-runner/execute-commands.ts"
       ],
-      "@zacatl/utils/command-runner/policy": [
-        "./src/utils/command-runner/policy.ts"
-      ],
-      "@zacatl/utils/command-runner/runner": [
-        "./src/utils/command-runner/runner.ts"
-      ],
-      "@zacatl/utils/command-runner/types": [
-        "./src/utils/command-runner/types.ts"
-      ],
-      "@zacatl/utils/encode-decode": [
-        "./src/utils/encode-decode.ts"
-      ],
-      "@zacatl/utils/error-guards": [
-        "./src/utils/error-guards.ts"
-      ],
-      "@zacatl/utils/hmac": [
-        "./src/utils/hmac.ts"
-      ],
-      "@zacatl/utils/measure-execution-time": [
-        "./src/utils/measure-execution-time.ts"
-      ],
-      "@zacatl/utils/optionals": [
-        "./src/utils/optionals.ts"
-      ]
+      "@zacatl/utils/command-runner/policy": ["./src/utils/command-runner/policy.ts"],
+      "@zacatl/utils/command-runner/runner": ["./src/utils/command-runner/runner.ts"],
+      "@zacatl/utils/command-runner/types": ["./src/utils/command-runner/types.ts"],
+      "@zacatl/utils/configuration": ["./src/utils/configuration.ts"],
+      "@zacatl/utils/configuration/json": ["./src/utils/configuration/json.ts"],
+      "@zacatl/utils/configuration/yml": ["./src/utils/configuration/yml.ts"],
+      "@zacatl/utils/encode-decode": ["./src/utils/encode-decode.ts"],
+      "@zacatl/utils/error-guards": ["./src/utils/error-guards.ts"],
+      "@zacatl/utils/hmac": ["./src/utils/hmac.ts"],
+      "@zacatl/utils/measure-execution-time": ["./src/utils/measure-execution-time.ts"],
+      "@zacatl/utils/optionals": ["./src/utils/optionals.ts"]
     }
   }
 }

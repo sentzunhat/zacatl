@@ -52,7 +52,7 @@ const fixtures: Fixture[] = [
     source: `
       import { DatabaseSync } from 'node:sqlite';
 
-      import { registerValue } from '@sentzunhat/zacatl/dependency-injection';
+      import { registerValue } from '@sentzunhat/zacatl/third-party/dependency-injection';
       import { DatabaseVendor } from '@sentzunhat/zacatl/service';
       import { createDatabaseToken } from '@sentzunhat/zacatl/service/layers/infrastructure/orm/tokens/factory';
       import { BaseRepository } from '@sentzunhat/zacatl/service/layers/infrastructure/repositories/nodesqlite/repository';

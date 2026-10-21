@@ -28,11 +28,14 @@ export class SequelizeAdapter implements DatabaseServerPort {
 
     await sequelize.authenticate();
 
+    // Retain the live instance before user setup can reject so the owning
+    // DatabaseServer can release it during failed startup cleanup.
+    this.sequelizeInstance = sequelize;
+
     if (onDatabaseConnected != null) {
       await onDatabaseConnected(sequelize);
     }
 
-    this.sequelizeInstance = sequelize;
     registerOrmInstance(DatabaseVendor.SEQUELIZE, connection, sequelize, container);
   }
 

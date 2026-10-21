@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-vi.mock('@zacatl/dependency-injection', () => ({
+vi.mock('@zacatl/third-party/dependency-injection', () => ({
   registerValue: vi.fn(),
   getContainer: (): { isRegistered: ReturnType<typeof vi.fn>; resolve: ReturnType<typeof vi.fn> } => ({
     isRegistered: vi.fn(),
@@ -8,7 +8,7 @@ vi.mock('@zacatl/dependency-injection', () => ({
   }),
 }));
 
-import { registerValue as mockRegisterValue } from '@zacatl/dependency-injection';
+import { registerValue as mockRegisterValue } from '@zacatl/third-party/dependency-injection';
 import { CustomError } from '@zacatl/error';
 
 import { SequelizeAdapter } from '../../../../../../src/service/platforms/server/database/adapters/sequelize';
@@ -19,9 +19,10 @@ import {
 } from '../../../../../../src/service/platforms/server/database/port';
 
 const makeSequelize = (
-  overrides: Partial<{ authenticate: () => Promise<void> }> = {},
+  overrides: Partial<{ authenticate: () => Promise<void>; close: () => Promise<void> }> = {},
 ): Record<string, unknown> => ({
   authenticate: vi.fn().mockResolvedValue(undefined),
+  close: vi.fn().mockResolvedValue(undefined),
   constructor: { name: 'Sequelize' },
   ...overrides,
 });
@@ -96,6 +97,22 @@ describe('SequelizeAdapter', () => {
 
       expect(onConnected).toHaveBeenCalledOnce();
       expect(onConnected).toHaveBeenCalledWith(fakeSequelize);
+    });
+
+    it('closes the authenticated instance when onDatabaseConnected rejects', async () => {
+      const close = vi.fn().mockResolvedValue(undefined);
+      const fakeSequelize = makeSequelize({ close });
+      const onConnected = vi.fn().mockRejectedValue(new Error('setup failed'));
+
+      await expect(adapter.connect('svc', {
+        vendor: DatabaseVendor.SEQUELIZE,
+        connection: { url: 'postgres://localhost/db' },
+        instance: fakeSequelize as DatabaseConfig['instance'],
+        onDatabaseConnected: onConnected,
+      } as DatabaseConfig)).rejects.toThrow('setup failed');
+
+      await adapter.disconnect();
+      expect(close).toHaveBeenCalledOnce();
     });
   });
 

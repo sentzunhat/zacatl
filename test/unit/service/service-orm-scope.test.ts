@@ -3,7 +3,7 @@ import { DatabaseSync } from 'node:sqlite';
 import fastify from 'fastify';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { getContainer } from '../../../src/dependency-injection/container';
+import { getContainer } from '../../../src/third-party/dependency-injection/container';
 import { createDatabaseToken } from '../../../src/service/layers/infrastructure/orm/tokens/factory';
 import { BaseRepository as MongooseRepository } from '../../../src/service/layers/infrastructure/repositories/mongoose/repository';
 import { BaseRepository } from '../../../src/service/layers/infrastructure/repositories/nodesqlite/repository';

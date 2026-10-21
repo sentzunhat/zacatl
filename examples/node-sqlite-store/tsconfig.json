@@ -15,7 +15,7 @@
     "baseUrl": ".",
     "paths": {
       "@sentzunhat/zacatl/*": ["../../build-src-esm/*"],
-      "@sentzunhat/zacatl/third-party": ["../../build-src-esm/third-party/index.d.ts"],
+      "@sentzunhat/zacatl/third-party": ["../../build-src-esm/third-party.d.ts"],
       "@sentzunhat/zacatl/third-party/*": ["../../build-src-esm/third-party/*"]
     }
   },

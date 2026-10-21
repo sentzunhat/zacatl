@@ -12,7 +12,7 @@
 | Functions  | `camelCase`        | `createLogger`, `resolveDependency`      |
 | Interfaces | `PascalCase`       | `ServerConfig`, `BadRequestErrorArgs`    |
 | Files      | `kebab-case`       | `get-route-handler.ts`, `user.test.ts`   |
-| Folders    | `kebab-case`       | `dependency-injection/`, `error-guards/` |
+| Folders    | `kebab-case`       | `third-party/dependency-injection/`, `error-guards/` |
 | Constants  | `UPPER_SNAKE_CASE` | `DATABASE_VENDOR`, `TIMEOUT_MS`          |
 
 ---
@@ -22,7 +22,9 @@
 ```
 src/
   ├── configuration/          # Config loading & validation
-  ├── dependency-injection/   # DI container wrappers
+  ├── third-party/            # Framework/library wrappers
+  │   ├── dependency-injection.ts # Public DI helper exports
+  │   └── dependency-injection/ # DI implementation
   ├── error/                  # Error classes
   ├── logs/                   # Logging abstractions
   ├── localization/           # i18n adapters
@@ -32,7 +34,6 @@ src/
   │   │   ├── domain/         # Business logic
   │   │   └── infrastructure/ # Repositories, adapters
   │   └── platforms/          # Server, CLI, Desktop setup
-  ├── third-party/            # Framework/library wrappers
   └── utils/                  # Utilities
 
 test/unit/                     # Tests mirroring src/

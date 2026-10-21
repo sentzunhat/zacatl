@@ -17,7 +17,7 @@ import {
   registerValue,
   registerDependencies,
   registerAndResolve,
-} from '@sentzunhat/zacatl/dependency-injection';
+} from '@sentzunhat/zacatl/third-party/dependency-injection';
 ```
 
 ## Registration Methods
@@ -32,7 +32,7 @@ calling `container.register(...)` directly so registration stays consistent and 
 **Pattern:**
 
 ```typescript
-import { registerDependency } from '@sentzunhat/zacatl/dependency-injection';
+import { registerDependency } from '@sentzunhat/zacatl/third-party/dependency-injection';
 
 registerDependency(MyService, MyService);
 ```
@@ -46,7 +46,7 @@ registerDependency(MyService, MyService);
 **Pattern:**
 
 ```typescript
-import { registerValue } from '@sentzunhat/zacatl/dependency-injection';
+import { registerValue } from '@sentzunhat/zacatl/third-party/dependency-injection';
 
 const repository = new MyRepository();
 registerValue(MyRepository, repository);
@@ -61,7 +61,7 @@ registerValue(MyRepository, repository);
 **Pattern:**
 
 ```typescript
-import { registerSingleton } from '@sentzunhat/zacatl/dependency-injection';
+import { registerSingleton } from '@sentzunhat/zacatl/third-party/dependency-injection';
 
 registerSingleton(GetAllHandler, GetAllHandler);
 registerSingleton(CreateHandler, CreateHandler);
@@ -74,7 +74,7 @@ registerSingleton(CreateHandler, CreateHandler);
 **Use for:** Batch registration/resolution in advanced setup.
 
 ```typescript
-import { registerDependencies, registerAndResolve } from '@sentzunhat/zacatl/dependency-injection';
+import { registerDependencies, registerAndResolve } from '@sentzunhat/zacatl/third-party/dependency-injection';
 
 registerDependencies([UserRepository, ProductRepository]);
 const services = registerAndResolve([UserService, ProductService]);
@@ -262,7 +262,7 @@ registerValue(MyRepositoryPort, repository);
 
 ```typescript
 import '@sentzunhat/zacatl/third-party/dependency-injection/reflect-metadata';
-import { container } from '@sentzunhat/zacatl/dependency-injection';
+import { container } from '@sentzunhat/zacatl/third-party/dependency-injection/tsyringe';
 
 // Infrastructure
 import { SequelizeGreetingRepository } from './infrastructure/repositories/greeting.repository';

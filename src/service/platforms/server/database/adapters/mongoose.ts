@@ -50,11 +50,13 @@ export class MongooseAdapter implements DatabaseServerPort {
       autoCreate: shouldAutoManageIndexes,
     });
 
+    // Retain the connected instance before user setup can reject.
+    this.mongooseInstance = mongoose;
+
     if (onDatabaseConnected != null) {
       await onDatabaseConnected(mongoose);
     }
 
-    this.mongooseInstance = mongoose;
     registerOrmInstance(DatabaseVendor.MONGOOSE, connection, mongoose, container);
   }
 

@@ -1,13 +1,9 @@
 import type { Express } from 'express';
 import type { FastifyInstance } from 'fastify';
 
-import {
-  createChildContainer,
-  getContainer,
-  registerValue,
-} from '@zacatl/dependency-injection/container';
 import { CustomError, InternalServerError } from '@zacatl/error';
 import { logger as defaultLogger, LoggerToken, type Logger } from '@zacatl/logs';
+import { getContainer, registerValue } from '@zacatl/third-party/dependency-injection';
 import {
   inject,
   injectable,
@@ -34,9 +30,11 @@ import {
   DatabaseServiceNameToken,
   PageServerAdapterToken,
   PageServerConfigToken,
+  PageServerResolutionContainerToken,
   ServerConfigToken,
 } from './tokens';
 import { ServerVendor, type HttpServerConfig, type PageServerConfig } from './types/server-config';
+import { createChildContainer } from '../../../third-party/dependency-injection/container';
 import { ApplicationContainerToken } from '../../layers/application/tokens';
 import type { RestApplicationEntryPoints } from '../../layers/application/types';
 import { InfrastructureContainerToken } from '../../layers/infrastructure/tokens';
@@ -195,6 +193,7 @@ export class Server {
     const pageServerContainer = createChildContainer(applicationContainer);
     registerValue(PageServerConfigToken, this.config, pageServerContainer);
     registerValue(PageServerAdapterToken, this.pageAdapter, pageServerContainer);
+    registerValue(PageServerResolutionContainerToken, handlerContainer, pageServerContainer);
     this.pageServer = pageServerContainer.resolve(PageServer);
 
     if (this.config.databases.length > 0) {
@@ -234,8 +233,25 @@ export class Server {
    * Stop the server: close HTTP connections and disconnect all databases.
    */
   public async stop(): Promise<void> {
-    await this.apiServer?.close();
-    await this.databaseServer?.disconnect();
+    let shutdownError: unknown;
+    let hasShutdownError = false;
+    try {
+      await this.apiServer?.close();
+    } catch (error) {
+      shutdownError = error;
+      hasShutdownError = true;
+    }
+    try {
+      await this.databaseServer?.disconnect();
+    } catch (error) {
+      if (!hasShutdownError) {
+        shutdownError = error;
+        hasShutdownError = true;
+      }
+    }
+    if (hasShutdownError) {
+      throw shutdownError;
+    }
   }
 
   /**

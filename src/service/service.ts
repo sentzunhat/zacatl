@@ -1,17 +1,14 @@
 import { InternalServerError } from '@zacatl/error';
-import { configureI18nNode } from '@zacatl/localization';
 import { logger as defaultLogger, LoggerToken } from '@zacatl/logs';
+import { getContainer, registerValue } from '@zacatl/third-party/dependency-injection';
+import { configureI18nNode } from '@zacatl/third-party/localization';
 
 import { ApplicationContainerToken } from './layers/application/tokens';
 import { DomainContainerToken } from './layers/domain/tokens';
 import { MongooseIndexManager } from './layers/infrastructure/orm/mongoose/index-manager';
 import { InfrastructureContainerToken } from './layers/infrastructure/tokens';
 import { PlatformsConfigToken } from './platforms/tokens';
-import {
-  createChildContainer,
-  getContainer,
-  registerValue,
-} from '../dependency-injection/container';
+import { createChildContainer } from '../third-party/dependency-injection/container';
 import type { DependencyContainer } from '../third-party/dependency-injection/tsyringe';
 import {
   MongooseIndexRegistry,
@@ -81,11 +78,15 @@ export class Service {
   ): void {
     if (config.layers != null) {
       registerValue(LayersConfigToken, config.layers, container);
-      registerValue(LayerContainerScopesToken, {
-        infrastructure: scopes.infrastructure,
-        domain: scopes.domain,
-        application: scopes.application,
-      }, container);
+      registerValue(
+        LayerContainerScopesToken,
+        {
+          infrastructure: scopes.infrastructure,
+          domain: scopes.domain,
+          application: scopes.application,
+        },
+        container,
+      );
     }
 
     if (config.platforms != null) {
@@ -117,7 +118,12 @@ export class Service {
     // repositories can resolve them in their constructors via the DI container.
     if (platforms?.server?.databases != null) {
       for (const dbConfig of platforms.server.databases) {
-        registerOrmInstance(dbConfig.vendor, dbConfig.connection, dbConfig.instance, scopes.infrastructure);
+        registerOrmInstance(
+          dbConfig.vendor,
+          dbConfig.connection,
+          dbConfig.instance,
+          scopes.infrastructure,
+        );
         if (dbConfig.vendor === DatabaseVendor.MONGOOSE) {
           this.mongooseIndexRegistry.registerOptions(dbConfig.connection.name, dbConfig.indexes);
         }

@@ -91,3 +91,12 @@ Plan files (when they exist) live under `.hawp/work/closed/YYYY/MM/DD/`.
 | `STAB-021` | `breaking`    | Path-based naming alignment for repositories and providers (BaseRepository, createApiAdapter/createPageAdapter)          | 2026-07-08 | `2026/07/08/STAB-021.md`                          |
 | `STAB-020` | `improvement` | Optimize Docker images with alpine runtime and Node 26                                                                   | 2026-07-06 | `2026/07/06/STAB-020.md`                          |
 | `STAB-018` | `improvement` | Remove dead duplicate server adapters and share prefix normalization                                                     | 2026-07-03 | `2026/07/03/STAB-018.md`                          |
+
+
+## Archived 2026-10-21
+
+| ID | Type | Title | Closed | Plan |
+| --- | --- | --- | --- | --- |
+| `72f2e6b9-a0fd-4abb-8151-c3b061b83281` | `bug` | node:sqlite without `sqlite3`, barrel polyfill fix, Fastify double-send fix, production audit fixes (legacy `RUNTIME-FIX-001`) — released in 0.0.62 | 2026-10-01 | [plan](2026/10/01/72f2e6b9-a0fd-4abb-8151-c3b061b83281/plan.md) |
+| `0.0.60` | `release` | 0.0.60 — CI orchestrator, Docker smoke matrix, DI child containers, README; released | 2026-09-29 | [plan](2026/09/29/0.0.60-release.md) |
+| `5c2c9ef3` | `refactoring` | P2: DI layered child containers (infra→domain→app) — shipped in 0.0.60 | 2026-09-29 | [closed/2026/09/29/5c2c9ef3-1a6e-469f-9c25-f644b5e3d635.md](2026/09/29/5c2c9ef3-1a6e-469f-9c25-f644b5e3d635.md) |

@@ -138,3 +138,4 @@ examples/*/data/
 
 # HAWP CLI: platform-specific binary installed by the HAWP update script
 .hawp/bin/
+.hawp/db/

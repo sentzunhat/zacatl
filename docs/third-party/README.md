@@ -53,28 +53,39 @@ import { Service } from '@sentzunhat/zacatl'; // root export removed in 0.0.56
 ## Package Structure
 
 ```
-src/third-party/
-├── index.ts                  # tsyringe + zod + uuid re-exports (no ORM barrels)
-├── databases/
-│   ├── mongoose.ts           # Mongoose re-export (subpath only)
-│   ├── sequelize.ts          # Sequelize re-export (subpath only)
-│   ├── sqlite3.ts            # sqlite3 re-export (subpath only)
-│   └── nodesqlite.ts         # node:sqlite helper (subpath only)
-├── dependency-injection/
-│   ├── tsyringe.ts           # DI container re-export
-│   └── reflect-metadata.ts   # reflect-metadata side-effect import
-├── eslint.ts                 # ESLint plugins re-export (subpath only)
-├── express.ts                # Express re-export (subpath only)
-├── fastify.ts                # Fastify + ZodTypeProvider
-├── http-proxy-middleware.ts  # HTTP proxy re-export (subpath only; optional peer)
-├── i18n.ts                   # i18n re-export (subpath only)
-├── js-yaml.ts                # YAML parser re-export (subpath only)
-├── pino.ts                   # Pino logger re-export (subpath only)
-├── uuid.ts                   # UUID utilities re-export (subpath only)
-└── zod.ts                    # Validation re-export (subpath only)
+src/
+├── third-party.ts                 # shared third-party barrel; package path /third-party
+└── third-party/
+    ├── databases/
+    │   ├── mongoose.ts            # Mongoose re-export (leaf subpath only)
+    │   ├── sequelize.ts           # Sequelize re-export (leaf subpath only)
+    │   ├── sqlite3.ts             # sqlite3 re-export (leaf subpath only)
+    │   └── nodesqlite.ts          # node:sqlite helper (leaf subpath only)
+    ├── dependency-injection.ts    # narrow DI facade; package path /third-party/dependency-injection
+    ├── dependency-injection/
+    │   ├── container.ts          # Zacatl DI implementation (not a package deep export)
+    │   ├── tsyringe.ts            # DI container re-export
+    │   └── reflect-metadata.ts    # reflect-metadata side-effect import
+    ├── eslint.ts                  # ESLint plugins re-export (subpath only)
+    ├── express.ts                 # Express re-export (subpath only)
+    ├── fastify.ts                 # Fastify + ZodTypeProvider
+    ├── http-proxy-middleware.ts   # HTTP proxy re-export (optional peer)
+    ├── i18n.ts                    # i18n re-export (subpath only)
+    ├── js-yaml.ts                 # YAML parser re-export (subpath only)
+    ├── pino.ts                    # Pino logger re-export (subpath only)
+    ├── uuid.ts                    # UUID utilities re-export (subpath only)
+    └── zod.ts                     # Validation re-export (subpath only)
 ```
 
-> ORM and DI modules live under nested folders. Flat shims (`third-party/mongoose`, `third-party/tsyringe`, …) are not published.
+The folder names alone do not create import paths. The source-path generator maps
+individual `.ts` files and directories with `index.ts`; the package export
+synchronizer publishes allowed module files. `databases/` has no folder barrel,
+so consumers import only the adapter they installed. This prevents a folder
+import from eagerly loading every optional ORM. DI keeps the stable
+`/third-party/dependency-injection` facade while its implementation remains private to the
+package entry; the tsyringe and reflect-metadata wrappers keep their explicit
+third-party subpaths. Flat shims (`third-party/mongoose`, `third-party/tsyringe`,
+…) are not published.
 
 ## Version Compatibility
 

@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
+import { createChildContainer, getContainer, registerValue } from '../../../../../../src/third-party/dependency-injection/container';
 import type { ServerConfig } from '../../../../../../src/service/platforms/server/server';
 import { PageServer } from '../../../../../../src/service/platforms/server/page/page-server';
 import type {
@@ -7,6 +8,7 @@ import type {
   StaticConfig,
 } from '../../../../../../src/service/platforms/server/page/port';
 import {
+  type PageRegistrationContext,
   ServerType,
   ServerVendor,
 } from '../../../../../../src/service/platforms/server/types/server-config';
@@ -53,11 +55,23 @@ describe('PageServer', () => {
     });
 
     it('should use configured prefixes for SPA fallback guard', async () => {
-      pageServer = new PageServer(makeConfig({ staticDir: './dist', prefixes: { api: '/v1' } }), adapter);
+      const config = makeConfig({ staticDir: './dist', prefixes: { api: '/v1' } });
+      config.server.prefixes = { api: '/api' };
+      pageServer = new PageServer(config, adapter);
 
       await pageServer.configure();
 
       expect(adapter.registerSpaFallback).toHaveBeenCalledWith({ api: '/v1' }, './dist');
+    });
+
+    it('inherits the Server API prefix for SPA fallback unless page prefixes override it', async () => {
+      const config = makeConfig({ staticDir: './dist' });
+      config.server.prefixes = { api: 'v1/' };
+      pageServer = new PageServer(config, adapter);
+
+      await pageServer.configure();
+
+      expect(adapter.registerSpaFallback).toHaveBeenCalledWith({ api: 'v1/' }, './dist');
     });
 
     it('should NOT pass prefixes as static file URL prefix', async () => {
@@ -94,13 +108,28 @@ describe('PageServer', () => {
       expect(adapter.registerSpaFallback).not.toHaveBeenCalled();
     });
 
-    it('should invoke customRegister with the adapter', async () => {
-      const customRegister = vi.fn().mockResolvedValue(undefined);
-      pageServer = new PageServer(makeConfig({ staticDir: './dist', customRegister }), adapter);
+    it('passes a scoped registration context that recognizes the configured API prefix', async () => {
+      let isApiRequest: PageRegistrationContext['isApiRequest'] | undefined;
+      const customRegister = vi.fn(({ isApiRequest: matchesApi }: PageRegistrationContext) => {
+        isApiRequest = matchesApi;
+      });
+      const config = makeConfig({ staticDir: './dist', customRegister });
+      config.server.prefixes = { api: 'v1/' };
+      pageServer = new PageServer(config, adapter);
 
       await pageServer.configure();
 
-      expect(customRegister).toHaveBeenCalledWith(adapter, { native: true });
+      expect(customRegister).toHaveBeenCalledWith({
+        adapter,
+        rawServer: { native: true },
+        isApiRequest: expect.any(Function),
+        resolve: expect.any(Function),
+      });
+      expect(isApiRequest?.('/v1')).toBe(true);
+      expect(isApiRequest?.('/v1/missing')).toBe(true);
+      expect(isApiRequest?.('/v1?source=page')).toBe(true);
+      expect(isApiRequest?.('/v10/missing')).toBe(false);
+      expect(isApiRequest?.('/api/missing')).toBe(false);
     });
 
     it('should invoke customRegister even when staticDir is absent', async () => {
@@ -109,7 +138,27 @@ describe('PageServer', () => {
 
       await pageServer.configure();
 
-      expect(customRegister).toHaveBeenCalledWith(adapter, { native: true });
+      expect(customRegister).toHaveBeenCalledWith({
+        adapter,
+        rawServer: { native: true },
+        isApiRequest: expect.any(Function),
+        resolve: expect.any(Function),
+      });
+      const context = customRegister.mock.calls[0]?.[0] as PageRegistrationContext;
+      expect(context.isApiRequest('/api/missing')).toBe(false);
+    });
+
+    it('resolves custom registration dependencies from the supplied scope', async () => {
+      const token = Symbol('page-provider');
+      let resolved: unknown;
+      const customRegister = vi.fn(({ resolve }) => { resolved = resolve(token); });
+      const parentContainer = createChildContainer(getContainer());
+      registerValue(token, 'service-owned', parentContainer);
+      pageServer = new PageServer(makeConfig({ customRegister }), adapter, parentContainer);
+
+      await pageServer.configure();
+
+      expect(resolved).toBe('service-owned');
     });
 
     it('supports adapters without optional raw-server access', async () => {
@@ -122,7 +171,12 @@ describe('PageServer', () => {
       pageServer = new PageServer(makeConfig({ customRegister }), adapterWithoutRawServer);
 
       await expect(pageServer.configure()).resolves.toBeUndefined();
-      expect(customRegister).toHaveBeenCalledWith(adapterWithoutRawServer, undefined);
+      expect(customRegister).toHaveBeenCalledWith({
+        adapter: adapterWithoutRawServer,
+        rawServer: undefined,
+        isApiRequest: expect.any(Function),
+        resolve: expect.any(Function),
+      });
     });
   });
 

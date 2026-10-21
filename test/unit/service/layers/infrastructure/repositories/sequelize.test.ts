@@ -10,7 +10,7 @@ import {
 } from '@zacatl/third-party/databases/sequelize';
 import { singleton } from '@zacatl/third-party/dependency-injection/tsyringe';
 
-import { clearContainer, getContainer } from '../../../../../../src/dependency-injection/container';
+import { clearContainer, getContainer } from '../../../../../../src/third-party/dependency-injection/container';
 import { BaseRepository } from '../../../../../../src/service/layers/infrastructure/repositories/sequelize/repository';
 import { ORMType } from '../../../../../../src/service/layers/infrastructure/repositories/types';
 

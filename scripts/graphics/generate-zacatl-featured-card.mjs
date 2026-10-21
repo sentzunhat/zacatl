@@ -1,0 +1,74 @@
+import { mkdir, writeFile } from 'node:fs/promises'
+import { dirname, resolve } from 'node:path'
+import { fileURLToPath } from 'node:url'
+
+const scriptDirectory = dirname(fileURLToPath(import.meta.url))
+const outputPath = resolve(
+  scriptDirectory,
+  '../../.hawp/work/active/a7728e13-5fd4-42bb-ab62-28693f428172/zacatl-featured-card.svg',
+)
+
+// Based on the "Code" handcraft from https://handcrafts.undraw.co/app
+// (Designer Lines, color customized). The site's license permits commercial
+// use and modification without attribution: https://handcrafts.undraw.co/license
+const codeDoodle = `
+  <g fill="#f7f2e9">
+    <path d="M11.95807 9.16698C8.2108 13.20157 4.46352 17.23615.71625 21.27074c-1.37202 1.47722-.64613 3.49155 1.10317 4.17846 4.62035 1.81431 8.79785 4.64518 12.28856 8.16049 2.27051 2.28651 5.80634-1.24872 3.53553-3.53553-4.12829-4.15739-9.05087-7.30861-14.49489-9.44635l1.10317 4.17846c3.74727-4.03459 7.49455-8.06917 11.24182-12.10376 2.18766-2.35539-1.34005-5.89935-3.53553-3.53553zm30.31089 3.53553c3.74727 4.03459 7.49455 8.06917 11.24182 12.10376.36772-1.39282.73545-2.78564 1.10317-4.17846-5.44399 2.13773-10.36664 5.289-14.49489 9.44635-2.26983 2.28583 1.26405 5.82303 3.53553 3.53553 3.49076-3.51537 7.66813-6.34615 12.28856-8.16049 1.7493-.68691 2.47519-2.70124 1.10317-4.17846-3.74727-4.03459-7.49455-8.06917-11.24182-12.10376-2.19454-2.3628-5.72413 1.17913-3.53553 3.53553zM24.69051 40.9371c4.91551-12.58945 9.83102-25.17889 14.74653-37.76834.49121-1.25808-.54011-2.74392-1.7461-3.0753-1.41591-.38905-2.58229.48342-3.0753 1.7461-4.91551 12.58945-9.83102 25.17889-14.74653 37.76834-.49121 1.25808.54011 2.74392 1.7461 3.0753 1.41591.38168 2.61472-.47158 3.0753-1.7461z"/>
+  </g>`
+
+const svg = `<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" role="img" aria-labelledby="title description">
+  <title id="title">Zacatl: compose services with clear boundaries</title>
+  <desc id="description">A minimal editorial card showing a hand-drawn code mark inside a terminal window, with taller grass growing from a shallow, green-edged soil layer beneath it and labels for Zacatl's Application, Domain, and Infrastructure layers.</desc>
+  <rect width="1200" height="630" rx="30" fill="#f7f2e9"/>
+  <path d="M72 72c118-13 235-9 347 1m-344 18c77-7 151-4 217 2" fill="none" stroke="#ddcbb6" stroke-width="3" stroke-linecap="round"/>
+  <text x="82" y="223" fill="#17324d" font-family="Georgia,serif" font-size="100" font-weight="700" letter-spacing="-3">Zacatl</text>
+  <path d="M84 245c155 8 296-5 450 0" fill="none" stroke="#b75d4a" stroke-width="5" stroke-linecap="round"/>
+  <text x="86" y="298" fill="#43576a" font-family="Arial,sans-serif" font-size="28">Compose modular services.</text>
+  <text x="86" y="338" fill="#43576a" font-family="Arial,sans-serif" font-size="28">Keep boundaries clear.</text>
+
+  <g transform="rotate(1.5 880 272)">
+    <rect x="696" y="123" width="368" height="282" rx="27" fill="#17324d"/>
+    <path d="M697 163c103 4 221-4 366 1" fill="none" stroke="#547080" stroke-width="3" stroke-linecap="round"/>
+    <circle cx="727" cy="144" r="6" fill="#e9a17d"/>
+    <circle cx="749" cy="144" r="6" fill="#e2c477"/>
+    <circle cx="771" cy="144" r="6" fill="#91b98e"/>
+    <text x="808" y="150" fill="#cbd6d4" font-family="Arial,sans-serif" font-size="14">~/zacatl</text>
+    <text x="726" y="207" fill="#e9a17d" font-family="monospace" font-size="24" font-weight="700">&gt;_</text>
+    <g transform="translate(817 198) scale(2.8)">${codeDoodle}
+    </g>
+    <path d="M724 354c73 10 170 9 307-2" fill="none" stroke="#547080" stroke-width="3" stroke-linecap="round"/>
+  </g>
+
+  <path d="M658 410c42-11 74-10 108-5 37 6 63 3 93-2 38-7 69 10 106 4 38-7 70-10 105-2 17 4 29 3 41-2l-5 48c-145 7-300 6-430-1z" fill="#9a6348"/>
+  <path d="M658 410c42-11 74-10 108-5 37 6 63 3 93-2 38-7 69 10 106 4 38-7 70-10 105-2 17 4 29 3 41-2" fill="none" stroke="#456b4a" stroke-width="7" stroke-linecap="round"/>
+  <path d="M658 410c42-11 74-10 108-5 37 6 63 3 93-2 38-7 69 10 106 4 38-7 70-10 105-2 17 4 29 3 41-2" fill="none" stroke="#7b9a62" stroke-width="3" stroke-linecap="round"/>
+  <path d="M677 432c59-5 105 7 168 2 60-4 95 5 159 1m-247 13c45-3 77 3 117 0m69 2c32-2 57-1 88 1" fill="none" stroke="#c08a61" stroke-width="2.5" stroke-linecap="round" opacity=".82"/>
+  <g fill="#684634" opacity=".72"><circle cx="755" cy="443" r="2.2"/><circle cx="838" cy="451" r="1.8"/><circle cx="960" cy="442" r="2.2"/><circle cx="1046" cy="451" r="1.8"/></g>
+  <g fill="none" stroke="#456b4a" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M680 411c-2-27-10-46-20-66m20 66c4-34 12-59 29-82m-24 80c-7-18-16-30-27-39m49 40c7-24 15-41 29-56"/>
+    <path d="M1074 411c-1-31-9-55-20-77m20 77c4-38 14-65 31-91m-17 87c7-24 18-43 33-57m-50 57c-9-19-17-31-28-42"/>
+    <path d="M695 413c-1-18-4-30-10-43m372 45c-2-18-6-31-12-45"/>
+  </g>
+  <g fill="#c08a61" stroke="#816044" stroke-width="1.2">
+    <ellipse cx="660" cy="343" rx="3" ry="6" transform="rotate(-35 660 343)"/><ellipse cx="656" cy="350" rx="3" ry="6" transform="rotate(-35 656 350)"/>
+    <ellipse cx="688" cy="334" rx="3" ry="6" transform="rotate(28 688 334)"/><ellipse cx="693" cy="341" rx="3" ry="6" transform="rotate(28 693 341)"/>
+    <ellipse cx="1105" cy="327" rx="3" ry="6" transform="rotate(35 1105 327)"/><ellipse cx="1110" cy="334" rx="3" ry="6" transform="rotate(35 1110 334)"/>
+    <ellipse cx="1057" cy="339" rx="3" ry="6" transform="rotate(-28 1057 339)"/><ellipse cx="1052" cy="347" rx="3" ry="6" transform="rotate(-28 1052 347)"/>
+  </g>
+
+  <g font-family="Arial,sans-serif" font-size="18" font-weight="700" text-anchor="middle">
+    <g transform="rotate(-2 203 440)"><rect x="84" y="399" width="238" height="60" rx="18" fill="#fffaf2" stroke="#b75d4a" stroke-width="3"/><text x="203" y="437" fill="#17324d">Application</text></g>
+    <g transform="rotate(1.5 438 440)"><rect x="320" y="399" width="238" height="60" rx="18" fill="#fffaf2" stroke="#66538b" stroke-width="3"/><text x="439" y="437" fill="#17324d">Domain</text></g>
+    <g transform="rotate(-1 582 520)"><rect x="84" y="482" width="474" height="60" rx="18" fill="#fffaf2" stroke="#367d79" stroke-width="3"/><text x="321" y="520" fill="#17324d">Infrastructure</text></g>
+  </g>
+
+  <path d="M746 526c103 9 195 7 302-3" fill="none" stroke="#ddcbb6" stroke-width="3" stroke-linecap="round"/>
+  <text x="746" y="566" fill="#586c7d" font-family="Arial,sans-serif" font-size="17">A framework for modular services</text>
+  <text x="84" y="594" fill="#586c7d" font-family="Arial,sans-serif" font-size="15">Private concept draft · not a release asset</text>
+</svg>
+`
+
+await mkdir(dirname(outputPath), { recursive: true })
+await writeFile(outputPath, svg, 'utf8')
+console.log(`Generated ${outputPath}`)

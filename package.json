@@ -1,7 +1,7 @@
 {
   "name": "@sentzunhat/zacatl",
   "type": "module",
-  "version": "0.0.65",
+  "version": "0.0.66",
   "packageManager": "npm@12.0.0",
   "repository": {
     "type": "git",
@@ -110,8 +110,8 @@
     "publish:ci:verify": "npm run prepublish:guard && npm run clean:src && npm run test && npm run type:check && npm run lint:silent && npm run build && npm run prepare-publish && npm run check:optional-peers && npm run smoke:consumers",
     "publish:ci": "npm run publish:ci:verify && npm publish ./publish --access public --tag latest --provenance",
     "update:readme-coverage": "npx tsx scripts/dev/update-coverage-readme.ts",
-    "postbuild:esm": "mkdir -p build-src-esm/eslint && cp -R src/eslint/* build-src-esm/eslint/ || true && mkdir -p build-src-esm/localization/locales && cp -R src/localization/locales/* build-src-esm/localization/locales/ || true",
-    "postbuild:cjs": "mkdir -p build-src-cjs/eslint && cp -R src/eslint/* build-src-cjs/eslint/ || true && mkdir -p build-src-cjs/localization/locales && cp -R src/localization/locales/* build-src-cjs/localization/locales/ || true",
+    "postbuild:esm": "node scripts/build/copy-runtime-assets.mjs esm",
+    "postbuild:cjs": "node scripts/build/copy-runtime-assets.mjs cjs",
     "postbuild": "npm run parallel -- \"npm run postbuild:esm,npm run postbuild:cjs\" && npm run local:exports && npm run prune:barrels",
     "format": "prettier --write .",
     "setup:hooks": "npx tsx scripts/hooks/setup-git-hooks.ts",
@@ -139,7 +139,7 @@
     "@typescript-eslint/eslint-plugin": "^8.71.2",
     "@typescript-eslint/parser": "^8.71.2",
     "@vitejs/plugin-react": "^6.1.2",
-    "@vitest/coverage-istanbul": "^4.1.11",
+    "@vitest/coverage-istanbul": "^4.1.12",
     "eslint": "^9.39.4",
     "eslint-import-resolver-typescript": "^4.4.5",
     "eslint-plugin-import": "^2.32.0",
@@ -162,7 +162,7 @@
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.71.2",
     "vite": "^8.3.4",
-    "vitest": "^4.1.11"
+    "vitest": "^4.1.12"
   },
   "license": "Apache-2.0",
   "dependencies": {
@@ -210,31 +210,6 @@
     }
   },
   "exports": {
-    "./configuration": {
-      "types": "./build-src-esm/configuration.d.ts",
-      "import": "./build-src-esm/configuration.js",
-      "require": "./build-src-cjs/configuration.js"
-    },
-    "./configuration/json": {
-      "types": "./build-src-esm/configuration/json.d.ts",
-      "import": "./build-src-esm/configuration/json.js",
-      "require": "./build-src-cjs/configuration/json.js"
-    },
-    "./configuration/yml": {
-      "types": "./build-src-esm/configuration/yml.d.ts",
-      "import": "./build-src-esm/configuration/yml.js",
-      "require": "./build-src-cjs/configuration/yml.js"
-    },
-    "./dependency-injection": {
-      "types": "./build-src-esm/dependency-injection.d.ts",
-      "import": "./build-src-esm/dependency-injection.js",
-      "require": "./build-src-cjs/dependency-injection.js"
-    },
-    "./dependency-injection/container": {
-      "types": "./build-src-esm/dependency-injection/container.d.ts",
-      "import": "./build-src-esm/dependency-injection/container.js",
-      "require": "./build-src-cjs/dependency-injection/container.js"
-    },
     "./error": {
       "types": "./build-src-esm/error.d.ts",
       "import": "./build-src-esm/error.js",
@@ -279,64 +254,6 @@
       "types": "./build-src-esm/error/validation.d.ts",
       "import": "./build-src-esm/error/validation.js",
       "require": "./build-src-cjs/error/validation.js"
-    },
-    "./eslint": {
-      "import": "./build-src-esm/eslint/index.mjs"
-    },
-    "./eslint/base": {
-      "import": "./build-src-esm/eslint/base.mjs"
-    },
-    "./eslint/best-practices": {
-      "import": "./build-src-esm/eslint/best-practices.mjs"
-    },
-    "./eslint/file-naming": {
-      "import": "./build-src-esm/eslint/file-naming.mjs"
-    },
-    "./eslint/imports": {
-      "import": "./build-src-esm/eslint/imports.mjs"
-    },
-    "./eslint/naming-conventions": {
-      "import": "./build-src-esm/eslint/naming-conventions.mjs"
-    },
-    "./eslint/scripts": {
-      "import": "./build-src-esm/eslint/scripts.mjs"
-    },
-    "./eslint/solid": {
-      "import": "./build-src-esm/eslint/solid.mjs"
-    },
-    "./eslint/strict": {
-      "import": "./build-src-esm/eslint/strict.mjs"
-    },
-    "./eslint/tests": {
-      "import": "./build-src-esm/eslint/tests.mjs"
-    },
-    "./eslint/type-safety": {
-      "import": "./build-src-esm/eslint/type-safety.mjs"
-    },
-    "./localization": {
-      "types": "./build-src-esm/localization.d.ts",
-      "import": "./build-src-esm/localization.js",
-      "require": "./build-src-cjs/localization.js"
-    },
-    "./localization/i18n-node": {
-      "types": "./build-src-esm/localization/i18n-node.d.ts",
-      "import": "./build-src-esm/localization/i18n-node.js",
-      "require": "./build-src-cjs/localization/i18n-node.js"
-    },
-    "./localization/node/core": {
-      "types": "./build-src-esm/localization/node/core.d.ts",
-      "import": "./build-src-esm/localization/node/core.js",
-      "require": "./build-src-cjs/localization/node/core.js"
-    },
-    "./localization/node/helpers": {
-      "types": "./build-src-esm/localization/node/helpers.d.ts",
-      "import": "./build-src-esm/localization/node/helpers.js",
-      "require": "./build-src-cjs/localization/node/helpers.js"
-    },
-    "./localization/node/types": {
-      "types": "./build-src-esm/localization/node/types.d.ts",
-      "import": "./build-src-esm/localization/node/types.js",
-      "require": "./build-src-cjs/localization/node/types.js"
     },
     "./logs": {
       "types": "./build-src-esm/logs.d.ts",
@@ -764,6 +681,11 @@
       "import": "./build-src-esm/service/platforms/server/database/adapters/sqlite.js",
       "require": "./build-src-cjs/service/platforms/server/database/adapters/sqlite.js"
     },
+    "./service/platforms/server/database/connection-name": {
+      "types": "./build-src-esm/service/platforms/server/database/connection-name.d.ts",
+      "import": "./build-src-esm/service/platforms/server/database/connection-name.js",
+      "require": "./build-src-cjs/service/platforms/server/database/connection-name.js"
+    },
     "./service/platforms/server/database/database-server": {
       "types": "./build-src-esm/service/platforms/server/database/database-server.d.ts",
       "import": "./build-src-esm/service/platforms/server/database/database-server.js",
@@ -889,6 +811,11 @@
       "import": "./build-src-esm/third-party/databases/sqlite3.js",
       "require": "./build-src-cjs/third-party/databases/sqlite3.js"
     },
+    "./third-party/dependency-injection": {
+      "types": "./build-src-esm/third-party/dependency-injection.d.ts",
+      "import": "./build-src-esm/third-party/dependency-injection.js",
+      "require": "./build-src-cjs/third-party/dependency-injection.js"
+    },
     "./third-party/dependency-injection/reflect-metadata": {
       "types": "./build-src-esm/third-party/dependency-injection/reflect-metadata.d.ts",
       "import": "./build-src-esm/third-party/dependency-injection/reflect-metadata.js",
@@ -900,9 +827,42 @@
       "require": "./build-src-cjs/third-party/dependency-injection/tsyringe.js"
     },
     "./third-party/eslint": {
-      "types": "./build-src-esm/third-party/eslint.d.ts",
-      "import": "./build-src-esm/third-party/eslint.js",
-      "require": "./build-src-cjs/third-party/eslint.js"
+      "import": "./build-src-esm/third-party/eslint/index.mjs"
+    },
+    "./third-party/eslint-plugins": {
+      "types": "./build-src-esm/third-party/eslint-plugins.d.ts",
+      "import": "./build-src-esm/third-party/eslint-plugins.js",
+      "require": "./build-src-cjs/third-party/eslint-plugins.js"
+    },
+    "./third-party/eslint/base": {
+      "import": "./build-src-esm/third-party/eslint/base.mjs"
+    },
+    "./third-party/eslint/best-practices": {
+      "import": "./build-src-esm/third-party/eslint/best-practices.mjs"
+    },
+    "./third-party/eslint/file-naming": {
+      "import": "./build-src-esm/third-party/eslint/file-naming.mjs"
+    },
+    "./third-party/eslint/imports": {
+      "import": "./build-src-esm/third-party/eslint/imports.mjs"
+    },
+    "./third-party/eslint/naming-conventions": {
+      "import": "./build-src-esm/third-party/eslint/naming-conventions.mjs"
+    },
+    "./third-party/eslint/scripts": {
+      "import": "./build-src-esm/third-party/eslint/scripts.mjs"
+    },
+    "./third-party/eslint/solid": {
+      "import": "./build-src-esm/third-party/eslint/solid.mjs"
+    },
+    "./third-party/eslint/strict": {
+      "import": "./build-src-esm/third-party/eslint/strict.mjs"
+    },
+    "./third-party/eslint/tests": {
+      "import": "./build-src-esm/third-party/eslint/tests.mjs"
+    },
+    "./third-party/eslint/type-safety": {
+      "import": "./build-src-esm/third-party/eslint/type-safety.mjs"
     },
     "./third-party/express": {
       "types": "./build-src-esm/third-party/express.d.ts",
@@ -928,6 +888,31 @@
       "types": "./build-src-esm/third-party/js-yaml.d.ts",
       "import": "./build-src-esm/third-party/js-yaml.js",
       "require": "./build-src-cjs/third-party/js-yaml.js"
+    },
+    "./third-party/localization": {
+      "types": "./build-src-esm/third-party/localization.d.ts",
+      "import": "./build-src-esm/third-party/localization.js",
+      "require": "./build-src-cjs/third-party/localization.js"
+    },
+    "./third-party/localization/i18n-node": {
+      "types": "./build-src-esm/third-party/localization/i18n-node.d.ts",
+      "import": "./build-src-esm/third-party/localization/i18n-node.js",
+      "require": "./build-src-cjs/third-party/localization/i18n-node.js"
+    },
+    "./third-party/localization/node/core": {
+      "types": "./build-src-esm/third-party/localization/node/core.d.ts",
+      "import": "./build-src-esm/third-party/localization/node/core.js",
+      "require": "./build-src-cjs/third-party/localization/node/core.js"
+    },
+    "./third-party/localization/node/helpers": {
+      "types": "./build-src-esm/third-party/localization/node/helpers.d.ts",
+      "import": "./build-src-esm/third-party/localization/node/helpers.js",
+      "require": "./build-src-cjs/third-party/localization/node/helpers.js"
+    },
+    "./third-party/localization/node/types": {
+      "types": "./build-src-esm/third-party/localization/node/types.d.ts",
+      "import": "./build-src-esm/third-party/localization/node/types.js",
+      "require": "./build-src-cjs/third-party/localization/node/types.js"
     },
     "./third-party/pino": {
       "types": "./build-src-esm/third-party/pino.d.ts",
@@ -968,6 +953,21 @@
       "types": "./build-src-esm/utils/command-runner/types.d.ts",
       "import": "./build-src-esm/utils/command-runner/types.js",
       "require": "./build-src-cjs/utils/command-runner/types.js"
+    },
+    "./utils/configuration": {
+      "types": "./build-src-esm/utils/configuration.d.ts",
+      "import": "./build-src-esm/utils/configuration.js",
+      "require": "./build-src-cjs/utils/configuration.js"
+    },
+    "./utils/configuration/json": {
+      "types": "./build-src-esm/utils/configuration/json.d.ts",
+      "import": "./build-src-esm/utils/configuration/json.js",
+      "require": "./build-src-cjs/utils/configuration/json.js"
+    },
+    "./utils/configuration/yml": {
+      "types": "./build-src-esm/utils/configuration/yml.d.ts",
+      "import": "./build-src-esm/utils/configuration/yml.js",
+      "require": "./build-src-cjs/utils/configuration/yml.js"
     },
     "./utils/encode-decode": {
       "types": "./build-src-esm/utils/encode-decode.d.ts",

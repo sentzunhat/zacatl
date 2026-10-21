@@ -573,13 +573,17 @@ grep "fix-esm.mjs" apps/backend/package.json
 
 ### "Cannot locate built-in locales directory"
 
-**Problem**: Missing source files in Docker image
+**Problem**: The package build is missing its bundled locale assets
 
-**Solution**: Dockerfile must copy source directories:
+**Solution**: Build Zacatl before assembling the example image. Its postbuild
+step copies locale JSON and ESLint config assets into `build-src-esm/` and
+`build-src-cjs/` under `third-party/`; the image carries those build trees.
+The runtime does not need separate `src/` copies. If locale lookup fails,
+inspect the package build output:
 
-```dockerfile
-COPY --from=build-backend /app/src/localization/locales /app/src/localization/locales
-COPY --from=build-backend /app/src/eslint               /app/src/eslint
+```sh
+find build-src-esm/third-party/localization/locales -maxdepth 1 -type f
+find build-src-esm/third-party/eslint -maxdepth 1 -type f
 ```
 
 ### Native Module Binding Errors (sqlite3)
@@ -731,7 +735,7 @@ docker compose down -v
 1. **One image per example** - not one for backend + one for frontend
 2. **Build script must include `dist`** - critical for ESM imports
 3. **Native modules need rebuild** - sqlite3 requires compilation in container
-4. **Source files needed at runtime** - locales and eslint directories
+4. **Bundled package assets needed at runtime** - locale JSON and ESLint config files under `build-src-esm/third-party/`
 5. **Framework dependencies must be copied** - node_modules from root
 6. **Build from repository root** - context is `../../..` from example folder
 7. **Container name says "backend"** - but it includes frontend too (legacy naming, monolithic architecture)

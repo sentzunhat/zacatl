@@ -14,7 +14,7 @@ Comprehensive reference for the zacatl repository structure, conventions, tech s
 
 - Naming: PascalCase for classes/interfaces/types/enums; camelCase for functions/variables; UPPER_SNAKE_CASE for constants; kebab-case for files/folders; enum values UPPER_SNAKE_CASE.
 - Patterns: port-adapter naming (Adapter/Port/Repository/Service), DI with decorators, repository pattern for ORM integration.
-- Module style: ESM source with dual ESM/CJS build outputs; sibling facade files (`src/error.ts` next to `src/error/`), no nested index barrels; path aliases resolved at build.
+- Module style: ESM source with dual ESM/CJS build outputs; explicit sibling entry files, no unintended nested index barrels; path aliases resolved at build.
 
 ## doc_style
 
@@ -35,11 +35,11 @@ Comprehensive reference for the zacatl repository structure, conventions, tech s
 
 ## files_src
 
-- src/configuration.ts
-- src/configuration/json.ts
-- src/configuration/yml.ts
-- src/dependency-injection.ts
-- src/dependency-injection/container.ts
+- src/utils/configuration.ts
+- src/utils/configuration/json.ts
+- src/utils/configuration/yml.ts
+- src/third-party/dependency-injection.ts
+- src/third-party/dependency-injection/container.ts
 - src/error.ts
 - src/error/bad-request.ts
 - src/error/bad-resource.ts
@@ -49,22 +49,22 @@ Comprehensive reference for the zacatl repository structure, conventions, tech s
 - src/error/not-found.ts
 - src/error/unauthorized.ts
 - src/error/validation.ts
-- src/eslint/base.mjs
-- src/eslint/best-practices.mjs
-- src/eslint/file-naming.mjs
-- src/eslint/imports.mjs
-- src/eslint/index.mjs
-- src/eslint/naming-conventions.mjs
-- src/eslint/scripts.mjs
-- src/eslint/solid.mjs
-- src/eslint/strict.mjs
-- src/eslint/tests.mjs
-- src/eslint/type-safety.mjs
-- src/localization.ts
-- src/localization/i18n-node.ts
-- src/localization/node/core.ts
-- src/localization/node/helpers.ts
-- src/localization/node/types.ts
+- src/third-party/eslint/base.mjs
+- src/third-party/eslint/best-practices.mjs
+- src/third-party/eslint/file-naming.mjs
+- src/third-party/eslint/imports.mjs
+- src/third-party/eslint/index.mjs
+- src/third-party/eslint/naming-conventions.mjs
+- src/third-party/eslint/scripts.mjs
+- src/third-party/eslint/solid.mjs
+- src/third-party/eslint/strict.mjs
+- src/third-party/eslint/tests.mjs
+- src/third-party/eslint/type-safety.mjs
+- src/third-party/localization.ts
+- src/third-party/localization/i18n-node.ts
+- src/third-party/localization/node/core.ts
+- src/third-party/localization/node/helpers.ts
+- src/third-party/localization/node/types.ts
 - src/logs.ts
 - src/logs/console.ts
 - src/logs/console/adapter.ts
@@ -157,7 +157,7 @@ Comprehensive reference for the zacatl repository structure, conventions, tech s
 - src/service/platforms/server/shared/prefixes/normalize-prefix.ts
 - src/service/platforms/server/types/server-config.ts
 - src/third-party.ts
-- src/third-party/eslint.ts
+- src/third-party/eslint-plugins.ts
 - src/third-party/express.ts
 - src/third-party/fastify.ts
 - src/third-party/http-proxy-middleware.ts
@@ -170,6 +170,8 @@ Comprehensive reference for the zacatl repository structure, conventions, tech s
 - src/third-party/databases/nodesqlite.ts
 - src/third-party/databases/sequelize.ts
 - src/third-party/databases/sqlite3.ts
+- src/third-party/dependency-injection.ts
+- src/third-party/dependency-injection/container.ts
 - src/third-party/dependency-injection/reflect-metadata.ts
 - src/third-party/dependency-injection/tsyringe.ts
 - src/utils.ts

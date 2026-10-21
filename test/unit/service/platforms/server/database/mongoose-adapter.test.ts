@@ -87,4 +87,15 @@ describe('Mongoose database adapter', () => {
       autoCreate: false,
     });
   });
+
+  it('disconnects the connected instance when onDatabaseConnected rejects', async () => {
+    const { config, mongoose } = makeConfig();
+    config.onDatabaseConnected = async () => { throw new Error('setup failed'); };
+    const adapter = new MongooseAdapter();
+
+    await expect(adapter.connect('svc', config)).rejects.toThrow('setup failed');
+    await adapter.disconnect();
+
+    expect(mongoose.disconnect).toHaveBeenCalledOnce();
+  });
 });

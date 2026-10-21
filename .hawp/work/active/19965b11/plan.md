@@ -208,7 +208,7 @@ for consumers that intentionally use the global container.
 - The server drops that resolved scope at registration:
   `src/service/platforms/server/api/api-server.ts:90-99` and `:104-113`
   call `resolveDependencies()` without the application container. Its default
-  is the global tsyringe container (`src/dependency-injection/container.ts:105-134`).
+  is the global tsyringe container (`src/third-party/dependency-injection/container.ts:105-134`).
 - Minimal reproduction: a temporary Vitest case used a route or hook decorated
   `@injectable()` with `@inject(LoggerToken)`, supplied `logger` through
   `ServiceConfig`, put the class in `layers.application.entryPoints.rest`,
@@ -1128,3 +1128,260 @@ version. Merging to `main` will run the main-branch release gates and, if they
 pass, create the tag, publish the package, and create a GitHub Release. The PR
 remains open and unmerged. The PR description and `docs/changelog.md` now
 describe this release path; pre-`0.1.0` `0.0.x` version policy is unchanged.
+
+## Zacatl 0.0.66 follow-up — 2026-10-21
+
+The existing composition and Service ownership changes are present at the
+`release-0.0.66` base (`b07979e2`): the Service owns child scopes and database
+registration, prepares databases before repository readiness, and delays HTTP
+listen until readiness succeeds. Direct `Server` and `Platforms` resolution
+and per-Service ORM/index-policy behavior also have focused source/tests in
+this branch. No additional ServiceConfig merge/module API is justified by the
+current evidence: the findings concern lifecycle cleanup, while reusable
+feature composition still lacks a second demonstrated consumer requirement.
+Keep the module API question separate and deferred.
+
+The current lifecycle patch is tracked in `f1080c66`; it is not a broader
+ServiceConfig/module-composition change. The website remains on its own
+integration path, so this branch's Zacatl checks do not establish website,
+container, or live deployment compatibility.
+
+### Website SSR 404 dependency scope — 2026-10-21
+
+The website consumer has a separate confirmed scope gap in its Fastify HTML
+404 handler: `createFastifyApp()` calls the global-only
+`resolveDependency(RenderPageProvider)`. `RenderPageProvider` is a singleton
+with a Service-owned repository dependency, so a second Service in the same
+process can use the first/global instance rather than its own Service graph.
+Zacatl's `PageServer.customRegister` previously exposed the adapter and native
+server but not the Service handler container.
+
+The current framework callback takes one `PageRegistrationContext` argument
+containing the page adapter, raw server, `resolve(token)` bound to the
+Application container used for that Service's handlers, and
+`isApiRequest(url)`. Direct unmanaged Server construction retains the global
+resolution fallback. This supersedes the earlier optional-third-argument
+design. Focused regression coverage starts two Server compositions with
+distinct Application scopes and confirms each page callback resolves its own
+value. The website source path was inspected, but the website was not changed
+or runtime-tested here; its 404 callback still needs to use `resolve` when
+consuming this API.
+
+### API route prefix configuration — 2026-10-21
+
+The framework already supports the desired canonical configuration: routes
+use relative handler URLs, and `server.prefixes.api` prepends the configured
+prefix. If omitted, Zacatl preserves each handler URL as written. Existing
+eight Service examples configure `/api` and define relative route URLs.
+Added Server-level regression coverage for both configured and omitted
+prefixes, and clarified the omission behavior in the `HttpServerConfig` docs.
+The website migration should set its API prefix once in server config and
+remove `/api` from handler URLs; its separate SPA/404 guard must continue to
+exclude the configured API prefix.
+
+### Release-branch verification — 2026-10-21
+
+Node 26.3.0/npm 11.17.0: 85 test files / 752 tests, type checks, build, lint,
+and five consumer smoke fixtures passed. All eight maintained Docker examples
+passed root plus `/api/greetings` CRUD checks using the local framework build;
+the two MongoDB examples used `mongo:7.0`. This Docker Desktop VM reports
+Linux kernel 7.0.12, and default `mongo:latest` exits with the documented
+MongoDB 6.19–7.0.13 kernel incompatibility. Thus the Mongo application path
+was exercised, but the default latest-Mongo image was not verified here.
+The website consumer itself was inspected, not edited or runtime-tested.
+
+GitHub release metadata and npm registry timestamps show `v0.0.65` published
+on 2026-10-20. The changelog's October 17 date is retained as the candidate
+date, while its stale “not published” status is corrected to record the
+publication date.
+
+Commit `a71bdc30` is pushed on `release-0.0.66` and draft PR #180 targets
+`main`. Local verification is complete. At the time of this plan update, PR
+CVE and peer-install checks are pending; Docker and publish-dry-run are skipped
+by the branch workflow policy. No HAWP item is closed based on pending checks.
+
+
+### Zacatl 0.0.66 follow-up verification — 2026-10-21
+
+Draft PR #180 head `a71bdc30` is open against `main`. Its CVE, pending-release, and peer-install checks pass; Docker smoke and publish dry-run are skipped by workflow policy. The local Node 26.3.0/npm 11.17.0 full suite, type check, build, lint, consumer fixtures, and maintained example smoke checks are recorded in the linked status report. The website API-prefix and 404-container migration remains a consumer task and was not runtime-tested. No new evidence supports a general ServiceConfig/module-composition API, so keep that design deferred and separate.
+
+### Page registration extension follow-up — 2026-10-21
+
+The website's `createFastifyApp()` keeps Fastify security, error, rate-limit,
+redirect, and static setup in application code. Only its HTML 404 handler
+needs the Service-owned `RenderPageProvider`; it currently resolves that
+provider globally. The owner selected a generic page registration extension
+instead of a framework-specific renderer or 404 provider. In commit
+`bde72f6f`, `PageServerConfig.customRegister` receives one named context with
+the adapter, native server, `resolve(token)` bound to the handler scope, and
+`isApiRequest(url)` bound to the configured API route prefix. With no API
+prefix configured, the matcher returns false. Page SPA fallback now inherits
+Server prefixes unless page prefixes are explicit. This closes the framework
+ergonomics and prefix-alignment gap; the website still needs a consumer change.
+
+Node 26.3.0/npm 11.17.0 verification: focused page/server/Fastify tests
+passed 3 files / 53 tests; the full suite passed 85 files / 754 tests. Type
+checks, build, lint (existing warnings, zero errors), five consumer smoke
+fixtures, local Markdown links, and `git diff --check` passed. A Fastify
+adapter regression confirms an unknown `/v1` API path gets a structured 404
+instead of the HTML fallback. The website's custom HTML 404 must still call
+its JSON 404 response when `isApiRequest(request.url)` is true. Website runtime,
+Docker, and live deployment behavior remain unverified for this follow-up.
+PR #180's CVE, pending-release, and peer-install checks pass on code head
+`bde72f6f`; Docker smoke and publish dry-run were skipped by workflow policy.
+
+
+### DI implementation path and export review — 2026-10-21
+
+The DI implementation is located at `src/third-party/dependency-injection/container.ts`, alongside Zacatl's other third-party wrappers. A small explicit-export facade lives at `src/third-party/dependency-injection.ts` because direct mapping to the implementation would expose internal helpers. The old `src/dependency-injection/` directory and root-level `src/dependency-injection.ts` facade are removed. The documented `@sentzunhat/zacatl/dependency-injection` package entry remains mapped to the explicit-export facade; its public exports are explicit and exclude internal child-container and singleton-registration helpers. The unsupported `/dependency-injection/container` deep package export is removed. Example TypeScript path mappings and framework documentation now use the moved implementation.
+
+**Verification:** On Node 26.3.0/npm 11.17.0, `npm test` passes (85 files / 761 tests), `npm run type:check` passes for source/test/scripts, `npm run build` passes and syncs the intended public export, `npm run lint:silent` passes with zero errors and pre-existing warnings, and `npm run smoke:consumers` passes all five fixtures. Focused DI/export/API/lifecycle tests pass (14 files / 149 tests). `git diff --check` passes. Consumer smoke reports the existing Sequelize-owned nested UUID advisory; no change is made to Zacatl's peer ownership.
+
+
+### DI alias and export synchronization — 2026-10-21
+
+Updated the recursive tsconfig path generator to retain the canonical `@zacatl/dependency-injection` alias after regeneration. Updated the local export synchronizer to validate explicit DI ESM/type artifacts before writing the stable `/dependency-injection` package export. The shared export policy now keeps both the facade and internal container out of third-party deep exports. Runtime alias rewriting covers the canonical DI package alias. Three example Vitest aliases now point at the moved facade.
+
+**Verification:** `npm run paths:generate` preserves the explicit alias; `npm run local:exports` emits the `/dependency-injection` facade entry without either deep container export. Focused script, type, test, build, and consumer-fixture checks are pending for this follow-up.
+
+Verification completed on Node 26.3.0/npm 11.17.0: `npm test` passed (85 files / 762 tests), `npm run type:check`, `npm run build`, and `npm run lint:silent` passed (zero lint errors; existing warnings). `npm run smoke:consumers` passed all five fixtures. `npm run paths:generate` and `npm run local:exports` passed; focused export-strategy tests passed (16 tests). ESM and CommonJS runtime entry checks passed with exactly nine public DI exports, and the internal deep import was rejected. `.hawp/bin/hawp links check` and `git diff --check` passed. Consumer smoke still reports the existing Sequelize-owned nested UUID advisory.
+
+### Third-party barrel and example path follow-up — 2026-10-21
+
+The third-party source barrel is `src/third-party.ts`, not `src/third-party/index.ts`; its ESM declaration is `build-src-esm/third-party.d.ts`. Updated the example source/build path templates, copied example TypeScript configs, script TypeScript config, and package-structure docs to use the real files. Source-mode example configs now include Zacatl's source tree in `rootDir` and retain the internal `@zacatl/*` mappings needed by framework source. Removed unused aliases that pointed to nonexistent infrastructure/domain/application/platform barrels. Updated the three maintained example Vitest aliases to target the source barrel and canonical source paths.
+
+Folder-level database exports remain intentionally absent: no database directory barrel exists, and the ORM wrappers are optional-peer leaf subpaths so importing a folder cannot eagerly load all adapters. The DI facade remains the single documented `/dependency-injection` entry; DI implementation and wrapper files are not exposed through a folder barrel.
+
+**Verification:** Node 26.3.0/npm 11.17.0: `npm run paths:generate`, `npm run build`, `npm run type:check`, and `npm run smoke:consumers` passed; all five consumer fixtures passed, with the existing Sequelize-owned nested UUID advisory. All seven source-mode example TypeScript configs passed `npx tsc --noEmit -p`; an exact-path audit found all 132 current Zacatl example/script path mappings resolve to existing files. Focused export-strategy tests passed (18 tests), full Zacatl suite passed (85 files / 764 tests), and all three example Vitest configs loaded successfully from their backend directories (they contain no tests). Local Markdown links and `git diff --check` passed. This does not establish example HTTP runtime or Docker behavior.
+
+### Copilot review follow-up — 2026-10-21
+
+Addressed the four comments against the current source: the root Vite alias now maps exactly to `src/third-party.ts` while the generic prefix continues to serve leaf paths; the architecture diagrams now show one third-party root and use valid sibling markers; and the infrastructure imports from the DI facade are consolidated.
+
+**Verification:** `npm test -- --run test/unit/service/layers/infrastructure` passed (18 files / 198 tests); `npm run type:check:src` and `git diff --check` passed. No full build or consumer runtime check was run for these review-only changes.
+
+
+### Copilot review follow-up: source-mode Vitest aliases — 2026-10-21
+
+The latest Copilot review reports three unresolved medium findings in
+`examples/express-sqlite-react/apps/backend/vitest.config.ts`,
+`examples/express-sqlite-svelte/apps/backend/vitest.config.ts`, and
+`examples/fastify-sqlite-svelte/apps/backend/vitest.config.ts`. Source inspection
+confirms these configs map the public `@sentzunhat/zacatl/*` namespace but do not
+map the internal `@zacatl/*` imports used by the raw Zacatl source, including
+`@zacatl/dependency-injection` and `@zacatl/error`. The configs can load without
+exercising those imports, so config-load checks alone are insufficient.
+
+**Follow-up:** preserve the exact DI facade and third-party barrel mappings, add
+all required internal aliases in the three source-mode configs (or consume one
+shared source alias definition if that is the established pattern), and add a
+smoke/regression that imports a source entry with transitive internal aliases.
+The separate `fastify-sqlite-react` built-package config is outside these review
+comments and should not be changed without separate evidence.
+
+**Planning refinement:** the affected backend directories currently have no
+test/spec files and their package manifests do not define a test script. Add a
+shared smoke fixture or equivalent runner that executes a transitive import of
+`@sentzunhat/zacatl/service` through each of the three configs. Preserve exact
+regex aliases for `@zacatl/dependency-injection` ->
+`src/third-party/dependency-injection.ts` and `@zacatl/third-party` ->
+`src/third-party.ts` before the general `@zacatl/*` source mapping. Compare local
+duplicated entries with a shared alias factory under `examples/shared`; select
+the simpler option that the three configs can execute without changing public
+example imports. The built-package `fastify-sqlite-react` config remains out of
+scope.
+
+**Acceptance for these comments:** a smoke test runs under each affected Vitest
+config and exercises at least one import that reaches both the DI facade and an
+error or third-party module in raw Zacatl source; a config-load-only check is
+not sufficient. Run the shared smoke against each config plus the relevant
+source-mode example TypeScript checks.
+
+
+### Implementation-ready brief — example source alias regression
+
+The three reviewed Vitest configs are nearly identical and map the public
+`@sentzunhat/zacatl/*` namespace only. Raw source `src/service/service.ts`
+reaches internal aliases including `@zacatl/dependency-injection`,
+`@zacatl/error`, `@zacatl/localization`, and `@zacatl/logs`; transitive source
+imports also use `@zacatl/third-party/*`. `examples/shared/zacatl-src-paths.json`
+currently covers public package aliases and does not supply those internal
+source aliases. The affected backends have no test script or test/spec files.
+
+**Recommended implementation:** keep exact mappings ahead of catchalls in
+`examples/express-sqlite-react/apps/backend/vitest.config.ts`,
+`examples/express-sqlite-svelte/apps/backend/vitest.config.ts`, and
+`examples/fastify-sqlite-svelte/apps/backend/vitest.config.ts`:
+`@zacatl/dependency-injection` ->
+`src/third-party/dependency-injection.ts`,
+`@zacatl/third-party` -> `src/third-party.ts`, plus the internal paths needed
+by raw source consistent with `tsconfig.base.json`. Compare a shared alias
+factory under `examples/shared` with copied entries; prefer shared only if the
+configs can consume it without making example config loading more fragile.
+Keep the built-package Fastify React config out of scope.
+
+Add one shared smoke test (suggested path:
+`examples/shared/zacatl-source-resolution.test.ts`) that imports `Service`
+through the public alias, and execute it separately under each of the three
+configs. This must exercise transitive imports; loading configs alone is not
+verification. Suggested commands:
+
+- `npx vitest run --config examples/express-sqlite-react/apps/backend/vitest.config.ts examples/shared/zacatl-source-resolution.test.ts`
+- `npx vitest run --config examples/express-sqlite-svelte/apps/backend/vitest.config.ts examples/shared/zacatl-source-resolution.test.ts`
+- `npx vitest run --config examples/fastify-sqlite-svelte/apps/backend/vitest.config.ts examples/shared/zacatl-source-resolution.test.ts`
+
+Then run the relevant source-mode TypeScript project checks. Risk is medium
+because the aliases affect development-time module resolution across examples;
+the alias break is intentional and must match the source-layout and export plans.
+
+### Owner-approved breaking source paths — 2026-10-21
+
+The owner approved removing compatibility aliases and breaking old package
+subpaths for a clean direct layout. Update raw-source imports and examples to
+the new generated names, including `@zacatl/utils/configuration`,
+`@zacatl/third-party/localization`, and `@zacatl/third-party/eslint-plugins`.
+Reserve `@zacatl/third-party/eslint` for the shareable config entry. The old
+`@zacatl/configuration`, `@zacatl/localization`, and wrapper meaning of
+`@zacatl/third-party/eslint` must not remain as forwarding aliases. Keep the
+source-mode regression smoke test pointed at Service so it traverses the new
+internal names under all three Vitest configs.
+
+### Source alias implementation update — 2026-10-21
+
+Updated all three reviewed configs with exact new-path aliases before their
+internal `@zacatl/*` fallback. Added the shared Service import smoke test and
+included its resolved path explicitly in each config so the test is discovered
+when that config runs. The configs and test were not executed in this pass.
+
+### Current-head Copilot findings: DI exports and documentation — 2026-10-21
+
+Five Copilot findings on PR #180 head `e520b6fd` were assessed against the
+source facade, generated package exports, export policy, and current docs.
+Added the explicit `./third-party/dependency-injection` types/import/require
+mapping and corrected the complete DI example to import `container` from the
+`tsyringe` wrapper and decorators from that same wrapper, while retaining
+`resolveDependency` on the helper facade. The export policy now filters the
+legacy root `configuration.js`, `localization.js`, and old
+`dependency-injection/` tree, including the existing retired container file.
+The third-party README now documents the supported `/third-party/dependency-injection`
+package path in its tree and prose.
+
+**Verification:** `npm test` passed (85 files / 765 tests); focused
+`test/unit/third-party/export-strategy.test.ts` passed (18 tests); `npm run
+build` regenerated 162 package exports. Direct package-map inspection confirms
+the DI facade exists and obsolete DI/configuration/localization subpaths are
+absent. `git diff --check` passed. PR, review thread, and CI readback are pending
+push.
+
+### Current-head Copilot package-path contract finding — 2026-10-22
+
+One new Copilot thread on PR #180 head `ffb80630` identifies a valid mismatch:
+the PR description said the old `/dependency-injection` package entry is
+preserved, while the `package.json` export policy retires
+`dependency-injection.js` and the changelog describes a breaking move to
+`/third-party/dependency-injection`. Existing owner direction in the source
+layout and docs plans approves removing old package subpaths without
+compatibility facades. The implementation and changelog are consistent with
+that decision. The PR description was updated to disclose the breaking removal
+before requesting the next review. Do not add a compatibility facade unless
+the owner changes the approved API decision.

@@ -6,7 +6,7 @@ import {
 
 import { DomainConfigToken, DomainContainerToken } from './tokens';
 import type { DomainConfig } from './types';
-import { ensureRegisteredSingleton } from '../../../dependency-injection/container';
+import { ensureRegisteredSingleton } from '../../../third-party/dependency-injection/container';
 
 @injectable()
 export class Domain {

@@ -39,7 +39,7 @@ Use `services` for classes that represent executable behaviors or background
 workflows as a semantic grouping in the domain layer:
 
 ```typescript
-import { registerDependencies, resolveDependencies } from '@sentzunhat/zacatl/dependency-injection';
+import { registerDependencies, resolveDependencies } from '@sentzunhat/zacatl/third-party/dependency-injection';
 import { singleton } from '@sentzunhat/zacatl/third-party/dependency-injection/tsyringe';
 
 @singleton()
@@ -91,7 +91,7 @@ domain: {
 All dependency injection uses three simple functions from one place:
 
 ```typescript
-import { registerDependencies, resolveDependencies, registerAndResolve } from '@sentzunhat/zacatl/dependency-injection';
+import { registerDependencies, resolveDependencies, registerAndResolve } from '@sentzunhat/zacatl/third-party/dependency-injection';
 ```
 
 ## Usage Pattern
@@ -144,7 +144,7 @@ const hooks = registerAndResolve([AuthHook, LoggingHook]);
 ## Example: Building a Service
 
 ```typescript
-import { registerDependencies, resolveDependencies, Constructor } from '@sentzunhat/zacatl/dependency-injection';
+import { registerDependencies, resolveDependencies } from '@sentzunhat/zacatl/third-party/dependency-injection';
 
 // Infrastructure
 class UserRepository {
@@ -212,7 +212,7 @@ Current pattern:
 
 ```typescript
 // ✅ NEW: Just use the functions
-import { registerDependencies } from '@sentzunhat/zacatl/dependency-injection';
+import { registerDependencies } from '@sentzunhat/zacatl/third-party/dependency-injection';
 
 class MyLayer {
   constructor(config) {

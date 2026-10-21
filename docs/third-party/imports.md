@@ -24,7 +24,7 @@ import {
   tseslint, // typescript-eslint
   tsEslintPlugin, // @typescript-eslint/eslint-plugin
   importPlugin, // eslint-plugin-import
-} from '@sentzunhat/zacatl/third-party/eslint';
+} from '@sentzunhat/zacatl/third-party/eslint-plugins';
 ```
 
 **Use case:** ESLint config files that need direct access to ESLint plugins and parsers.
@@ -32,7 +32,7 @@ import {
 **Example (eslint.config.mjs):**
 
 ```javascript
-import { tsEslintParser, tseslint } from '@sentzunhat/zacatl/third-party/eslint';
+import { tsEslintParser, tseslint } from '@sentzunhat/zacatl/third-party/eslint-plugins';
 
 export default [
   {
@@ -158,7 +158,7 @@ export default [
 
 ```javascript
 // ❌ INCORRECT - Will fail because built package not available during dev
-import { tseslint, tsEslintParser } from '@sentzunhat/zacatl/third-party/eslint';
+import { tseslint, tsEslintParser } from '@sentzunhat/zacatl/third-party/eslint-plugins';
 ```
 
 ### TypeScript Service Code (src/\*_/_.ts)
@@ -233,18 +233,18 @@ import { BaseRepository } from '@sentzunhat/zacatl/service/layers/infrastructure
 import { singleton } from '@sentzunhat/zacatl/third-party/dependency-injection/tsyringe';
 ```
 
-### Subpath: `/eslint`
-
-```typescript
-// ✅ ESLint configurations (for config files)
-import { recommended, baseConfig } from '@sentzunhat/zacatl/eslint';
-```
-
 ### Subpath: `/third-party/eslint`
 
 ```typescript
+// ✅ ESLint configurations (for config files)
+import { recommended, baseConfig } from '@sentzunhat/zacatl/third-party/eslint';
+```
+
+### Subpath: `/third-party/eslint-plugins`
+
+```typescript
 // ✅ ESLint internals (re-exports)
-import { tseslint, tsEslintParser } from '@sentzunhat/zacatl/third-party/eslint';
+import { tseslint, tsEslintParser } from '@sentzunhat/zacatl/third-party/eslint-plugins';
 ```
 
 ### Subpath: `/third-party/databases/mongoose`
@@ -291,7 +291,7 @@ import { BaseRepository } from '@sentzunhat/zacatl/service/layers/infrastructure
 
 ## FAQ
 
-### Q: Why can't I use `@sentzunhat/zacatl/third-party/eslint` in ESLint config?
+### Q: Why can't I use `@sentzunhat/zacatl/third-party/eslint-plugins` in an ESLint config?
 
 **A:** ESLint config files run at **development time** before the package is built. The third-party exports only exist in the **published/built** package. During development, use direct imports instead.
 

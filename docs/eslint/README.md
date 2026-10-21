@@ -32,7 +32,7 @@ Create an `eslint.config.mjs` file in your project root:
 
 ```javascript
 // eslint.config.mjs
-import { recommended } from '@sentzunhat/zacatl/eslint';
+import { recommended } from '@sentzunhat/zacatl/third-party/eslint';
 
 export default [
   {
@@ -49,7 +49,7 @@ To add project-specific overrides, append them after `...recommended`:
 
 ```javascript
 // eslint.config.mjs
-import { recommended } from '@sentzunhat/zacatl/eslint';
+import { recommended } from '@sentzunhat/zacatl/third-party/eslint';
 
 export default [
   { ignores: ['build/**', 'node_modules/**', 'coverage/**'] },
@@ -91,7 +91,7 @@ Zacatl provides eight modular ESLint configurations, all composed into `recommen
 The easiest way to get started — spreads all eight configs in the correct order.
 
 ```javascript
-import { recommended } from '@sentzunhat/zacatl/eslint';
+import { recommended } from '@sentzunhat/zacatl/third-party/eslint';
 
 export default [...recommended];
 ```
@@ -101,7 +101,7 @@ export default [...recommended];
 Foundation layer: `@eslint/js` recommended + `typescript-eslint` recommended + project-level overrides. Exported as an array so `tseslint.configs.recommended` is spread correctly.
 
 ```javascript
-import { baseConfig } from '@sentzunhat/zacatl/eslint';
+import { baseConfig } from '@sentzunhat/zacatl/third-party/eslint';
 
 export default [...baseConfig];
 ```
@@ -118,7 +118,7 @@ export default [...baseConfig];
 Applies to all `**/*.ts` files so the `_`-prefix ignore pattern works in both `src/` and `test/`.
 
 ```javascript
-import { strictConfig } from '@sentzunhat/zacatl/eslint';
+import { strictConfig } from '@sentzunhat/zacatl/third-party/eslint';
 
 export default [strictConfig];
 ```
@@ -133,7 +133,7 @@ export default [strictConfig];
 Requires `parserOptions.project` — uses type information at lint time.
 
 ```javascript
-import { typeSafetyConfig } from '@sentzunhat/zacatl/eslint';
+import { typeSafetyConfig } from '@sentzunhat/zacatl/third-party/eslint';
 
 export default [typeSafetyConfig];
 ```
@@ -153,7 +153,7 @@ export default [typeSafetyConfig];
 ### 5. `bestPracticesConfig` (general code quality)
 
 ```javascript
-import { bestPracticesConfig } from '@sentzunhat/zacatl/eslint';
+import { bestPracticesConfig } from '@sentzunhat/zacatl/third-party/eslint';
 
 export default [bestPracticesConfig];
 ```
@@ -174,7 +174,7 @@ export default [bestPracticesConfig];
 Enforces Port-Adapter naming conventions.
 
 ```javascript
-import { namingConventions } from '@sentzunhat/zacatl/eslint';
+import { namingConventions } from '@sentzunhat/zacatl/third-party/eslint';
 
 export default [namingConventions];
 ```
@@ -190,7 +190,7 @@ export default [namingConventions];
 Automatically organizes and sorts imports. Uses `eslint-import-resolver-typescript` so path aliases in `tsconfig.json` are resolved correctly.
 
 ```javascript
-import { importsConfig } from '@sentzunhat/zacatl/eslint';
+import { importsConfig } from '@sentzunhat/zacatl/third-party/eslint';
 
 export default [importsConfig];
 ```
@@ -208,7 +208,7 @@ export default [importsConfig];
 Enforces SOLID-principle constraints for class design.
 
 ```javascript
-import { solidConfig } from '@sentzunhat/zacatl/eslint';
+import { solidConfig } from '@sentzunhat/zacatl/third-party/eslint';
 
 export default [...solidConfig];
 ```
@@ -225,7 +225,7 @@ export default [...solidConfig];
 ### Override Specific Rules
 
 ```javascript
-import { recommended } from '@sentzunhat/zacatl/eslint';
+import { recommended } from '@sentzunhat/zacatl/third-party/eslint';
 
 export default [
   ...recommended,
@@ -242,7 +242,7 @@ export default [
 ### Project-Specific Rules for Test Files
 
 ```javascript
-import { recommended } from '@sentzunhat/zacatl/eslint';
+import { recommended } from '@sentzunhat/zacatl/third-party/eslint';
 
 export default [
   ...recommended,
@@ -259,7 +259,7 @@ export default [
 ### Mix and Match Configs
 
 ```javascript
-import { baseConfig, importsConfig } from '@sentzunhat/zacatl/eslint';
+import { baseConfig, importsConfig } from '@sentzunhat/zacatl/third-party/eslint';
 
 export default [
   ...baseConfig,
@@ -277,7 +277,7 @@ export default [
 ### Add Path Aliases Support
 
 ```javascript
-import { recommended } from '@sentzunhat/zacatl/eslint';
+import { recommended } from '@sentzunhat/zacatl/third-party/eslint';
 
 export default [
   ...recommended,
@@ -498,7 +498,7 @@ Verify your `tsconfig.json` is in the project root or update the parser configur
 You can temporarily change the severity to `warn` while refactoring:
 
 ```javascript
-import { recommended } from '@sentzunhat/zacatl/eslint';
+import { recommended } from '@sentzunhat/zacatl/third-party/eslint';
 
 export default [
   ...recommended,

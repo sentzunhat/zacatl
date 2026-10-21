@@ -1,8 +1,8 @@
 import { AsyncLocalStorage } from 'node:async_hooks';
 
+import { getContainer } from '@zacatl/third-party/dependency-injection';
 import type { DependencyContainer } from '@zacatl/third-party/dependency-injection/tsyringe';
 
-import { getContainer } from '../../../../dependency-injection/container';
 
 // Consumer repositories usually call super(config) with no container argument.
 // Capture their owning Infrastructure scope only while DI constructs them; ORM

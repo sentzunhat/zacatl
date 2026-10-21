@@ -8,7 +8,7 @@ import {
   getContainer,
   registerDependency,
   registerSingleton,
-} from '../../../src/dependency-injection/container';
+} from '../../../src/third-party/dependency-injection/container';
 
 /**
  * DI Integration Tests - Active Functions Only

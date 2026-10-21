@@ -1,3 +1,6 @@
+import type { InjectionToken } from '../../../../third-party/dependency-injection/tsyringe';
+import type { PageServerPort } from '../page/port';
+
 export enum ServerVendor {
   FASTIFY = 'FASTIFY',
   EXPRESS = 'EXPRESS',
@@ -19,12 +22,22 @@ export interface HttpServerConfig {
   gateway?: GatewayService;
 }
 
+/** Tools available while registering custom page handlers for one Server. */
+export interface PageRegistrationContext {
+  adapter: PageServerPort;
+  rawServer: unknown;
+  /** Match a URL against this Server's configured API route prefix. */
+  isApiRequest(url: string): boolean;
+  /** Resolve a dependency from this Server's handler scope. */
+  resolve<T>(token: InjectionToken<T>): T;
+}
+
 export interface PageServerConfig {
   devServerUrl?: string | undefined;
   staticDir?: string | undefined;
   /** Enable SPA fallback (serve index.html for non-API, non-asset routes). Defaults to true when staticDir is set. */
   spaFallback?: boolean | undefined;
-  /** Named API prefixes excluded from SPA fallback. Defaults to `{ api: '/api' }`. Add more keys for additional API groups. */
+  /** Named prefixes excluded from SPA fallback. Defaults to the Server's route prefixes, then `{ api: '/api' }`. */
   prefixes?: ApiPrefixes | undefined;
   /**
    * Cache-Control for static assets — the CDN-friendly pattern for
@@ -37,8 +50,8 @@ export interface PageServerConfig {
    * @example { maxAge: '1y', immutable: true }
    */
   cache?: { maxAge?: number | string; immutable?: boolean } | undefined;
-  /** Configure the page server adapter; second argument exposes the raw Fastify/Express instance. */
-  customRegister?: ((server: unknown, rawServer?: unknown) => Promise<void> | void) | undefined;
+  /** Register custom page handlers with the native server and Service-scoped resolver. */
+  customRegister?: ((context: PageRegistrationContext) => Promise<void> | void) | undefined;
 }
 
 export enum ServerType {

@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 
 import { InternalServerError } from '@zacatl/error';
 
-import { clearContainer, getContainer, resolveDependency } from '../../../../../../src/dependency-injection';
+import { clearContainer, getContainer, resolveDependency } from '../../../../../../src/third-party/dependency-injection/container';
 import { createDatabaseToken } from '../../../../../../src/service/layers/infrastructure/orm/tokens/factory';
 import {
   getOrmInstance,

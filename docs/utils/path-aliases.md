@@ -6,15 +6,21 @@
 
 Zacatl uses TypeScript path aliases internally for cleaner imports during development.
 
+## Keeping aliases and exports synchronized
+
+- Run `npm run paths:generate` after moving or adding source modules. The generator maps source files to their current `@zacatl/*` paths, including the `utils/configuration` and `third-party/localization` modules.
+- `npm run build` runs the local package export synchronizer. Package subpaths follow the current source layout; retired `/configuration`, `/localization`, `/eslint`, and `/dependency-injection` paths are not compatibility aliases.
+- The public DI entry is `/third-party/dependency-injection`. Import only its documented exports; do not import internal helpers from `/third-party/dependency-injection/container`.
+
 ## Internal Aliases (Development Only)
 
 ### Core Modules
 
 ```typescript
-import { loadJSON } from '@zacatl/configuration';
-import { registerDependency, resolveDependency } from '@zacatl/dependency-injection';
+import { loadJSON } from '@zacatl/utils/configuration';
+import { registerDependency, resolveDependency } from '@zacatl/third-party/dependency-injection';
 import { CustomError, BadRequestError } from '@zacatl/error';
-import { configureI18nNode } from '@zacatl/localization';
+import { configureI18nNode } from '@zacatl/third-party/localization';
 import { logger } from '@zacatl/logs';
 import { Service } from '@zacatl/service';
 import { encode, generateHmac } from '@zacatl/utils';
@@ -87,14 +93,15 @@ import { logger } from '@zacatl/logs';
 
 | Alias                          | Path                                 | Exports                    |
 | ------------------------------ | ------------------------------------ | -------------------------- |
-| `@zacatl/configuration`        | `src/configuration/`                 | Config loading, validation |
-| `@zacatl/dependency-injection` | `src/dependency-injection/`          | DI container utilities     |
+| `@zacatl/utils/configuration`  | `src/utils/configuration.ts` and `src/utils/configuration/` | Config loading, validation |
+| `@zacatl/third-party/dependency-injection` | `src/third-party/dependency-injection.ts` | Public DI helpers |
 | `@zacatl/error`                | `src/error/`                         | Error classes              |
-| `@zacatl/localization`         | `src/localization/`                  | i18n support               |
+| `@zacatl/third-party/localization` | `src/third-party/localization.ts` and `src/third-party/localization/` | i18n support |
 | `@zacatl/logs`                 | `src/logs/`                          | Logging                    |
 | `@zacatl/service`              | `src/service/`                       | Service class              |
 | `@zacatl/utils`                | `src/utils/`                         | Utility functions          |
-| `@zacatl/third-party`          | `src/third-party/`                   | tsyringe, zod re-exports   |
+| `@zacatl/third-party`          | `src/third-party.ts`                 | tsyringe, zod re-exports   |
+| `@zacatl/third-party/eslint-plugins` | `src/third-party/eslint-plugins.ts` | Vendor ESLint packages |
 | `@zacatl/optionals`            | `src/utils/optionals.ts`             | Optional type helpers      |
 | `@zacatl/service/layers/infrastructure/infrastructure` | `src/service/layers/infrastructure/infrastructure.ts` | Infrastructure layer bootstrapper |
 | `@zacatl/service/layers/domain/domain` | `src/service/layers/domain/domain.ts` | Domain layer bootstrapper |

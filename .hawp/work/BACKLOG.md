@@ -26,16 +26,17 @@ Each row links to its plan file when one exists.
 
 | ID | Type | Title | Status | Detail | Updated | Next Action |
 | -- | ---- | ----- | ------ | ------ | ------- | ----------- |
-| `0b959aed` | infrastructure | Audit and refresh Zacatl dependencies after 0.0.64 | in-progress | [plan](active/0b959aed/plan.md) | 2026-10-16 | Patch/minor updates are installed and basic checks pass; resolve registry/advisory state and finish the full compatibility matrix |
-| `19965b11` | improvement | Design reusable modular ServiceConfig composition | in-progress | [plan](active/19965b11/plan.md) | 2026-10-19 | Keep the Service/Layers/Platforms ownership model and composition API separate from focused PR review fixes |
-| `0ab7e9b2` | improvement | Document real-world Zacatl Service composition lessons | in-progress | [plan](active/0ab7e9b2/plan.md) | 2026-10-19 | Align remaining guides and examples to the Service architecture map after runtime contracts settle |
-| `6ec737fa` | bug | Preserve direct Server entry-point resolution | in-progress | [plan](active/6ec737fa/plan.md) | 2026-10-19 | Local fix and focused coverage pass; verify pushed PR head and CI before closure |
-| `fa61f33c` | bug | Scope ORM registrations and index policy to each Service | in-progress | [plan](active/fa61f33c/plan.md) | 2026-10-19 | Direct Layers global fallback restored without weakening Service scope; verify final PR head and CI |
-| `f1080c66` | bug | Define restart behavior and clean up partial database connections | analyzing | [plan](active/f1080c66/plan.md) | 2026-10-19 | Reproduce lifecycle failures and choose one-shot contract or full restart support in a separate change |
+| `0b959aed` | infrastructure | Audit and refresh Zacatl dependencies after 0.0.64 | in-progress | [plan](active/0b959aed/plan.md) | 2026-10-22 | Compatible Vitest/Vite patches, root checks, peers, smokes, and nine example audits pass; assess dev-only advisories and complete example/Docker matrix |
+| `19965b11` | improvement | Design reusable modular ServiceConfig composition | in-progress | [plan](active/19965b11/plan.md) | 2026-10-22 | Keep the PR description aligned with the breaking DI path move; complete the three-config transitive Vitest smoke test |
+| `0ab7e9b2` | improvement | Document real-world Zacatl Service composition lessons | in-progress | [plan](active/0ab7e9b2/plan.md) | 2026-10-21 | Zacatl guide and prefix examples are reconciled; verify the website's scoped HTML 404 and configured `/api` JSON 404 migration separately |
+| `f1080c66` | bug | Define restart behavior and clean up partial database connections | in-progress | [plan](active/f1080c66/plan.md) | 2026-10-22 | Existing cleanup/normalization passes focused tests, type check, and build; characterize restart across providers before choosing a contract |
 | `bfea146e` | improvement | Move database connection ownership into Infrastructure | plan-ready | [plan](active/bfea146e/plan.md) | 2026-10-19 | After PR #138 integration, design config and source migration in small compatibility-aware slices |
 | `4c4365a1` | improvement | Define Domain client boundaries for entry points | plan-ready | [plan](active/4c4365a1/plan.md) | 2026-10-19 | Compare consumer shapes and choose a pattern or small API after the current release lane |
-| `533c3a53` | refactoring | Replace obsolete public API compatibility shims with canonical contracts | in-progress | [plan](active/533c3a53/plan.md) | 2026-10-20 | Canonical API cleanup is pushed; docs sweep and wrapper-import fixes are local, awaiting final review, push, CI, and Copilot re-review |
-| `b0649873` | refactoring | Organize the `src/` root around the agreed architecture | plan-ready | [plan](active/b0649873/plan.md) | 2026-10-20 | Map current ownership and package exports, then review a target tree before moving files |
+| `b0649873` | refactoring | Organize the `src/` root around the agreed architecture | in-progress | [plan](active/b0649873/plan.md) | 2026-10-21 | Complete aliases, package exports, build/runtime assets, and docs for the owner-proposed source tree; old paths intentionally break |
+| `1e905c1f` | improvement | Review import/export and path-generation scripts for scalable maintenance | in-progress | [plan](active/1e905c1f/plan.md) | 2026-10-22 | Source wildcard correction and checks pass; continue staged generator/export/asset-path work |
+| `a7728e13-5fd4-42bb-ab62-28693f428172` | improvement | Create a hand-drawn Zacatl Featured-card SVG | in-progress | [plan](active/a7728e13-5fd4-42bb-ab62-28693f428172/plan.md) | 2026-10-21 | Build a private SVG concept from verified modular-service architecture; keep it out of site and package assets until owner review |
+| `04b3e320` | task | Audit documentation for current source layout and public module paths | in-progress | [plan](active/04b3e320/plan.md) | 2026-10-22 | Archive-index link fixed and link checks pass; finish the broader scoped doc consistency review |
+| `b74c989a` | bug | Restore the publish dry-run lint gate after the Service alias migration | in-progress | [plan](active/b74c989a/plan.md) | 2026-10-22 | Local publish dry-run passes; verify the pushed-head CI run before closing |
 
 ## Blocked / Parked
 
@@ -58,6 +59,9 @@ moved to [closed/BACKLOG-ARCHIVE.md](closed/BACKLOG-ARCHIVE.md#archived-2026-07-
 
 | ID                              | Type          | Title                                                                                                                                          | Closed     | Plan                                                                                                                               |
 | ------------------------------- | ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- | ---------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| `6ec737fa` | `bug` | Preserve direct Server entry-point resolution — direct and Service-scoped resolution verified on PR #180 head `a71bdc30` | 2026-10-21 | [plan](closed/2026/10/21/6ec737fa/plan.md) |
+| `fa61f33c` | `bug` | Scope ORM registrations and index policy to each Service — same-name vendor isolation verified on PR #180 head `a71bdc30` | 2026-10-21 | [plan](closed/2026/10/21/fa61f33c/plan.md) |
+| `533c3a53` | `refactoring` | Replace obsolete public API compatibility shims with canonical contracts — current API, docs and examples verified on PR #180 head `a71bdc30` | 2026-10-21 | [plan](closed/2026/10/21/533c3a53/plan.md) |
 | `3b1813ff` | `bug` | Reject malformed ZodError lookalikes before wrapping — nonempty issue validation prevents malformed errors from becoming request validation errors | 2026-10-20 | [plan](closed/2026/10/20/3b1813ff/plan.md) |
 | `ac0c4acf-c90a-4a32-a66a-b058577368f6` | `improvement` | Align work records with HAWP UUID/folder layout — backlog consistency passes; historical closed-record debt documented | 2026-10-15 | [plan](closed/2026/10/15/ac0c4acf-c90a-4a32-a66a-b058577368f6/plan.md) |
 | `b4f0c8a1` | `docs` | README positioning pass — problem/audience first, full CRUD path in code near the top, refreshed figures | 2026-10-15 | [plan](closed/2026/10/15/b4f0c8a1/plan.md) |
@@ -65,9 +69,6 @@ moved to [closed/BACKLOG-ARCHIVE.md](closed/BACKLOG-ARCHIVE.md#archived-2026-07-
 | `DEPS-063` | `maintenance` | In-major dependency updates and example lockfile audit fixes (all nine examples at 0 advisories) — released in 0.0.64 | 2026-10-04 | [evidence/2026/10/04/bacf99c4…/evidence.md](evidence/2026/10/04/bacf99c4-236e-4bd1-ae54-8d96713b383a/evidence.md) |
 | `83cef132-c1df-402c-9504-a0df1cdf7567` | `tooling` | Refresh HAWP kit and Codex provider from HAWP main | 2026-10-15 | [plan](closed/2026/10/15/83cef132-c1df-402c-9504-a0df1cdf7567/plan.md) |
 | `LOG-001` | `feature` | Shared logger for the Service, Fastify and Express (`toFastifyLogger`, `ServiceConfig.logger`, `LoggerToken`) — released in 0.0.63 | 2026-10-03 | [evidence/2026/10/03/78dba5ff…/evidence.md](evidence/2026/10/03/78dba5ff-0cd1-442e-86e3-f7faf701a4b5/evidence.md) |
-| `72f2e6b9-a0fd-4abb-8151-c3b061b83281` | `bug` | node:sqlite without `sqlite3`, barrel polyfill fix, Fastify double-send fix, production audit fixes (legacy `RUNTIME-FIX-001`) — released in 0.0.62 | 2026-10-01 | [plan](closed/2026/10/01/72f2e6b9-a0fd-4abb-8151-c3b061b83281/plan.md) |
-| `0.0.60` | `release` | 0.0.60 — CI orchestrator, Docker smoke matrix, DI child containers, README; released | 2026-09-29 | [closed/2026/09/29/0.0.60-release.md](closed/2026/09/29/0.0.60-release.md) |
-| `5c2c9ef3` | `refactoring` | P2: DI layered child containers (infra→domain→app) — shipped in 0.0.60 | 2026-09-29 | [closed/2026/09/29/5c2c9ef3-1a6e-469f-9c25-f644b5e3d635.md](closed/2026/09/29/5c2c9ef3-1a6e-469f-9c25-f644b5e3d635.md) |
 
 Older closed rows: [closed/BACKLOG-ARCHIVE.md](closed/BACKLOG-ARCHIVE.md).
 

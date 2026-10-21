@@ -34,6 +34,10 @@ export const PageServerAdapterToken: InjectionToken<PageServerPort> = Symbol.for
   '@sentzunhat/zacatl/service/platforms/server/page/adapter',
 );
 // eslint-disable-next-line @typescript-eslint/naming-convention -- DI token names use PascalCase like LoggerToken.
+export const PageServerResolutionContainerToken: InjectionToken<DependencyContainer> = Symbol.for(
+  '@sentzunhat/zacatl/service/platforms/server/page/resolution-container',
+);
+// eslint-disable-next-line @typescript-eslint/naming-convention -- DI token names use PascalCase like LoggerToken.
 export const DatabaseServiceNameToken: InjectionToken<string> = Symbol.for(
   '@sentzunhat/zacatl/service/platforms/server/database/service-name',
 );

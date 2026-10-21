@@ -1,0 +1,11 @@
+{
+  "index": {
+    "paths": [
+      ".hawp/kit",
+      ".hawp/work",
+      "docs",
+      "scripts/utils/README.md",
+      "README.md"
+    ]
+  }
+}

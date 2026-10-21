@@ -53,6 +53,28 @@ routes, and pages. The current configuration still places database connection
 entries under `platforms.server.databases`; Service prepares the infrastructure
 connections before Server begins listening.
 
+### Service startup and shutdown
+
+`Service.start()` registers application routes and hooks, prepares configured
+databases and page handlers, waits for `layers.start()` readiness, and then
+starts the platform listener. The HTTP listener is not opened until repository
+readiness succeeds.
+
+If startup fails, Service attempts platform cleanup and rethrows the original
+startup error. Database preparation tracks each adapter before connecting, so
+cleanup can disconnect adapters that connected before a later connection or
+`onDatabaseConnected` callback failed. Shutdown attempts database disconnect
+even when HTTP close fails; when both fail, the HTTP close error is preserved
+as the primary error. A failed adapter disconnect remains tracked so a later
+`stop()` can retry it. Duplicate connections with the same vendor and
+connection name are rejected before they can replace an adapter already owned
+by the Service; names may be reused with different vendors.
+
+Calling `start()` again after `stop()` is not a documented restart contract.
+Do not rely on restarting the same Service instance; create a new instance or
+process for a new lifecycle. The current Fastify plus in-memory SQLite restart
+probe failed on a second start.
+
 ### `ServerConfig`
 
 Main configuration object for the server platform.
@@ -100,7 +122,7 @@ type HttpServerConfig = {
 - `vendor` - HTTP framework: `FASTIFY` or `EXPRESS`
 - `instance` - The Fastify or Express instance (create before passing to config)
 - `host` - Optional bind address; `Service.start({ host })` overrides it. Defaults to `0.0.0.0` for Docker port publishing.
-- `prefixes` - Named route prefixes used by the server and SPA fallback guards
+- `prefixes` - Optional named route prefixes. When `prefixes.api` is set, Zacatl prepends it to each route handler URL; when omitted, handler URLs are registered unchanged. Page SPA fallback inherits these prefixes unless `page.prefixes` overrides them; with neither configured, its exclusion defaults to `/api`.
 - `gateway` - Gateway configuration with proxy routes (required when `type` is `GATEWAY`)
 
 ---
@@ -113,17 +135,24 @@ Configuration for serving frontend applications (React, Vue, Svelte, etc.) and s
 type PageServerConfig = {
   devServerUrl?: string;
   staticDir?: string;
-  customRegister?: (adapter: unknown, rawServer?: unknown) => Promise<void> | void;
+  customRegister?: (context: PageRegistrationContext) => Promise<void> | void;
   prefixes?: ApiPrefixes;
 };
 ```
+
+`PageRegistrationContext` provides `adapter`, `rawServer`, `isApiRequest(url)`,
+and `resolve(token)`. Import it from
+`@sentzunhat/zacatl/service/platforms/server/types/server-config` when
+annotating the callback type. Migrate positional callbacks from
+`(adapter, rawServer, container)` to `({ adapter, rawServer, resolve,
+isApiRequest })`; use `resolve(Token)` for Service-owned dependencies.
 
 **Properties:**
 
 - `devServerUrl` - Development server URL for proxying (e.g., Vite dev server at `http://localhost:5173`)
 - `staticDir` - Directory containing built static files (e.g., `./dist/client`)
-- `customRegister` - Custom registration callback. Its first argument is Zacatl's page adapter; the second is the underlying Fastify or Express instance.
-- `prefixes` - API route prefixes to exclude from SPA fallback (default: `{ api: "/api" }`)
+- `customRegister` - Callback for app-specific plugins and handlers. `resolve(token)` uses this Service's Application scope; direct unmanaged Server construction retains its global resolution path. `isApiRequest(url)` recognizes the configured API route prefix, including its subpaths. When no API prefix is configured it returns false. The helper identifies API requests; the custom handler must leave them to the API's JSON 404 behavior. Zacatl does not convert a custom HTML 404 response to JSON automatically.
+- `prefixes` - Path groups excluded from SPA fallback. Defaults to `server.prefixes`, then `{ api: "/api" }`.
 
 ---
 
@@ -150,8 +179,13 @@ type DatabaseConfig = {
 - `vendor` - Database vendor: `MONGOOSE`, `SEQUELIZE`, or `SQLITE`
 - `connection.url` - For SQLite: a file path (e.g. `'app.db'`) or `':memory:'`. For others: the full connection URI.
 - `connection.name` - Optional. Stable token name for multi-database setups: repositories reference it via `connection: { name: '...' }` in their config. Omit for a single database per vendor; Zacatl falls back to the vendor default token.
+- A vendor/name pair identifies one Service-owned database connection. Do not
+  configure the same vendor and name more than once; a name can be reused for
+  a different vendor.
 - `instance` - The Mongoose or Sequelize instance. **Not required for `SQLITE`** — the adapter opens the file internally.
-- `onDatabaseConnected` - Optional callback invoked after successful connection (use for model initialization, syncing, etc.).
+- `onDatabaseConnected` - Optional callback invoked after a successful
+  connection (use for model initialization, syncing, etc.). If it throws,
+  startup fails and Service cleanup attempts to close the connected adapter.
 
 ---
 
@@ -717,9 +751,10 @@ const service = new Service({
   platforms: {
     server: {
       page: {
-        customRegister: async (_adapter, rawServer) => {
+        customRegister: async ({ rawServer, resolve, isApiRequest }) => {
           const fastify = rawServer as FastifyInstance;
-          // Register custom plugins, middleware, etc.
+          const pageRenderer = resolve(PageRenderer);
+          registerHtmlNotFound(fastify, pageRenderer, isApiRequest);
           await fastify.register(somePlugin);
         },
       },
@@ -728,6 +763,10 @@ const service = new Service({
   },
 });
 ```
+
+`PageRenderer` and `registerHtmlNotFound` are application code. The latter
+should return the normal JSON 404 when `isApiRequest(request.url)` is true, and render
+HTML only for page requests. Keep its response policy in the application.
 
 ---
 

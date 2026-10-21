@@ -5,13 +5,14 @@ import { InternalServerError } from '../../../src/error';
 import {
   createChildContainer,
   ensureRegisteredSingleton,
-} from '@zacatl/dependency-injection/container';
+} from '../../../src/third-party/dependency-injection/container';
 import type { ServiceConfig } from '../../../src/service/service';
 import { Service, ServiceType } from '../../../src/service/service';
 import {
   ServerType,
   ServerVendor,
 } from '../../../src/service/platforms/server/types/server-config';
+import { DatabaseVendor } from '../../../src/service/platforms/server/database/port';
 
 describe('Service (unit)', () => {
   it('throws when config.type is missing', () => {
@@ -174,6 +175,109 @@ describe('Service (unit)', () => {
     await start;
     expect(instance.server.listening).toBe(true);
     await svc.stop();
+  });
+
+  it('releases a connected database when onDatabaseConnected fails during startup', async () => {
+    const instance = fastify();
+    const close = vi.fn();
+    const database = { prepare: vi.fn(), close };
+    const svc = new Service({
+      type: ServiceType.SERVER,
+      layers: { application: { entryPoints: { rest: { routes: [] } } } },
+      platforms: {
+        server: {
+          name: 'callback-failure',
+          server: { type: ServerType.SERVER, vendor: ServerVendor.FASTIFY, instance },
+          databases: [{
+            vendor: DatabaseVendor.SQLITE,
+            connection: { url: ':memory:' },
+            instance: database as never,
+            onDatabaseConnected: async () => { throw new Error('database setup failed'); },
+          }],
+          port: 0,
+        },
+      },
+      run: { auto: false },
+    });
+
+    await expect(svc.start()).rejects.toThrow();
+    expect(close).toHaveBeenCalledOnce();
+  });
+
+  it('releases databases when repository readiness fails during startup', async () => {
+    const instance = fastify();
+    const close = vi.fn();
+    const database = { prepare: vi.fn(), close };
+    class FailingRepository {
+      async ready(): Promise<void> { throw new Error('repository failed'); }
+    }
+    const svc = new Service({
+      type: ServiceType.SERVER,
+      layers: {
+        infrastructure: { repositories: [FailingRepository as never] },
+        application: { entryPoints: { rest: { routes: [] } } },
+      },
+      platforms: {
+        server: {
+          name: 'repository-failure',
+          server: { type: ServerType.SERVER, vendor: ServerVendor.FASTIFY, instance },
+          databases: [{ vendor: DatabaseVendor.SQLITE, connection: { url: ':memory:' }, instance: database as never }],
+          port: 0,
+        },
+      },
+      run: { auto: false },
+    });
+
+    await expect(svc.start()).rejects.toThrow('repository failed');
+    expect(close).toHaveBeenCalledOnce();
+    expect(instance.server.listening).toBe(false);
+  });
+
+  it('releases databases when page setup fails during startup', async () => {
+    const instance = fastify();
+    const close = vi.fn();
+    const database = { prepare: vi.fn(), close };
+    const svc = new Service({
+      type: ServiceType.SERVER,
+      layers: { application: { entryPoints: { rest: { routes: [] } } } },
+      platforms: {
+        server: {
+          name: 'page-failure',
+          server: { type: ServerType.SERVER, vendor: ServerVendor.FASTIFY, instance },
+          databases: [{ vendor: DatabaseVendor.SQLITE, connection: { url: ':memory:' }, instance: database as never }],
+          page: { customRegister: async () => { throw new Error('page setup failed'); } },
+          port: 0,
+        },
+      },
+      run: { auto: false },
+    });
+
+    await expect(svc.start()).rejects.toThrow('failed to prepare service');
+    expect(close).toHaveBeenCalledOnce();
+    expect(instance.server.listening).toBe(false);
+  });
+
+  it('releases databases when listener startup fails', async () => {
+    const instance = fastify();
+    vi.spyOn(instance, 'listen').mockRejectedValue(new Error('listener failed'));
+    const close = vi.fn();
+    const database = { prepare: vi.fn(), close };
+    const svc = new Service({
+      type: ServiceType.SERVER,
+      layers: { application: { entryPoints: { rest: { routes: [] } } } },
+      platforms: {
+        server: {
+          name: 'listener-failure',
+          server: { type: ServerType.SERVER, vendor: ServerVendor.FASTIFY, instance },
+          databases: [{ vendor: DatabaseVendor.SQLITE, connection: { url: ':memory:' }, instance: database as never }],
+          port: 0,
+        },
+      },
+      run: { auto: false },
+    });
+
+    await expect(svc.start()).rejects.toThrow('failed to start service');
+    expect(close).toHaveBeenCalledOnce();
   });
 
   it('stop() resolves cleanly without platforms', async () => {
