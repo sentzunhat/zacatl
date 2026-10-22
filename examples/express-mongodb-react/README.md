@@ -7,10 +7,9 @@ Production-grade Zacatl example with scalable MongoDB database.
 ### Start MongoDB
 
 ```bash
-# Docker (recommended)
-docker run -d -p 27017:27017 --name mongo mongo:latest
-
-# Or install locally: brew install mongodb-community
+# From the repository root; initializes the local:local user and appdb.
+EXPRESS_MONGODB_HOST_PORT=27017 docker compose \
+  -f examples/express-mongodb-react/docker-compose.yml up -d mongodb
 ```
 
 ### Run Example
@@ -25,9 +24,9 @@ npm run dev
 
 ## Database Setup
 
-- **Connection**: `mongodb://localhost:27017/api/greetings-db`
-- **Connection file**: `backend/src/infrastructure/database/connection.ts`
-- **Local run**: `docker run -d -p 27017:27017 --name mongo mongo:latest`
+- **Connection**: `mongodb://local:local@localhost:27017/appdb`
+- **Connection config**: `apps/backend/src/config.ts`
+- **Database**: `appdb` (the `/api` prefix applies to HTTP routes, not MongoDB)
 
 ## What's Included
 
@@ -41,12 +40,12 @@ npm run dev
 ## Project Structure
 
 ```
-backend/              # Express API
+apps/backend/         # Express API
 └── src/
   ├── application/    # Handlers, schemas
   ├── domain/         # Services, models, ports
   └── infrastructure/ # Repositories, Mongoose models
-frontend/             # React + Vite
+apps/frontend/        # React + Vite
 ```
 
 ## API Endpoints
@@ -91,7 +90,7 @@ docker compose up -d
 ### Notes
 
 - MongoDB runs in a separate container via docker-compose
-- Backend connects to `mongodb://mongo:27017/api/greetings-db`
+- Backend connects to `mongodb://local:local@mongodb:27017/appdb`
 - See [docker.md](../docker.md) for multi-example setup
 
 ## Documentation

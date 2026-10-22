@@ -378,3 +378,13 @@ from this local run.
 The website working tree had pre-existing unrelated local edits, which remain
 untouched. This item stays active for the release-dependent dependency/lock
 update and remaining consumer acceptance review.
+
+
+### Copilot MongoDB example correction — 2026-10-22
+
+The Express/MongoDB example README's local and Docker URIs included the HTTP
+`/api` prefix as a MongoDB database path, producing an invalid database name
+with `/`. Corrected both URIs to the example's single `appdb` database path,
+matching its config and Docker Compose defaults. The API route prefix remains
+`/api`; it is unrelated to the database URI. Repository search found no other
+MongoDB URI with `/api/`.

@@ -301,3 +301,18 @@ Markdown link checker passed across 214 files, and `git diff --check` passed.
 This verifies the edited docs and index setup, not the entirety of every
 architecture/API claim in the wider docs inventory; broader review remains
 active.
+
+
+### Copilot example and ESLint map findings — 2026-10-22
+
+Confirmed and corrected two documentation mismatches in the latest PR review:
+`examples/express-mongodb-react/README.md` had `/api/` in both MongoDB URIs,
+which Mongoose interprets as part of the database name; both now use the single
+`appdb` path segment, matching the example config and Compose initialization. The
+README now starts the configured Compose service with its host port aligned to
+the local default and uses the correct `mongodb` service hostname in Docker.
+It also corrects the connection-config path and source-tree names.
+`docs/third-party/README.md` still showed the
+removed `eslint.ts` node; the tree now distinguishes `eslint-plugins.ts` from
+the `eslint/` shareable-config directory and names their public subpaths. A
+repository search found no other MongoDB URI containing `/api/`.

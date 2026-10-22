@@ -66,7 +66,8 @@ src/
     │   ├── container.ts          # Zacatl DI implementation (not a package deep export)
     │   ├── tsyringe.ts            # DI container re-export
     │   └── reflect-metadata.ts    # reflect-metadata side-effect import
-    ├── eslint.ts                  # ESLint plugins re-export (subpath only)
+    ├── eslint-plugins.ts          # Vendor plugin/parser wrapper; /third-party/eslint-plugins
+    ├── eslint/                    # Shareable ESLint configurations; /third-party/eslint
     ├── express.ts                 # Express re-export (subpath only)
     ├── fastify.ts                 # Fastify + ZodTypeProvider
     ├── http-proxy-middleware.ts   # HTTP proxy re-export (optional peer)
