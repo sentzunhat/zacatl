@@ -108,7 +108,7 @@ import {
   registerSingleton,
   registerValue,
   resolveDependency,
-} from '@sentzunhat/zacatl/dependency-injection';
+} from '@sentzunhat/zacatl/third-party/dependency-injection';
 
 registerDependency(UserService, UserService);
 registerSingleton(NotificationService, NotificationService);
@@ -519,7 +519,7 @@ class UserOrderCoordinator {
 
 ```typescript
 // Instead of decorators
-import { registerSingleton, resolveDependency } from '@sentzunhat/zacatl/dependency-injection';
+import { registerSingleton, resolveDependency } from '@sentzunhat/zacatl/third-party/dependency-injection';
 
 registerSingleton(MyRepository, MyRepository);
 registerSingleton(MyService, MyService);
@@ -650,7 +650,7 @@ Use explicit subpaths (no root barrel since 0.0.56):
 ```typescript
 import { Service } from '@sentzunhat/zacatl/service';
 import { BadRequestError, ValidationError, NotFoundError } from '@sentzunhat/zacatl/error';
-import { resolveDependency } from '@sentzunhat/zacatl/dependency-injection';
+import { resolveDependency } from '@sentzunhat/zacatl/third-party/dependency-injection';
 import { inject, singleton, container } from '@sentzunhat/zacatl/third-party/dependency-injection/tsyringe';
 ```
 

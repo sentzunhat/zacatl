@@ -1,7 +1,8 @@
-import { getContainer, registerValue } from '@zacatl/dependency-injection';
 import { InternalServerError } from '@zacatl/error';
+import { getContainer, registerValue } from '@zacatl/third-party/dependency-injection';
 import type { DependencyContainer, InjectionToken } from '@zacatl/third-party/dependency-injection/tsyringe';
 
+import { normalizeConnectionName } from './connection-name';
 import { type DatabaseVendor, type DatabaseInstance } from './port';
 import { createDatabaseToken } from '../../../layers/infrastructure/orm/tokens/factory';
 
@@ -44,7 +45,7 @@ export const registerOrmInstance = (
   // Repositories resolve the unnamed default connection by vendor. A URL is
   // not a stable public connection name and would make default registrations
   // impossible to resolve (for example, `:memory:` versus `SQLITE`).
-  const tokenKey = connection?.name ?? vendor;
+  const tokenKey = normalizeConnectionName(vendor, connection?.name);
   const token = createDatabaseToken(vendor, tokenKey);
 
   registerValue(token as InjectionToken<DatabaseInstance>, instance, container);

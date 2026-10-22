@@ -1,4 +1,9 @@
 import { InternalServerError } from '@zacatl/error';
+import { getContainer, registerValue } from '@zacatl/third-party/dependency-injection';
+import {
+  createChildContainer,
+  ensureRegisteredSingleton,
+} from '@zacatl/third-party/dependency-injection/container';
 import {
   inject,
   injectable,
@@ -15,12 +20,6 @@ import { ServerConfigToken } from './server/tokens';
 import { PlatformsConfigToken } from './tokens';
 import { CliConfigToken, DesktopConfigToken } from './tokens';
 import type { PlatformsConfig } from './types';
-import {
-  createChildContainer,
-  ensureRegisteredSingleton,
-  getContainer,
-  registerValue,
-} from '../../dependency-injection/container';
 import type { ApplicationEntryPoints } from '../layers/application/types';
 
 /**

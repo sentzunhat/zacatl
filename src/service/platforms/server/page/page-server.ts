@@ -1,9 +1,19 @@
 import { CustomError } from '@zacatl/error';
-import { inject, injectable } from '@zacatl/third-party/dependency-injection/tsyringe';
+import { getContainer, resolveDependency } from '@zacatl/third-party/dependency-injection';
+import {
+  inject,
+  injectable,
+  type DependencyContainer,
+} from '@zacatl/third-party/dependency-injection/tsyringe';
 
 import type { ServerConfig } from '../server';
 import { type ApiPrefixes, type PageServerPort, type StaticConfig } from './port';
-import { PageServerAdapterToken, PageServerConfigToken } from '../tokens';
+import { isUnderPrefix } from '../shared/prefixes/is-under-prefix';
+import {
+  PageServerAdapterToken,
+  PageServerConfigToken,
+  PageServerResolutionContainerToken,
+} from '../tokens';
 
 /**
  * PageServer - Encapsulates frontend/page rendering logic
@@ -15,13 +25,16 @@ import { PageServerAdapterToken, PageServerConfigToken } from '../tokens';
 export class PageServer {
   private readonly config: ServerConfig;
   private readonly adapter: PageServerPort;
+  private readonly resolutionContainer: DependencyContainer;
 
   constructor(
     @inject(PageServerConfigToken) config: ServerConfig,
     @inject(PageServerAdapterToken) adapter: PageServerPort,
+    @inject(PageServerResolutionContainerToken) resolutionContainer?: DependencyContainer,
   ) {
     this.config = config;
     this.adapter = adapter;
+    this.resolutionContainer = resolutionContainer ?? getContainer();
   }
 
   /**
@@ -87,7 +100,7 @@ export class PageServer {
     const {
       staticDir,
       spaFallback = true,
-      prefixes = { api: '/api' },
+      prefixes = this.config.server.prefixes ?? { api: '/api' },
       cache,
       customRegister,
     } = this.config.page;
@@ -104,7 +117,14 @@ export class PageServer {
     }
 
     if (customRegister != null) {
-      await customRegister(this.adapter, this.adapter.getRawServer?.());
+      const configuredApiPrefix = this.config.server.prefixes?.api;
+      await customRegister({
+        adapter: this.adapter,
+        rawServer: this.adapter.getRawServer?.(),
+        isApiRequest: (url) =>
+          configuredApiPrefix != null && isUnderPrefix(url, configuredApiPrefix),
+        resolve: (token) => resolveDependency(token, this.resolutionContainer),
+      });
     }
   }
 

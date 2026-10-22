@@ -1,0 +1,15 @@
+{
+  "index": {
+    "paths": [
+      ".hawp/kit",
+      ".hawp/work",
+      "docs",
+      "src",
+      ".github/agents/docs-alignment.agent.md",
+      ".github/prompts/hawp-docs-alignment-simplicity.prompt.md",
+      ".github/instructions/hawp-docs-alignment.instructions.md",
+      "scripts/utils/README.md",
+      "README.md"
+    ]
+  }
+}

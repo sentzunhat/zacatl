@@ -30,7 +30,7 @@ Complete Zacatl API documentation.
 import { Service } from '@sentzunhat/zacatl/service';
 
 import { NotFoundError, BadRequestError } from '@sentzunhat/zacatl/error';
-import { loadJSON, loadYML } from '@sentzunhat/zacatl/configuration';
+import { loadJSON, loadYML } from '@sentzunhat/zacatl/utils/configuration';
 
 // Full paths (still supported)
 import { createLogger } from '@sentzunhat/zacatl/logs';

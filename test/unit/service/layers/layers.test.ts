@@ -4,10 +4,10 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 import {
   clearContainer,
-  createChildContainer,
   getContainer,
   registerValue,
-} from '../../../../src/dependency-injection';
+} from '../../../../src/third-party/dependency-injection/container';
+import { createChildContainer } from '../../../../src/third-party/dependency-injection/container';
 import { BaseRepository } from '../../../../src/service/layers/infrastructure/repositories/nodesqlite/repository';
 import { Layers } from '../../../../src/service/layers/layers';
 import { LayersConfigToken } from '../../../../src/service/layers/tokens';

@@ -1,5 +1,6 @@
-import { resolveDependencies } from '@zacatl/dependency-injection';
 import { InternalServerError } from '@zacatl/error';
+import { resolveDependencies } from '@zacatl/third-party/dependency-injection';
+import { ensureRegisteredSingleton } from '@zacatl/third-party/dependency-injection/container';
 import {
   inject,
   injectable,
@@ -8,7 +9,6 @@ import {
 
 import { ApplicationConfigToken, ApplicationContainerToken } from './tokens';
 import type { ApplicationConfig } from './types';
-import { ensureRegisteredSingleton } from '../../../dependency-injection/container';
 
 @injectable()
 export class Application {

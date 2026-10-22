@@ -34,26 +34,98 @@ describe('Export Strategy Verification', () => {
     });
 
     it('should provide BaseRepository from each ORM vendor subpath', async () => {
-      const { BaseRepository: MongooseBaseRepository } = await import(
-        '@zacatl/service/layers/infrastructure/repositories/mongoose/repository'
-      );
-      const { BaseRepository: SequelizeBaseRepository } = await import(
-        '@zacatl/service/layers/infrastructure/repositories/sequelize/repository'
-      );
-      const { BaseRepository: NodeSqliteBaseRepository } = await import(
-        '@zacatl/service/layers/infrastructure/repositories/nodesqlite/repository'
-      );
+      const { BaseRepository: MongooseBaseRepository } =
+        await import('@zacatl/service/layers/infrastructure/repositories/mongoose/repository');
+      const { BaseRepository: SequelizeBaseRepository } =
+        await import('@zacatl/service/layers/infrastructure/repositories/sequelize/repository');
+      const { BaseRepository: NodeSqliteBaseRepository } =
+        await import('@zacatl/service/layers/infrastructure/repositories/nodesqlite/repository');
       expect(MongooseBaseRepository).toBeDefined();
       expect(SequelizeBaseRepository).toBeDefined();
       expect(NodeSqliteBaseRepository).toBeDefined();
     });
-    it('should provide DI utilities from @zacatl/dependency-injection subpath', async () => {
-      const diExports = await import('@zacatl/dependency-injection');
+    it('should provide DI utilities from @zacatl/third-party/dependency-injection subpath', async () => {
+      const diExports = await import('@zacatl/third-party/dependency-injection');
 
-      expect(diExports.resolveDependency).toBeDefined();
-      expect(diExports.registerDependency).toBeDefined();
-      expect(diExports.registerSingleton).toBeDefined();
-      expect(diExports.clearContainer).toBeDefined();
+      expect(Object.keys(diExports).sort()).toEqual(
+        [
+          'clearContainer',
+          'getContainer',
+          'registerAndResolve',
+          'registerDependencies',
+          'registerDependency',
+          'registerSingleton',
+          'registerValue',
+          'resolveDependencies',
+          'resolveDependency',
+        ].sort(),
+      );
+    });
+
+    it('should preserve the public DI source alias after path generation', () => {
+      const tsconfig = JSON.parse(
+        fs.readFileSync(path.join(repoRoot, 'tsconfig.base.json'), 'utf8'),
+      ) as {
+        compilerOptions: { paths: Record<string, string[]> };
+      };
+
+      expect(tsconfig.compilerOptions.paths['@zacatl/third-party/dependency-injection']).toEqual([
+        './src/third-party/dependency-injection.ts',
+      ]);
+      expect(tsconfig.compilerOptions.paths['@zacatl/third-party']).toEqual([
+        './src/third-party.ts',
+      ]);
+      expect(tsconfig.compilerOptions.paths['@zacatl/third-party/databases/mongoose']).toEqual([
+        './src/third-party/databases/mongoose.ts',
+      ]);
+      expect(tsconfig.compilerOptions.paths['@zacatl/third-party/databases']).toBeUndefined();
+    });
+
+    it('should not expose the internal container module as a package subpath', () => {
+      const packageJson = JSON.parse(
+        fs.readFileSync(path.join(repoRoot, 'package.json'), 'utf8'),
+      ) as {
+        exports: Record<string, unknown>;
+      };
+
+      expect(packageJson.exports).not.toHaveProperty('./dependency-injection');
+      expect(packageJson.exports).toHaveProperty('./third-party/dependency-injection');
+      expect(packageJson.exports).not.toHaveProperty('./dependency-injection/container');
+      expect(packageJson.exports).not.toHaveProperty(
+        './third-party/dependency-injection/container',
+      );
+    });
+
+    it('should expose the shared third-party barrel and only explicit database adapter subpaths', () => {
+      const packageJson = JSON.parse(
+        fs.readFileSync(path.join(repoRoot, 'package.json'), 'utf8'),
+      ) as {
+        exports: Record<string, unknown>;
+      };
+
+      expect(packageJson.exports).toHaveProperty('./third-party');
+      expect(packageJson.exports).toHaveProperty('./third-party/databases/mongoose');
+      expect(packageJson.exports).toHaveProperty('./third-party/databases/sequelize');
+      expect(packageJson.exports).not.toHaveProperty('./third-party/databases');
+      expect(packageJson.exports).toHaveProperty('./third-party/dependency-injection');
+      expect(packageJson.exports).toHaveProperty('./third-party/eslint');
+      expect(packageJson.exports).toHaveProperty('./third-party/eslint-plugins');
+    });
+
+    it('should keep shared example aliases pointed at the real third-party barrel files', () => {
+      const sourcePaths = JSON.parse(
+        fs.readFileSync(path.join(repoRoot, 'examples/shared/zacatl-src-paths.json'), 'utf8'),
+      ) as { compilerOptions: { paths: Record<string, string[]> } };
+      const buildPaths = JSON.parse(
+        fs.readFileSync(path.join(repoRoot, 'examples/shared/zacatl-build-paths.json'), 'utf8'),
+      ) as { compilerOptions: { paths: Record<string, string[]> } };
+
+      expect(sourcePaths.compilerOptions.paths['@sentzunhat/zacatl/third-party']).toEqual([
+        'REL/src/third-party.ts',
+      ]);
+      expect(buildPaths.compilerOptions.paths['@sentzunhat/zacatl/third-party']).toEqual([
+        'REL/build-src-esm/third-party.d.ts',
+      ]);
     });
 
     it('should NOT export ORMs from service subpath', () => {
@@ -121,7 +193,7 @@ describe('Export Strategy Verification', () => {
     });
 
     it('should keep module imports explicit without a root re-export barrel', async () => {
-      const diExports = await import('@zacatl/dependency-injection');
+      const diExports = await import('@zacatl/third-party/dependency-injection');
 
       expect(serviceModule.Service).toBeDefined();
       expect(diExports.resolveDependency).toBeDefined();
@@ -134,7 +206,7 @@ describe('Export Strategy Verification', () => {
     });
 
     it('should maintain minimal bundle size for users not needing ORMs', async () => {
-      const { resolveDependency } = await import('@zacatl/dependency-injection');
+      const { resolveDependency } = await import('@zacatl/third-party/dependency-injection');
 
       expect(serviceModule.Service).toBeDefined();
       expect(resolveDependency).toBeDefined();

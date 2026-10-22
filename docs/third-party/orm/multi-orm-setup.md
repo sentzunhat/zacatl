@@ -59,7 +59,7 @@ const service = new Service({
           connection: { url: 'postgres://user:pass@localhost:5432/mydb' },
           onDatabaseConnected: async (db) => {
             console.log('✅ PostgreSQL connected');
-            await (db as Sequelize).sync({ alter: true });
+            await (db as Sequelize).sync();
           },
         },
       ],
@@ -69,6 +69,10 @@ const service = new Service({
 
 await service.start({ host: '0.0.0.0', port: 3000 });
 ```
+
+The Sequelize `sync()` examples create missing tables for local setup. Use
+versioned migrations for production schema changes; avoid `sync({ alter: true })`
+as an automatic startup step.
 
 ## Step-by-Step Setup
 
@@ -274,7 +278,7 @@ const service = new Service({
             initProductModel(seq);
 
             // Sync database (creates tables)
-            await seq.sync({ alter: true });
+            await seq.sync();
           },
         },
       ],

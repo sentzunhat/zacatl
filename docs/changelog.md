@@ -2,9 +2,45 @@
 
 ---
 
-## [0.0.65] - 2026-10-17
+## [0.0.66] - 2026-10-22
 
-**Status**: Release candidate in PR #138 targeting `main`; not published
+**Status**: Prepared for review; not published
+
+### ⚠️ Breaking package subpaths
+
+- Configuration moves from `@sentzunhat/zacatl/configuration` to
+  `@sentzunhat/zacatl/utils/configuration`.
+- Localization moves from `@sentzunhat/zacatl/localization` to
+  `@sentzunhat/zacatl/third-party/localization`.
+- Shareable ESLint configs move from `@sentzunhat/zacatl/eslint` to
+  `@sentzunhat/zacatl/third-party/eslint`; the vendor package wrapper is
+  available separately at `@sentzunhat/zacatl/third-party/eslint-plugins`.
+- Dependency injection moves from `@sentzunhat/zacatl/dependency-injection` to
+  `@sentzunhat/zacatl/third-party/dependency-injection`.
+- These previous package subpaths are removed without compatibility facades.
+
+### 🔧 Service lifecycle cleanup
+
+- The DI implementation now lives at `src/third-party/dependency-injection/container.ts`; its public helper entry is `@sentzunhat/zacatl/third-party/dependency-injection`. The unsupported `dependency-injection/container` deep package export is removed, and internal child-container and singleton-registration helpers are no longer exposed through the public package entry.
+- Database startup now releases adapters that connected before a later
+  connection or `onDatabaseConnected` callback fails. Duplicate vendor/name
+  connection keys are rejected before replacing an owned adapter, and an
+  adapter whose disconnect fails remains tracked for a later cleanup retry.
+- Shutdown attempts database disconnect even if closing the HTTP server fails,
+  while preserving the first cleanup error, including when a rejected promise
+  has an `undefined` rejection reason. Named database adapters can be retrieved
+  by vendor and connection name.
+- `PageServerConfig.customRegister` receives one named context with the page
+  adapter, native server, `isApiRequest(url)` helper, and a resolver bound to
+  the Service's Application scope. Custom page handlers can resolve their own
+  dependencies and preserve JSON 404 responses under the configured API prefix
+  without selecting a container or repeating prefix matching. Direct Server
+  construction keeps its global resolution path. Page SPA fallback inherits
+  configured Server prefixes unless the page config overrides them.
+
+## [0.0.65] - 2026-10-20
+
+**Status**: Published on npm and as GitHub release v0.0.65 on 2026-10-20
 
 ### ✨ Features and fixes
 
@@ -82,13 +118,10 @@
 
 ### 🚦 Integration and release boundary
 
-- PR #138 now targets `main` as the `0.0.65` release candidate. Its pull
-  request checks passed; merging it will start the main-branch release gates,
-  followed by the automated tag, npm publish, and GitHub Release if those gates
-  pass. The PR remains open and has not been merged.
-- The website still consumes published Zacatl 0.0.64. This release candidate
-  does not migrate the website; website adoption remains tracked by its
-  existing work item `2a1dc541-2cca-4c2f-b431-7a6535b77040`.
+- PR #138 merged into `main` on 2026-10-20. Zacatl 0.0.65 was published to npm
+  and released as GitHub tag `v0.0.65` that day.
+- The website migration is separate from the framework release and remains
+  tracked by work item `2a1dc541-2cca-4c2f-b431-7a6535b77040`.
 
 ## [0.0.64] - 2026-10-03
 
@@ -1014,7 +1047,7 @@ See [third-party/single-import.md](third-party/single-import.md) for the full su
 ### ✨ Improvements
 
 - **ESLint: consolidated `solid` config** — Added `src/eslint/solid.mjs` (a consolidated, ready-to-use Flat config) and exported it via the package `recommended` set so consumers can opt into a single, well-configured ESLint bundle.
-- **ESLint: relaxed naming rules for literal properties** — The `naming-conventions` rules now allow numeric keys (e.g. `200`) and dot-delimited alphanumeric property names (e.g. `device.browser.fingerprint`, `diego.beltran.is.best`), which avoids false positives when using status-code keys or dotted property identifiers in literal objects.
+- **ESLint: relaxed naming rules for literal properties** — The `naming-conventions` rules now allow numeric keys (e.g. `200`) and dot-delimited alphanumeric property names (e.g. `device.browser.fingerprint`, `record.metadata.source`), which avoids false positives when using status-code keys or dotted property identifiers in literal objects.
 
 ### 📚 Documentation
 

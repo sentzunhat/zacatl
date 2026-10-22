@@ -7,8 +7,8 @@ import { describe, it, expect } from 'vitest';
 import {
   loadStaticCatalog,
   mergeStaticCatalogs,
-} from '../../../../src/localization/node/core';
-import type { I18nStaticCatalogType } from '../../../../src/localization/node/types';
+} from '../../../../src/third-party/localization/node/core';
+import type { I18nStaticCatalogType } from '../../../../src/third-party/localization/node/types';
 
 describe('i18n-node core', () => {
   it('loadStaticCatalog reads available locale files', () => {

@@ -1,8 +1,8 @@
 # Zacatl Framework Overview
 
 Zacatl is a modular TypeScript framework built around layered composition.
-`src/` is organized so each module can evolve independently while staying on a
-stable public API surface.
+`src/` groups shared utilities, third-party integrations, and Service modules;
+package subpaths follow this source layout.
 
 ## Current Implementation Status
 
@@ -14,11 +14,20 @@ stable public API surface.
 
 ```text
 src/
-├── configuration/
-├── dependency-injection/
+├── utils/
+│   ├── configuration.ts
+│   ├── configuration/
+│   └── command-runner/
+├── third-party/
+│   ├── eslint-plugins.ts
+│   ├── eslint/
+│   ├── localization.ts
+│   ├── localization/
+│   ├── dependency-injection.ts # Public DI helper exports
+│   └── dependency-injection/ # DI implementation
+├── third-party.ts
 ├── error/
 ├── logs/
-├── localization/
 ├── service/
 │   ├── layers/
 │   │   ├── application/
@@ -31,8 +40,6 @@ src/
 │       ├── cli/
 │       ├── desktop/
 │       └── context/
-├── third-party/
-└── utils/
 ```
 
 ## Architectural Patterns in Use
@@ -67,7 +74,7 @@ src/
 - Add new domain logic under `src/service/layers/domain/` and keep framework-specific code out of domain modules.
 - Add infrastructure implementations under `src/service/layers/infrastructure/` and bind through existing ports/types.
 - Add new server-facing behavior under `src/service/layers/application/entry-points/rest/` (or matching entry-point family).
-- Export through the module's facade file (e.g. `src/error.ts`) and keep docs aligned with the exported subpath.
+- Export through the module's explicit entry file (e.g. `src/error.ts`) and keep docs aligned with the exported subpath.
 
 ## Known Gaps and Future Improvements
 
@@ -77,11 +84,11 @@ src/
 
 ## Module Index
 
-- Configuration: [configuration/README.md](../configuration/README.md)
+- Configuration: [configuration/README.md](../configuration/README.md) — package subpath `@sentzunhat/zacatl/utils/configuration`
 - Dependency Injection: [dependency-injection/README.md](../dependency-injection/README.md)
 - Errors: [error/README.md](../error/README.md)
 - Logging: [logs/README.md](../logs/README.md)
-- Localization: [localization/README.md](../localization/README.md)
+- Localization: [localization/README.md](../localization/README.md) — package subpath `@sentzunhat/zacatl/third-party/localization`
 - ORM Adapters: [third-party/orm/README.md](../third-party/orm/README.md)
 - Service and Platforms: [service/README.md](../service/README.md)
 

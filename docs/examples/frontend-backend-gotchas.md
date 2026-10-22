@@ -25,12 +25,11 @@ the framework adapter (`createFastifyApiAdapter` / `createExpressApiAdapter`).
 Each route handler defines a **relative** URL (`url: '/greetings'`); the
 adapter prepends the prefix, producing `/api/greetings`.
 
-**Page server SPA exclusion** is handled separately by `page.prefixes`,
-which defaults to `{ api: '/api' }` when omitted. You do **not** need to
-set it explicitly — the framework default is correct for all examples.
-
-**Rule:** Never set `page.prefixes` in example configs. The framework
-default already matches `server.prefixes.api`.
+**Page server SPA exclusion** uses `page.prefixes` when supplied. Otherwise,
+it inherits `server.prefixes`; if neither is configured, the page server
+excludes `/api` by default. Set `page.prefixes` only when the page fallback
+needs additional or different exclusions. In the standard examples, omitting
+it keeps API routing and SPA fallback aligned automatically.
 
 ---
 
@@ -171,8 +170,9 @@ Express does not have this restriction.
    of `/api/greetings`. Fix: add `prefixes: { api: '/api' }` to the
    `server:` block in `config.ts`.
 
-2. **Setting `page.prefixes` explicitly** — creates drift risk. Omit it;
-   the framework default is `{ api: '/api' }`.
+2. **Duplicating `server.prefixes` in `page.prefixes`** — can drift when the
+   API prefix changes. Omit it when the page should inherit the API prefix;
+   set it only for intentional page-specific exclusions.
 
 3. **Frontend fetching bare `/greetings`** — all fetch calls must use
    `/api/greetings`. Search for `'/greetings'` (without `/api`) to catch.

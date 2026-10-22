@@ -80,12 +80,12 @@ test/
 ├── setup.ts                 # Shared bootstrap loaded for all tests
 ├── tsconfig.json            # Test-specific TypeScript config
 └── unit/                    # Unit tests (majority)
-    ├── configuration/       # mirrors src/configuration/
-    ├── dependency-injection/ # mirrors src/dependency-injection/
+    ├── configuration/       # mirrors src/utils/configuration/
+    ├── dependency-injection/ # DI helper tests; implementation is under src/third-party/
     ├── error/               # mirrors src/error/
     ├── helpers/             # Shared test helpers
     ├── lib/                 # Vitest global setup / teardown
-    ├── localization/        # mirrors src/localization/
+    ├── localization/        # mirrors src/third-party/localization/
     ├── logs/                # mirrors src/logs/
     ├── service/             # mirrors src/service/
     │   ├── layers/          # application, domain, infrastructure
@@ -94,7 +94,7 @@ test/
     └── utils/               # mirrors src/utils/
 ```
 
-**Mirrored Structure:** Test folders must mirror `src/` structure for easy navigation.
+**Mirrored Structure:** Test folders generally mirror `src/` for easy navigation. Logical groups such as DI compatibility tests may intentionally differ from the implementation path.
 
 ```
 src/
@@ -606,7 +606,7 @@ import {
   registerDependency,
   registerSingleton,
   resolveDependency,
-} from '../../../src/dependency-injection/container';
+} from '../../../src/third-party/dependency-injection/container';
 
 class TestService {
   public id = Math.random();

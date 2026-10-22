@@ -1,7 +1,7 @@
+import { InternalServerError } from '@zacatl/error';
 import type { Sequelize, WhereOptions } from '@zacatl/third-party/databases/sequelize';
 import type { DependencyContainer } from '@zacatl/third-party/dependency-injection/tsyringe';
 
-import { InternalServerError } from '../../../../../error';
 import type {
   SequelizeRepositoryConfig,
   SequelizeRepositoryModel,

@@ -76,6 +76,17 @@ against that transition without presenting the target as an implemented API.
 
 Build/run the affected example, run documentation link checks and targeted Zacatl tests, and compare examples against current public declaration types. Do not update a release/changelog claim without a corresponding implementation/release.
 
+## Lifecycle documentation follow-up — 2026-10-21
+
+The unreleased changelog now records the confirmed cleanup behavior from
+`f1080c66`: database connections are released after callback or later
+connection failures, and database disconnect is attempted when HTTP close
+fails. No restart guarantee is documented because public docs do not promise
+restart after `stop()` and the existing cached prepare state does not establish
+it. Existing Service order remains database preparation, repository
+readiness, then HTTP listen. Consumer and Docker behavior remain unverified by
+this Zacatl-only run.
+
 ## Website consumer findings — 2026-10-16
 
 Document the supported first import as `@sentzunhat/zacatl/third-party/dependency-injection/reflect-metadata`; the shorter `/third-party/reflect-metadata` path from a consumer example is not exported in `0.0.64`. Show one `PinoLoggerAdapter` shared with Fastify through `toFastifyLogger`, `CustomError.toJSON()` for public responses, and server-only diagnostics. The website has applied these pieces locally while retaining its manual HTTP/database lifecycle.
@@ -133,7 +144,7 @@ are in [work item 19965b11](../19965b11/plan.md#independent-source-and-published
   `src/service/layers/application/application.ts:34-51` (nested scopes and
   application handler resolution).
 - `src/service/platforms/server/api/api-server.ts:90-113` and
-  `src/dependency-injection/container.ts:105-134` (platform re-resolution via
+  `src/third-party/dependency-injection/container.ts:105-134` (platform re-resolution via
   global default).
 - `src/service/platforms/server/server.ts:141-165`,
   `src/service/platforms/server/database/database-server.ts:28-58`,
@@ -273,3 +284,107 @@ stubs and the proposed Domain clients concept. Remaining documentation work
 is to reconcile older examples and DI guidance after review items `6ec737fa`
 and `fa61f33c` settle. The version guide's pre-`0.1.0` exception now has a
 clearer boundary; the release version remains a separate PR decision.
+
+### Website SSR 404 container follow-up — 2026-10-21
+
+The website's Fastify HTML 404 handler calls the global-only
+`resolveDependency(RenderPageProvider)`. Since that provider depends on a
+Service-owned repository, global resolution can select the wrong provider when
+multiple Services share a process. Zacatl's current `PageServer.customRegister`
+receives one `PageRegistrationContext` argument containing `adapter`,
+`rawServer`, `resolve(token)`, and `isApiRequest(url)`. The Service-managed
+resolver uses the matching Application scope; direct unmanaged Server
+construction retains the global fallback. The website callback still needs to
+use `resolve(RenderPageProvider)` and was not changed or runtime-tested here.
+
+### API prefix config and website migration — 2026-10-21
+
+`HttpServerConfig.prefixes.api` already prefixes relative handler URLs. When
+the field is omitted, Zacatl registers the handler URL unchanged; Server-level
+regressions cover both cases. All eight maintained Service examples configure
+`/api` and keep `/api` out of route handler paths. The website migration should
+set `prefixes: { api: '/api' }`, convert its current `/api/health` and
+`/api/projects` handler URLs to `/health` and `/projects`, keep frontend fetch
+URLs at `/api/...`, and update SPA/404 exclusions from the same prefix value.
+The current Zacatl pass did not edit the website.
+
+
+## Zacatl 0.0.66 consumer follow-up — 2026-10-21
+
+Zacatl's current `PageServer.customRegister` accepts one named context; the
+website 404 handler should use its `resolve(RenderPageProvider)` member to
+select the matching Service scope. API prefix behavior is configured through
+`prefixes.api`; the website migration should configure `/api`, convert handler
+routes to `/health` and `/projects`, preserve frontend `/api/...` requests, and
+update SPA/404 exclusions. This repository did not modify or runtime-test the
+website. Keep this item active for broader doc reconciliation and a
+consumer-verified example.
+
+### Updated website migration instruction — 2026-10-21
+
+The earlier positional `customRegister` guidance is superseded by Zacatl
+commit `bde72f6f`. The callback receives `{ adapter, rawServer, resolve,
+isApiRequest }`; use `resolve(RenderPageProvider)` in the website's page
+registration, and pass that provider to a website-owned
+`registerHtmlNotFound()` helper. Move only the HTML 404 registration out of
+`createFastifyApp()`; preserve its security plugins, error handler, rate limit,
+redirect hook, static setup, and their working Fastify registration order.
+
+Set `server.prefixes.api` to `/api` and make the health/projects handler paths
+relative (`/health`, `/projects`). Keep frontend fetches at `/api/...`.
+Inside the HTML 404 callback, return the existing structured JSON 404 for
+`isApiRequest(request.url)` before attempting HTML rendering; also retain the
+non-GET/HEAD and non-HTML Accept checks. If page SPA fallback is used, it now
+inherits the Server API prefix unless explicitly overridden. Verify unknown
+`/api` and `/api/*` requests stay JSON 404, page misses return HTML 404, and
+two Services resolve distinct render providers. The website was inspected but
+not changed or runtime-tested in this Zacatl branch.
+
+### Zacatl documentation sync — 2026-10-21
+
+Updated `docs/examples/frontend-backend-gotchas.md` to match the current
+`page.prefixes` precedence: explicit page prefixes override, otherwise page
+fallback inherits `server.prefixes`, then defaults to `/api`. Updated
+`docs/service/README.md` with the verified Service startup/cleanup sequence,
+the observed Fastify + in-memory SQLite restart failure, and the boundary that
+`isApiRequest()` classifies a URL but a custom HTML handler must delegate API
+misses to its JSON 404 response. These Zacatl docs do not claim the website
+migration or its runtime behavior has been verified.
+
+The same sync corrected the `0.0.65` changelog heading to 2026-10-20 after
+checking the GitHub release publication timestamp (2026-10-20T18:20:54Z); the
+prior heading date of 2026-10-17 did not match the release publication date.
+
+
+### Website integration verification — 2026-10-22
+
+Updated the website's Zacatl and ESLint imports to the canonical 0.0.66 public
+paths (`/third-party/dependency-injection` and `/third-party/eslint`). The
+website's ignored `node_modules/@sentzunhat/zacatl` now symlinks to this
+checkout's prepared `publish/` package (0.0.66); its previous installed 0.0.65
+package is preserved at `node_modules/@sentzunhat/zacatl-0.0.65-local-backup`.
+A local `node_modules/.bin/zacatl-fix-esm` symlink points to the prepared CLI.
+
+With Node 26.10.0, `npm run dev` started both Vite and the backend. HTTP checks
+returned frontend 200, `/api/health` 200 JSON, `/api/projects` 200 JSON, an
+unknown `/api/*` route 404 JSON, and an unknown page 404 HTML. This confirms the
+reported export error was caused by the installed 0.0.65 package being used
+with 0.0.66 imports. The website manifest still declares `^0.0.65` and its
+lockfile resolves 0.0.65; because 0.x caret ranges do not include 0.0.66, this
+local symlink is a development bridge only. Update the website dependency and
+lockfile after 0.0.66 is published; do not infer publication or deployment
+from this local run.
+
+The website working tree had pre-existing unrelated local edits, which remain
+untouched. This item stays active for the release-dependent dependency/lock
+update and remaining consumer acceptance review.
+
+
+### Copilot MongoDB example correction — 2026-10-22
+
+The Express/MongoDB example README's local and Docker URIs included the HTTP
+`/api` prefix as a MongoDB database path, producing an invalid database name
+with `/`. Corrected both URIs to the example's single `appdb` database path,
+matching its config and Docker Compose defaults. The API route prefix remains
+`/api`; it is unrelated to the database URI. Repository search found no other
+MongoDB URI with `/api/`.

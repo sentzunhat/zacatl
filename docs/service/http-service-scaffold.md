@@ -216,7 +216,7 @@ export const CreateTaskSchema = {
 
 ```typescript
 import type { FastifyRequest, FastifyReply } from 'fastify';
-import { resolveDependency } from '@sentzunhat/zacatl/dependency-injection';
+import { resolveDependency } from '@sentzunhat/zacatl/third-party/dependency-injection';
 import { TaskService } from '../../../domain/providers/task.service.js';
 
 interface CreateTaskBody {
@@ -245,7 +245,7 @@ export async function createTaskHandler(
 
 ```typescript
 import type { FastifyRequest, FastifyReply } from 'fastify';
-import { resolveDependency } from '@sentzunhat/zacatl/dependency-injection';
+import { resolveDependency } from '@sentzunhat/zacatl/third-party/dependency-injection';
 import { TaskService } from '../../../domain/providers/task.service.js';
 
 export async function listTasksHandler(request: FastifyRequest, reply: FastifyReply) {
@@ -551,7 +551,7 @@ export class UserRepository extends BaseRepository<User, User, UserOutput> {
 ### ✅ 4. Handler Uses resolveDependency
 
 ```typescript
-import { resolveDependency } from '@sentzunhat/zacatl/dependency-injection';
+import { resolveDependency } from '@sentzunhat/zacatl/third-party/dependency-injection';
 import { TaskService } from '../../../domain/providers/task.service.js';
 
 export async function handler(request: FastifyRequest, reply: FastifyReply) {
@@ -604,7 +604,7 @@ Each feature (e.g., "create user", "list tasks") gets its own folder with:
 
 ```typescript
 import type { FastifyRequest, FastifyReply } from 'fastify';
-import { resolveDependency } from '@sentzunhat/zacatl/dependency-injection';
+import { resolveDependency } from '@sentzunhat/zacatl/third-party/dependency-injection';
 import { UserService } from '../../../domain/providers/user.service.js';
 
 interface CreateUserBody {

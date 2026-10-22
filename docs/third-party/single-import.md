@@ -21,7 +21,7 @@ import { Service } from '@sentzunhat/zacatl/service';
 import { BaseRepository } from '@sentzunhat/zacatl/service/layers/infrastructure/repositories/mongoose/repository';
 import type { LeanDocument } from '@sentzunhat/zacatl/service/layers/infrastructure/repositories/types';
 import { NotFoundError } from '@sentzunhat/zacatl/error';
-import { resolveDependency } from '@sentzunhat/zacatl/dependency-injection';
+import { resolveDependency } from '@sentzunhat/zacatl/third-party/dependency-injection';
 import { container, inject, singleton } from '@sentzunhat/zacatl/third-party/dependency-injection/tsyringe';
 import { mongoose, Schema } from '@sentzunhat/zacatl/third-party/databases/mongoose';
 import { Sequelize, DataTypes } from '@sentzunhat/zacatl/third-party/databases/sequelize';
@@ -41,9 +41,9 @@ import { z } from '@sentzunhat/zacatl/third-party/zod';
 | `ORMType` | `@sentzunhat/zacatl/service/layers/infrastructure/orm/types` |
 | Shared repository types | `@sentzunhat/zacatl/service/layers/infrastructure/repositories/types` |
 | Error classes | `@sentzunhat/zacatl/error` |
-| `registerDependency`, `resolveDependency`, … | `@sentzunhat/zacatl/dependency-injection` |
-| `loadJSON`, `loadYML` | `@sentzunhat/zacatl/configuration` |
-| `configureI18nNode`, locale helpers | `@sentzunhat/zacatl/localization` |
+| `registerDependency`, `resolveDependency`, … | `@sentzunhat/zacatl/third-party/dependency-injection` |
+| `loadJSON`, `loadYML` | `@sentzunhat/zacatl/utils/configuration` |
+| `configureI18nNode`, locale helpers | `@sentzunhat/zacatl/third-party/localization` |
 | `createLogger`, `requestContext` | `@sentzunhat/zacatl/logs` |
 | `Optional`, command runner utilities | `@sentzunhat/zacatl/utils` |
 | tsyringe, zod, express, fastify re-exports | `@sentzunhat/zacatl/third-party` or deeper subpaths |
@@ -76,7 +76,7 @@ import { ServerType, ServerVendor } from '@sentzunhat/zacatl/service/platforms/s
 import { BaseRepository } from '@sentzunhat/zacatl/service/layers/infrastructure/repositories/mongoose/repository';
 import type { LeanDocument } from '@sentzunhat/zacatl/service/layers/infrastructure/repositories/types';
 import { NotFoundError } from '@sentzunhat/zacatl/error';
-import { resolveDependency } from '@sentzunhat/zacatl/dependency-injection';
+import { resolveDependency } from '@sentzunhat/zacatl/third-party/dependency-injection';
 import { inject, singleton } from '@sentzunhat/zacatl/third-party/dependency-injection/tsyringe';
 import { mongoose, Schema } from '@sentzunhat/zacatl/third-party/databases/mongoose';
 import { z } from '@sentzunhat/zacatl/third-party/zod';

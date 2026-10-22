@@ -151,3 +151,28 @@ example locks. PR #137 and compatible older proposals whose versions are
 superseded by `dev` were closed, and their stale branch refs were removed.
 Breaking-major proposals remain open for separate compatibility decisions:
 ESLint 10 (#131, #86), Vitest 5 (#127), and coverage-istanbul 5 (#125).
+
+### Targeted compatible security refresh — 2026-10-22
+
+Updated root `vitest` and `@vitest/coverage-istanbul` from `4.1.11` to
+`4.1.12`, and root Vite from `8.3.4` to `8.3.5`, within declared semver
+ranges. Refreshed all nine example lockfiles: Vite entries moved from
+`8.1.4`/`8.1.5` to `8.3.5` within `^8.1.4`; the separate
+`fastify-sqlite-react` Vitest lock entry moved to `4.1.12`. Root package
+metadata was synchronized in each example lockfile. A comparison against the
+base lockfiles found no package-major updates.
+
+**Verified:** `npm ci`, 85 test files / 765 tests, `npm run type:check`,
+`npm run build`, optional-peer checks (309 entrypoint builds), consumer smoke
+fixtures, and `git diff --check` passed. Audits report zero vulnerabilities
+for all nine examples and zero root production vulnerabilities. The root full
+audit retains seven high-severity development-only transitive findings; npm
+fixes would require breaking downgrades, so none were applied. The two SQL
+consumer fixtures continue to report consumer-owned Sequelize/UUID advisories.
+
+`npm run lint:silent` remains failing on service import-order findings and a
+`console` no-undef error in the unrelated local graphics generator; no files
+in those paths changed in this dependency slice. The full example build and
+Docker matrix were not rerun. Keep this item active until compatible handling
+of the remaining development findings and the broader compatibility matrix
+are decided and verified.

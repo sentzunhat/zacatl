@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 
-import { pruneNestedBarrelIndexes } from './prune-barrels.js';
+import { getExportTargetsFromPackage, pruneNestedBarrelIndexes } from './prune-barrels.js';
 
 const root = process.cwd();
 const pkgPath = path.join(root, 'package.json');
@@ -37,15 +37,41 @@ const fixEntryKeepBuild = (entry: unknown): unknown => {
   return entry;
 };
 
-fs.rmSync(publishDir, { recursive: true, force: true });
-fs.mkdirSync(publishDir, { recursive: true });
+const requireExistingDirectory = (label: string, candidates: readonly string[]): string => {
+  const existing = candidates.find((candidate) => {
+    try {
+      return fs.statSync(candidate).isDirectory();
+    } catch {
+      return false;
+    }
+  });
 
-// Copy compiled source into publish/build/{esm,cjs} and include a bin folder
-const buildDest = path.join(publishDir, 'build');
-const buildEsmDest = path.join(buildDest, 'esm');
-const buildCjsDest = path.join(buildDest, 'cjs');
-fs.mkdirSync(buildEsmDest, { recursive: true });
-fs.mkdirSync(buildCjsDest, { recursive: true });
+  if (existing === undefined) {
+    throw new Error(
+      `prepare-publish: required ${label} directory not found. Checked: ${candidates.join(', ')}`,
+    );
+  }
+
+  return existing;
+};
+
+const requireExistingFile = (label: string, candidates: readonly string[]): string => {
+  const existing = candidates.find((candidate) => {
+    try {
+      return fs.statSync(candidate).isFile();
+    } catch {
+      return false;
+    }
+  });
+
+  if (existing === undefined) {
+    throw new Error(
+      `prepare-publish: required ${label} file not found. Checked: ${candidates.join(', ')}`,
+    );
+  }
+
+  return existing;
+};
 
 const esmCandidates = [
   path.join(root, 'build-src-esm'),
@@ -57,99 +83,93 @@ const cjsCandidates = [
   path.join(root, 'build', 'cjs'),
   path.join(root, 'cjs'),
 ];
-
-const copyFirstExisting = (candidates: string[], dest: string): string | null => {
-  for (const cand of candidates) {
-    if (fs.existsSync(cand)) {
-      fs.cpSync(cand, dest, { recursive: true });
-      return cand;
-    }
-  }
-  return null;
-};
-
-const usedEsm = copyFirstExisting(esmCandidates, buildEsmDest);
-const usedCjs = copyFirstExisting(cjsCandidates, buildCjsDest);
-// eslint-disable-next-line no-console
-if (usedEsm === null) console.warn('No ESM build source found in', esmCandidates);
-// eslint-disable-next-line no-console
-if (usedCjs === null) console.warn('No CJS build source found in', cjsCandidates);
-
-// The published root package.json declares "type": "module", so the CJS tree
-// needs its own scope marker or every `require()` subpath would load .js
-// files under build/cjs as ESM and crash for CommonJS consumers.
-if (usedCjs !== null) {
-  fs.writeFileSync(
-    path.join(buildCjsDest, 'package.json'),
-    `${JSON.stringify({ type: 'commonjs' }, null, 2)}\n`,
-  );
-}
-
-pruneNestedBarrelIndexes([buildEsmDest, buildCjsDest]);
-
-const binDir = path.join(buildDest, 'bin');
-fs.mkdirSync(binDir, { recursive: true });
-
 const scriptsCandidates = [
   path.join(root, 'build-scripts-esm', 'fix-esm.js'),
   path.join(root, 'build-scripts-cjs', 'fix-esm.js'),
   path.join(root, 'build-scripts-esm', 'build', 'fix-esm.js'),
   path.join(root, 'build-scripts-cjs', 'build', 'fix-esm.js'),
 ];
-
 const scriptsUtilsCandidates = [
   path.join(root, 'build-scripts-esm', 'utils'),
   path.join(root, 'build-scripts-cjs', 'utils'),
 ];
 
+// Resolve every required input before clearing a previously prepared publish tree.
+const usedEsm = requireExistingDirectory('ESM build source', esmCandidates);
+const usedCjs = requireExistingDirectory('CJS build source', cjsCandidates);
+const fixEsmSource = requireExistingFile('fix-esm CLI build', scriptsCandidates);
+const scriptUtilsSource = requireExistingDirectory(
+  'compiled script utilities',
+  scriptsUtilsCandidates,
+);
+const requiredAssetDirectories = [
+  'third-party/eslint',
+  'third-party/localization/locales',
+] as const;
+const requiredAssetFiles = [
+  'third-party/eslint/index.mjs',
+  'third-party/localization/locales/en.json',
+  'third-party/localization/locales/es.json',
+] as const;
+
+for (const assetDirectory of requiredAssetDirectories) {
+  const assetPath = path.join(usedEsm, assetDirectory);
+  try {
+    if (!fs.statSync(assetPath).isDirectory()) throw new Error('not a directory');
+  } catch {
+    throw new Error(`prepare-publish: required ESM runtime assets missing: ${assetPath}`);
+  }
+}
+for (const assetFile of requiredAssetFiles) {
+  const assetPath = path.join(usedEsm, assetFile);
+  try {
+    if (!fs.statSync(assetPath).isFile()) throw new Error('not a file');
+  } catch {
+    throw new Error(`prepare-publish: required ESM package asset missing: ${assetPath}`);
+  }
+}
+
+fs.rmSync(publishDir, { recursive: true, force: true });
+fs.mkdirSync(publishDir, { recursive: true });
+
+// Copy compiled source into publish/build/{esm,cjs} and include a bin folder
+const buildDest = path.join(publishDir, 'build');
+const buildEsmDest = path.join(buildDest, 'esm');
+const buildCjsDest = path.join(buildDest, 'cjs');
+fs.mkdirSync(buildEsmDest, { recursive: true });
+fs.mkdirSync(buildCjsDest, { recursive: true });
+
+fs.cpSync(usedEsm, buildEsmDest, { recursive: true });
+fs.cpSync(usedCjs, buildCjsDest, { recursive: true });
+
+// The published root package.json declares "type": "module", so the CJS tree
+// needs its own scope marker or every `require()` subpath would load .js
+// files under build/cjs as ESM and crash for CommonJS consumers.
+fs.writeFileSync(
+  path.join(buildCjsDest, 'package.json'),
+  `${JSON.stringify({ type: 'commonjs' }, null, 2)}\n`,
+);
+
+const binDir = path.join(buildDest, 'bin');
+fs.mkdirSync(binDir, { recursive: true });
+
 // Copy fix-esm.js into bin/ and rewrite its utils import to be self-contained
-for (const cand of scriptsCandidates) {
-  if (fs.existsSync(cand)) {
-    try {
-      const dest = path.join(binDir, 'fix-esm.js');
-      // Rewrite all ../utils/* imports to ./utils/* so the script is self-contained
-      let content = fs.readFileSync(cand, 'utf-8');
-      content = content.replace(/from\s+['"]\.\.\/utils\//g, "from './utils/");
-      fs.writeFileSync(dest, content, 'utf-8');
-      try {
-        fs.chmodSync(dest, 0o755);
-      } catch (_) {
-        /* chmod failures are non-fatal on Windows */
-      }
-    } catch (err: unknown) {
-      // eslint-disable-next-line no-console
-      console.warn(
-        `Could not copy script ${cand} to fix-esm.js:`,
-        err instanceof Error ? err.message : String(err),
-      );
-    }
-    break;
+{
+  const dest = path.join(binDir, 'fix-esm.js');
+  // Rewrite all ../utils/* imports to ./utils/* so the script is self-contained
+  let content = fs.readFileSync(fixEsmSource, 'utf-8');
+  content = content.replace(/from\s+['"]\.\.\/utils\//g, "from './utils/");
+  fs.writeFileSync(dest, content, 'utf-8');
+  try {
+    fs.chmodSync(dest, 0o755);
+  } catch {
+    /* chmod failures are non-fatal on Windows */
   }
 }
 
 // Copy utils into bin/ to make fix-esm.js self-contained
 const binUtilsDest = path.join(binDir, 'utils');
-let copiedScriptUtils = false;
-for (const utilsDir of scriptsUtilsCandidates) {
-  if (fs.existsSync(utilsDir)) {
-    try {
-      fs.cpSync(utilsDir, binUtilsDest, { recursive: true });
-      copiedScriptUtils = true;
-    } catch (err: unknown) {
-      // eslint-disable-next-line no-console
-      console.warn(
-        `Could not copy script utils from ${utilsDir}:`,
-        err instanceof Error ? err.message : String(err),
-      );
-    }
-    break;
-  }
-}
-
-if (!copiedScriptUtils) {
-  // eslint-disable-next-line no-console
-  console.warn('No compiled script utils found in', scriptsUtilsCandidates);
-}
+fs.cpSync(scriptUtilsSource, binUtilsDest, { recursive: true });
 
 const removeSourceMaps = (dir: string): void => {
   if (!fs.existsSync(dir)) return;
@@ -173,29 +193,11 @@ const removeSourceMaps = (dir: string): void => {
 removeSourceMaps(buildEsmDest);
 removeSourceMaps(buildCjsDest);
 
-const esmEslint = path.join(buildEsmDest, 'eslint');
-const esmLocalization = path.join(buildEsmDest, 'localization');
-if (fs.existsSync(esmEslint) && !fs.existsSync(path.join(buildCjsDest, 'eslint'))) {
-  try {
-    fs.cpSync(esmEslint, path.join(buildCjsDest, 'eslint'), { recursive: true });
-  } catch (err: unknown) {
-    // eslint-disable-next-line no-console
-    console.warn(
-      'Could not copy eslint assets to CJS build:',
-      err instanceof Error ? err.message : String(err),
-    );
-  }
-}
-if (fs.existsSync(esmLocalization) && !fs.existsSync(path.join(buildCjsDest, 'localization'))) {
-  try {
-    fs.cpSync(esmLocalization, path.join(buildCjsDest, 'localization'), { recursive: true });
-  } catch (err: unknown) {
-    // eslint-disable-next-line no-console
-    console.warn(
-      'Could not copy localization assets to CJS build:',
-      err instanceof Error ? err.message : String(err),
-    );
-  }
+for (const assetDirectory of requiredAssetDirectories) {
+  const esmAssetDirectory = path.join(buildEsmDest, assetDirectory);
+  // Copy the complete asset directory so CJS does not retain stale partial files.
+  fs.rmSync(path.join(buildCjsDest, assetDirectory), { recursive: true, force: true });
+  fs.cpSync(esmAssetDirectory, path.join(buildCjsDest, assetDirectory), { recursive: true });
 }
 
 interface PublishPkg {
@@ -339,6 +341,9 @@ if (newPkg['exports'] === undefined) {
     newPkg['exports'] = exportsObj;
   }
 }
+const stagedExportTargets = getExportTargetsFromPackage(newPkg);
+pruneNestedBarrelIndexes([buildEsmDest, buildCjsDest], stagedExportTargets);
+
 const copyIfExists = (name: string): void => {
   const src = path.join(root, name);
   const dest = path.join(publishDir, name);

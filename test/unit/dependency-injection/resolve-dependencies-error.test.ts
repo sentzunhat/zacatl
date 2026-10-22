@@ -10,7 +10,7 @@ import {
   clearContainer,
   registerSingleton,
   resolveDependencies,
-} from '../../../src/dependency-injection/container';
+} from '../../../src/third-party/dependency-injection/container';
 
 // A class that is intentionally NOT decorated with @injectable
 class UnregisteredService {

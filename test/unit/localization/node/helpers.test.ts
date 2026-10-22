@@ -10,7 +10,7 @@ import {
   deepMerge,
   readJsonFile,
   findExistingDir,
-} from '../../../../src/localization/node/helpers';
+} from '../../../../src/third-party/localization/node/helpers';
 
 describe('i18n-node helpers', () => {
   it('isPlainObject detects plain objects correctly', () => {

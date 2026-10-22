@@ -3,7 +3,7 @@ import { container } from '@zacatl/third-party/dependency-injection/tsyringe';
 import {
   registerDependencies,
   registerAndResolve,
-} from '../../../src/dependency-injection/container';
+} from '../../../src/third-party/dependency-injection/container';
 
 class DummyDependency {
   public value = 'dummy';

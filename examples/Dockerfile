@@ -72,8 +72,6 @@ COPY --from=builder /app/build-src-cjs            ./build-src-cjs
 COPY --from=builder /app/node_modules             ./node_modules
 COPY --from=builder /app/build-scripts-esm        ./build-scripts-esm
 COPY --from=builder /app/scripts                  ./scripts
-COPY --from=builder /app/src/localization/locales ./src/localization/locales
-COPY --from=builder /app/src/eslint               ./src/eslint
 
 COPY examples/${EXAMPLE} ./examples/${EXAMPLE}
 
@@ -121,8 +119,6 @@ WORKDIR /app/examples/${EXAMPLE}
 COPY --from=build-backend --chown=65532:65532 /app/package.json             /app/package.json
 COPY --from=build-backend --chown=65532:65532 /app/node_modules             /app/node_modules
 COPY --from=build-backend --chown=65532:65532 /app/build-src-esm            /app/build-src-esm
-COPY --from=build-backend --chown=65532:65532 /app/src/localization/locales /app/src/localization/locales
-COPY --from=build-backend --chown=65532:65532 /app/src/eslint               /app/src/eslint
 
 # Example runtime artifacts (pruned node_modules from backend, dist from both)
 COPY --from=build-backend  --chown=65532:65532 /app/examples/${EXAMPLE}/node_modules     ./node_modules

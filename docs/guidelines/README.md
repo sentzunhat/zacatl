@@ -49,7 +49,7 @@ For fast onboarding context (What / How / Why + API/Security/Performance), see
 | Interfaces   | PascalCase       | `BadRequestErrorArgs`, `ServerConfig`    |
 | Type Aliases | PascalCase       | `Constructor<T>`, `LoggerPort`           |
 | Files        | kebab-case       | `get-route-handler.ts`, `bad-request.ts` |
-| Folders      | kebab-case       | `dependency-injection/`, `error-guards/` |
+| Folders      | kebab-case       | `third-party/dependency-injection/`, `error-guards/` |
 | Constants    | UPPER_SNAKE_CASE | `DatabaseVendor.MONGOOSE`                |
 
 ## How to Use These Guides

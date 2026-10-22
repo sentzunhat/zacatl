@@ -6,7 +6,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import i18n from '@zacatl/third-party/i18n';
 
-import { configureI18nNode, resolveBuiltInLocalesDir } from '../../../src/localization/i18n-node';
+import { configureI18nNode, resolveBuiltInLocalesDir } from '../../../src/third-party/localization/i18n-node';
 
 describe('configureI18nNode', () => {
   afterEach(() => {

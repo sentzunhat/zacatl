@@ -1,3 +1,4 @@
+import { ensureRegisteredSingleton } from '@zacatl/third-party/dependency-injection/container';
 import {
   inject,
   injectable,
@@ -6,7 +7,6 @@ import {
 
 import { DomainConfigToken, DomainContainerToken } from './tokens';
 import type { DomainConfig } from './types';
-import { ensureRegisteredSingleton } from '../../../dependency-injection/container';
 
 @injectable()
 export class Domain {

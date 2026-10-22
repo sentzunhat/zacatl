@@ -9,7 +9,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 
 import { container } from '@zacatl/third-party/dependency-injection/tsyringe';
 
-import { clearContainer, resolveDependency } from '../../../src/dependency-injection';
+import { clearContainer, resolveDependency } from '../../../src/third-party/dependency-injection/container';
 import { Domain } from '../../../src/service/layers/domain/domain';
 import { Infrastructure } from '../../../src/service/layers/infrastructure/infrastructure';
 import type { RepositoryModel } from '../../../src/service/layers/infrastructure/repositories/types';

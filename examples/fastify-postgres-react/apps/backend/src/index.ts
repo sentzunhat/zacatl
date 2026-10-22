@@ -9,7 +9,7 @@ import { createLogger, PinoLoggerAdapter, toFastifyLogger } from '@sentzunhat/za
 import { Sequelize } from '@sentzunhat/zacatl/third-party/databases/sequelize';
 import { serializerCompiler, validatorCompiler } from 'fastify-type-provider-zod';
 import { Service } from '@sentzunhat/zacatl/service';
-import { config, createServiceConfig } from './config';
+import { API_PREFIX, config, createServiceConfig } from './config';
 import { initGreetingModel } from './infrastructure/greetings/models/greeting.model';
 
 let activeService: Service | null = null;
@@ -68,13 +68,13 @@ async function main() {
 
     console.log(`✓ Server running on http://localhost:${config.port}`);
     console.log('\n📚 Available endpoints:');
-    console.log('  GET    /greetings              - Get all greetings');
-    console.log('  GET    /greetings/:id          - Get greeting by ID');
-    console.log('  GET    /greetings/random/:lang - Get random greeting by language');
-    console.log('  POST   /greetings              - Create new greeting');
-    console.log('  PUT    /greetings/:id              - Update a greeting');
-    console.log('  DELETE /greetings/:id          - Delete greeting');
-    console.log(`\n💡 Try: curl http://localhost:${config.port}/greetings`);
+    console.log(`  GET    ${API_PREFIX}/greetings              - Get all greetings`);
+    console.log(`  GET    ${API_PREFIX}/greetings/:id          - Get greeting by ID`);
+    console.log(`  GET    ${API_PREFIX}/greetings/random/:lang - Get random greeting by language`);
+    console.log(`  POST   ${API_PREFIX}/greetings              - Create new greeting`);
+    console.log(`  PUT    ${API_PREFIX}/greetings/:id              - Update a greeting`);
+    console.log(`  DELETE ${API_PREFIX}/greetings/:id          - Delete greeting`);
+    console.log(`\n💡 Try: curl http://localhost:${config.port}${API_PREFIX}/greetings`);
     console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
   } catch (error) {
     console.error('❌ Failed to start service:', error);

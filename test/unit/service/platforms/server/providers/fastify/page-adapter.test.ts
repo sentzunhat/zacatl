@@ -164,6 +164,17 @@ describe('FastifyPageAdapter', () => {
     });
   });
 
+  it('returns a JSON 404 under a configured API prefix instead of the HTML fallback', async () => {
+    adapter.registerSpaFallback({ api: '/v1' }, '/dist/client');
+    const reply = { status: vi.fn().mockReturnThis(), send: vi.fn(), sendFile: vi.fn() };
+
+    await notFoundHandler({ raw: { url: '/v1/missing' }, method: 'GET', url: '/v1/missing' }, reply);
+
+    expect(reply.status).toHaveBeenCalledWith(404);
+    expect(reply.send).toHaveBeenCalledWith(expect.objectContaining({ error: 'Not Found' }));
+    expect(reply.sendFile).not.toHaveBeenCalled();
+  });
+
   describe('register', () => {
     it('should resolve without error', async () => {
       await expect(adapter.register()).resolves.toBeUndefined();

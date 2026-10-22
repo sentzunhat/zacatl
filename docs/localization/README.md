@@ -7,17 +7,18 @@ Add multi-language support to your application using i18n-node.
 Zacatl's localization module:
 
 ```
-src/localization/
+src/third-party/localization/
 ├── i18n-node.ts    # HTTP request localization setup (configureI18nNode)
-├── index.ts        # Public exports
 ├── locales/        # Built-in translations (en.json, es.json)
 └── node/           # i18n-node helpers and types
+
+The package entry is the sibling `src/third-party/localization.ts` file.
 ```
 
 ## Quick Start (i18n-node)
 
 ```typescript
-import { configureI18nNode } from '@sentzunhat/zacatl/localization';
+import { configureI18nNode } from '@sentzunhat/zacatl/third-party/localization';
 import i18n from '@sentzunhat/zacatl/third-party/i18n';
 
 configureI18nNode({
@@ -40,9 +41,10 @@ The localization module automatically detects Zacatl's built-in locales director
 
 Built-in Zacatl locales are resolved from the first matching candidate, including:
 
-1. **Current package runtime layout**: `src/localization/locales/` or supported build output layouts next to the executing module
-2. **Installed package layouts**: `node_modules/@sentzunhat/zacatl/src/localization/locales/`, `build-src-esm/...`, `build-src-cjs/...`, `build/esm/...`, or `build/cjs/...`
-3. **Project-level fallbacks**: `src/localization/locales/`, `localization/locales/`, or a top-level `locales/` directory under the consumer project root
+1. **Source checkout**: `src/third-party/localization/locales/`.
+2. **Local build output**: `build-src-esm/third-party/localization/locales/` or `build-src-cjs/third-party/localization/locales/`.
+3. **Published package output**: `build/esm/third-party/localization/locales/` or `build/cjs/third-party/localization/locales/` under the installed package directory.
+4. **Project-level fallbacks**: `src/locales/`, `localization/locales/`, or a top-level `locales/` directory under the consumer project root.
 
 Additional non-built-in locales are then merged from:
 
@@ -55,7 +57,7 @@ If automatic detection fails (rare cases), explicitly configure `builtInLocalesD
 
 ```typescript
 configureI18nNode({
-  builtInLocalesDir: './node_modules/@sentzunhat/zacatl/src/localization/locales',
+  builtInLocalesDir: './node_modules/@sentzunhat/zacatl/build/esm/third-party/localization/locales',
   locales: {
     default: 'en',
     supported: ['en', 'es'],
@@ -65,7 +67,7 @@ configureI18nNode({
 
 ## Translation Files
 
-Zacatl ships built-in translations in its own `src/localization/locales/` directory. Consumer services can add their own translations in any discovered `locales/` directory, or point at specific folders with `locales.directories`.
+Zacatl ships built-in translations in its own `src/third-party/localization/locales/` directory. Consumer services can add their own translations in any discovered `locales/` directory, or point at specific folders with `locales.directories`.
 
 Common service layouts include:
 
@@ -121,7 +123,7 @@ console.log(i18n.__('greeting', { name: 'Juan' })); // "Hola Juan"
 Extend i18n-node by loading translations from custom sources:
 
 ```typescript
-import { configureI18nNode } from '@sentzunhat/zacatl/localization';
+import { configureI18nNode } from '@sentzunhat/zacatl/third-party/localization';
 import i18n from '@sentzunhat/zacatl/third-party/i18n';
 
 // Configure with custom locale directories

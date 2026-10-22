@@ -1,7 +1,7 @@
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-import { zacatlScriptsRecommended } from '../src/eslint/scripts.mjs';
+import { zacatlScriptsRecommended } from '../src/third-party/eslint/scripts.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

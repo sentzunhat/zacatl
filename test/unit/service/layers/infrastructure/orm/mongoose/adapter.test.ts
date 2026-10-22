@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
-import { clearContainer } from '../../../../../../../src/dependency-injection';
+import { clearContainer } from '../../../../../../../src/third-party/dependency-injection/container';
 import { MongooseAdapter } from '../../../../../../../src/service/layers/infrastructure/orm/mongoose/adapter';
 import {
   clearMongooseIndexRegistry,

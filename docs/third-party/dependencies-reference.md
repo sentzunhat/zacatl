@@ -24,7 +24,7 @@ import {
 } from '@sentzunhat/zacatl/third-party/dependency-injection/tsyringe';
 import { z } from '@sentzunhat/zacatl/third-party/zod';
 import { Service } from '@sentzunhat/zacatl/service';
-import { resolveDependency } from '@sentzunhat/zacatl/dependency-injection';
+import { resolveDependency } from '@sentzunhat/zacatl/third-party/dependency-injection';
 import { logger } from '@sentzunhat/zacatl/logs';
 ```
 
@@ -46,7 +46,7 @@ import {
 ### Configuration
 
 ```typescript
-import { loadJSON, loadYML } from '@sentzunhat/zacatl/configuration';
+import { loadJSON, loadYML } from '@sentzunhat/zacatl/utils/configuration';
 ```
 
 ### Infrastructure
@@ -136,7 +136,7 @@ npm install @sentzunhat/zacatl
 **Use:**
 
 ```typescript
-import { resolveDependency } from '@sentzunhat/zacatl/dependency-injection';
+import { resolveDependency } from '@sentzunhat/zacatl/third-party/dependency-injection';
 import { Service } from '@sentzunhat/zacatl/service';
 import { ServerType, ServerVendor } from '@sentzunhat/zacatl/service/platforms/server/types/server-config';
 import { Fastify } from '@sentzunhat/zacatl/third-party/fastify';
@@ -327,7 +327,7 @@ Do you need database access?
 
 ```typescript
 // Everything you need for a basic service (no database)
-import { resolveDependency } from '@sentzunhat/zacatl/dependency-injection';
+import { resolveDependency } from '@sentzunhat/zacatl/third-party/dependency-injection';
 import { Service } from '@sentzunhat/zacatl/service';
 import { singleton } from '@sentzunhat/zacatl/third-party/dependency-injection/tsyringe';
 

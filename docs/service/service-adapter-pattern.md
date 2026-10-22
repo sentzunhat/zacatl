@@ -82,7 +82,7 @@ const serviceConfig = {
           onDatabaseConnected: async (db: unknown) => {
             // Initialize models/schemas
             initModels(db);
-            await db.sync({ alter: true });
+            await db.sync();
           },
         },
       ],
@@ -106,6 +106,10 @@ const serviceConfig = {
   },
 };
 ```
+
+This `sync()` call is a convenient local-demo table initializer. For production
+schema changes, use versioned database migrations instead of automatically
+altering tables at service startup.
 
 ### 3. **Service Initialization**
 

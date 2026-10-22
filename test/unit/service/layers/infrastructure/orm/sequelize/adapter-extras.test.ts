@@ -3,7 +3,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 import { container } from '@zacatl/third-party/dependency-injection/tsyringe';
 
-import { clearContainer } from '../../../../../../../src/dependency-injection';
+import { clearContainer } from '../../../../../../../src/third-party/dependency-injection/container';
 import { InternalServerError } from '../../../../../../../src/error';
 import { SequelizeAdapter } from '../../../../../../../src/service/layers/infrastructure/orm/sequelize/adapter';
 import { ORMType } from '../../../../../../../src/service/layers/infrastructure/repositories/types';

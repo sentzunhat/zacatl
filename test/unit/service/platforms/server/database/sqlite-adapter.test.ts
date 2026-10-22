@@ -1,8 +1,8 @@
-import { describe, it, expect, afterEach, beforeAll } from 'vitest';
+import { describe, it, expect, afterEach, beforeAll, vi } from 'vitest';
 
 import { CustomError } from '@zacatl/error';
 
-import { clearContainer, resolveDependency } from '../../../../../../src/dependency-injection';
+import { clearContainer, resolveDependency } from '../../../../../../src/third-party/dependency-injection/container';
 import { createDatabaseToken } from '../../../../../../src/service/layers/infrastructure/orm/tokens/factory';
 import { SqliteAdapter } from '../../../../../../src/service/platforms/server/database/adapters/sqlite';
 import { DatabaseVendor } from '../../../../../../src/service/platforms/server/database/port';
@@ -90,6 +90,22 @@ describe('SqliteAdapter', () => {
       });
 
       expect(received).toBe(adapter.getDatabase());
+    });
+
+    it('keeps a connected database available for cleanup when the callback rejects', async () => {
+      adapter = new SqliteAdapter();
+      const close = vi.fn();
+      const fakeDb = { prepare: vi.fn(), close };
+
+      await expect(adapter.connect('TestService', {
+        vendor: DatabaseVendor.SQLITE,
+        connection: { url: ':memory:' },
+        instance: fakeDb as never,
+        onDatabaseConnected: async () => { throw new Error('setup failed'); },
+      })).rejects.toThrow('Failed to open SQLite database');
+
+      await adapter.disconnect();
+      expect(close).toHaveBeenCalledOnce();
     });
 
     it('wraps open failures in CustomError with the offending path', async () => {

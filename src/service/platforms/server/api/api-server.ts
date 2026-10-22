@@ -1,6 +1,5 @@
-import { resolveDependencies } from '@zacatl/dependency-injection';
-import { getContainer } from '@zacatl/dependency-injection/container';
 import { CustomError, InternalServerError } from '@zacatl/error';
+import { getContainer, resolveDependencies } from '@zacatl/third-party/dependency-injection';
 import {
   inject,
   injectable,

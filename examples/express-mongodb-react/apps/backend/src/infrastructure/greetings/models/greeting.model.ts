@@ -2,7 +2,7 @@
  * Mongoose Model for Greeting Entity
  */
 
-import mongoose, { type Document } from 'mongoose';
+import { mongoose, type Document } from '@sentzunhat/zacatl/third-party/databases/mongoose';
 import type { Greeting } from '../../../domain/entities/greeting';
 import { greetingSchema } from '../repositories/greeting/schema';
 

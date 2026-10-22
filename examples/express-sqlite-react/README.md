@@ -40,20 +40,20 @@ frontend/             # React + Vite
 
 ## API Endpoints
 
-- `GET /greetings` - All greetings (optional `?language=en`)
-- `GET /greetings/:id` - Single greeting
-- `GET /greetings/random/:language` - Random greeting
-- `POST /greetings` - Create: `{"message": "...", "language": "..."}`
-- `DELETE /greetings/:id` - Delete greeting
+- `GET /api/greetings` - All greetings (optional `?language=en`)
+- `GET /api/greetings/:id` - Single greeting
+- `GET /api/greetings/random/:language` - Random greeting
+- `POST /api/greetings` - Create: `{"message": "...", "language": "..."}`
+- `DELETE /api/greetings/:id` - Delete greeting
 
 ## Test It
 
 ```bash
-curl -X POST http://localhost:8181/greetings \
+curl -X POST http://localhost:8181/api/greetings \
   -H "Content-Type: application/json" \
   -d '{"message": "Hello World", "language": "en"}'
 
-curl http://localhost:8181/greetings
+curl http://localhost:8181/api/greetings
 ```
 
 ## 🐳 Docker Deployment
@@ -74,7 +74,7 @@ docker compose up -d
 
 ### Access
 
-- **Backend API**: http://localhost:8181/greetings
+- **Backend API**: http://localhost:8181/api/greetings
 - **Frontend**: Served by backend (static files)
 
 ### Architecture Notes

@@ -34,31 +34,42 @@ const collectExportTargets = (value: unknown, targets: Set<string>): void => {
   }
 };
 
-export const getExportTargets = (packageJsonPath = path.resolve('package.json')): Set<string> => {
-  if (!fs.existsSync(packageJsonPath)) return new Set();
+export const getExportTargetsFromPackage = (value: unknown): Set<string> => {
+  if (value === null || typeof value !== 'object' || Array.isArray(value)) return new Set();
 
-  const pkg = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8')) as Record<string, unknown>;
+  const pkg = value as Record<string, unknown>;
   const targets = new Set<string>();
-
-  collectExportTargets(pkg.main, targets);
-  collectExportTargets(pkg.module, targets);
-  collectExportTargets(pkg.types, targets);
-  collectExportTargets(pkg.exports, targets);
-
+  collectExportTargets(pkg['main'], targets);
+  collectExportTargets(pkg['module'], targets);
+  collectExportTargets(pkg['types'], targets);
+  collectExportTargets(pkg['exports'], targets);
   return targets;
 };
 
+export const getExportTargets = (packageJsonPath = path.resolve('package.json')): Set<string> => {
+  if (!fs.existsSync(packageJsonPath)) return new Set();
+
+  const pkg = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8')) as unknown;
+  return getExportTargetsFromPackage(pkg);
+};
+
 const shouldPrune = (rootDir: string, filePath: string, exportTargets: ReadonlySet<string>): boolean => {
-  const rel = path.relative(rootDir, filePath);
+  const rel = normalizePath(path.relative(rootDir, filePath));
   if (!rel || rel.startsWith('..')) return false;
 
-  // Resolve file path relative to package root so it matches package.json export strings
+  // Package targets are relative to the package root, while pruning walks one
+  // build condition at a time (build/esm or build/cjs). Compare after stripping
+  // the corresponding package/build prefix.
   const rootName = path.basename(rootDir);
-  const sourceRel = normalizePath(path.join(rootName, rel));
+  const prefixes = [`build/${rootName}/`, `build-src-${rootName}/`, `${rootName}/`];
+  for (const target of exportTargets) {
+    const normalizedTarget = normalizePath(target);
+    const prefix = prefixes.find((candidate) => normalizedTarget.startsWith(candidate));
+    const targetRel = prefix === undefined ? normalizedTarget : normalizedTarget.slice(prefix.length);
+    if (targetRel === rel) return false;
+  }
 
-  if (exportTargets.has(sourceRel)) return false;
-
-  const parts = rel.split(path.sep);
+  const parts = rel.split('/');
   const isNestedBarrel = parts.length > 2 && path.basename(filePath).startsWith('index.');
   return isNestedBarrel;
 };

@@ -5,7 +5,7 @@
 
 import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
-import type { Sequelize } from 'sequelize';
+import type { Sequelize } from '@sentzunhat/zacatl/third-party/databases/sequelize';
 import type { ApplicationRestRoutes } from '@sentzunhat/zacatl/service/layers/application/types';
 import { ServiceType } from '@sentzunhat/zacatl/service/service';
 import { DatabaseVendor } from '@sentzunhat/zacatl/service/platforms/server/database/port';
@@ -63,7 +63,7 @@ export const createServiceConfig = (app: Application, sequelize: Sequelize) => {
             instance: sequelize,
             connection: { url: config.databaseUrl },
             onDatabaseConnected: async () => {
-              await sequelize.sync({ alter: true });
+              await sequelize.sync();
             },
           },
         ],

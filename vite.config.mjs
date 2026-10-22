@@ -11,21 +11,58 @@ export default defineConfig({
     extensions: ['.ts', '.tsx', '.js', '.mjs', '.json'],
     alias: [
       // Exact-match entries first (regex) — prevent subpath bleed-through
-      { find: /^@zacatl\/service$/, replacement: path.resolve(__dirname, './src/service/service.ts') },
+      {
+        find: /^@zacatl\/service$/,
+        replacement: path.resolve(__dirname, './src/service/service.ts'),
+      },
       // Specific subpath prefixes before shorter ones
-      { find: '@zacatl/third-party/databases/mongoose', replacement: path.resolve(__dirname, './src/third-party/databases/mongoose') },
-      { find: '@zacatl/third-party/databases/sequelize', replacement: path.resolve(__dirname, './src/third-party/databases/sequelize') },
-      { find: '@zacatl/optionals', replacement: path.resolve(__dirname, './src/utils/optionals.ts') },
-      { find: '@zacatl/orm', replacement: path.resolve(__dirname, './src/service/layers/infrastructure/orm') },
-      { find: '@zacatl/infrastructure', replacement: path.resolve(__dirname, './src/service/layers/infrastructure') },
-      { find: '@zacatl/domain', replacement: path.resolve(__dirname, './src/service/layers/domain') },
-      { find: '@zacatl/application', replacement: path.resolve(__dirname, './src/service/layers/application') },
+      {
+        find: '@zacatl/third-party/databases/mongoose',
+        replacement: path.resolve(__dirname, './src/third-party/databases/mongoose'),
+      },
+      {
+        find: '@zacatl/third-party/databases/sequelize',
+        replacement: path.resolve(__dirname, './src/third-party/databases/sequelize'),
+      },
+      {
+        find: /^@zacatl\/third-party\/dependency-injection$/,
+        replacement: path.resolve(__dirname, './src/third-party/dependency-injection.ts'),
+      },
+      {
+        find: /^@zacatl\/third-party\/localization$/,
+        replacement: path.resolve(__dirname, './src/third-party/localization.ts'),
+      },
+      {
+        find: /^@zacatl\/utils\/configuration$/,
+        replacement: path.resolve(__dirname, './src/utils/configuration.ts'),
+      },
+      {
+        find: /^@zacatl\/third-party$/,
+        replacement: path.resolve(__dirname, './src/third-party.ts'),
+      },
+      {
+        find: '@zacatl/optionals',
+        replacement: path.resolve(__dirname, './src/utils/optionals.ts'),
+      },
+      {
+        find: '@zacatl/orm',
+        replacement: path.resolve(__dirname, './src/service/layers/infrastructure/orm'),
+      },
+      {
+        find: '@zacatl/infrastructure',
+        replacement: path.resolve(__dirname, './src/service/layers/infrastructure'),
+      },
+      {
+        find: '@zacatl/domain',
+        replacement: path.resolve(__dirname, './src/service/layers/domain'),
+      },
+      {
+        find: '@zacatl/application',
+        replacement: path.resolve(__dirname, './src/service/layers/application'),
+      },
       { find: '@zacatl/platform', replacement: path.resolve(__dirname, './src/service/platforms') },
       // Generic prefixes after specific ones
-      { find: '@zacatl/configuration', replacement: path.resolve(__dirname, './src/configuration') },
-      { find: '@zacatl/dependency-injection', replacement: path.resolve(__dirname, './src/dependency-injection') },
       { find: '@zacatl/error', replacement: path.resolve(__dirname, './src/error') },
-      { find: '@zacatl/localization', replacement: path.resolve(__dirname, './src/localization') },
       { find: '@zacatl/logs', replacement: path.resolve(__dirname, './src/logs') },
       { find: '@zacatl/service', replacement: path.resolve(__dirname, './src/service') },
       { find: '@zacatl/utils', replacement: path.resolve(__dirname, './src/utils') },

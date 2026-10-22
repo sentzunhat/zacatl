@@ -1,8 +1,9 @@
 import type { FastifyInstance } from 'fastify';
 
-import { createChildContainer, getContainer, registerValue } from '../../../../../src/dependency-injection/container';
+import { createChildContainer, getContainer, registerValue } from '../../../../../src/third-party/dependency-injection/container';
 import { DatabaseVendor } from '../../../../../src/service/platforms/server/database/port';
 import type { DatabaseInstance } from '../../../../../src/service/platforms/server/database/port';
+import type { RouteHandler } from '../../../../../src/service/layers/application/entry-points/rest/fastify/handlers/route-handler';
 import type { ServerConfig } from '../../../../../src/service/platforms/server/server';
 import { Server } from '../../../../../src/service/platforms/server/server';
 import { ServerConfigToken } from '../../../../../src/service/platforms/server/tokens';
@@ -13,18 +14,23 @@ import {
 import { ApplicationContainerToken } from '../../../../../src/service/layers/application/tokens';
 import { ServiceContainerToken } from '../../../../../src/service/tokens/service';
 
-const createServer = (config: ServerConfig): Server => {
+const createServer = (
+  config: ServerConfig,
+  registerApplication?: (container: ReturnType<typeof createChildContainer>) => void,
+): Server => {
   const serviceContainer = createChildContainer(getContainer());
   registerValue(ServiceContainerToken, serviceContainer, serviceContainer);
   const applicationContainer = createChildContainer(serviceContainer);
   registerValue(ApplicationContainerToken, applicationContainer, applicationContainer);
+  registerApplication?.(applicationContainer);
   return new Server(config, serviceContainer, applicationContainer);
 };
 
 class FakeFastifyInstance {
   listen = vi.fn(() => Promise.resolve());
   close = vi.fn(() => Promise.resolve());
-  withTypeProvider = vi.fn(() => ({ route: vi.fn() }));
+  route = vi.fn();
+  withTypeProvider = vi.fn(() => ({ route: this.route }));
   addHook = vi.fn();
   register = vi.fn();
   setNotFoundHandler = vi.fn();
@@ -108,6 +114,33 @@ describe('Server', () => {
   });
 
   describe('start', () => {
+    it.each([
+      { configuredPrefix: undefined, expectedUrl: '/health' },
+      { configuredPrefix: '/api', expectedUrl: '/api/health' },
+    ])('registers route URL $expectedUrl when prefix is $configuredPrefix', async ({ configuredPrefix, expectedUrl }) => {
+      class HealthHandler implements RouteHandler {
+        method = 'GET' as const;
+        url = '/health';
+        schema = {};
+        execute = vi.fn();
+      }
+      config = {
+        ...config,
+        databases: [],
+        server: {
+          ...config.server,
+          ...(configuredPrefix === undefined ? {} : { prefixes: { api: configuredPrefix } }),
+        },
+      };
+      const server = createServer(config, (container) => {
+        registerValue(HealthHandler, new HealthHandler(), container);
+      });
+
+      await server.registerEntrypoints({ routes: [HealthHandler], hooks: [] });
+
+      expect(fakeFastify.route).toHaveBeenCalledWith(expect.objectContaining({ url: expectedUrl }));
+    });
+
     it('prepares databases for direct Server.start() callers', async () => {
       const onDatabaseConnected = vi.fn();
       const customRegister = vi.fn();
@@ -193,6 +226,35 @@ describe('Server', () => {
       const server = createServer(config);
       await expect(server.stop()).resolves.toBeUndefined();
     });
+
+    it('attempts database disconnect when HTTP close rejects and preserves that error', async () => {
+      const server = createServer({ ...config, databases: [] });
+      const closeError = new Error('HTTP close failed');
+      const disconnect = vi.fn().mockRejectedValue(new Error('database disconnect failed'));
+      (server as unknown as { apiServer: { close: () => Promise<void> } }).apiServer = {
+        close: vi.fn().mockRejectedValue(closeError),
+      };
+      (server as unknown as { databaseServer: { disconnect: () => Promise<void> } }).databaseServer = {
+        disconnect,
+      };
+
+      await expect(server.stop()).rejects.toBe(closeError);
+      expect(disconnect).toHaveBeenCalledOnce();
+    });
+
+    it('does not swallow an HTTP close rejection whose reason is undefined', async () => {
+      const server = createServer({ ...config, databases: [] });
+      const disconnect = vi.fn().mockResolvedValue(undefined);
+      (server as unknown as { apiServer: { close: () => Promise<void> } }).apiServer = {
+        close: vi.fn().mockRejectedValue(undefined),
+      };
+      (server as unknown as { databaseServer: { disconnect: () => Promise<void> } }).databaseServer = {
+        disconnect,
+      };
+
+      await expect(server.stop()).rejects.toBeUndefined();
+      expect(disconnect).toHaveBeenCalledOnce();
+    });
   });
 
   describe('registerEntrypoints()', () => {
@@ -226,6 +288,38 @@ describe('Server', () => {
       const server = createServer(config);
 
       await expect(server.registerEntrypoints({ routes: [] })).resolves.toBeUndefined();
+    });
+  });
+
+  describe('page registration scope', () => {
+    it('passes each Service Application container to its page registration callback', async () => {
+      const token = Symbol('page-provider');
+      const scopes = ['service-a', 'service-b'].map((value) => {
+        const serviceContainer = createChildContainer(getContainer());
+        registerValue(ServiceContainerToken, serviceContainer, serviceContainer);
+        const applicationContainer = createChildContainer(serviceContainer);
+        registerValue(ApplicationContainerToken, applicationContainer, applicationContainer);
+        registerValue(token, value, applicationContainer);
+        return { value, serviceContainer, applicationContainer, app: new FakeFastifyInstance() };
+      });
+
+      const observed = await Promise.all(scopes.map(async ({ serviceContainer, applicationContainer, app }) => {
+        let resolvedValue: unknown;
+        const server = new Server({
+          ...config,
+          databases: [],
+          server: { ...config.server, instance: app as never },
+          page: {
+            customRegister: ({ resolve }) => {
+              resolvedValue = resolve(token);
+            },
+          },
+        }, serviceContainer, applicationContainer);
+        await server.prepare();
+        return resolvedValue;
+      }));
+
+      expect(observed).toEqual(['service-a', 'service-b']);
     });
   });
 

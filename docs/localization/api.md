@@ -10,14 +10,14 @@ import {
   loadCatalog,
   mergeCatalogs,
   resolveBuiltInLocalesDir,
-} from '@sentzunhat/zacatl/localization';
+} from '@sentzunhat/zacatl/third-party/localization';
 
 import type {
   ConfigureI18nInput,
   I18nCatalogType,
   LoadCatalogInput,
   MergeCatalogsInput,
-} from '@sentzunhat/zacatl/localization';
+} from '@sentzunhat/zacatl/third-party/localization';
 
 import i18n from '@sentzunhat/zacatl/third-party/i18n';
 ```

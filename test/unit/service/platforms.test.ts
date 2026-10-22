@@ -4,7 +4,7 @@ import {
   createChildContainer,
   getContainer,
   registerValue,
-} from '../../../src/dependency-injection/container';
+} from '../../../src/third-party/dependency-injection/container';
 import type { ApplicationEntryPoints } from '../../../src/service/layers/application/types';
 import { ApplicationContainerToken } from '../../../src/service/layers/application/tokens';
 import { Platforms } from '../../../src/service/platforms/platforms';

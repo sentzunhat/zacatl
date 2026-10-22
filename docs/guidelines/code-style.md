@@ -175,7 +175,7 @@ const timeoutMs = 5000; // Avoid PascalCase for variables
 
 ```
 src/
-  dependency-injection/
+  third-party/dependency-injection/
   error-guards/
   get-route-handler.ts
   user-repository.ts
@@ -563,7 +563,7 @@ Use block comments at the top of files to describe purpose:
  * Simple JSON and YAML configuration loader with Zod schema validation
  *
  * @example
- * import { loadJSON } from '@zacatl/configuration';
+ * import { loadJSON } from '@zacatl/utils/configuration';
  * const config = loadJSON('./config.json', serverSchema);
  */
 ```
@@ -835,7 +835,7 @@ class GetUserHandler extends GetRouteHandler<User> {
 ### Loading Configuration
 
 ```typescript
-import { loadJSON, loadYAML } from '@zacatl/configuration';
+import { loadJSON, loadYAML } from '@zacatl/utils/configuration';
 import { z } from '@zacatl/third-party/zod';
 
 // Define schema

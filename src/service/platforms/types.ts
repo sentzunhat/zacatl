@@ -1,8 +1,9 @@
 // @barrel-generated
+import type { Optional } from '@zacatl/utils/optionals';
+
 import type { CliConfig } from './cli/types';
 import type { DesktopConfig } from './desktop/types';
 import type { ServerConfig } from './server/server';
-import type { Optional } from '../../utils/optionals';
 
 export interface PlatformsConfig {
   /** Server configuration (required for SERVER type) */
