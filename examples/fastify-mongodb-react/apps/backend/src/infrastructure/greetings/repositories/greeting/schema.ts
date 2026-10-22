@@ -1,4 +1,4 @@
-import { Schema } from 'mongoose';
+import { Schema } from '@sentzunhat/zacatl/third-party/databases/mongoose';
 
 import type { Greeting } from '../../../../domain/entities/greeting';
 

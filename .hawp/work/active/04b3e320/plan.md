@@ -277,3 +277,27 @@ dry-run was skipped by workflow policy. Unit/type/lint/build/packed-consumer
 checks are not represented by that run, although the local suite and build
 passed against the same source before the documentation-only commit. Treat
 this as a CI evidence limitation, not a confirmed implementation bug.
+
+
+### Search index and doc alignment refresh — 2026-10-22
+
+Updated `.hawp/config/search.json` to retain `.hawp/kit` and `.hawp/work`, add
+project `docs/`, `README.md`, selected source README files under `src/`, and the
+Docs Alignment agent, prompt, and instruction files. Rebuilt the index with the
+HAWP librarian CLI: 350 ingested documents and 2,813 chunks (SQLite reports 351
+document rows including index metadata). A representative search for
+`website API prefix` returned the existing Service composition and consumer
+follow-up records. The current indexer ingests Markdown only, so adding `src/`
+indexes its eight README files; it does not index TypeScript implementation
+files. Source-code indexing would require a separate indexer/chunker change,
+which is outside this docs audit. No vector table was present; retrieval is
+lexical.
+
+Reconciled two Sequelize setup examples in
+`docs/service/service-adapter-pattern.md` and
+`docs/third-party/orm/multi-orm-setup.md` to use plain `sync()` and explain
+that production schema changes should use versioned migrations. The local
+Markdown link checker passed across 214 files, and `git diff --check` passed.
+This verifies the edited docs and index setup, not the entirety of every
+architecture/API claim in the wider docs inventory; broader review remains
+active.

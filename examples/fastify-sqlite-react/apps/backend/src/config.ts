@@ -86,7 +86,7 @@ export const createServiceConfig = (fastify: FastifyInstance, sequelize: Sequeli
             connection: { url: config.databaseUrl },
             onDatabaseConnected: async (db: unknown) => {
               const sequelizeDb = db as Sequelize;
-              await sequelizeDb.sync({ alter: true });
+              await sequelizeDb.sync();
             },
           },
         ],

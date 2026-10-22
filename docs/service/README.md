@@ -68,7 +68,9 @@ even when HTTP close fails; when both fail, the HTTP close error is preserved
 as the primary error. A failed adapter disconnect remains tracked so a later
 `stop()` can retry it. Duplicate connections with the same vendor and
 connection name are rejected before they can replace an adapter already owned
-by the Service; names may be reused with different vendors.
+by the Service; names may be reused with different vendors. If shutdown is
+requested while database setup is still connecting, cleanup waits for that
+setup to settle before disconnecting and releasing adapter ownership.
 
 Calling `start()` again after `stop()` is not a documented restart contract.
 Do not rely on restarting the same Service instance; create a new instance or

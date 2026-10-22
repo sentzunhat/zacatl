@@ -354,3 +354,27 @@ migration or its runtime behavior has been verified.
 The same sync corrected the `0.0.65` changelog heading to 2026-10-20 after
 checking the GitHub release publication timestamp (2026-10-20T18:20:54Z); the
 prior heading date of 2026-10-17 did not match the release publication date.
+
+
+### Website integration verification — 2026-10-22
+
+Updated the website's Zacatl and ESLint imports to the canonical 0.0.66 public
+paths (`/third-party/dependency-injection` and `/third-party/eslint`). The
+website's ignored `node_modules/@sentzunhat/zacatl` now symlinks to this
+checkout's prepared `publish/` package (0.0.66); its previous installed 0.0.65
+package is preserved at `node_modules/@sentzunhat/zacatl-0.0.65-local-backup`.
+A local `node_modules/.bin/zacatl-fix-esm` symlink points to the prepared CLI.
+
+With Node 26.10.0, `npm run dev` started both Vite and the backend. HTTP checks
+returned frontend 200, `/api/health` 200 JSON, `/api/projects` 200 JSON, an
+unknown `/api/*` route 404 JSON, and an unknown page 404 HTML. This confirms the
+reported export error was caused by the installed 0.0.65 package being used
+with 0.0.66 imports. The website manifest still declares `^0.0.65` and its
+lockfile resolves 0.0.65; because 0.x caret ranges do not include 0.0.66, this
+local symlink is a development bridge only. Update the website dependency and
+lockfile after 0.0.66 is published; do not infer publication or deployment
+from this local run.
+
+The website working tree had pre-existing unrelated local edits, which remain
+untouched. This item stays active for the release-dependent dependency/lock
+update and remaining consumer acceptance review.

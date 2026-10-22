@@ -129,29 +129,29 @@ docker build \
 
 ```bash
 # Express SQLite (8181)
-curl http://localhost:8181/greetings
+curl http://localhost:8181/api/greetings
 
 # Fastify SQLite (8081)
-curl http://localhost:8081/greetings
+curl http://localhost:8081/api/greetings
 ```
 
 > **Note**: Svelte examples use the same ports as React examples (Express: 8181, Fastify: 8081)
 
 # Express MongoDB (8182)
 
-curl http://localhost:8182/greetings
+curl http://localhost:8182/api/greetings
 
 # Fastify MongoDB (8082)
 
-curl http://localhost:8082/greetings
+curl http://localhost:8082/api/greetings
 
 # Express PostgreSQL (8183)
 
-curl http://localhost:8183/greetings
+curl http://localhost:8183/api/greetings
 
 # Fastify PostgreSQL (8083)
 
-curl http://localhost:8083/greetings
+curl http://localhost:8083/api/greetings
 
 ````
 

@@ -33,11 +33,11 @@ npm run dev
 
 ## API Endpoints
 
-- `GET /greetings` - List all greetings (optional `?language=` filter)
-- `GET /greetings/:id` - Get greeting by ID
-- `POST /greetings` - Create greeting
-- `DELETE /greetings/:id` - Delete greeting
-- `GET /greetings/random/:language` - Get random greeting
+- `GET /api/greetings` - List all greetings (optional `?language=` filter)
+- `GET /api/greetings/:id` - Get greeting by ID
+- `POST /api/greetings` - Create greeting
+- `DELETE /api/greetings/:id` - Delete greeting
+- `GET /api/greetings/random/:language` - Get random greeting
 
 ## Frontend Features
 

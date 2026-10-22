@@ -42,7 +42,7 @@ export function createServiceConfig(fastify: FastifyInstance, sequelize: Sequeli
     logger,
     platforms: {
       server: {
-        name: 'fastify-sqlite',
+        name: 'fastify-postgres',
         port: config.port,
         server: {
           type: ServerType.SERVER,
@@ -62,7 +62,7 @@ export function createServiceConfig(fastify: FastifyInstance, sequelize: Sequeli
             connection: { url: config.databaseUrl },
             onDatabaseConnected: async (db: unknown) => {
               const sequelizeDb = db as Sequelize;
-              await sequelizeDb.sync({ alter: true });
+              await sequelizeDb.sync();
             },
           },
         ],

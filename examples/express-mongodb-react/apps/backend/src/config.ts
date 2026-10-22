@@ -4,7 +4,7 @@
  */
 
 import type { Application } from '@sentzunhat/zacatl/third-party/express';
-import type { Mongoose } from 'mongoose';
+import type { Mongoose } from '@sentzunhat/zacatl/third-party/databases/mongoose';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import { ServiceType } from '@sentzunhat/zacatl/service/service';

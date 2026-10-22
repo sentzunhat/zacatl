@@ -16,7 +16,7 @@ import {
 } from '@sentzunhat/zacatl/service/platforms/server/types/server-config';
 import type { FastifyInstance } from '@sentzunhat/zacatl/third-party/fastify';
 import type { Logger } from '@sentzunhat/zacatl/logs';
-import type { Mongoose } from 'mongoose';
+import type { Mongoose } from '@sentzunhat/zacatl/third-party/databases/mongoose';
 import { repositories } from './infrastructure/greetings/repositories/repositories';
 import { GreetingServiceAdapter } from './domain/greetings/service/adapter';
 import { hookHandlers } from './application/hook-handlers/hooks';

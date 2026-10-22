@@ -232,3 +232,27 @@ no product-code change.
 
 **Remaining:** Verify the integrated PR head and required CI. Website runtime
 and all-provider restart behavior remain unverified.
+
+
+### Copilot pending-connection shutdown race — 2026-10-22
+
+**Finding confirmed:** `DatabaseServer.configure()` records an adapter before
+awaiting `connect()`. A concurrent `disconnect()` could call an adapter while
+its connect operation was pending. Sequelize/Mongoose may not yet have assigned
+the connected instance that `disconnect()` needs; the server could then remove
+the adapter from ownership after a no-op close and leave the eventual live
+connection untracked.
+
+**Implemented:** serialize concurrent `configure()` calls around the active
+configuration promise. `disconnect()` waits for that operation to settle before
+tearing down owned adapters. Setup-failure cleanup uses the internal teardown
+path directly, avoiding self-wait, and adapter teardown is shared across
+concurrent disconnect callers. Added a deferred-connect regression proving
+shutdown does not call adapter disconnect or remove ownership before setup
+completes, then disconnects and removes the adapter once setup settles.
+Updated `docs/service/README.md` to state this shutdown behavior.
+
+**Verification:** targeted `database-server.test.ts` passed 15 tests on Node
+26.3.0. Full type, lint, build, release-dry-run, and PR CI results are pending.
+Restart semantics remain a separate open question; this fix coordinates shutdown
+with active connection setup and does not add restart support.

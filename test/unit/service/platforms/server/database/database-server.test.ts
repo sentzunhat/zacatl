@@ -262,6 +262,34 @@ describe('DatabaseServer', () => {
       expect(mockDisconnect).toHaveBeenCalledTimes(2);
     });
 
+    it('waits for pending connection setup before disconnecting the adapter', async () => {
+      let finishConnect: (() => void) | undefined;
+      const adapter = {
+        connect: vi.fn(() => new Promise<void>((resolve) => {
+          finishConnect = resolve;
+        })),
+        disconnect: vi.fn().mockResolvedValue(undefined),
+      };
+      vi.mocked(createDatabaseAdapter).mockReturnValueOnce(adapter);
+      const server = new DatabaseServer('svc', [
+        { vendor: DatabaseVendor.SEQUELIZE, connection: { url: 'postgres://localhost/db' } },
+      ]);
+
+      const configuring = server.configure();
+      const disconnecting = server.disconnect();
+
+      await Promise.resolve();
+      expect(adapter.connect).toHaveBeenCalledOnce();
+      expect(adapter.disconnect).not.toHaveBeenCalled();
+      expect(server.getAdapters().size).toBe(1);
+
+      finishConnect?.();
+      await Promise.all([configuring, disconnecting]);
+
+      expect(adapter.disconnect).toHaveBeenCalledOnce();
+      expect(server.getAdapters().size).toBe(0);
+    });
+
     it('retains adapters whose disconnect fails so a later call can retry', async () => {
       const disconnect = vi.fn()
         .mockRejectedValueOnce(new Error('temporary disconnect failure'))

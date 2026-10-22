@@ -25,7 +25,7 @@ npm run dev
 
 ## Database Setup
 
-- **Connection**: `mongodb://localhost:27017/greetings-db`
+- **Connection**: `mongodb://localhost:27017/api/greetings-db`
 - **Connection file**: `backend/src/infrastructure/database/connection.ts`
 - **Local run**: `docker run -d -p 27017:27017 --name mongo mongo:latest`
 
@@ -51,20 +51,20 @@ frontend/             # React + Vite
 
 ## API Endpoints
 
-- `GET /greetings` - All greetings (optional `?language=en`)
-- `GET /greetings/:id` - Single greeting
-- `GET /greetings/random/:language` - Random greeting
-- `POST /greetings` - Create: `{"message": "...", "language": "..."}`
-- `DELETE /greetings/:id` - Delete greeting
+- `GET /api/greetings` - All greetings (optional `?language=en`)
+- `GET /api/greetings/:id` - Single greeting
+- `GET /api/greetings/random/:language` - Random greeting
+- `POST /api/greetings` - Create: `{"message": "...", "language": "..."}`
+- `DELETE /api/greetings/:id` - Delete greeting
 
 ## Test It
 
 ```bash
-curl -X POST http://localhost:8182/greetings \
+curl -X POST http://localhost:8182/api/greetings \
   -H "Content-Type: application/json" \
   -d '{"message": "Hello World", "language": "en"}'
 
-curl http://localhost:8182/greetings
+curl http://localhost:8182/api/greetings
 ```
 
 ## 🐳 Docker Deployment
@@ -85,13 +85,13 @@ docker compose up -d
 
 ### Access
 
-- **Backend API**: http://localhost:8182/greetings
+- **Backend API**: http://localhost:8182/api/greetings
 - **Frontend**: Served by backend (static files)
 
 ### Notes
 
 - MongoDB runs in a separate container via docker-compose
-- Backend connects to `mongodb://mongo:27017/greetings-db`
+- Backend connects to `mongodb://mongo:27017/api/greetings-db`
 - See [docker.md](../docker.md) for multi-example setup
 
 ## Documentation
