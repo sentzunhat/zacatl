@@ -1,15 +1,15 @@
 import { InternalServerError } from '@zacatl/error';
 import { getContainer, registerValue } from '@zacatl/third-party/dependency-injection';
 import {
+  createChildContainer,
+  ensureRegisteredSingleton,
+} from '@zacatl/third-party/dependency-injection/container';
+import {
   inject,
   injectable,
   type DependencyContainer,
 } from '@zacatl/third-party/dependency-injection/tsyringe';
 
-import {
-  createChildContainer,
-  ensureRegisteredSingleton,
-} from '../../third-party/dependency-injection/container';
 import { ApplicationContainerToken } from '../layers/application/tokens';
 import { ServiceContainerToken } from '../tokens/service';
 import type { ServiceStartOptions } from '../types';

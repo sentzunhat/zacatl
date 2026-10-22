@@ -4,6 +4,7 @@ import type { FastifyInstance } from 'fastify';
 import { CustomError, InternalServerError } from '@zacatl/error';
 import { logger as defaultLogger, LoggerToken, type Logger } from '@zacatl/logs';
 import { getContainer, registerValue } from '@zacatl/third-party/dependency-injection';
+import { createChildContainer } from '@zacatl/third-party/dependency-injection/container';
 import {
   inject,
   injectable,
@@ -34,7 +35,6 @@ import {
   ServerConfigToken,
 } from './tokens';
 import { ServerVendor, type HttpServerConfig, type PageServerConfig } from './types/server-config';
-import { createChildContainer } from '../../../third-party/dependency-injection/container';
 import { ApplicationContainerToken } from '../../layers/application/tokens';
 import type { RestApplicationEntryPoints } from '../../layers/application/types';
 import { InfrastructureContainerToken } from '../../layers/infrastructure/tokens';

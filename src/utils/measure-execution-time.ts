@@ -1,6 +1,6 @@
 import { performance } from 'perf_hooks';
 
-import { logger } from '../logs';
+import { logger } from '@zacatl/logs';
 
 export interface MeasureExecutionTimeOptions {
   name: string;

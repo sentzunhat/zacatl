@@ -1,9 +1,9 @@
 import type { StatementSync } from 'node:sqlite';
 
+import { InternalServerError } from '@zacatl/error';
 import type { DependencyContainer } from '@zacatl/third-party/dependency-injection/tsyringe';
+import { uuidv4 } from '@zacatl/third-party/uuid';
 
-import { InternalServerError } from '../../../../../error';
-import { uuidv4 } from '../../../../../third-party/uuid';
 import type {
   NodeSqliteRepositoryConfig,
   NodeSqliteRepositoryModel,

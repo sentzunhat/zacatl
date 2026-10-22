@@ -1,3 +1,4 @@
+import { InternalServerError, ValidationError } from '@zacatl/error';
 import { type QueryFilter, type Mongoose } from '@zacatl/third-party/databases/mongoose';
 import type { DependencyContainer } from '@zacatl/third-party/dependency-injection/tsyringe';
 
@@ -6,7 +7,6 @@ import {
   MongooseIndexRegistryToken,
   type MongooseIndexRegistry,
 } from './index-policy';
-import { InternalServerError, ValidationError } from '../../../../../error';
 import type {
   MongooseRepositoryConfig,
   MongooseRepositoryModel,

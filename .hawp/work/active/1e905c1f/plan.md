@@ -330,3 +330,15 @@ wildcard. Existing exact aliases and the seven internal `@zacatl/*` wildcards
 remain intact. All eight example `tsconfig.dev.json` projects passed
 `npx tsc --noEmit -p`; TypeScript API checks confirmed a deep Service import
 resolves to `src/service/...` in each of the seven local path maps.
+
+### Canonical import boundary clarification — 2026-10-22
+
+Clarified and applied the import convention in `docs/utils/path-aliases.md`:
+Zacatl runtime cross-module imports use internal `@zacatl/*` aliases, while
+consumer applications use public `@sentzunhat/zacatl/*` package paths for
+Zacatl and relative paths for their own local modules. Replaced deep relative
+cross-module imports in runtime source with the generated internal aliases;
+kept local barrel re-exports and nearby module imports relative. A source audit
+of example TypeScript/JavaScript imports found no relative import resolving
+into the repository-level `src/`. Do not rewrite valid application-local
+relative imports as package imports.

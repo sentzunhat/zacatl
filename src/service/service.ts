@@ -1,24 +1,24 @@
 import { InternalServerError } from '@zacatl/error';
 import { logger as defaultLogger, LoggerToken } from '@zacatl/logs';
 import { getContainer, registerValue } from '@zacatl/third-party/dependency-injection';
+import { createChildContainer } from '@zacatl/third-party/dependency-injection/container';
+import type { DependencyContainer } from '@zacatl/third-party/dependency-injection/tsyringe';
 import { configureI18nNode } from '@zacatl/third-party/localization';
 
 import { ApplicationContainerToken } from './layers/application/tokens';
 import { DomainContainerToken } from './layers/domain/tokens';
 import { MongooseIndexManager } from './layers/infrastructure/orm/mongoose/index-manager';
-import { InfrastructureContainerToken } from './layers/infrastructure/tokens';
-import { PlatformsConfigToken } from './platforms/tokens';
-import { createChildContainer } from '../third-party/dependency-injection/container';
-import type { DependencyContainer } from '../third-party/dependency-injection/tsyringe';
 import {
   MongooseIndexRegistry,
   MongooseIndexRegistryToken,
 } from './layers/infrastructure/orm/mongoose/index-policy';
+import { InfrastructureContainerToken } from './layers/infrastructure/tokens';
 import { Layers } from './layers/layers';
 import { LayerContainerScopesToken, LayersConfigToken } from './layers/tokens';
 import { Platforms } from './platforms/platforms';
 import { registerOrmInstance } from './platforms/server/database/orm-instance';
 import { DatabaseVendor } from './platforms/server/database/port';
+import { PlatformsConfigToken } from './platforms/tokens';
 import { ServiceContainerToken } from './tokens/service';
 import { ServiceType } from './types';
 import type { ServiceConfig, ServiceStartOptions } from './types';

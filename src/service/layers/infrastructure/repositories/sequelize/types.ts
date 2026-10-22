@@ -1,7 +1,8 @@
 import type {
   ModelStatic,
   SequelizeModel as Model,
-} from '../../../../../third-party/databases/sequelize';
+} from '@zacatl/third-party/databases/sequelize';
+
 import type { ConnectionRef } from '../../../../platforms/server/database/port';
 import type { ORMType } from '../../orm/types';
 export type { LeanDocument } from '../../orm/sequelize/types';

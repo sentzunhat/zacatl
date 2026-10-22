@@ -5,7 +5,7 @@
 
 import fs from 'fs';
 
-import { BadRequestError } from '../../../error';
+import { BadRequestError } from '@zacatl/error';
 
 /**
  * Type guard: check if value is a plain object.

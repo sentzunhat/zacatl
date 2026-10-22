@@ -1,9 +1,10 @@
 // @barrel-generated
+import type { Optional } from '@zacatl/utils/optionals';
+
 import type { ApplicationConfig } from './application/types';
 import type { ProviderPort } from './domain/ports/provider';
 import type { DomainConfig } from './domain/types';
 import type { InfrastructureConfig } from './infrastructure/types';
-import type { Optional } from '../../utils/optionals';
 
 export interface LayersConfig {
   /** Application layer: Entry points for different contexts */

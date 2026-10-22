@@ -1,4 +1,5 @@
-import type { MongooseModel, Schema } from '../../../../../third-party/databases/mongoose';
+import type { MongooseModel, Schema } from '@zacatl/third-party/databases/mongoose';
+
 import type { ConnectionRef } from '../../../../platforms/server/database/port';
 import type { MongooseRepositoryIndexOptions } from '../../orm/mongoose/index-policy';
 import type { ORMType } from '../../orm/types';

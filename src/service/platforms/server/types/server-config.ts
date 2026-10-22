@@ -1,4 +1,5 @@
-import type { InjectionToken } from '../../../../third-party/dependency-injection/tsyringe';
+import type { InjectionToken } from '@zacatl/third-party/dependency-injection/tsyringe';
+
 import type { PageServerPort } from '../page/port';
 
 export enum ServerVendor {

@@ -1,5 +1,6 @@
+import { InternalServerError } from '@zacatl/error';
+
 import { globalMongooseIndexRegistry, type MongooseIndexRegistry } from './index-policy';
-import { InternalServerError } from '../../../../../error';
 import type { MongooseRepositoryModel } from '../../repositories/mongoose/types';
 
 export interface MongooseIndexModelSelector {

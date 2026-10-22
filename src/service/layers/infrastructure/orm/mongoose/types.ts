@@ -4,7 +4,8 @@ import type {
   IfAny,
   ObjectId,
   Require_id,
-} from '../../../../../third-party/databases/mongoose';
+} from '@zacatl/third-party/databases/mongoose';
+
 import type { LeanDocument } from '../types';
 
 export { ORMType } from '../types';

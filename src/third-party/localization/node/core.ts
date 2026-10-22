@@ -6,13 +6,14 @@
 import fs from 'fs';
 import path from 'path';
 
+import { NotFoundError } from '@zacatl/error';
+
 import { readJsonFile, deepMerge, findExistingDir } from './helpers';
 import type {
   I18nStaticCatalogType,
   LoadStaticCatalogInput,
   MergeStaticCatalogsInput,
 } from './types';
-import { NotFoundError } from '../../../error';
 
 /**
  * Load a static catalog from JSON files in a locales directory.

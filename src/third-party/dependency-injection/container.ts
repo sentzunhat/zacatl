@@ -1,9 +1,9 @@
 import '@zacatl/third-party/dependency-injection/reflect-metadata';
 import { InternalServerError } from '@zacatl/error';
+import type { Constructor } from '@zacatl/service/layers/types';
 import { container as tsyringeContainer } from '@zacatl/third-party/dependency-injection/tsyringe';
 import type { DependencyContainer, InjectionToken } from '@zacatl/third-party/dependency-injection/tsyringe';
 
-import type { Constructor } from '../../service/layers/types';
 
 export const getContainer = (): typeof tsyringeContainer => {
   return tsyringeContainer;

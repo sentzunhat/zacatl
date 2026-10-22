@@ -5,8 +5,7 @@
  * helper constructors used by higher-level error wrappers.
  */
 import { uuidv4 } from '@zacatl/third-party/uuid';
-
-import type { Optional } from '../utils/optionals';
+import type { Optional } from '@zacatl/utils/optionals';
 
 export type HttpStatusCode =
   | 200 // OK

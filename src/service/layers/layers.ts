@@ -1,5 +1,6 @@
 import { InternalServerError } from '@zacatl/error';
 import { getContainer, registerValue } from '@zacatl/third-party/dependency-injection';
+import { createChildContainer } from '@zacatl/third-party/dependency-injection/container';
 import {
   inject,
   injectable,
@@ -16,7 +17,6 @@ import { Domain } from './domain/domain';
 import { Infrastructure } from './infrastructure/infrastructure';
 import { InfrastructureConfigToken, InfrastructureContainerToken } from './infrastructure/tokens';
 import type { LayersConfig } from './types';
-import { createChildContainer } from '../../third-party/dependency-injection/container';
 
 @injectable()
 export class Layers {
