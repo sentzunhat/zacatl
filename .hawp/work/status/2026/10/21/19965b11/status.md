@@ -374,3 +374,64 @@ changes remain untouched.
 Commit and push only the five finding-related code/documentation changes and
 this HAWP record. Then verify PR #180 head, CI, and review-thread resolution.
 Keep the PR draft; do not merge, publish, or deploy.
+
+#### Archival continuation: clean Copilot review and consumer runtime — 2026-10-22
+
+Conversation/event date and checkpoint update date: 2026-10-22. This extends
+the existing HAWP timeline for work item `19965b11`; it does not create a
+parallel `docs/checkpoints/` artifact. The public Zacatl record omits personal
+identifiers, machine-local paths, and the identity of a private downstream
+consumer.
+
+**Before:** The prior section records the five findings fixed and pushed, with
+review and CI readback pending. The latest code commit before this continuation
+was `bb357f6f53da088bcedd968b94bb1bca9bb53bfa` on `release-0.0.66`.
+
+**During:** The final Copilot Balanced review reported no open issues; the
+MongoDB URI comment is resolved, and nine example lockfiles were listed as
+generated files not reviewed. All 12 CI checks passed, including the publish
+dry-run, peer install, CVE scan, and eight Docker smoke jobs. A final source
+review checked database shutdown coordination, scoped page resolution, API
+prefix behavior, and the intentional public-export migration. The review
+identified no additional code blocker. Approval still requires a maintainer
+with write access and acceptance of the documented breaking removal of old
+package subpaths.
+
+A local downstream consumer integration was verified against a symlink to
+Zacatl 0.0.66. On Node 26.10.0, backend type checking and the full frontend and
+backend build passed. The full development setup started successfully;
+health and project API requests returned 200, unknown `/api` requests returned
+JSON 404, and page routes rendered HTML with the expected HTML page-not-found
+response. The consumer manifest still specifies `^0.0.65`, which excludes
+`0.0.66`; `npm ls` reports the symlinked package as invalid for that range.
+Thus runtime compatibility through the local link is verified, while a
+reproducible clean install is not. The consumer dependency range and lockfile
+remain downstream follow-up. The build also emitted existing bundle-size and
+ineffective-dynamic-import warnings without failing.
+
+**After:** Zacatl PR #180 is open, marked ready for review, mergeable, and
+awaiting a required human approval. At the pre-archive readback its head was
+`bb357f6f`; all 23 review threads were resolved and all 12 checks passed. No
+merge, npm publication, or deployment occurred. The downstream runtime check
+confirmed compatibility through the local 0.0.66 link but did not establish
+clean-install reproducibility or deployment behavior.
+
+#### Continuation state
+
+The next Zacatl gate is maintainer approval of PR #180 after accepting its
+documented pre-1.0 breaking package-subpath migration. The HAWP archival push
+will add a documentation-only commit to `release-0.0.66`, so the PR head will
+advance beyond the head covered by the clean Copilot review; request or inspect
+a review of that new head before treating the review as current. Do not merge,
+publish, or deploy without the owner's explicit decision.
+
+For the downstream consumer, resume by aligning its Zacatl dependency range
+and lockfile with 0.0.66, then verify a clean install and repeat the focused
+runtime/build checks. Keep that private consumer's identity and local paths
+out of this public repository record. The broader reusable `ServiceConfig`
+composition work remains active and is not closed by this integration check.
+
+Memory delta: a compact private memory note points to this canonical HAWP
+continuation and records the final Copilot/CI state plus the downstream
+version-range caveat. Earlier lifecycle and DI notes remain historical; this
+section does not duplicate their implementation detail.

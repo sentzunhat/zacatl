@@ -1385,3 +1385,25 @@ compatibility facades. The implementation and changelog are consistent with
 that decision. The PR description was updated to disclose the breaking removal
 before requesting the next review. Do not add a compatibility facade unless
 the owner changes the approved API decision.
+
+### Downstream composition verification — 2026-10-22
+
+A downstream consumer was run against a local symlink to the Zacatl 0.0.66
+package. Under Node 26.10.0, backend type checking and the full consumer build
+passed. Runtime checks confirmed the application health route and project API,
+JSON 404 behavior under `/api`, and HTML responses for page routes and page
+404s. This is direct evidence that the consumer can use the new Service
+composition and routing behavior through the symlink; it does not establish a
+clean install or public deployment.
+
+The consumer package manifest still declares `@sentzunhat/zacatl` as
+`^0.0.65`, which excludes `0.0.66`; `npm ls` reports the linked package as
+invalid for that range. Aligning the consumer's version range and lockfile,
+then verifying a clean install, remains downstream work. Identifying details
+of that private consumer are intentionally omitted from this public plan.
+
+The wider reusable `ServiceConfig` composition work remains in progress. This
+consumer exercise validates the current `Service` lifecycle/config path but
+does not add or prove a general-purpose module-composition API. See the
+[2026-10-21 PR #180 checkpoint](../../status/2026/10/21/19965b11/status.md)
+for the final review and CI readback.
