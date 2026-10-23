@@ -45,7 +45,7 @@ The owner approved public README and LinkedIn profile use on 2026-10-23. The car
 - [x] The generator, SVG, and PNG stay in `scripts/graphics/` and `docs/assets/`; package metadata, exports, and release behavior do not change.
 - [x] Owner approved the concept for public README and LinkedIn profile use on 2026-10-23.
 - [x] LinkedIn link-preview dimensions and profile media formats checked against current LinkedIn Help.
-- [ ] LinkedIn Featured profile item visibly displays the uploaded banner.
+- [x] LinkedIn Featured profile item visibly displays the uploaded banner and saved description; verified in the signed-in profile UI on 2026-10-23.
 - [x] No package version, dependency, package export, or release asset changes.
 
 ## Verification
@@ -60,4 +60,4 @@ The owner approved public README and LinkedIn profile use on 2026-10-23. The car
 
 ## Outcome
 
-In progress: the owner approved public use. The README and public SVG/PNG assets are on the scoped branch. LinkedIn Featured upload remains to be completed and verified.
+In progress pending review and merge: the README and public SVG/PNG assets are on the scoped branch, and the LinkedIn Featured Zacatl item visibly displays the uploaded banner with its description. PR #183 is open from `zacatl-social-card-verification`; the README banner will appear on the repository's main branch after merge.

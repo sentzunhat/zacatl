@@ -35,7 +35,7 @@ Small, reviewable addition: a no-dependency Node script emits a hand-drawn-style
 - [x] Content reflects only verified Zacatl architecture concepts and does not imply hosted-service or performance guarantees.
 - [x] Work is isolated from existing path/export and source-layout changes.
 - [x] Owner approved public README and LinkedIn profile Featured use on 2026-10-23.
-- [ ] LinkedIn Featured item visibly displays the uploaded card.
+- [x] LinkedIn Featured item visibly displays the uploaded card and saved description; verified in the signed-in profile UI on 2026-10-23.
 - [x] No package version, dependency, or package behavior change occurs.
 
 ## Owner approval requirements
