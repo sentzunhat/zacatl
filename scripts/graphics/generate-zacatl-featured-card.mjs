@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url'
 const scriptDirectory = dirname(fileURLToPath(import.meta.url))
 const outputPath = resolve(
   scriptDirectory,
-  '../../.hawp/work/active/a7728e13-5fd4-42bb-ab62-28693f428172/zacatl-featured-card.svg',
+  '../../docs/assets/zacatl-social-card.svg',
 )
 
 // Based on the "Code" handcraft from https://handcrafts.undraw.co/app
@@ -17,10 +17,10 @@ const codeDoodle = `
   </g>`
 
 const svg = `<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" role="img" aria-labelledby="title description">
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="627" viewBox="0 0 1200 627" role="img" aria-labelledby="title description">
   <title id="title">Zacatl: compose services with clear boundaries</title>
   <desc id="description">A minimal editorial card showing a hand-drawn code mark inside a terminal window, with taller grass growing from a shallow, green-edged soil layer beneath it and labels for Zacatl's Application, Domain, and Infrastructure layers.</desc>
-  <rect width="1200" height="630" rx="30" fill="#f7f2e9"/>
+  <rect width="1200" height="627" rx="30" fill="#f7f2e9"/>
   <path d="M72 72c118-13 235-9 347 1m-344 18c77-7 151-4 217 2" fill="none" stroke="#ddcbb6" stroke-width="3" stroke-linecap="round"/>
   <text x="82" y="223" fill="#17324d" font-family="Georgia,serif" font-size="100" font-weight="700" letter-spacing="-3">Zacatl</text>
   <path d="M84 245c155 8 296-5 450 0" fill="none" stroke="#b75d4a" stroke-width="5" stroke-linecap="round"/>
@@ -65,7 +65,6 @@ const svg = `<?xml version="1.0" encoding="UTF-8"?>
 
   <path d="M746 526c103 9 195 7 302-3" fill="none" stroke="#ddcbb6" stroke-width="3" stroke-linecap="round"/>
   <text x="746" y="566" fill="#586c7d" font-family="Arial,sans-serif" font-size="17">A framework for modular services</text>
-  <text x="84" y="594" fill="#586c7d" font-family="Arial,sans-serif" font-size="15">Private concept draft · not a release asset</text>
 </svg>
 `
 

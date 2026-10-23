@@ -2,6 +2,8 @@
 
 <div align="center">
 
+<img src="./docs/assets/zacatl-social-card.png" alt="Zacatl composes modular services with clear Application, Domain, and Infrastructure boundaries." width="100%" />
+
 **Package**
 
 [![npm version](https://img.shields.io/npm/v/@sentzunhat/zacatl.svg?style=flat-square)](https://www.npmjs.com/package/@sentzunhat/zacatl)
